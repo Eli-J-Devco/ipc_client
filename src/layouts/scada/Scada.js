@@ -1,18 +1,18 @@
 import React from "react";
 import { Outlet } from 'react-router-dom';
 import Header from "./header/Header";
-import Footer from "./footer/Footer";
-import LeftMenu from "./leftMenu/LeftMenu";
+import Footer from './footer/Footer';
+import TopMenu from './topMenu/TopMenu';
 
-function Datalogger(props){
+function Scada(props) {
     return (
-        <div className="datalogger">
+        <div className="scada">
             <Header />
-            <LeftMenu />
+            <TopMenu />
             <Outlet />
             <Footer />
         </div>
     );
 }
 
-export default Datalogger;
+export default Scada;
