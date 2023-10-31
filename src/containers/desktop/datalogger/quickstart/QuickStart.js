@@ -1,8 +1,10 @@
 import React from "react";
-function QuickStart (props){
+function QuickStart(props) {
     return (
-        <div className="quick-start">
-            Quick Start
+        <div className="main">
+            <div className="quick-start">
+                Quick Start
+            </div>
         </div>
     );
 }

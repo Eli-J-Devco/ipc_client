@@ -1,11 +1,22 @@
+import { Component } from 'react';
+import { withTranslation } from 'react-i18next';
+import LeftMenuJsx from './LeftMenu.jsx';
 
-import React from "react";
-function LeftMenu (props){
-    return (
-        <div className="left-menu">
-            Left Menu Datalogger
-        </div>
-    );
+class LeftMenu extends Component {
+
+    constructor(props, context) {
+        super(props, context);
+        this.jsxTemplate = LeftMenuJsx;
+        this.state = {
+            permissions: []
+        };
+    }
+    
+    render() {
+        return this.jsxTemplate.call(this)
+    }
 }
 
-export default LeftMenu;
+
+const HighOrderComponentTranslated = withTranslation('common')(LeftMenu)
+export default HighOrderComponentTranslated;
