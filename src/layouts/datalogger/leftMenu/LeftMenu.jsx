@@ -53,7 +53,7 @@ export default function LeftMenu() {
                 </li>
                 <li>
                     <NavLink to="/rs485" className={(navData) => navData.isActive ? styles.active : ""}>
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsHlink="http://www.w3.org/1999/xlink">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
                             <rect width="18" height="18" fill="url(#device)" />
                             <defs>
                                 <pattern id="device" patternContentUnits="objectBoundingBox" width="1" height="1">
