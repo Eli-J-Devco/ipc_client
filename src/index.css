@@ -20,8 +20,10 @@ a{
   height: calc(100% - 60px);
   right: 0;
   overflow-x: auto;
+  padding: 10px;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+

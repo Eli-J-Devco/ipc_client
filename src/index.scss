@@ -1,0 +1,18 @@
+.crumb {
+    background-color: #f2f2f2;
+    padding: 7px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+
+    .breadcrumb {
+        margin: 0;
+
+        li {
+            &:last-child {
+                &::before {
+                    content: ">";
+                }
+            }
+        }
+    }
+}
