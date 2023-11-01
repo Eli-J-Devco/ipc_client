@@ -1,12 +1,12 @@
 import { Component } from 'react';
 import { withTranslation } from 'react-i18next';
-import QuickStartJsx from './QuickStart.jsx';
+import Rs485OneJsx from './Rs485One.jsx';
 
-class QuickStart extends Component {
+class Rs485One extends Component {
 
     constructor(props, context) {
         super(props, context);
-        this.jsxTemplate = QuickStartJsx;
+        this.jsxTemplate = Rs485OneJsx;
         this.state = {
             tab: 1
         };
@@ -25,5 +25,5 @@ class QuickStart extends Component {
 }
 
 
-const HighOrderComponentTranslated = withTranslation('common')(QuickStart)
+const HighOrderComponentTranslated = withTranslation('common')(Rs485One)
 export default HighOrderComponentTranslated;

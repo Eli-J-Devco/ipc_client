@@ -1,23 +1,17 @@
 import { Component } from 'react';
 import { withTranslation } from 'react-i18next';
-import QuickStartJsx from './QuickStart.jsx';
+import RemoteAccessJsx from './RemoteAccess.jsx';
 
-class QuickStart extends Component {
+class RemoteAccess extends Component {
 
     constructor(props, context) {
         super(props, context);
-        this.jsxTemplate = QuickStartJsx;
+        this.jsxTemplate = RemoteAccessJsx;
         this.state = {
             tab: 1
         };
     }
 
-
-    onClickChangeTab = (index) => {
-        this.setState({
-            tab: index
-        });
-    }
 
     render() {
         return this.jsxTemplate.call(this)
@@ -25,5 +19,5 @@ class QuickStart extends Component {
 }
 
 
-const HighOrderComponentTranslated = withTranslation('common')(QuickStart)
+const HighOrderComponentTranslated = withTranslation('common')(RemoteAccess)
 export default HighOrderComponentTranslated;

@@ -1,23 +1,17 @@
 import { Component } from 'react';
 import { withTranslation } from 'react-i18next';
-import QuickStartJsx from './QuickStart.jsx';
+import UploadChannelsJsx from './UploadChannels.jsx';
 
-class QuickStart extends Component {
+class UploadChannels extends Component {
 
     constructor(props, context) {
         super(props, context);
-        this.jsxTemplate = QuickStartJsx;
+        this.jsxTemplate = UploadChannelsJsx;
         this.state = {
             tab: 1
         };
     }
 
-
-    onClickChangeTab = (index) => {
-        this.setState({
-            tab: index
-        });
-    }
 
     render() {
         return this.jsxTemplate.call(this)
@@ -25,5 +19,5 @@ class QuickStart extends Component {
 }
 
 
-const HighOrderComponentTranslated = withTranslation('common')(QuickStart)
+const HighOrderComponentTranslated = withTranslation('common')(UploadChannels)
 export default HighOrderComponentTranslated;

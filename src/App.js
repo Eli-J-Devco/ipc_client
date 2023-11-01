@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import QuickStart from './containers/desktop/datalogger/quickstart/QuickStart';
-import Datalogger from './layouts/datalogger/datalogger';
+import Datalogger from './layouts/datalogger/Datalogger';
 import Error from './layouts/error/Error';
 import LoginAdmin from './layouts/login/loginAdmin/LoginAdmin';
 import ForgotPassword from './layouts/login/forgotPassword/ForgotPassword';
-import ResetPassword from './layouts/login/resetPassword/ResetPassword'
+import ResetPassword from './layouts/login/resetPassword/ResetPassword';
 import Scada from './layouts/scada/Scada';
 import ScadaDashboard from './containers/desktop/scada/daskboard/Dashboard';
 import Devices from './containers/desktop/datalogger/devices/Devices';
