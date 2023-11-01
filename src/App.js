@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import QuickStart from './containers/desktop/datalogger/quickstart/QuickStart';
-import Datalogger from './layouts/datalogger/Datalogger';
+import Datalogger from './layouts/datalogger/datalogger';
 import Error from './layouts/error/Error';
-import Login from './layouts/login/Login';
+import LoginAdmin from './layouts/login/loginAdmin/LoginAdmin';
+import ForgotPassword from './layouts/login/forgotPassword/ForgotPassword';
+import ResetPassword from './layouts/login/resetPassword/ResetPassword'
 import Scada from './layouts/scada/Scada';
 import ScadaDashboard from './containers/desktop/scada/daskboard/Dashboard';
 import Devices from './containers/desktop/datalogger/devices/Devices';
@@ -14,7 +16,9 @@ export default class App extends Component {
     return (
         <div className="App">
           <Routes>
-            <Route path='/' element = {<Login />}> </Route>
+            <Route path='/' element = {<LoginAdmin />}> </Route>
+            <Route path='/forgot-password' element = {<ForgotPassword />}> </Route>
+            <Route path='/reset-password' element = {<ResetPassword />}> </Route>
 
             <Route path='/datalogger' element = {<Datalogger />}>
               <Route index element = {<QuickStart />} />
