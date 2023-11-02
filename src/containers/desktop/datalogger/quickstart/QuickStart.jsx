@@ -1,5 +1,4 @@
 import React from 'react';
-import { NavLink } from "react-router-dom";
 import styles from './QuickStart.module.scss';
 import SiteInformation from './siteInformation/SiteInformation';
 import EthernetOne from './ethernetOne/EthernetOne';
@@ -11,6 +10,7 @@ import UploadChannels from './uploadChannels/UploadChannels';
 import LoggingRate from './loggingRate/LoggingRate';
 import Done from './done/Done';
 import RemoteAccess from './remoteAccess/RemoteAccess';
+import Breadcrumb from '../../../../components/breadCrumb/BreadCrumb';
 
 export default function QuickStart() {
     var { tab } = this.state;
@@ -49,16 +49,19 @@ export default function QuickStart() {
     }
     return (
         <div className="main">
-            <div className="crumb">
-                <ol className="breadcrumb">
-                    <li className="breadcrumb-item">
-                        <NavLink to="/datalogger">
-                            Daskboard
-                        </NavLink>
-                    </li>
-                    <li className="breadcrumb-item active">Quick Start</li>
-                </ol>
-            </div>
+            <Breadcrumb
+                routes={[
+                    {
+                        path: "/datalogger",
+                        name: "Dashboard"
+                    },
+                    {
+                        path: "/datalogger/quickstart",
+                        name: "Quick Start"
+                    }
+                ]}
+            />
+
             <div className={styles.quick_start}>
                 <div className={styles.tab_title}>
                     <ul>
