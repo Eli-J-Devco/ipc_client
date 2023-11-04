@@ -13,7 +13,7 @@ function useValidate(onSubmit, children) {
         email: yup.string().email('Invalid email address').required('Required')
     });
 
-    const fieldsInUse = isArray(children) ? children.map(item => item.props.name) : [children.props.name];
+    const fieldsInUse = isArray(children) ? children.map(item => item.props.name) : [children?.props?.name];
     const initialValuesInUse = pick(initialValues, fieldsInUse);
     const validationSchemaInUse = validationSchema.pick(fieldsInUse);
 
