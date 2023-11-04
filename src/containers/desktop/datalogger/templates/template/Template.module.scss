@@ -1,0 +1,19 @@
+.template {
+    .header {
+        color: var(--text-color-light);
+        background-color: var(--bg-color-dark);
+        padding: 7px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+    }
+
+    .body {
+        padding: 7px;
+        border-radius: 4px;
+        background-color: var(--bg-color-light);
+
+        .outlet {
+            padding: 10px;
+        }
+    }
+}

@@ -1,0 +1,22 @@
+.template-management {
+    .section {
+        margin-bottom: 15px;
+        
+        .title {
+            background-color: var(--bg-color-light);
+            padding: 7px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            line-height: 10px;
+        }
+    
+        .body {
+            margin: 10px;
+    
+            .imageBtn {
+                position: relative;
+                bottom: 1px;
+            }
+        }
+    }
+}
