@@ -1,0 +1,28 @@
+.btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    line-height: 14px;
+    background-color: var(--bg-color-dark);
+    color: var(--text-color-light);
+
+    &.grey {
+        background-color: var(--bg-color-grey);
+        color: var(--text-color-dark);
+    }
+
+    &.dark {
+        background-color: var(--bg-color-dark);
+        color: var(--text-color-light);
+    }
+
+    &.light {
+        background-color: var(--bg-color-white);
+        color: var(--text-color-dark);
+    }
+
+    &:hover {
+        background-color: var(--bg-color-yellow);
+        color: var(--text-color-dark);
+    }
+}
