@@ -1,12 +1,12 @@
 .tabs {
     a,
     a:hover {
-        color: #14141f;
+        color: var(--text-color-dark);
     }
     
     .active,
     .active:hover {
-        color: #FFF;
-        background-color: #383434;
+        color: var(--text-color-light);
+        background-color: var(--bg-color-dark);
     }
 }
