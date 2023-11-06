@@ -21,14 +21,13 @@ function FormInput({ children, className, id, onSubmit }) {
     );
 }
 
-function Text({ className, label, placeholder, name, disabled, readOnly, autoComplete = "off" }) {
-    const { handleBlur, handleChange, values, touched, errors } = useContext(FormInputContext);
+function Text({ className, label, placeholder, name, value, disabled, readOnly, autoComplete = "off", onChange, onBlur }) {
+    const validate = useContext(FormInputContext);
 
     return (
         <Form.Group
             controlId={name}
             className={className}
-            
         >
             {label && <Form.Label>{ label }</Form.Label>}
 
@@ -39,16 +38,39 @@ function Text({ className, label, placeholder, name, disabled, readOnly, autoCom
                 disabled={disabled}
                 readOnly={readOnly}
                 autoComplete={autoComplete}
-                value={values[name]}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                isInvalid={touched[name] && errors[name]}
+                value={validate ? validate.values[name] : value}
+                onChange={validate ? validate.handleChange : onChange}
+                onBlur={validate ? validate.handleBlur : onBlur}
+                isInvalid={validate ? validate.touched[name] && validate.errors[name] : false}
             />
 
-            <Form.Control.Feedback type="invalid" >{ errors[name] }</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid" >{ validate ? validate.errors[name] : "" }</Form.Control.Feedback>
         </Form.Group>
     );
 }
 FormInput.Text = Text;
+
+function Check({ className, label, name, checked, disabled, inline, type = "checkbox", onChange, onBlur }) {
+    const validate = useContext(FormInputContext);
+
+    return (
+        <Form.Check
+            type={type}
+            id={name}
+            name={name}
+            label={label}
+            disabled={disabled}
+            inline={inline}
+            className={className}
+            checked={validate ? validate.values[name] : checked}
+            onChange={validate ? validate.handleChange : onChange}
+            onBlur={validate ? validate.handleBlur : onBlur}
+            isInvalid={validate ? validate.touched[name] && validate.errors[name] : false}
+            feedback={validate ? validate.errors[name] : ""}
+            feedbackType="invalid"
+        />
+    );
+}
+FormInput.Check = Check;
 
 export default FormInput;

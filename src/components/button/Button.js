@@ -20,13 +20,14 @@ function Text({ text, className }) {
 }
 Button.Text = Text;
 
-function Image({ image, className, onClick }) {
+function Image({ children, image, className, onClick }) {
     return (
         <span
             className={`${styles.img} ${className ? className : ""}`}
             onClick={onClick}
         >
             {image}
+            {children}
         </span>
     );
 }
