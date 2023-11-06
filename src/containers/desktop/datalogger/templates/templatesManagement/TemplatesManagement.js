@@ -1,30 +1,42 @@
 import Button from "../../../../../components/button/Button";
+import Table from "../../../../../components/table/Table";
 import styles from "./TemplatesManagement.module.scss";
 import CreateTemplateModal from "./createTemplateModal/CreateTemplateModal";
 import useTemplatesManagement from "./useTemplatesManagement";
+import { ReactComponent as EditIcon } from "../../../../../assets/images/edit.svg";
+import { ReactComponent as DeleteIcon } from "../../../../../assets/images/delete.svg";
 
 function TemplatesManagement() {
-    const { isModalOpen, openModal, closeModal, template } = useTemplatesManagement();
+    const { isModalOpen, openModal, closeModal, template, columns, templateList, handleOnItemEdit } = useTemplatesManagement();
 
     return (
         <div className={styles["template-management"]} >
             <div className="row">
-                <div className="col-12 col-xxl-6">
+                <div className="col-12 col-lg-6">
                     <div className={styles.section} >
                         <div className={styles.title}>
                             Edit Or Manage Your Templates
                         </div>
 
                         <div className={styles.body}> 
-                            <Button variant="grey" >
-                                <Button.Text text="Edit" />
-                            </Button>
-                            <Button variant="grey" className="ms-3" >
-                                <Button.Text text="Download" />
-                            </Button>
-                            <Button variant="grey" className="ms-3" >
-                                <Button.Text text="Delete" />
-                            </Button>
+                            <Table
+                                columns={columns}
+                                data={templateList}
+                                action={item => (
+                                    <div className="d-flex flex-wrap justify-content-center">
+                                        <Button.Image
+                                            image={<EditIcon />}
+                                            onClick={() => handleOnItemEdit(item)}
+                                            className="mx-2"
+                                        />
+                                        <Button.Image
+                                            image={<DeleteIcon />}
+                                            onClick={() => handleOnItemEdit(item)}
+                                            className="mx-2"
+                                        />
+                                    </div>
+                                )}
+                            />
                         </div>
                     </div>
 
@@ -33,7 +45,7 @@ function TemplatesManagement() {
                             Create A Template
                         </div>
 
-                        <div className={styles.body}> 
+                        <div className={`d-flex ${styles.body}`}>
                             <Button variant="dark" onClick={() => openModal("Modbus Template")} >
                                 <Button.Text text="Create Modbus Template" />
                             </Button>
