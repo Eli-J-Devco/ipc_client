@@ -5,7 +5,7 @@ function Button({ children, variant, className, type, formId, onClick }) {
         <button
             type={type ? type : "button"}
             form={type === "submit" && formId ? formId : ""}
-            className={`${styles.btn} ${variant ? styles[variant] : ""} ${className}`}
+            className={`${styles.btn} ${variant ? styles[variant] : ""} ${className ? className : ""}`}
             onClick={onClick}
         >
             {children}
@@ -15,14 +15,19 @@ function Button({ children, variant, className, type, formId, onClick }) {
 
 function Text({ text, className }) {
     return (
-        <span className={className} >{text}</span>
+        <span className={className ? className : ""} >{text}</span>
     );
 }
 Button.Text = Text;
 
-function Image({ image, className }) {
+function Image({ image, className, onClick }) {
     return (
-        <span className={className} >{image}</span>
+        <span
+            className={`${styles.img} ${className ? className : ""}`}
+            onClick={onClick}
+        >
+            {image}
+        </span>
     );
 }
 Button.Image = Image;
