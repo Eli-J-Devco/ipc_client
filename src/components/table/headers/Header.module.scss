@@ -1,0 +1,67 @@
+.header {
+    padding: 7px;
+    background-color: var(--bg-color-light);
+    position: sticky;
+    top: 0;
+    text-wrap: nowrap;
+
+    &:first-child {
+        padding-left: 20px;
+    }
+
+    &:last-child {
+        padding-right: 20px;
+        text-align: center;
+    }
+
+    &:hover {
+        .resizer {
+            opacity: 1;
+        }
+    }
+
+    &.grey {
+        background-color: var(--bg-color-grey);
+
+        .resizer {
+            background-color: var(--bg-color-light);
+        }
+    }
+
+    &.light {
+        background-color: var(--bg-color-white);
+
+        .resizer {
+            background-color: var(--bg-color-grey);
+        }
+    }
+
+    &.is-resizing {
+        + th {
+            .resizer {
+                opacity: 0;
+            }
+        }
+    }
+
+    .resizer {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 5px;
+        opacity: 0;
+        background: var(--bg-color-grey);
+        cursor: col-resize;
+        user-select: none;
+        touch-action: none;
+
+        &.is-resizing {
+            opacity: 1;
+        }
+    }
+
+    .draggable {
+        cursor: move;
+    }
+}

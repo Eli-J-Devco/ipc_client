@@ -8,7 +8,8 @@ import { useClickAway } from "@uidotdev/usehooks";
 
 function useTable({ columns, data, slugProps }) {
     const [columnVisibility, setColumnVisibility] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: true}), {}));
-    const [columnSizing, setColumnSizing] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: 150}), {}));
+    const [columnSizing, setColumnSizing] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: cur.width ? cur.width : 100}), {}));
+    const [columnOrder, setColumnOrder] = useState(columns.map(column => column.id.toString()));
     const [isDropDownsShow, setIsDropDownsShow] = useState(false);
     const dropDownsRef = useClickAway(() => setIsDropDownsShow(false));
     
@@ -39,11 +40,13 @@ function useTable({ columns, data, slugProps }) {
         getCoreRowModel: getCoreRowModel(),
         state: {
             columnVisibility,
-            columnSizing
+            columnSizing,
+            columnOrder
         },
         onColumnVisibilityChange: setColumnVisibility,
         columnResizeMode: "onChange",
-        onColumnSizingChange: setColumnSizing
+        onColumnSizingChange: setColumnSizing,
+        onColumnOrderChange: setColumnOrder
     });
 
     const handleOpenDropDowns = () => setIsDropDownsShow(true);

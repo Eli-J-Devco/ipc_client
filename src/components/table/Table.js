@@ -4,13 +4,14 @@ import useTable from './useTable';
 import { ReactComponent as ColumnsIcon } from '../../assets/images/table-columns-solid.svg';
 import Button from '../button/Button';
 import DropDowns from './dropDowns/DropDowns';
+import Header from './headers/Header';
 
-function Table({ variant, className, maxHeight, columns, data, visible, resizable, ...slugProps }) {
+function Table({ variant, className, maxHeight, columns, data, visible, resizable, draggable, ...slugProps }) {
     // slugProps: pass component that wrapping value by prop that have the same name with slug value
     const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef } = useTable({ columns, data, slugProps });
 
     return (
-        <div>
+        <div style={{ maxWidth: table.getTotalSize() }}>
             <div className={`d-flex justify-content-end align-items-center ${styles.control}`}>
                 {
                     visible &&
@@ -35,23 +36,14 @@ function Table({ variant, className, maxHeight, columns, data, visible, resizabl
                         <tr className={styles["header-row"]}>
                             {
                                 table.getFlatHeaders().map(header => (
-                                    <th
+                                    <Header
                                         key={header.id}
-                                        className={`${variant ? styles[variant] : ""} ${header.column.getIsResizing() ? styles["is-resizing"] : ""}`}
-                                        style={{ width: header.getSize() }}
-                                    >
-                                        {header.column.columnDef.header}
-                                        
-                                        {
-                                            resizable &&
-                                            <div
-                                                className={`${styles.resizer} ${header.column.getIsResizing() ? styles["is-resizing"] : ""}`}
-                                                onMouseDown={header.getResizeHandler()}
-                                                onTouchStart={header.getResizeHandler()}
-                                            />
-                                        }
-                                    </th>
-
+                                        variant={variant}
+                                        item={header}
+                                        table={table}
+                                        resizable={resizable}
+                                        draggable={draggable}
+                                    />
                                 ))
                             }
                         </tr>
