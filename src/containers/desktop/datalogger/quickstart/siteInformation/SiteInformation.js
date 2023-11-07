@@ -1,8 +1,8 @@
-import { Component } from 'react';
 import { withTranslation } from 'react-i18next';
+import BaseComponent from '../../../../../BaseComponent.js';
 import SiteInformationJsx from './SiteInformation.jsx';
 
-class SiteInformation extends Component {
+class SiteInformation extends BaseComponent {
 
     constructor(props, context) {
         super(props, context);

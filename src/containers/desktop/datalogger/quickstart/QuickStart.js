@@ -8,7 +8,7 @@ class QuickStart extends Component {
         super(props, context);
         this.jsxTemplate = QuickStartJsx;
         this.state = {
-            tab: 1
+            tab: 2
         };
     }
 

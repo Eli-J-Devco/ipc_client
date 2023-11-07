@@ -13,11 +13,10 @@ class EthernetOne extends Component {
     }
 
 
-    onClickChangeTab = (index) => {
-        this.setState({
-            tab: index
-        });
+    handleDropdownChange = (item) => {
+       
     }
+
 
     render() {
         return this.jsxTemplate.call(this)

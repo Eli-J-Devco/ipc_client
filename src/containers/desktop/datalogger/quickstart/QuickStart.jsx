@@ -46,6 +46,8 @@ export default function QuickStart() {
         case 10:
             htmlTab = <Done />
             break;
+        default:
+            htmlTab = <SiteInformation />
     }
     return (
         <div className="main">

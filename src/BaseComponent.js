@@ -13,6 +13,26 @@ export default class BaseComponent extends React.Component {
             // Error Type 1. Abstract class can not be constructed.
             throw new TypeError("Can not construct abstract class.");
         }
+
+
+    }
+
+    handleInputChange(event, data) {
+        let target = event.target;
+        let name = target.name;
+        let value = target.value
+        if (target.type === 'checkbox') {
+            value = target.checked ? 1 : 0;
+        }
+        if (name) {
+            let item = this.state.curItem;
+            item[name] = (event.target.validity.valid) ? value : this.state.curItem[name];
+            if (event.setResultType) {
+                this.setState({ curItem: item, resultType: value });
+            } else {
+                this.setState({ curItem: item });
+            }
+        }
     }
 
     /**

@@ -1,5 +1,20 @@
 {
     "common": {
         "header": "Header"
+    },
+    "site": {
+        "site_name": "Site Name",
+        "location": "Location",
+        "admin_contact": "Administrative Contact",
+        "description": "Description",
+        "info_note": "Enter information to describe and identify this unit. The information is displayed at the top of all the web pages and on your browser's tab heading.",
+        "ip_address": "IP Address",
+        "subnet_mask": "Subnet Mask",
+        "gateway": "Gateway",
+        "mtu": "Ethernet MTU",
+        "dns1": "DNS 1",
+        "dns2": "DNS 2",
+        "ethernet": "Ethernet",
+        "mtu_note": "(128-1500, default 1500)"
     }
 }
