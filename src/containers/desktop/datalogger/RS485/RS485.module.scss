@@ -1,0 +1,10 @@
+.rs485 {
+    padding: 7px;
+    border-radius: 4px;
+    background-color: var(--bg-color-light);
+
+    .outlet {
+        background-color: var(--bg-color-white);
+        padding: 10px;
+    }
+}

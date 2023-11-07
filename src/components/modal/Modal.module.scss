@@ -1,0 +1,14 @@
+.modal {
+    .header {
+        background-color: var(--bg-color-dark);
+        color: var(--text-color-light);
+    }
+
+    .body {
+        padding: 1rem 2rem;
+    }
+}
+
+.grey {
+    background-color: var(--bg-color-grey);
+}

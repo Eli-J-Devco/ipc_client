@@ -1,0 +1,12 @@
+.tabs {
+    a,
+    a:hover {
+        color: var(--text-color-dark);
+    }
+    
+    .active,
+    .active:hover {
+        color: var(--text-color-light);
+        background-color: var(--bg-color-dark);
+    }
+}

@@ -1,0 +1,24 @@
+.crumb {
+    background-color: var(--bg-color-light);
+    padding: 7px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+
+    .breadcrumb {
+        margin: 0;
+
+        li {
+            &::before {
+                content: ">";
+            }
+
+            &:first-child::before {
+                content: "";
+            }
+
+            .active {
+                font-weight: 500;
+            }
+        }
+    }
+}
