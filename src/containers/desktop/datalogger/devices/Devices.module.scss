@@ -1,0 +1,52 @@
+.main_devices{
+  position: fixed;
+  width: calc(100% - 240px);
+  height: calc(100% - 60px);
+  top: 60px;
+  right: 0;
+  padding: 25px;
+  .header_devices{
+    background-color: #F2F2F2;
+    height: 44px;
+    margin: auto;
+    border-radius: 10px;
+    padding: 6px 0 8px 18px;
+    .title{
+      padding-top: 4px;
+    }
+    .button{
+      display: flex;
+      justify-content: right;
+      .export{
+        border-radius: 15px;
+        background-color: #D3D3D3;
+        width: auto;
+        padding: 5px 15px;
+        text-align: center;
+        cursor: pointer;
+        display: inline-block;
+        margin-right: 16px;
+        span{
+          margin-left: 8px;
+        }
+        svg{
+          position: relative;
+          top: -4px;
+        }
+      }
+      .add{
+        margin-right: 16px;
+        background-color: #D3D3D3;
+        border-radius: 15px;
+        width: 46px;
+        text-align: center;
+        cursor: pointer;
+        display: inline-block;
+        padding: 5px 15px;
+      }
+    }
+  }
+  table{
+    width: 100% !important;
+  }
+}

@@ -10,6 +10,7 @@ export const RText = (props) => (
         {props.labelIcon &&
             <i className={"icon-tip-help " + props.iconClass} onClick={props.iconClick} aria-hidden="true" data-tip={props.dataTooktip}></i>
         }
+        <div className='d-flex mt-1 mb-3'>
         <input id={props.inputId ? props.inputId : null}
             style={props.style ? props.style : null}
             className={props.inputClass}
@@ -30,7 +31,7 @@ export const RText = (props) => (
 
         {(props.info !== "" && typeof props.info !== 'undefined') &&
 
-            <span className='help' data-tooltip-id="my-tooltip" data-tooltip-content={props.info} >
+            <span className='help' data-tooltip-id="my-tooltip" data-tooltip-content={props.info} style={{position: 'relative', marginLeft: "8px", top: '4px'}}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="22px" height="22px">
                     <path d="M 25 2 C 12.309295 2 2 12.309295 2 25 C 2 37.690705 12.309295 48 25 48 C 37.690705 48 48 37.690705 48 25 C 48 12.309295 37.690705 2 25 2 z M 25 4 C 36.609824 4 46 13.390176 46 25 C 46 36.609824 36.609824 46 25 46 C 13.390176 46 4 36.609824 4 25 C 4 13.390176 13.390176 4 25 4 z M 25 11 A 3 3 0 0 0 22 14 A 3 3 0 0 0 25 17 A 3 3 0 0 0 28 14 A 3 3 0 0 0 25 11 z M 21 21 L 21 23 L 22 23 L 23 23 L 23 36 L 22 36 L 21 36 L 21 38 L 22 38 L 23 38 L 27 38 L 28 38 L 29 38 L 29 36 L 28 36 L 27 36 L 27 21 L 26 21 L 22 21 L 21 21 z" />
                 </svg>
@@ -40,7 +41,7 @@ export const RText = (props) => (
             //     {props.required === 'required' ? <span className="required">*</span> : null}
             // </label>
         }
-
+        </div>
 
     </React.Fragment>
 )
@@ -49,7 +50,7 @@ export const RCheckbox = (props) => (
     <React.Fragment>
         <input
             id={props.inputId}
-            type="checkbox"
+            type={props.type ? props.type : "checkbox"}
             name={props.inputName}
             className={props.inputClass != null && typeof props.inputClass != 'undefined' ? props.inputClass :
                 "filled-in chk-col-blue"}
@@ -61,7 +62,7 @@ export const RCheckbox = (props) => (
             value={props.value}
             checked={(props.checked === 1) ? true : false}
         />
-        <label htmlFor={props.inputId} className={"chkbox-gray-border " + (props.labelClass ? props.labelClass : "")}>
+        <label style={{marginLeft: "8px"}} htmlFor={props.inputId} className={"chkbox-gray-border " + (props.labelClass ? props.labelClass : "")}>
             {(props.label !== "" && typeof props.label != 'undefined') && props.label}
         </label>
     </React.Fragment>

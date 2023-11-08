@@ -159,7 +159,7 @@ class ReactSelectDropdown extends Component {
         return (
             <div>
                 {label ?
-                    <label className="control-label" htmlFor={name}>
+                    <label className="control-label mb-1" htmlFor={name}>
                         {label} {required === 'required' ? <span className="required">*</span> : null}
                     </label>
                     : ''}
