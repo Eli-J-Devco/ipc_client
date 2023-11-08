@@ -20,6 +20,18 @@ import PointList from './containers/desktop/datalogger/templates/template/pointL
 import RegisterBlocks from './containers/desktop/datalogger/templates/template/registerBlocks/RegisterBlocks';
 import Advanced from './containers/desktop/datalogger/templates/template/advanced/Advanced';
 
+import SiteInformation from './containers/desktop/datalogger/quickstart/siteInformation/SiteInformation';
+import EnthernetOne from './containers/desktop/datalogger/quickstart/ethernetOne/EthernetOne';
+import EnthernetTwo from './containers/desktop/datalogger/quickstart/ethernetTwo/EthernetTwo';
+import Firmware from './containers/desktop/datalogger/quickstart/firmware/Firmware';
+import RS485One from './containers/desktop/datalogger/quickstart/rs485One/Rs485One';
+import RS485Two from './containers/desktop/datalogger/quickstart/rs485Two/Rs485Two';
+
+import LoggingRate from './containers/desktop/datalogger/quickstart/loggingRate/LoggingRate';
+import UploadChannels from './containers/desktop/datalogger/quickstart/uploadChannels/UploadChannels';
+import RemoteAccess from './containers/desktop/datalogger/quickstart/remoteAccess/RemoteAccess';
+import Done from './containers/desktop/datalogger/quickstart/done/Done';
+
 export default class App extends Component {
     render() {
         return (
@@ -31,7 +43,18 @@ export default class App extends Component {
 
                     <Route path='/datalogger' element = {<Datalogger />}>
                         <Route index element = {<QuickStart />} />
-                        <Route path='quickstart' element = {<QuickStart />} />
+                        <Route path='quickstart' element = {<QuickStart />}>
+                            <Route index element = {<SiteInformation />} />
+                                <Route path='ethernet-1' element={<EnthernetOne />} />
+                                <Route path='ethernet-2' element = {<EnthernetTwo />} />
+                                <Route path='firmware' element = {<Firmware />} />
+                                <Route path='rs485-1' element = {<RS485One />} />
+                                <Route path='rs485-2' element = {<RS485Two />} />
+                                <Route path='logging-rate' element = {<LoggingRate />} />
+                                <Route path='upload-channels' element = {<UploadChannels />} />
+                                <Route path='remote-access' element = {<RemoteAccess />} />
+                                <Route path='done' element = {<Done />} />
+                        </Route>
                         <Route path='rs485' element = {<RS485 />} >
                             <Route path=':id' element={<Device />} />
                             <Route path='options' element = {<Options />} />

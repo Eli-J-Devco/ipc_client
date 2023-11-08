@@ -6,7 +6,7 @@ const FormInputContext = createContext();
 
 function FormInput({ children, className, id, onSubmit }) {
     const validate = useValidate(onSubmit, children);
-    
+
     return (
         <FormInputContext.Provider value={validate} >
             <Form
@@ -29,7 +29,7 @@ function Text({ className, label, placeholder, name, value, disabled, readOnly, 
             controlId={name}
             className={className}
         >
-            {label && <Form.Label>{ label }</Form.Label>}
+            {label && <Form.Label>{label}</Form.Label>}
 
             <Form.Control
                 placeholder={placeholder}
@@ -44,7 +44,7 @@ function Text({ className, label, placeholder, name, value, disabled, readOnly, 
                 isInvalid={validate ? validate.touched[name] && validate.errors[name] : false}
             />
 
-            <Form.Control.Feedback type="invalid" >{ validate ? validate.errors[name] : "" }</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid" >{validate ? validate.errors[name] : ""}</Form.Control.Feedback>
         </Form.Group>
     );
 }
