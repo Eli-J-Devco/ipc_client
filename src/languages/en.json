@@ -1,6 +1,9 @@
 {
     "common": {
-        "header": "Header"
+        "header": "Header",
+        "add": "Add",
+        "add_multiple": "Add Multiple",
+        "cancel": "Cancel"
     },
     "site": {
         "site_name": "Site Name",
@@ -16,5 +19,32 @@
         "dns2": "DNS 2",
         "ethernet": "Ethernet",
         "mtu_note": "(128-1500, default 1500)"
+    },
+    "devices": {
+        "add_device": "Add Device",
+        "device_name": "Device Name",
+        "device_name_note": "Device Name Note",
+        "communication_protocol": "Select Device's communication protocol",
+        "device_connected": "How is Modbus Device connected?",
+        "recommended_adding": "We recommend adding the new device as #003, which is available in Device List and on all busses",
+        "device_number": "Device Number",
+        "device_number_note": "device_number_note",
+        "rtu_bus_address": "RTU Bus-Address",
+        "rtu_bus_address_note": "RTU Bus-Address Note",
+        "tcp_gateway_port": "MB/TCP Gateway Port",
+        "tcp_gateway_port_note": "MB/TCP Gateway Port Note",
+        "tcp_gateway_ip": "MB/TCP Gateway IP-Address",
+        "tcp_gateway_ip_note": "MB/TCP Gateway IP-Address Note",
+        "search_for_modbus_devices": "Auto-detect requires \"Search for Modbus Devices\" be enable in ",
+        "to_create_virtual": "To create a Virtual Meter, use the ",
+        "device_framework": "Device Framework",
+        "to_create_template": " to create a template, then add a meter using that template.",
+        "device_type": "Device type",
+        "template_library": "Template Library",
+        "add_multi_device": "Add Multiple Devices",
+        "add_multi_device_title": "Add multiple devices, from #3 to #12, inclusive.",
+        "add_multi_device_info": "Will skip over existing devices in the range.",
+        "how_many_to_add": "How many to add?",
+        "when_adding": "When adding, increment"
     }
 }
