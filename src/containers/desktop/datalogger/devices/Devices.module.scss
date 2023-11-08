@@ -47,6 +47,8 @@
     }
   }
   table{
-    width: 100% !important;
+    thead{
+      height: 48px;
+    }
   }
 }

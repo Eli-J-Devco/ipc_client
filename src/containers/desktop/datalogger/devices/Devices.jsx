@@ -70,7 +70,7 @@ export default function Devices() {
         </div>
       </div>
 
-      <Table columns={columns} data={data}   variant={'table_device'}
+      <Table columns={columns} data={data} maxWidth={'100%'}
         actions={item => (
           <div className="d-flex flex-wrap justify-content-center">
               <Button.Image

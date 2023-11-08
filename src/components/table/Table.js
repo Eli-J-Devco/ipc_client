@@ -6,12 +6,12 @@ import Button from '../button/Button';
 import DropDowns from './dropDowns/DropDowns';
 import Header from './headers/Header';
 
-function Table({ variant, className, maxHeight, columns, data, visible, resizable, draggable, ...slugProps }) {
+function Table({ variant, className, maxHeight, maxWidth, columns, data, visible, resizable, draggable, ...slugProps }) {
     // slugProps: pass component that wrapping value by prop that have the same name with slug value
     const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef } = useTable({ columns, data, slugProps });
 
     return (
-        <div style={{ maxWidth: table.getTotalSize() }}>
+        <div style={{ maxWidth }}>
             <div className={`d-flex justify-content-end align-items-center ${styles.control}`}>
                 {
                     visible &&
@@ -31,7 +31,7 @@ function Table({ variant, className, maxHeight, columns, data, visible, resizabl
             </div>
 
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
-                <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ width: table.getTotalSize() }}>
+                <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ maxWidth }}>
                     <thead>
                         <tr className={styles["header-row"]}>
                             {
