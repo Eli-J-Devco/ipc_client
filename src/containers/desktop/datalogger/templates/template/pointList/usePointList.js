@@ -6,12 +6,13 @@ function usePointList() {
     const [columns, ] = useState([
         {
             id: 1,
-            slug: "id",
+            slug: "id_checkbox",
             name: "Point#"
         }, {
             id: 2,
             slug: "name",
-            name: "Name"
+            name: "Name",
+            width: 200
         }, {
             id: 3,
             slug: "unit",

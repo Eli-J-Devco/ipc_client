@@ -1,4 +1,5 @@
 import Button from "../../../../../../components/button/Button";
+import FormInput from "../../../../../../components/formInput/FormInput";
 import Table from "../../../../../../components/table/Table";
 import EditPointModal from "./editPointModal/EditPointModal";
 import usePointList from "./usePointList";
@@ -8,14 +9,23 @@ function PointList() {
 
     return (
         <div>
-            <div>
-                <span>Number of Points</span>
-                <Button className="ms-3" >
-                    <Button.Text text="Change Number of Points" />
+            <div className="d-flex">
+                <FormInput.Text
+                    label="Number of Points:"
+                    name="num_of_point"
+                    className="mx-3"
+                    horizontal
+                />
+
+                <Button className="mx-3">
+                    <Button.Text text="Change Number of Points"/>
                 </Button>
             </div>
 
             <Table
+                visible
+                resizable
+                draggable
                 maxHeight="600px"
                 columns={columns}
                 data={pointList}
@@ -23,6 +33,13 @@ function PointList() {
                     <Button onClick={() => handlePointEdit(item)}>
                         <Button.Text text="Edit" />
                     </Button>
+                )}
+                id_checkbox={item => (
+                    <FormInput.Check
+                        inline
+                        name={item.name}
+                        label={`pt${item.id}`}
+                    />
                 )}
             />
 
