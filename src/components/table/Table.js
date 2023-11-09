@@ -12,7 +12,7 @@ function Table({ variant, className, maxHeight, maxWidth, columns, data, visible
 
     return (
         <div style={{ maxWidth: table.getTotalSize() }}>
-            <div className={`d-flex justify-content-end align-items-center ${styles.control}`}>
+            <div className={`d-flex ${styles.control}`}>
                 {
                     visible &&
                     <div className="position-relative">

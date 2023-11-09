@@ -25,7 +25,7 @@ function DropDowns({ data, isShow, refProp }) {
                     <li key={item.id}>
                         <FormInput.Check
                             label={item.columnDef.header}
-                            name={item.columnDef.accessorKey}
+                            name={`column-visible-${item.columnDef.accessorKey}`}
                             checked={item.getIsVisible()}
                             onChange={item.getToggleVisibilityHandler()}
                         />
