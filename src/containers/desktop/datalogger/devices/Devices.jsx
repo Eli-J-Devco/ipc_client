@@ -31,13 +31,13 @@ export default function Devices() {
     {id: 10, serial_number: 10, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS INV', type: 'SolarEdge 3 Phase Inverter', points: 37}
   ]
   const columns = [
-    {id: 1, slug: "serial_number", name: "Serial Number"},
-    {id: 2, slug: "port", name: "Port"},
-    {id: 3, slug: "status", name: "Status"},
-    {id: 4, slug: "name_and_purpose", name: "Name and Purpose"},
-    {id: 5, slug: "type", name: "Type"},
-    {id: 6, slug: "points", name: "Points"},
-    {id: 7, slug: "actions", name: "Actions"}
+    {id: 1, slug: "serial_number", name: "Serial Number", width: 100},
+    {id: 2, slug: "port", name: "Port", width: 300},
+    {id: 3, slug: "status", name: "Status", width: 100},
+    {id: 4, slug: "name_and_purpose", name: "Name and Purpose", width: 400},
+    {id: 5, slug: "type", name: "Type", width: 300},
+    {id: 6, slug: "points", name: "Points", width: 100},
+    {id: 7, slug: "actions", name: "Actions", width: 150}
   ]
 
   return (
@@ -70,7 +70,7 @@ export default function Devices() {
         </div>
       </div>
 
-      <Table columns={columns} data={data} maxWidth={'100%'}
+      <Table columns={columns} data={data}
         actions={item => (
           <div className="d-flex flex-wrap justify-content-center">
               <Button.Image

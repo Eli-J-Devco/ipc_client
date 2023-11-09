@@ -11,7 +11,7 @@ function Table({ variant, className, maxHeight, maxWidth, columns, data, visible
     const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef } = useTable({ columns, data, slugProps });
 
     return (
-        <div style={{ maxWidth }}>
+        <div style={{ maxWidth: table.getTotalSize() }}>
             <div className={`d-flex justify-content-end align-items-center ${styles.control}`}>
                 {
                     visible &&
@@ -31,7 +31,7 @@ function Table({ variant, className, maxHeight, maxWidth, columns, data, visible
             </div>
 
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
-                <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ maxWidth }}>
+                <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ maxWidth:  table.getTotalSize() }}>
                     <thead>
                         <tr className={styles["header-row"]}>
                             {
