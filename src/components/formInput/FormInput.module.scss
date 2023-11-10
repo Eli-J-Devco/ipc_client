@@ -60,4 +60,11 @@
     .select {
         flex: 1;
     }
+
+    .errors {
+        color: var(--bs-form-invalid-color);
+        font-size: .875em;
+        margin-top: 0.25rem;
+        width: 100%;
+    }
 }
