@@ -9,7 +9,8 @@
     }
     .footer{
         justify-content: flex-start;
-        border-top: 1px solid #000;
+        border-top: 1px solid var(--bg-color-dark);
+        padding: 1rem 2rem;
     }
 }
 

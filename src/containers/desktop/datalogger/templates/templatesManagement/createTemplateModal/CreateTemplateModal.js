@@ -4,7 +4,7 @@ import Modal from "../../../../../../components/modal/Modal";
 import useSubmitTemplate from "./useSubmitTemplate";
 
 function CreateTemplateModal({ isOpen, close, template }) {
-    const handleOnSubmit = useSubmitTemplate(close);
+    const { handleOnSubmit, initialValues } = useSubmitTemplate(close);
 
     return (
         <Modal
@@ -16,6 +16,7 @@ function CreateTemplateModal({ isOpen, close, template }) {
             <FormInput
                 id="template-form"
                 onSubmit={handleOnSubmit}
+                initialValues={initialValues}
             >
                 <FormInput.Text
                     label={`Name of new ${template}`}
