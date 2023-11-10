@@ -1,5 +1,49 @@
 import React from 'react';
 
+export const RRadio = (props) => (
+    <React.Fragment>
+        <div className="radio_box">
+            <label>
+                <input id={props.inputId} type="radio" name={props.inputName}
+                    onChange={props.onChange} disabled={props.disabled} onKeyPress={props.rEnter}
+                    checked={(props.checked === 1) ? true : false}
+                />
+                <span className="lever switch-col-darkblue" />
+
+                {(props.label !== "" && typeof props.label !== 'undefined') ?
+                    <var className="radio_var" htmlFor={props.inputId} >
+                        {props.label}
+                    </var>
+                    : null}
+
+            </label>
+        </div>
+
+
+    </React.Fragment>
+)
+
+export const RSwitch = (props) => (
+    <React.Fragment>
+        <div className="switch">
+            <label>
+                <input id={props.inputId} type="checkbox" name={props.inputName}
+                    onChange={props.onChange} disabled={props.disabled} onKeyPress={props.rEnter}
+                    checked={(props.checked === 1) ? true : false}
+                />
+                <span className="lever switch-col-darkblue" />
+
+                {(props.label !== "" && typeof props.label !== 'undefined') ?
+                    <var className="control-var" htmlFor={props.inputId} >
+                        {props.label}
+                    </var>
+                    : null}
+
+            </label>
+        </div>
+
+    </React.Fragment>
+)
 
 export const RText = (props) => (
     <React.Fragment>
@@ -11,36 +55,36 @@ export const RText = (props) => (
             <i className={"icon-tip-help " + props.iconClass} onClick={props.iconClick} aria-hidden="true" data-tip={props.dataTooktip}></i>
         }
         <div className='d-flex mt-1 mb-3'>
-        <input id={props.inputId ? props.inputId : null}
-            style={props.style ? props.style : null}
-            className={props.inputClass}
-            name={props.inputName}
-            maxLength={typeof props.maxLength !== 'undefined' ? props.maxLength : null}
-            value={props.value == null || typeof props.value === 'undefined' ? '' : props.value}
-            placeholder={props.placeholder}
-            onChange={props.onChange} tabIndex={props.tabindex}
-            // disabled={props.disabled} onKeyPress={Libs.rEnter}
-            onKeyUp={props.onKeyUp}
-            onFocus={props.onFocus}
-            onClick={props.onClick}
-            onKeyDown={props.onKeyDown}
-            autoComplete="off"
-            onBlur={props.onBlur}
-            pattern={props.pattern == null || typeof props.pattern === 'undefined' ? '.*' : props.pattern}
-        />
+            <input id={props.inputId ? props.inputId : null}
+                style={props.style ? props.style : null}
+                className={props.inputClass}
+                name={props.inputName}
+                maxLength={typeof props.maxLength !== 'undefined' ? props.maxLength : null}
+                value={props.value == null || typeof props.value === 'undefined' ? '' : props.value}
+                placeholder={props.placeholder}
+                onChange={props.onChange} tabIndex={props.tabindex}
+                // disabled={props.disabled} onKeyPress={Libs.rEnter}
+                onKeyUp={props.onKeyUp}
+                onFocus={props.onFocus}
+                onClick={props.onClick}
+                onKeyDown={props.onKeyDown}
+                autoComplete="off"
+                onBlur={props.onBlur}
+                pattern={props.pattern == null || typeof props.pattern === 'undefined' ? '.*' : props.pattern}
+            />
 
-        {(props.info !== "" && typeof props.info !== 'undefined') &&
+            {(props.info !== "" && typeof props.info !== 'undefined') &&
 
-            <span className='help' data-tooltip-id="my-tooltip" data-tooltip-content={props.info} style={{position: 'relative', marginLeft: "8px", top: '4px'}}>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="22px" height="22px">
-                    <path d="M 25 2 C 12.309295 2 2 12.309295 2 25 C 2 37.690705 12.309295 48 25 48 C 37.690705 48 48 37.690705 48 25 C 48 12.309295 37.690705 2 25 2 z M 25 4 C 36.609824 4 46 13.390176 46 25 C 46 36.609824 36.609824 46 25 46 C 13.390176 46 4 36.609824 4 25 C 4 13.390176 13.390176 4 25 4 z M 25 11 A 3 3 0 0 0 22 14 A 3 3 0 0 0 25 17 A 3 3 0 0 0 28 14 A 3 3 0 0 0 25 11 z M 21 21 L 21 23 L 22 23 L 23 23 L 23 36 L 22 36 L 21 36 L 21 38 L 22 38 L 23 38 L 27 38 L 28 38 L 29 38 L 29 36 L 28 36 L 27 36 L 27 21 L 26 21 L 22 21 L 21 21 z" />
-                </svg>
-            </span>
+                <span className='help' data-tooltip-id="my-tooltip" data-tooltip-content={props.info} style={{ position: 'relative', marginLeft: "8px", top: '4px' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="22px" height="22px">
+                        <path d="M 25 2 C 12.309295 2 2 12.309295 2 25 C 2 37.690705 12.309295 48 25 48 C 37.690705 48 48 37.690705 48 25 C 48 12.309295 37.690705 2 25 2 z M 25 4 C 36.609824 4 46 13.390176 46 25 C 46 36.609824 36.609824 46 25 46 C 13.390176 46 4 36.609824 4 25 C 4 13.390176 13.390176 4 25 4 z M 25 11 A 3 3 0 0 0 22 14 A 3 3 0 0 0 25 17 A 3 3 0 0 0 28 14 A 3 3 0 0 0 25 11 z M 21 21 L 21 23 L 22 23 L 23 23 L 23 36 L 22 36 L 21 36 L 21 38 L 22 38 L 23 38 L 27 38 L 28 38 L 29 38 L 29 36 L 28 36 L 27 36 L 27 21 L 26 21 L 22 21 L 21 21 z" />
+                    </svg>
+                </span>
 
-            // <label className="control-label">{props.label}
-            //     {props.required === 'required' ? <span className="required">*</span> : null}
-            // </label>
-        }
+                // <label className="control-label">{props.label}
+                //     {props.required === 'required' ? <span className="required">*</span> : null}
+                // </label>
+            }
         </div>
 
     </React.Fragment>
@@ -62,8 +106,8 @@ export const RCheckbox = (props) => (
             value={props.value}
             checked={(props.checked === 1) ? true : false}
         />
-        <label style={{marginLeft: "8px"}} htmlFor={props.inputId} className={"chkbox-gray-border " + (props.labelClass ? props.labelClass : "")}>
-            {(props.label !== "" && typeof props.label != 'undefined') && props.label}
+        <label htmlFor={props.inputId} className={"chkbox-gray-border " + (props.labelClass ? props.labelClass : "")}>
+            {(props.label !== "" && typeof props.label != 'undefined') && <var style={{ fontStyle: "normal" }} >{props.label}</var>}
         </label>
     </React.Fragment>
 )
@@ -120,7 +164,7 @@ export const RButton = (props) => (
                         </g>
                     </svg>
                     : props.iClassType === 'save' ?
-                        <svg version="1.1" className='icon_save' width= "16" height="16" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                        <svg version="1.1" className='icon_save' width="16" height="16" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                             viewBox="0 0 256 256" style={{ enableBackground: "new 0 0 256 256", fill: "white" }} xmlSpace="preserve">
 
                             <g transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">

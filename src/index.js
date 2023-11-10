@@ -8,7 +8,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter } from 'react-router-dom';
-import { I18nextProvider } from "react-i18next";
+import { I18nextProvider, initReactI18next } from "react-i18next";
 import i18next from "i18next";
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -16,20 +16,17 @@ import en from './languages/en.json';
 import vi from './languages/vi.json';
 import th from './languages/th.json';
 
-i18next.init({
+const resources = {
+  en: { translation: en },
+  vi: { translation: vi },
+  th: { translation: th }
+};
+
+i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
-  lng: 'en',
-  resources: {
-    vi: {
-      common: vi
-    },
-    en: {
-      common: en
-    },
-    th: {
-      common: th
-    }
-  },
+  lng: 'en', // if you're using a language detector, do not define the lng option
+  debug: false,
+  resources
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

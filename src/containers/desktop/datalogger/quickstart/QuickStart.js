@@ -1,32 +1,3 @@
-// import { Component } from 'react';
-// import { withTranslation } from 'react-i18next';
-// import QuickStartJsx from './QuickStart.jsx';
-
-// class QuickStart extends Component {
-
-//     constructor(props, context) {
-//         super(props, context);
-//         this.jsxTemplate = QuickStartJsx;
-//         this.state = {
-//             tab: 2
-//         };
-//     }
-
-
-//     onClickChangeTab = (index) => {
-//         this.setState({
-//             tab: index
-//         });
-//     }
-
-//     render() {
-//         return this.jsxTemplate.call(this)
-//     }
-// }
-
-
-// const HighOrderComponentTranslated = withTranslation('common')(QuickStart)
-// export default HighOrderComponentTranslated;
 import { Outlet } from "react-router-dom";
 import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
 import NavTabs from '../../../../components/navTabs/NavTabs';
@@ -49,43 +20,43 @@ function QuickStart() {
                     <NavTabs
                         routes={[
                             {
-                                path: `/datalogger/quickstart`,
+                                path: "/datalogger/quickstart",
                                 name: "Site Information"
                             },
                             {
-                                path: `/datalogger/quickstart/ethernet-1`,
-                                name: "Ethernet 1"
+                                path: "/datalogger/quickstart/ethernet-1",
+                                name: "Ethernet-1"
                             },
                             {
-                                path: `/datalogger/quickstart/ethernet-2`,
-                                name: "Ethernet 2"
+                                path: "/datalogger/quickstart/ethernet-2",
+                                name: "Ethernet-2"
                             },
                             {
-                                path: `/datalogger/quickstart/firmware`,
+                                path: "/datalogger/quickstart/firmware",
                                 name: "Firmware"
                             },
                             {
-                                path: `/datalogger/quickstart/rs485-1`,
-                                name: "RS485 1"
+                                path: "/datalogger/quickstart/rs485-1",
+                                name: "RS485-1"
                             },
                             {
-                                path: `/datalogger/quickstart/rs485-2`,
-                                name: "RS485 2"
+                                path: "/datalogger/quickstart/rs485-2",
+                                name: "RS485-2"
                             },
                             {
-                                path: `/datalogger/quickstart/logging-rate`,
+                                path: "/datalogger/quickstart/logging-rate",
                                 name: "Logging Rate"
                             },
                             {
-                                path: `/datalogger/quickstart/upload-channels`,
+                                path: "/datalogger/quickstart/upload-channels",
                                 name: "Upload Channels"
                             },
                             {
-                                path: `/datalogger/quickstart/remote-access`,
+                                path: "/datalogger/quickstart/remote-access",
                                 name: "Remote Access"
                             },
                             {
-                                path: `/datalogger/quickstart/done`,
+                                path: "/datalogger/quickstart/done",
                                 name: "Done"
                             }
                         ]}

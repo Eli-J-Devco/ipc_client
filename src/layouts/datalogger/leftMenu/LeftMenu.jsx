@@ -7,7 +7,7 @@ export default function LeftMenu() {
         <div className={styles.left_menu}>
             <ul>
                 <li>
-                    <NavLink to="quickstart" className={(navData) => navData.isActive ? styles.active : ""} end>
+                    <NavLink to="quickstart" className={(navData) => navData.isActive ? styles.active : ""}>
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect width="18" height="18" fill="url(#pattern0)" />
                             <defs>

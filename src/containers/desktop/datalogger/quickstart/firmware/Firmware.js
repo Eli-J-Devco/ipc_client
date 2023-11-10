@@ -1,29 +1,29 @@
-import { Component } from 'react';
-import { withTranslation } from 'react-i18next';
-import FirmwareJsx from './Firmware.jsx';
+import { useTranslation } from "react-i18next";
+import styles from './Firmware.module.scss';
 
-class Firmware extends Component {
+function Firmware() {
+    const { t } = useTranslation();
 
-    constructor(props, context) {
-        super(props, context);
-        this.jsxTemplate = FirmwareJsx;
-        this.state = {
-            tab: 1
-        };
-    }
+    return (
+        <div className={styles.firmwre}>
+            <div className='note'>
+                <p> {t('site.firmware_note')} </p>
+            </div>
 
+            <div className={styles.form_body}>
+                <div className='container'>
+                    <div className='row'>
+                        <div className='col-md-3'></div>
+                        <div className='col-md-6'>
+                            Firmware
+                        </div>
+                        <div className='col-md-3'></div>
+                    </div>
+                </div>
+            </div>
 
-    onClickChangeTab = (index) => {
-        this.setState({
-            tab: index
-        });
-    }
-
-    render() {
-        return this.jsxTemplate.call(this)
-    }
+        </div>
+    );
 }
 
-
-const HighOrderComponentTranslated = withTranslation('common')(Firmware)
-export default HighOrderComponentTranslated;
+export default Firmware;

@@ -26,7 +26,6 @@ import EnthernetTwo from './containers/desktop/datalogger/quickstart/ethernetTwo
 import Firmware from './containers/desktop/datalogger/quickstart/firmware/Firmware';
 import RS485One from './containers/desktop/datalogger/quickstart/rs485One/Rs485One';
 import RS485Two from './containers/desktop/datalogger/quickstart/rs485Two/Rs485Two';
-
 import LoggingRate from './containers/desktop/datalogger/quickstart/loggingRate/LoggingRate';
 import UploadChannels from './containers/desktop/datalogger/quickstart/uploadChannels/UploadChannels';
 import RemoteAccess from './containers/desktop/datalogger/quickstart/remoteAccess/RemoteAccess';
@@ -42,7 +41,6 @@ export default class App extends Component {
                     <Route path='/reset-password' element = {<ResetPassword />}> </Route>
 
                     <Route path='/datalogger' element = {<Datalogger />}>
-                        <Route index element = {<QuickStart />} />
                         <Route path='quickstart' element = {<QuickStart />}>
                             <Route index element = {<SiteInformation />} />
                                 <Route path='ethernet-1' element={<EnthernetOne />} />
