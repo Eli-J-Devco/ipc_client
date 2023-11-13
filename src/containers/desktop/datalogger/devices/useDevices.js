@@ -4,10 +4,15 @@
 * 
 *********************************************************/
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 export default function useDevices() {
   const [isAddDevice, setIsAddDevice] = useState(false);
-
+  const navigate = useNavigate();
+  const handleConfigDevice = item => {
+    navigate(`/datalogger/devices/${item.id}`);
+};
 
   const openAddDevice = () => setIsAddDevice(true);
   const closeAddDevice = () => setIsAddDevice(false);
@@ -16,6 +21,7 @@ export default function useDevices() {
   return {
     isAddDevice,
     openAddDevice,
-    closeAddDevice
+    closeAddDevice,
+    handleConfigDevice
   }
 }

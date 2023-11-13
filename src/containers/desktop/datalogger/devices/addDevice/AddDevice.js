@@ -17,7 +17,7 @@ import useAddDevice from './useAddDevice';
 export default function AddDevice(props) {
   const { closeAddDevice } = props;
   const { isAddMultipleDevice, openAddMultipleDevice, closeAddMultipleDevice, handleDropdownChange, handleInputChange, curItem }  = useAddDevice();
-
+  
   const options = [
     { id: "1", value: "datalogger", label: 'Data Logger' },
     { id: "2", value: "inverter", label: 'Inverter' },
@@ -39,7 +39,6 @@ export default function AddDevice(props) {
     </div>
   
   return (
-    <>
     <Modal
       isOpen={true}
       close={closeAddDevice}
@@ -99,6 +98,7 @@ export default function AddDevice(props) {
             inputId="device_name"
             inputName="device_name"
             name="device_name"
+            value={curItem.device_name}
             onChange={(e) => handleInputChange(e) }
             info="Device Name Note"
           > </RText>
@@ -194,6 +194,7 @@ export default function AddDevice(props) {
               inputId="device_number"
               inputName="device_number"
               name="device_number"
+              value={curItem.device_number}
               onChange={(e) => handleInputChange(e)}
               info="device number note"
             > </RText>
@@ -208,6 +209,7 @@ export default function AddDevice(props) {
               inputId="rtu_bus_address"
               inputName="rtu_bus_address"
               name="rtu_bus_address"
+              value={curItem.rtu_bus_address}
               onChange={(e) => handleInputChange(e) }
               info="RTU Bus-Address"
             > </RText>
@@ -222,6 +224,7 @@ export default function AddDevice(props) {
               inputId="tcp_gateway_port"
               inputName="tcp_gateway_port"
               name="tcp_gateway_port"
+              value={curItem.tcp_gateway_port}
               onChange={(e) => handleInputChange(e) }
               info="MB/TCP Gateway Port"
             > </RText>
@@ -236,6 +239,7 @@ export default function AddDevice(props) {
               inputId="tcp_gateway_ip"
               inputName="tcp_gateway_ip"
               name="tcp_gateway_ip"
+              value={curItem.tcp_gateway_ip}
               onChange={(e) => handleInputChange(e) }
               info="MB/TCP Gateway IP-Address"
             > </RText>
@@ -281,7 +285,5 @@ export default function AddDevice(props) {
         </div>
       </div>
     </Modal>
-
-    </>
   )
 }

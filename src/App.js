@@ -9,6 +9,7 @@ import ResetPassword from './layouts/login/resetPassword/ResetPassword';
 import Scada from './layouts/scada/Scada';
 import ScadaDashboard from './containers/desktop/scada/daskboard/Dashboard';
 import Devices from './containers/desktop/datalogger/devices/Devices';
+import ConfigDevice from './containers/desktop/datalogger/devices/configDevice/ConfigDevice';
 import ScadaDevices from './containers/desktop/scada/devices/Devices';
 import RS485 from './containers/desktop/datalogger/RS485/RS485';
 import Device from './containers/desktop/datalogger/RS485/device/Device';
@@ -57,7 +58,9 @@ export default class App extends Component {
                             <Route path=':id' element={<Device />} />
                             <Route path='options' element = {<Options />} />
                         </Route>
-                        <Route path='devices' element = {<Devices />} />
+                        <Route path='devices' element = {<Devices />} >
+                            <Route path=':id' element={<ConfigDevice />} />
+                        </Route>
                         <Route path='templates' element={<Templates />} >
                             <Route index element = {<TemplatesManagement />} />
                             <Route path=':name' element={<Template />} >
