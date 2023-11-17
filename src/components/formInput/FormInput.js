@@ -1,7 +1,7 @@
 import Form from 'react-bootstrap/Form';
 import ReactSelect from 'react-select';
 import useValidate from './useValidate';
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import styles from "./FormInput.module.scss";
 
 const FormInputContext = createContext();
@@ -138,5 +138,60 @@ function Select({ className, label, name, option, horizontal, closeMenuOnSelect,
     );
 }
 FormInput.Select = Select;
+
+function File({ className, name, value, disabled, readOnly, accept, onChange }) {
+    const validate = useContext(FormInputContext);
+    const [file, setFile] = useState(undefined);
+    const firstRender = useRef(true);
+
+    useEffect(() => {
+        if (validate && !firstRender.current) validate.setFieldTouched(name, true);
+        firstRender.current = false;
+    }, [file]);
+
+    return (
+        <div className={`${styles["form-file-container"]} ${className ? className : ""}`}>
+            <div className={styles["form-file-wrapper"]}>
+                <label
+                    htmlFor={name}
+                    className={styles["form-file"]}
+                >
+                    Select file
+
+                    <input
+                        type="file"
+                        id={name}
+                        name={name}
+                        disabled={disabled}
+                        readOnly={readOnly}
+                        accept={accept}
+                        onChange={
+                            validate && onChange === undefined ?
+                                e => {
+                                    const file = e.target.files ? e.target.files[0] : undefined;
+                                    validate.setFieldValue(name, file);
+                                    setFile(file);
+                                }
+                                :
+                                onChange
+                        }
+                    />
+                </label>
+
+                <span className={styles.description}>
+                    {
+                        validate ?
+                            file ? file.name : "No file selected"
+                            :
+                            value ? value.name : "No file selected"
+                    }
+                </span>
+            </div>
+
+            {validate && validate.touched[name] && validate.errors[name] ? <div className={styles.errors}>{validate.errors[name]}</div> : ""}
+        </div>
+    );
+}
+FormInput.File = File;
 
 export default FormInput;

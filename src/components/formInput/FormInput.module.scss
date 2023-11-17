@@ -68,3 +68,40 @@
         width: 100%;
     }
 }
+
+.form-file-container {
+    .form-file-wrapper {
+        border: 1px solid var(--bg-color-dark);
+        padding: 10px 0;
+        border-radius: 10px;
+        width: fit-content;
+        background-color: var(--bg-color-white);
+    
+        .form-file {
+            background-color: var(--bg-color-grey);
+            padding: 3px 7px;
+            border-radius: 4px;
+            margin: 0 20px;
+            &:hover {
+                opacity: 0.8;
+                cursor: pointer;
+            }
+        }
+    
+        .description {
+            margin: 0 20px;
+            text-wrap: nowrap;
+        }
+    
+        input { 
+            display: none;
+        }
+    }
+
+    .errors {
+        color: var(--bs-form-invalid-color);
+        font-size: .875em;
+        margin-top: 0.25rem;
+        width: 100%;
+    }
+}
