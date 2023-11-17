@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 function useTemplatesManagement() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [template, setTemplate] = useState("Modbus Template");
+    const [fileUpload, setFileUpload] = useState(null);
     const [columns, ] = useState([
         {
             id: 1,
@@ -41,6 +42,9 @@ function useTemplatesManagement() {
     const handleOnItemEdit = item => {
         navigate(`/datalogger/templates/${item.file_name}/points`);
     };
+    const handleFileUploadChange = (e) => {
+        setFileUpload(e.target.files ? e.target.files[0] : undefined)
+    }
 
     return {
         isModalOpen,
@@ -49,7 +53,9 @@ function useTemplatesManagement() {
         template,
         columns,
         templateList,
-        handleOnItemEdit
+        handleOnItemEdit,
+        fileUpload,
+        handleFileUploadChange
     };
 }
 

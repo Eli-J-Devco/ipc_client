@@ -5,9 +5,10 @@ import CreateTemplateModal from "./createTemplateModal/CreateTemplateModal";
 import useTemplatesManagement from "./useTemplatesManagement";
 import { ReactComponent as EditIcon } from "../../../../../assets/images/edit.svg";
 import { ReactComponent as DeleteIcon } from "../../../../../assets/images/delete.svg";
+import FormInput from "../../../../../components/formInput/FormInput";
 
 function TemplatesManagement() {
-    const { isModalOpen, openModal, closeModal, template, columns, templateList, handleOnItemEdit } = useTemplatesManagement();
+    const { isModalOpen, openModal, closeModal, template, columns, templateList, handleOnItemEdit, fileUpload, handleFileUploadChange } = useTemplatesManagement();
 
     return (
         <div className={styles["template-management"]} >
@@ -67,6 +68,14 @@ function TemplatesManagement() {
                         </div>
 
                         <div className={styles.body}>
+                            <FormInput.File
+                                name="file_upload"
+                                onChange={handleFileUploadChange}
+                                value={fileUpload}
+                                accept=".json"
+                                className="mb-2"
+                            />
+
                             <Button variant="dark" >
                                 <Button.Text text="Upload File" />
                             </Button>
