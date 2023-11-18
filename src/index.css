@@ -14,13 +14,10 @@ a{
 }
 
 .main{
-  position: absolute;
-  top: 60px;
-  width: calc(100% - 250px);
-  height: calc(100% - 60px);
-  right: 0;
+  height: 100%;
   overflow-x: auto;
   padding: 10px;
+  flex: 1;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',

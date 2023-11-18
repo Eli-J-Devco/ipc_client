@@ -1,0 +1,32 @@
+.datalogger {
+    height: 100vh;
+    
+    .container {
+        height: calc(100% - 60px);
+        display: flex;
+        flex-direction: row;
+
+        .sidebar{
+            background-color: #fafbfc;
+            height: 100%;
+            min-width: 200px;
+            max-width: 300px;
+            box-shadow: 0px 2px 5px #DDD;
+            overflow-x: auto;
+            display: flex;
+            flex-direction: row;
+
+            .resizer {
+                flex-basis: 5px;
+                cursor: col-resize;
+                -webkit-user-select: none; /* Safari */
+                -ms-user-select: none; /* IE 10 and IE 11 */
+                user-select: none; /* Standard syntax */
+                
+                &:hover {
+                    background-color: var(--bg-color-light);
+                }
+            }
+        }
+    }
+}
