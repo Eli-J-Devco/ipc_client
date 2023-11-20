@@ -6,7 +6,7 @@ import Button from '../button/Button';
 import DropDowns from './dropDowns/DropDowns';
 import Header from './headers/Header';
 
-function Table({ variant, className, maxHeight, maxWidth, columns, data, visible, resizable, draggable, ...slugProps }) {
+function Table({ variant, className, maxHeight, columns, data, visible, resizable, draggable, ...slugProps }) {
     // slugProps: pass component that wrapping value by prop that have the same name with slug value
     const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef } = useTable({ columns, data, slugProps });
 
@@ -31,7 +31,7 @@ function Table({ variant, className, maxHeight, maxWidth, columns, data, visible
             </div>
 
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
-                <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ maxWidth:  table.getTotalSize() }}>
+                <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ width: table.getTotalSize() }}>
                     <thead>
                         <tr className={styles["header-row"]}>
                             {

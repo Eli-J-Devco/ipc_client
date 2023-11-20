@@ -1,16 +1,28 @@
 import React from "react";
 import { Outlet } from 'react-router-dom';
 import Header from "./header/Header";
-import Footer from "./footer/Footer";
+// import Footer from "./footer/Footer";
 import LeftMenu from "./leftMenu/LeftMenu";
+import styles from "./Datalogger.module.scss";
+import useResizableSideBar from "./useResizableSidebar";
 
-function Datalogger(props){
+function Datalogger() {
+    const { sidebarWidth, startResizing } = useResizableSideBar();
+    
     return (
-        <div className="datalogger">
+        <div className={styles.datalogger}>
             <Header />
-            <LeftMenu />
-            <Outlet />
-            <Footer />
+            <div className={styles.container}>
+                <div className={styles.sidebar} style={{ width: sidebarWidth }}>
+                    <LeftMenu/>
+                    <div
+                        className={styles.resizer}
+                        onMouseDown={startResizing}
+                    />
+                </div>
+                <Outlet />
+            </div>
+            {/* <Footer /> */}
         </div>
     );
 }
