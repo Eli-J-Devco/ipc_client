@@ -1,0 +1,67 @@
+.filter {
+    .utils {
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .main {
+        .header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            background-color: var(--bg-color-light);
+            padding: 7px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+
+            .clear-all-button {
+                padding: 3px 6px;
+            }
+        }
+    
+        .body {
+            margin-bottom: 15px;
+
+            .search {
+                input {
+                    border-radius: 15px;
+                    border-color: var(--bg-color-dark);
+                }
+            }
+
+            .check-box-wrapper {
+                max-width: none;
+
+                .fieldset {
+                    border: 1px solid var(--bg-color-light);
+                    border-radius: 4px;
+                    padding: 0 10px;
+                    height: 250px;
+                    overflow: auto;
+    
+                    .legend {
+                        float: none;
+                        padding: 0 2px;
+                        width: unset;
+                        font-size: 14px;
+                        font-weight: bold;
+                    }
+    
+                    &.others {
+                        height: 120px;
+
+                        &.top {
+                            margin-bottom: 10px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .footer {
+            display: flex;
+            justify-content: center;
+        }
+    }
+}

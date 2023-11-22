@@ -30,6 +30,7 @@ import LoggingRate from './containers/desktop/datalogger/quickstart/loggingRate/
 import UploadChannels from './containers/desktop/datalogger/quickstart/uploadChannels/UploadChannels';
 import RemoteAccess from './containers/desktop/datalogger/quickstart/remoteAccess/RemoteAccess';
 import Done from './containers/desktop/datalogger/quickstart/done/Done';
+import Alarms from './containers/desktop/datalogger/alarms/Alarms';
 
 export default class App extends Component {
     render() {
@@ -66,6 +67,7 @@ export default class App extends Component {
                                 <Route path='advanced' element = {<Advanced />} />
                             </Route>
                         </Route>
+                        <Route path='alarms' element = {<Alarms />} />
                     </Route>
 
                     <Route path='/scada' element = {<Scada />}>
