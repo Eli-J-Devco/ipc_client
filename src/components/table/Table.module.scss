@@ -1,5 +1,13 @@
 .control {
     margin: 10px 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    .side {
+        flex-basis: 100px;
+    }
 }
 
 .table-wrapper {

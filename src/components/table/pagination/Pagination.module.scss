@@ -1,0 +1,36 @@
+.pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+    user-select: none;
+    
+    .item {
+        color: var(--text-color-dark);
+        background-color: var(--bg-color-white);
+        margin: 0 2px !important;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .control {
+        color: var(--text-color-dark);
+        margin: 0 2px !important;
+    }
+
+    .ellipsis {
+        color: var(--text-color-dark);
+        margin: 0 2px !important;
+        background-color: var(--bg-color-white);
+        cursor: default;
+        box-shadow: none;
+    }
+
+    span.item,
+    a.item:hover,
+    a.control:hover {
+        background-color: var(--bg-color-yellow);
+        border-color: var(--bg-color-yellow);
+    }
+
+    a.control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(56, 52, 52, 0.25);
+    }
+}
