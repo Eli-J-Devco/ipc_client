@@ -1,5 +1,29 @@
 .control {
     margin: 10px 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    .center {
+        display: flex;
+        
+        .page-count {
+            margin: 0 2px;
+            background-color: var(--bg-color-light);
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+
+            &:focus-visible {
+                outline: none;
+            }
+        }
+    }
+
+    .side {
+        flex-basis: 100px;
+    }
 }
 
 .table-wrapper {
@@ -13,14 +37,23 @@
     
         &.grey {
             background-color: var(--bg-color-grey);
+
+            .footer-row {
+                .item {
+                    background-color: var(--bg-color-grey);
+                }
+            }
         }
     
         &.light {
             background-color: var(--bg-color-white);
+
+            .footer-row {
+                .item {
+                    background-color: var(--bg-color-white);
+                }
+            }
         }
-    
-        // .header-row {
-        // }
     
         .body-row {
             background-color: var(--bg-color-white);
@@ -61,6 +94,12 @@
     
         .footer-row {
             height: 10px;
+
+            .item {
+                position: sticky;
+                bottom: 0;
+                background-color: var(--bg-color-light);
+            }
         }
     }
 }

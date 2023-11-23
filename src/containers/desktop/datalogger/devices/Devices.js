@@ -53,7 +53,7 @@ export default function Devices() {
 
 
   return (
-    <div className={styles.main_devices}>
+    <div className={`main ${styles.main_devices}`}>
       {isAddDevice && <AddDevice  closeAddDevice={closeAddDevice} />}
       <div className={styles.header_devices}>
         <div className='row'>

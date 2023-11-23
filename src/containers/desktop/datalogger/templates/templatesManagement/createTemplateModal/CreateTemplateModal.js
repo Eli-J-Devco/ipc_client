@@ -30,7 +30,7 @@ function CreateTemplateModal({ isOpen, close, template }) {
                 <Button.Text text={`Yes, Create ${template}`} />
             </Button>
 
-            <Button variant="light" onClick={close} className="ms-3" >
+            <Button variant="white" onClick={close} className="ms-3" >
                 <Button.Text text="Cancel" />
             </Button>
         </Modal>

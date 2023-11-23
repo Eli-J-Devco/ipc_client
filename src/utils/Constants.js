@@ -50,5 +50,7 @@ const Constants = {
         "APPROVAL":"approval",
         "FULL": "auths"
     },
+    "PAGE_SIZES": [10, 20, 50, 100],
+    "DEFAULT_PAGE_SIZE": 20,
 };
 export default Constants;

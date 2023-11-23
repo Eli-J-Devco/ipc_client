@@ -1,0 +1,29 @@
+.btn {
+    border: none;
+    padding: 7.5px 20px;
+    line-height: 14px;
+    background-color: transparent;
+    border: 1px solid var(--bg-color-dark);
+    margin-left: -1px;
+    text-wrap: nowrap;
+
+    &:first-child {
+        border-top-left-radius: 15px;
+        border-bottom-left-radius: 15px;
+    }
+
+    &:last-child {
+        border-top-right-radius: 15px;
+        border-bottom-right-radius: 15px;
+    }
+
+    &:hover {
+        background-color: var(--bg-color-yellow);
+        color: var(--text-color-dark);
+    }
+
+    &.active {
+        color: var(--text-color-light);
+        background-color: var(--bg-color-dark);
+    }
+}

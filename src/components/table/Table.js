@@ -5,33 +5,83 @@ import { ReactComponent as ColumnsIcon } from '../../assets/images/table-columns
 import Button from '../button/Button';
 import DropDowns from './dropDowns/DropDowns';
 import Header from './headers/Header';
+import Pagination from './pagination/Pagination';
+import Constants from '../../utils/Constants';
 
-function Table({ variant, className, maxHeight, maxWidth, columns, data, visible, resizable, draggable, ...slugProps }) {
-    // slugProps: pass component that wrapping value by prop that have the same name with slug value
-    const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef } = useTable({ columns, data, slugProps });
+/**
+ * Table props
+ * @property {string}    variant                 - style base on specific variant
+ * @property {string}    className               - custom class
+ * @property {string}    maxHeight               - set maxHeight inline style for table (exclude control bar) for each specific case
+ * @property {object[]}  columns                 - table columns definition
+ * @property {number}    columns[].id            - column id
+ * @property {string}    columns[].slug          - column slug
+ * @property {string}    columns[].name          - oclumn name
+ * @property {string}    columns[].width         - column width: optional, default value: 100px
+ * @property {array}     data                    - fetching data
+ * @property {boolean}   visible                 - enable hide/unhide columns
+ * @property {boolean}   resizable               - enable resize columns
+ * @property {boolean}   draggable               - enable reorder columns
+ * @property {object}    pagination              - pagination
+ * @property {boolean}   pagination.enable       - enable pagination
+ * @property {string}    pagination.total        - total records without limit and offset
+ * @property {string}    pagination.setLimit     - get limit from table component
+ * @property {string}    pagination.setOffset    - get offset from table component
+ * @property {component} slugProps               - component that wrapping cell's value. when pass component in, prop's name is column's slug value
+ */
+function Table({ variant, className, maxHeight, columns, data, visible, resizable, draggable, pagination, ...slugProps }) {
+    const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef, handleOnChangePageSize } = useTable({ columns, data, total: pagination?.total, setLimit: pagination?.setLimit, setOffset: pagination?.setOffset, slugProps });
 
     return (
-        <div style={{ maxWidth: table.getTotalSize() }}>
-            <div className={`d-flex ${styles.control}`}>
-                {
-                    visible &&
-                    <div className="position-relative">
-                        <Button.Image
-                            image={<ColumnsIcon />}
-                            onClick={handleOpenDropDowns}
-                        />
+        <div>
+            <div className={styles.control}>
+                <div className={styles.side}>
+                    {
+                        visible &&
+                        <div className="position-relative">
+                            <Button.Image
+                                image={<ColumnsIcon />}
+                                onClick={handleOpenDropDowns}
+                            />
 
-                        <DropDowns
-                            isShow={isDropDownsShow}
-                            data={table}
-                            refProp={dropDownsRef}
-                        />
-                    </div>
-                }
+                            <DropDowns
+                                isShow={isDropDownsShow}
+                                data={table}
+                                refProp={dropDownsRef}
+                            />
+                        </div>
+                    }
+                </div>
+
+                <div className={styles.center}>
+                    {
+                        pagination?.enable && table.getPageCount() > 0 &&
+                            <>
+                                <select
+                                    className={styles["page-count"]}
+                                    value={table.getState().pagination.pageSize}
+                                    onChange={handleOnChangePageSize}
+                                >
+                                    {
+                                        Constants.PAGE_SIZES.map(pageSize => (
+                                            <option key={pageSize} value={pageSize}>
+                                                {pageSize} items/page
+                                            </option>
+                                        ))
+                                    }
+                                </select>
+                            
+                                <Pagination controls={table} />
+                            </>
+                    }
+                </div>
+
+                <div className={styles.side}>
+                </div>
             </div>
 
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
-                <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ maxWidth:  table.getTotalSize() }}>
+                <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ minWidth: table.getTotalSize() }}>
                     <thead>
                         <tr className={styles["header-row"]}>
                             {
@@ -70,6 +120,15 @@ function Table({ variant, className, maxHeight, maxWidth, columns, data, visible
                     
                     <tfoot>
                         <tr className={styles["footer-row"]}>
+                            {
+                                table.getAllColumns().map(column => (
+                                    <td
+                                        key={column.id}
+                                        className={styles.item}
+                                    >
+                                    </td>
+                                ))
+                            }
                         </tr>
                     </tfoot>
                 </table>

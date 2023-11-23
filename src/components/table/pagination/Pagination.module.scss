@@ -1,0 +1,62 @@
+$box-shadow-dark: 0 0 0 0.25rem rgba(56, 52, 52, 0.25);
+$border-radius: 0.25rem;
+$margin: 0 2px !important;
+$width: 31px;
+$padding: 4px 0;
+
+.pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+    user-select: none;
+    
+    .item {
+        color: var(--text-color-dark);
+        background-color: var(--bg-color-light);
+        border: none;
+        border-radius: $border-radius;
+        margin: $margin;
+        width: $width;
+        padding: $padding;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+
+        &:focus {
+            box-shadow: $box-shadow-dark;
+        }
+    }
+
+    .control {
+        color: var(--text-color-dark);
+        background-color: var(--bg-color-light);
+        border: none;
+        border-radius: $border-radius;
+        margin: $margin;
+        width: $width;
+        padding: $padding;
+        text-align: center;
+    }
+
+    .ellipsis {
+        color: var(--text-color-dark);
+        background-color: var(--bg-color-light);
+        border: none;
+        border-radius: $border-radius;
+        margin: $margin;
+        width: $width;
+        padding: $padding;
+        text-align: center;
+        cursor: default;
+        box-shadow: none;
+    }
+
+    span.item,
+    a.item:hover,
+    a.control:hover {
+        background-color: var(--bg-color-yellow);
+        border-color: var(--bg-color-yellow);
+    }
+
+    a.control:focus {
+        box-shadow: $box-shadow-dark;
+    }
+}

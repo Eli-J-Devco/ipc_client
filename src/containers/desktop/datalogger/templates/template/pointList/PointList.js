@@ -26,7 +26,7 @@ function PointList() {
                 visible
                 resizable
                 draggable
-                maxHeight="600px"
+                maxHeight="calc(100vh - 400px)"
                 columns={columns}
                 data={pointList}
                 action={item => (

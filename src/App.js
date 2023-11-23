@@ -29,6 +29,7 @@ import LoggingRate from './containers/desktop/datalogger/quickstart/loggingRate/
 import UploadChannels from './containers/desktop/datalogger/quickstart/uploadChannels/UploadChannels';
 import RemoteAccess from './containers/desktop/datalogger/quickstart/remoteAccess/RemoteAccess';
 import Done from './containers/desktop/datalogger/quickstart/done/Done';
+import Alarms from './containers/desktop/datalogger/alarms/Alarms';
 
 import RS485OneRS from './containers/desktop/datalogger/RS485/rs485OneRS/Rs485OneRS';
 import RS485TwoRS from './containers/desktop/datalogger/RS485/rs485TwoRS/Rs485TwoRS';
@@ -115,6 +116,7 @@ export default class App extends Component {
                                 <Route path='advanced' element = {<Advanced />} />
                             </Route>
                         </Route>
+                        <Route path='alarms' element = {<Alarms />} />
                     </Route>
 
                     <Route path='/scada' element = {<Scada />}>
