@@ -44,7 +44,21 @@
         "remote_access_note": "Enable the Remote Access feature if you would like to allow secure off-site configuration and monitoring through our R-A server.",
         "allow_remote": "Allow Remote Access",
         "done_note": "Choose the web page you would like to see first after you log in.",
-        "go_to_page": "First Page on Login"
+        "go_to_page": "First Page on Login",
+        "search_mbrtu": "Search for Modbus/RTU Devices",
+        "search_mbrtu_note": "Note",
+        "scheduled_upload_time": "Scheduled Upload Time ",
+        "times_to_retry": "Number of Times to Retry (on failure)",
+        "wait_before_retry": "Time to Wait before Retry (on failure)",
+        "upload_debug": "Upload Debug Information",
+        "alarm_status": "Upload Data on Alarm Status Change",
+        "low_disk_alarm": "Upload Data on Low Disk Alarm",
+        "system_startup": "Upload Data on System Startup",
+        "upload_schudule": "Data Upload Status",
+        "upload_schudule1": "senddata.log",
+        "names_only": "ModHopper Names Only",
+        "name_and_statistics": "Names and Statistics",
+        "attached_devices_only": "Attached Devices Only"
     },
     "devices": {
         "add_device": "Add Device",

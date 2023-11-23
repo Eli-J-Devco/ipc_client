@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
-import styles from './Rs485One.module.scss';
+import styles from './Rs485OneRS.module.scss';
 import { RCheckbox, RButton } from './../../../../../components/Controls';
 import ReactSelectDropdown from '../../../../../components/ReactSelectDropdown';
 import FormInput from "../../../../../components/formInput/FormInput";
 
-function Rs485One() {
+function Rs485OneRS() {
     const { t } = useTranslation();
     const parity = [
         { value: 0, label: 'None' },
@@ -195,23 +195,12 @@ function Rs485One() {
 
                                 <div className='form-footer'>
                                     <div className='mb-3'>
-                                        <RButton
-                                            className="btn_back"
-                                            text="Back"
-                                            iClass={true}
-                                            iClassType="back"
-                                        />
 
                                         <RButton
-                                            className="btn_save margin-left15"
+                                            className="btn_save"
                                             text="Save & Next"
                                             iClass={true}
                                             iClassType="save"
-                                        />
-
-                                        <RButton
-                                            className="btn_skip margin-left15"
-                                            text="Skip"
                                         />
 
                                     </div>
@@ -226,4 +215,4 @@ function Rs485One() {
     );
 }
 
-export default Rs485One;
+export default Rs485OneRS;

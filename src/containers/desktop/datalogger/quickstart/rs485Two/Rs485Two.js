@@ -52,7 +52,6 @@ function Rs485Two() {
                     <div className='row'>
                         <div className='col-md-3'></div>
                         <div className='col-md-6'>
-                            <FormInput id="rs4851-form">
                                 <div className="list-checkbox">
                                     <p> {t('site.rs485_baud_rate')} </p>
                                     <div className='mb-3'>
@@ -218,7 +217,6 @@ function Rs485Two() {
                                     </div>
                                 </div>
 
-                            </FormInput>
                         </div>
                         <div className='col-md-3'></div>
                     </div>
