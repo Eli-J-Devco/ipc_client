@@ -11,19 +11,10 @@ export default function useAddDevice() {
 
 
   const handleInputChange = (event, data) =>{
-    let target = event.target;
-    let name = target.name;
-    let value = target.value
-    if (target.type === 'radio') {
-        value = target.checked ? 1 : 0;
-    }
+    const { name, value } = event.target
     
-    if (name) {
-        let item = {} ;
-        item[name] = (event.target.validity.valid) ? value : curItem[name];
-        setCurItem(item);
-    }
-}
+    setCurItem({...curItem,  [name]: value});
+  }
 
   const handleDropdownChange = (item) => {
      

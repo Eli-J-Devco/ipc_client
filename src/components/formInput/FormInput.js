@@ -6,8 +6,8 @@ import styles from "./FormInput.module.scss";
 
 const FormInputContext = createContext();
 
-function FormInput({ children, className, id, onSubmit, initialValues }) {
-    const validate = useValidate(onSubmit, initialValues);
+function FormInput({ children, className, id, onSubmit, initialValues, validationSchema }) {
+    const validate = useValidate(onSubmit, initialValues, validationSchema);
 
     return (
         <FormInputContext.Provider value={validate} >
@@ -100,10 +100,10 @@ function Select({ className, label, name, option, horizontal, closeMenuOnSelect,
         }),
         control: (baseStyles, state) => ({
             ...baseStyles,
-            borderColor: state.isFocused ? "var(--bg-color-dark)" : "hsl(0, 0%, 80%)",
+            borderColor: state.isFocused ? "var(--bg-color-dark)" : validate && validate.touched[name] && validate.errors[name] ? "var(--bs-form-invalid-border-color)" : "hsl(0, 0%, 80%)",
             boxShadow: state.isFocused ? "0 0 0 0.25rem rgba(56, 52, 52, 0.25)" : "",
             "&:hover": {
-                borderColor: state.isFocused ? "var(--bg-color-dark)" : "hsl(0, 0%, 70%)"
+                borderColor: state.isFocused ? "var(--bg-color-dark)" : validate && validate.touched[name] && validate.errors[name] ? "var(--bs-form-invalid-border-color)" : "hsl(0, 0%, 70%)"
             },
             minHeight: 31
         })
@@ -128,10 +128,12 @@ function Select({ className, label, name, option, horizontal, closeMenuOnSelect,
                 maxMenuHeight={200}
                 menuPosition={"fixed"}
                 value={validate && value === undefined ? validate.values[name] : value}
-                onChange={validate && onChange === undefined ? validate.handleChange : onChange}
-                onBlur={validate && onBlur === undefined ? validate.handleBlur : onBlur}
+                onChange={validate && onChange === undefined ? selected => validate.setFieldValue(name, selected) : onChange}
+                onBlur={validate && onBlur === undefined ? e => validate.setFieldTouched(name, true) : onBlur}
                 placeholder={placeholder}
             />
+
+            {validate && validate.touched[name] && validate.errors[name] ? <div className={styles.errors}>{validate.errors[name]}</div> : ""}
         </div>
     );
 }

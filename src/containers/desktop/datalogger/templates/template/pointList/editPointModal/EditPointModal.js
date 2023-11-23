@@ -5,7 +5,7 @@ import styles from "./EditPointModal.module.scss";
 import useEditPointModal from "./useEditPointModal";
 
 function EditPointModal({ isOpen, close, data }) {
-    const { modbusConfig, setModbusConfig, modbusRegisterType, setModbusRegisterType } = useEditPointModal();
+    const { modbusConfig, setModbusConfig, modbusRegisterType, setModbusRegisterType, validationSchema } = useEditPointModal();
     
     return (
         <Modal
@@ -36,6 +36,7 @@ function EditPointModal({ isOpen, close, data }) {
                 id="point-configuration-form"
                 onSubmit={values => console.log(values)}
                 initialValues={data}
+                validationSchema={validationSchema}
             >
                 <div className="row my-2">
                     <div className="col-4">
@@ -80,6 +81,7 @@ function EditPointModal({ isOpen, close, data }) {
                     <div className="col-3 align-self-end">
                         <FormInput.Select
                             isSearchable={false}
+                            isClearable={true}
                         />
                     </div>
 
@@ -202,7 +204,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 <div className={`my-2 p-2 text-center fw-bold ${styles.title} ${styles.light}`}>
-                    Scalse & Offset
+                    Scale & Offset
                 </div>
 
                 {
