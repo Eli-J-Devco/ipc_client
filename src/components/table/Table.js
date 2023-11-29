@@ -58,7 +58,7 @@ function Table({ variant, className, maxHeight, columns, data, visible, resizabl
                         pagination?.enable && table.getPageCount() > 0 &&
                             <>
                                 <select
-                                    className={styles["page-count"]}
+                                    className={`${styles["page-count"]} ${variant ? styles[variant] : ""}`}
                                     value={table.getState().pagination.pageSize}
                                     onChange={handleOnChangePageSize}
                                 >
@@ -71,7 +71,7 @@ function Table({ variant, className, maxHeight, columns, data, visible, resizabl
                                     }
                                 </select>
                             
-                                <Pagination controls={table} />
+                                <Pagination controls={table} variant={variant} />
                             </>
                     }
                 </div>

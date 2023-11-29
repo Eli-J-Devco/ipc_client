@@ -52,11 +52,27 @@ $padding: 4px 0;
     span.item,
     a.item:hover,
     a.control:hover {
-        background-color: var(--bg-color-yellow);
-        border-color: var(--bg-color-yellow);
+        background-color: var(--bg-color-yellow) !important;
+        border-color: var(--bg-color-yellow) !important;
     }
 
     a.control:focus {
         box-shadow: $box-shadow-dark;
+    }
+
+    &.grey {
+        .item,
+        .control,
+        .ellipsis {
+            background-color: var(--bg-color-grey);
+        }
+    }
+
+    &.light {
+        .item,
+        .control,
+        .ellipsis {
+            background-color: var(--bg-color-white);
+        }
     }
 }

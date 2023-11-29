@@ -15,6 +15,14 @@
             border-radius: 0.25rem;
             cursor: pointer;
 
+            &.grey {
+                background-color: var(--bg-color-grey);
+            }
+
+            &.light {
+                background-color: var(--bg-color-white);
+            }
+
             &:focus-visible {
                 outline: none;
             }
