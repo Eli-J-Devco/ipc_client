@@ -78,9 +78,9 @@ function Filter({ isExpand, onExpand }) {
                     </div>
 
                     <div className={styles.body}>
-                        <div className="d-flex flex-wrap mb-3">
+                        <div className="d-flex flex-wrap gap-2 mb-3">
                             <FormInput.Text
-                                className={`my-1 ${styles.search}`}
+                                className={styles.search}
                                 placeholder="Keyword..."
                             />
 
@@ -99,11 +99,9 @@ function Filter({ isExpand, onExpand }) {
                                         text: "Year"
                                     },
                                 ]}
-                                className="mx-0 my-1 mx-sm-3"
                             />
 
                             <DatePickerButton
-                                className="my-1"
                                 prevDate="Aug 18, 2023"
                                 nextDate="Aug 20, 2023"
                             />

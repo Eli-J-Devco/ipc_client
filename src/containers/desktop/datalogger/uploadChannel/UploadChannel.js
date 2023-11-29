@@ -14,7 +14,7 @@ function UploadChannel() {
                         name: "Dashboard"
                     },
                     {
-                        path: "/datalogger/upload-channel",
+                        path: "/datalogger/upload",
                         name: "Upload Channels"
                     }
                 ]}
