@@ -30,6 +30,10 @@ import UploadChannels from './containers/desktop/datalogger/quickstart/uploadCha
 import RemoteAccess from './containers/desktop/datalogger/quickstart/remoteAccess/RemoteAccess';
 import Done from './containers/desktop/datalogger/quickstart/done/Done';
 import Alarms from './containers/desktop/datalogger/alarms/Alarms';
+import Data from './containers/desktop/datalogger/data/Data';
+import DataLogs from './containers/desktop/datalogger/data/dataLogs/DataLogs';
+import DataLoggingRate from './containers/desktop/datalogger/data/loggingRate/LoggingRate';
+import SyncHistory from './containers/desktop/datalogger/data/syncHistory/SyncHistory';
 
 import RS485OneRS from './containers/desktop/datalogger/RS485/rs485OneRS/Rs485OneRS';
 import RS485TwoRS from './containers/desktop/datalogger/RS485/rs485TwoRS/Rs485TwoRS';
@@ -108,15 +112,23 @@ export default class App extends Component {
                         <Route path='devices' element = {<Devices />} >
                             <Route path=':id' element={<ConfigDevice />} />
                         </Route>
+                        
                         <Route path='templates' element={<Templates />} >
-                            <Route index element = {<TemplatesManagement />} />
+                            <Route index element={<TemplatesManagement />} />
                             <Route path=':name' element={<Template />} >
                                 <Route path='points' element={<PointList />} />
-                                <Route path='registers' element = {<RegisterBlocks />} />
-                                <Route path='advanced' element = {<Advanced />} />
+                                <Route path='registers' element={<RegisterBlocks />} />
+                                <Route path='advanced' element={<Advanced />} />
                             </Route>
                         </Route>
-                        <Route path='alarms' element = {<Alarms />} />
+
+                        <Route path='data' element={<Data />} >
+                            <Route path='data-logs' element={<DataLogs />} />
+                            <Route path='logging-rate' element={<DataLoggingRate />} />
+                            <Route path='sync-history' element={<SyncHistory />} />
+                        </Route>
+                        
+                        <Route path='alarms' element={<Alarms />} />
                     </Route>
 
                     <Route path='/scada' element = {<Scada />}>
