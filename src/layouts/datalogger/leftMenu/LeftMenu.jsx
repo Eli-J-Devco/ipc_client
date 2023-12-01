@@ -95,7 +95,7 @@ export default function LeftMenu() {
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="data/data-logs" className={(navData) => navData.isActive ? styles.active : ""}>
+                    <NavLink to="data" className={(navData) => navData.isActive ? styles.active : ""}>
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
                             <rect width="18" height="18" fill="url(#datas)" />
                             <defs>
@@ -180,7 +180,7 @@ export default function LeftMenu() {
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="/systems" className={(navData) => navData.isActive ? styles.active : ""}>
+                    <NavLink to="system" className={(navData) => navData.isActive ? styles.active : ""}>
 
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
                             <rect width="18" height="18" fill="url(#system)" />
@@ -192,7 +192,7 @@ export default function LeftMenu() {
                             </defs>
                         </svg>
 
-                        <span>Systems</span>
+                        <span>System</span>
                     </NavLink>
                 </li>
                 <li>

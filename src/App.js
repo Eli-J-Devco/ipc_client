@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import QuickStart from './containers/desktop/datalogger/quickstart/QuickStart';
 import Datalogger from './layouts/datalogger/Datalogger';
 import Error from './layouts/error/Error';
 import LoginAdmin from './layouts/login/loginAdmin/LoginAdmin';
@@ -8,10 +7,11 @@ import ForgotPassword from './layouts/login/forgotPassword/ForgotPassword';
 import ResetPassword from './layouts/login/resetPassword/ResetPassword';
 import Scada from './layouts/scada/Scada';
 import ScadaDashboard from './containers/desktop/scada/daskboard/Dashboard';
+import ScadaDevices from './containers/desktop/scada/devices/Devices';
+
 import Devices from './containers/desktop/datalogger/devices/Devices';
 import ConfigDevice from './containers/desktop/datalogger/devices/configDevice/ConfigDevice';
-import ScadaDevices from './containers/desktop/scada/devices/Devices';
-import RS485 from './containers/desktop/datalogger/RS485/RS485';
+
 import Templates from './containers/desktop/datalogger/templates/Templates';
 import TemplatesManagement from './containers/desktop/datalogger/templates/templatesManagement/TemplatesManagement';
 import Template from './containers/desktop/datalogger/templates/template/Template';
@@ -19,6 +19,7 @@ import PointList from './containers/desktop/datalogger/templates/template/pointL
 import RegisterBlocks from './containers/desktop/datalogger/templates/template/registerBlocks/RegisterBlocks';
 import Advanced from './containers/desktop/datalogger/templates/template/advanced/Advanced';
 
+import QuickStart from './containers/desktop/datalogger/quickstart/QuickStart';
 import SiteInformation from './containers/desktop/datalogger/quickstart/siteInformation/SiteInformation';
 import EnthernetOne from './containers/desktop/datalogger/quickstart/ethernetOne/EthernetOne';
 import EnthernetTwo from './containers/desktop/datalogger/quickstart/ethernetTwo/EthernetTwo';
@@ -29,12 +30,15 @@ import LoggingRate from './containers/desktop/datalogger/quickstart/loggingRate/
 import UploadChannels from './containers/desktop/datalogger/quickstart/uploadChannels/UploadChannels';
 import RemoteAccess from './containers/desktop/datalogger/quickstart/remoteAccess/RemoteAccess';
 import Done from './containers/desktop/datalogger/quickstart/done/Done';
+
 import Alarms from './containers/desktop/datalogger/alarms/Alarms';
+
 import Data from './containers/desktop/datalogger/data/Data';
 import DataLogs from './containers/desktop/datalogger/data/dataLogs/DataLogs';
 import DataLoggingRate from './containers/desktop/datalogger/data/loggingRate/LoggingRate';
 import SyncHistory from './containers/desktop/datalogger/data/syncHistory/SyncHistory';
 
+import RS485 from './containers/desktop/datalogger/RS485/RS485';
 import RS485OneRS from './containers/desktop/datalogger/RS485/rs485OneRS/Rs485OneRS';
 import RS485TwoRS from './containers/desktop/datalogger/RS485/rs485TwoRS/Rs485TwoRS';
 import RS485Options from './containers/desktop/datalogger/RS485/options/Options';
@@ -49,11 +53,21 @@ import NetworkEnthernetTwo from './containers/desktop/datalogger/networking/ethe
 import NetworkAccess from './containers/desktop/datalogger/networking/networkAccess/NetworkAccess';
 import NWRemoteAccess from './containers/desktop/datalogger/networking/remoteAccess/RemoteAccess';
 import StaticRoutes from './containers/desktop/datalogger/networking/staticRoutes/StaticRoutes';
+
 import ModHoppers from './containers/desktop/datalogger/modHoppers/ModHoppers';
 import ModHoppersOne from './containers/desktop/datalogger/modHoppers/modHoppersOne/ModHoppersOne';
 import ModHoppersTwo from './containers/desktop/datalogger/modHoppers/modHoppersTwo/ModHoppersTwo';
 import GroupOptions from './containers/desktop/datalogger/modHoppers/groupOptions/GroupOptions';
 
+import System from './containers/desktop/datalogger/system/System';
+import SystemSiteInformation from './containers/desktop/datalogger/system/siteInformation/SiteInformation';
+import DateTime from './containers/desktop/datalogger/system/datetime/DateTime';
+import BackupRestore from './containers/desktop/datalogger/system/backupRestore/BackupRestore';
+import SystemFirmware from './containers/desktop/datalogger/system/firmware/Firmware';
+import AutoUpdate from './containers/desktop/datalogger/system/autoUpdate/AutoUpdate';
+import RebootShutdown from './containers/desktop/datalogger/system/rebootShutdown/RebootShutdown';
+import Synchronized from './containers/desktop/datalogger/system/synchronized/Synchronized';
+import Alarm from './containers/desktop/datalogger/system/alarm/Alarm';
 
 export default class App extends Component {
     render() {
@@ -123,12 +137,23 @@ export default class App extends Component {
                         </Route>
 
                         <Route path='data' element={<Data />} >
-                            <Route path='data-logs' element={<DataLogs />} />
+                            <Route index element={<DataLogs />} />
                             <Route path='logging-rate' element={<DataLoggingRate />} />
                             <Route path='sync-history' element={<SyncHistory />} />
                         </Route>
                         
                         <Route path='alarms' element={<Alarms />} />
+
+                        <Route path='system' element={<System />} >
+                            <Route index element={<SystemSiteInformation />} />
+                            <Route path='datetime' element={<DateTime />} />
+                            <Route path='backup-restore' element={<BackupRestore />} />
+                            <Route path='firmware' element={<SystemFirmware />} />
+                            <Route path='auto-update' element={<AutoUpdate />} />
+                            <Route path='reboot-shutdown' element={<RebootShutdown />} />
+                            <Route path='synchronized' element={<Synchronized />} />
+                            <Route path='alarm' element={<Alarm />} />
+                        </Route>
                     </Route>
 
                     <Route path='/scada' element = {<Scada />}>

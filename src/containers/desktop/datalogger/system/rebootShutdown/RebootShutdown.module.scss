@@ -1,0 +1,20 @@
+.firmware {
+    max-width: 400px;
+
+    .fieldset {
+        border: 1px solid var(--bg-color-grey);
+        border-radius: 4px;
+        padding: 0 10px;
+        margin: 20px 0;
+        overflow: auto;
+        width: 100%;
+    
+        .legend {
+            float: none;
+            padding: 0 2px;
+            width: unset;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    }
+}
