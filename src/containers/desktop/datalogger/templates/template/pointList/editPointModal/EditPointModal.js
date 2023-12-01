@@ -24,7 +24,7 @@ function EditPointModal({ isOpen, close, data }) {
                     </Button>
 
                     <Button
-                        variant="grey"
+                        variant="white"
                         className="m-0 ms-3"
                     >
                         <Button.Text text="Cancel"/>

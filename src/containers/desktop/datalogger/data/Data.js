@@ -13,7 +13,7 @@ function Data() {
                         name: "Dashboard"
                     },
                     {
-                        path: "/datalogger/data/data-logs",
+                        path: "/datalogger/data",
                         name: "Data"
                     }
                 ]}
@@ -23,7 +23,7 @@ function Data() {
                 <NavTabs
                     routes={[
                         {
-                            path: "/datalogger/data/data-logs",
+                            path: "/datalogger/data",
                             name: "Data Logs"
                         },
                         {
