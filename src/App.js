@@ -68,6 +68,7 @@ import AutoUpdate from './containers/desktop/datalogger/system/autoUpdate/AutoUp
 import RebootShutdown from './containers/desktop/datalogger/system/rebootShutdown/RebootShutdown';
 import Synchronized from './containers/desktop/datalogger/system/synchronized/Synchronized';
 import Alarm from './containers/desktop/datalogger/system/alarm/Alarm';
+import Users from './containers/desktop/datalogger/users/Users'
 
 export default class App extends Component {
     render() {
@@ -153,6 +154,10 @@ export default class App extends Component {
                             <Route path='reboot-shutdown' element={<RebootShutdown />} />
                             <Route path='synchronized' element={<Synchronized />} />
                             <Route path='alarm' element={<Alarm />} />
+                        </Route>
+
+                        <Route path='users' element={<Users />} >
+
                         </Route>
                     </Route>
 

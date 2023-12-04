@@ -1,0 +1,47 @@
+.header{
+  position: relative;
+  text-align: right;
+  .right_header{
+    display: flex;
+    position: absolute;
+    right: 10px;
+    top: 2px;
+    .search {
+      input {
+          border-radius: 15px;
+          border-color: var(--bg-color-dark);
+      }
+      margin-right: 1rem;
+    }
+    .button{
+      display: flex;
+      .export{
+        border-radius: 15px;
+        background-color: #D3D3D3;
+        width: auto;
+        padding: 5px 15px;
+        text-align: center;
+        cursor: pointer;
+        display: inline-block;
+        margin-right: 16px;
+        span{
+          margin-left: 8px;
+        }
+        svg{
+          position: relative;
+          top: -4px;
+        }
+      }
+      .add{
+        margin-right: 16px;
+        background-color: #D3D3D3;
+        border-radius: 15px;
+        width: 46px;
+        text-align: center;
+        cursor: pointer;
+        display: inline-block;
+        padding: 5px 15px;
+      }
+    }
+  }
+}
