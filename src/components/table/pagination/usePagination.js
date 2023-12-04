@@ -37,7 +37,7 @@ function usePagination({ controls, siblingCount = 1 }) {
         // Case 3: No right dots to show, but left dots to be shown
         if (shouldShowLeftDots && !shouldShowRightDots) {
             const rightItemCount = 3 + 2 * siblingCount;
-            const rightRange = range(lastPageIndex - rightItemCount, lastPageIndex);
+            const rightRange = range(lastPageIndex - rightItemCount + 1, lastPageIndex);
             return [firstPageIndex, -1, ...rightRange];
         }
          

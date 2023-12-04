@@ -1,9 +1,10 @@
 import { Outlet } from "react-router-dom";
 import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
+import styles from './UploadChannel.module.scss';
 import NavTabs from "../../../../components/navTabs/NavTabs";
-import styles from './RS485.module.scss';
 
-function RS485() {
+function UploadChannel() {
+
     return (
         <div className="main">
             <Breadcrumb
@@ -13,36 +14,33 @@ function RS485() {
                         name: "Dashboard"
                     },
                     {
-                        path: "/datalogger/rs485",
-                        name: "RS485"
+                        path: "/datalogger/upload-channel",
+                        name: "Upload Channels"
                     }
                 ]}
             />
 
-            <div className={styles.rs485}>
+
+            <div className={styles.upload_channels}>
                 <NavTabs
                     routes={[
                         {
-                            path: "/datalogger/rs485",
-                            name: "RS485-1"
+                            path: "/datalogger/upload",
+                            name: "Upload Channels"
                         },
                         {
-                            path: "/datalogger/rs485/2",
-                            name: "RS485-2"
-                        },
-                        {
-                            path: "/datalogger/rs485/options",
-                            name: "Options"
+                            path: "/datalogger/upload/schedule",
+                            name: "Upload Schedule"
                         }
                     ]}
                 />
 
                 <div className={styles.outlet}>
-                    <Outlet />
+                    {<Outlet />}
                 </div>
             </div>
         </div>
     );
 }
 
-export default RS485;
+export default UploadChannel;

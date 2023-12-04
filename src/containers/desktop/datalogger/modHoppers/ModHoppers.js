@@ -1,9 +1,9 @@
 import { Outlet } from "react-router-dom";
 import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
 import NavTabs from "../../../../components/navTabs/NavTabs";
-import styles from './RS485.module.scss';
+import styles from './ModHoppers.module.scss';
 
-function RS485() {
+function ModHoppers() {
     return (
         <div className="main">
             <Breadcrumb
@@ -13,25 +13,25 @@ function RS485() {
                         name: "Dashboard"
                     },
                     {
-                        path: "/datalogger/rs485",
-                        name: "RS485"
+                        path: "/datalogger/modhoppers",
+                        name: "ModHoppers"
                     }
                 ]}
             />
 
-            <div className={styles.rs485}>
+            <div className={styles.modhoppers}>
                 <NavTabs
                     routes={[
                         {
-                            path: "/datalogger/rs485",
-                            name: "RS485-1"
+                            path: "/datalogger/modhoppers",
+                            name: "ModHoppers-1"
                         },
                         {
-                            path: "/datalogger/rs485/2",
-                            name: "RS485-2"
+                            path: "/datalogger/modhoppers/2",
+                            name: "ModHoppers-2"
                         },
                         {
-                            path: "/datalogger/rs485/options",
+                            path: "/datalogger/modhoppers/group-options",
                             name: "Options"
                         }
                     ]}
@@ -45,4 +45,4 @@ function RS485() {
     );
 }
 
-export default RS485;
+export default ModHoppers;

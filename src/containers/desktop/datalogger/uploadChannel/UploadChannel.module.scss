@@ -1,0 +1,27 @@
+.upload_channels{
+    .form_body{
+        margin-top: 30px;
+        .channels{
+            border: 1px solid #DDD;
+            margin-bottom: 30px;
+            border-radius: 4px;
+            .title{
+                padding: 10px 15px;
+                .title_name{
+                    padding-right: 10px;
+                }
+            }
+        }
+    }
+}
+
+.upload_channels {
+    padding: 7px;
+    border-radius: 4px;
+    background-color: var(--bg-color-light);
+
+    .outlet {
+        background-color: var(--bg-color-white);
+        padding: 10px;
+    }
+}

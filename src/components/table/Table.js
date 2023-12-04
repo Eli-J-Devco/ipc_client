@@ -33,7 +33,7 @@ function Table({ variant, className, maxHeight, columns, data, visible, resizabl
     const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef, handleOnChangePageSize } = useTable({ columns, data, total: pagination?.total, setLimit: pagination?.setLimit, setOffset: pagination?.setOffset, slugProps });
 
     return (
-        <div style={{ maxWidth: table.getTotalSize() }}>
+        <div>
             <div className={styles.control}>
                 <div className={styles.side}>
                     {
@@ -56,32 +56,32 @@ function Table({ variant, className, maxHeight, columns, data, visible, resizabl
                 <div className={styles.center}>
                     {
                         pagination?.enable && table.getPageCount() > 0 &&
-                        <Pagination controls={table} />
+                            <>
+                                <select
+                                    className={styles["page-count"]}
+                                    value={table.getState().pagination.pageSize}
+                                    onChange={handleOnChangePageSize}
+                                >
+                                    {
+                                        Constants.PAGE_SIZES.map(pageSize => (
+                                            <option key={pageSize} value={pageSize}>
+                                                {pageSize} items/page
+                                            </option>
+                                        ))
+                                    }
+                                </select>
+                            
+                                <Pagination controls={table} />
+                            </>
                     }
                 </div>
 
                 <div className={styles.side}>
-                    {
-                        pagination?.enable && table.getPageCount() > 0 &&
-                        <select
-                            className="float-end"
-                            value={table.getState().pagination.pageSize}
-                            onChange={handleOnChangePageSize}
-                        >
-                            {
-                                Constants.PAGE_SIZES.map(pageSize => (
-                                    <option key={pageSize} value={pageSize}>
-                                        {pageSize}/page
-                                    </option>
-                                ))
-                            }
-                        </select>
-                    }
                 </div>
             </div>
 
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
-                <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ width: table.getTotalSize() }}>
+                <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ minWidth: table.getTotalSize() }}>
                     <thead>
                         <tr className={styles["header-row"]}>
                             {
@@ -120,6 +120,15 @@ function Table({ variant, className, maxHeight, columns, data, visible, resizabl
                     
                     <tfoot>
                         <tr className={styles["footer-row"]}>
+                            {
+                                table.getAllColumns().map(column => (
+                                    <td
+                                        key={column.id}
+                                        className={styles.item}
+                                    >
+                                    </td>
+                                ))
+                            }
                         </tr>
                     </tfoot>
                 </table>

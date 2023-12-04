@@ -12,8 +12,6 @@ import Devices from './containers/desktop/datalogger/devices/Devices';
 import ConfigDevice from './containers/desktop/datalogger/devices/configDevice/ConfigDevice';
 import ScadaDevices from './containers/desktop/scada/devices/Devices';
 import RS485 from './containers/desktop/datalogger/RS485/RS485';
-import Device from './containers/desktop/datalogger/RS485/device/Device';
-import Options from './containers/desktop/datalogger/RS485/options/Options';
 import Templates from './containers/desktop/datalogger/templates/Templates';
 import TemplatesManagement from './containers/desktop/datalogger/templates/templatesManagement/TemplatesManagement';
 import Template from './containers/desktop/datalogger/templates/template/Template';
@@ -31,6 +29,27 @@ import LoggingRate from './containers/desktop/datalogger/quickstart/loggingRate/
 import UploadChannels from './containers/desktop/datalogger/quickstart/uploadChannels/UploadChannels';
 import RemoteAccess from './containers/desktop/datalogger/quickstart/remoteAccess/RemoteAccess';
 import Done from './containers/desktop/datalogger/quickstart/done/Done';
+import Alarms from './containers/desktop/datalogger/alarms/Alarms';
+
+import RS485OneRS from './containers/desktop/datalogger/RS485/rs485OneRS/Rs485OneRS';
+import RS485TwoRS from './containers/desktop/datalogger/RS485/rs485TwoRS/Rs485TwoRS';
+import RS485Options from './containers/desktop/datalogger/RS485/options/Options';
+
+import UploadChannel from './containers/desktop/datalogger/uploadChannel/UploadChannel';
+import Schedule from './containers/desktop/datalogger/uploadChannel/schedule/Schedule';
+import Channel from './containers/desktop/datalogger/uploadChannel/channel/Channel';
+
+import Networking from './containers/desktop/datalogger/networking/Networking';
+import NetworkEnthernetOne from './containers/desktop/datalogger/networking/ethernetOne/EthernetOne';
+import NetworkEnthernetTwo from './containers/desktop/datalogger/networking/ethernetTwo/EthernetTwo';
+import NetworkAccess from './containers/desktop/datalogger/networking/networkAccess/NetworkAccess';
+import NWRemoteAccess from './containers/desktop/datalogger/networking/remoteAccess/RemoteAccess';
+import StaticRoutes from './containers/desktop/datalogger/networking/staticRoutes/StaticRoutes';
+import ModHoppers from './containers/desktop/datalogger/modHoppers/ModHoppers';
+import ModHoppersOne from './containers/desktop/datalogger/modHoppers/modHoppersOne/ModHoppersOne';
+import ModHoppersTwo from './containers/desktop/datalogger/modHoppers/modHoppersTwo/ModHoppersTwo';
+import GroupOptions from './containers/desktop/datalogger/modHoppers/groupOptions/GroupOptions';
+
 
 export default class App extends Component {
     render() {
@@ -55,9 +74,37 @@ export default class App extends Component {
                                 <Route path='done' element = {<Done />} />
                         </Route>
                         <Route path='rs485' element = {<RS485 />} >
-                            <Route path=':id' element={<Device />} />
-                            <Route path='options' element = {<Options />} />
+                            <Route index element = {<RS485OneRS />} />
+                                <Route path='2' element={<RS485TwoRS />} />
+                                <Route path='options' element = {<RS485Options />} />
                         </Route>
+
+                        
+                        <Route path='modHoppers' element = {<ModHoppers />} >
+                            <Route index element = {<ModHoppersOne />} />
+                                <Route path='2' element={<ModHoppersTwo />} />
+                                <Route path='group-options' element = {<GroupOptions />} />
+                        </Route>
+
+                        <Route path='devices' element = {<Devices />} />
+                        <Route path='' element = {<UploadChannel />} />
+
+                        <Route path='upload' element = {<UploadChannel />} >
+                            <Route index element = {<Channel />} />
+                                <Route path='channel' element={<Channel />} />
+                                <Route path='schedule' element={<Schedule />} />
+                        </Route>
+
+                        <Route path='networking' element = {<Networking />} >
+                            <Route index element = {<NetworkEnthernetOne />} />
+                                <Route path='ethernet-1' element={<NetworkEnthernetOne />} />
+                                <Route path='ethernet-2' element={<NetworkEnthernetTwo />} />
+                                <Route path='network-access' element={<NetworkAccess />} />
+                                <Route path='remote-acesss' element={<NWRemoteAccess />} />
+                                <Route path='static-routes' element={<StaticRoutes />} />
+                        </Route>
+
+
                         <Route path='devices' element = {<Devices />} >
                             <Route path=':id' element={<ConfigDevice />} />
                         </Route>
@@ -69,6 +116,7 @@ export default class App extends Component {
                                 <Route path='advanced' element = {<Advanced />} />
                             </Route>
                         </Route>
+                        <Route path='alarms' element = {<Alarms />} />
                     </Route>
 
                     <Route path='/scada' element = {<Scada />}>
