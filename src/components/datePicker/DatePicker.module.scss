@@ -1,0 +1,47 @@
+$box-shadow-dark: 0 0 0 0.25rem rgba(56, 52, 52, 0.25);
+
+.date-picker {
+    .input {
+        padding: 4px 28px 4px 8px;
+        border: 1px solid var(--bg-color-grey);
+        border-radius: 4px;
+
+        &:focus {
+            border-color: var(--bg-color-dark);
+            outline: none;
+            box-shadow: $box-shadow-dark;
+        }
+    }
+
+    .icon {
+        padding: 7px;
+        right: 0;
+        top: 1px;
+    }
+
+    .clear {
+        right: 28px;
+        padding: 0;
+        
+        &:after {
+            background-color: transparent;
+            color: rgba(0, 0, 0, 0.2);
+            font-size: 22px;
+        }
+    }
+}
+
+.popper {
+    .day {
+        &[aria-selected="true"] {
+            background-color: var(--bg-color-yellow);
+            color: var(--text-color-dark);
+        }
+    }
+
+    button {
+        span {
+            top: 6px;
+        }
+    }
+}

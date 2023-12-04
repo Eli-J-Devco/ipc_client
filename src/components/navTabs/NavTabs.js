@@ -1,9 +1,9 @@
 import { NavLink } from "react-router-dom";
 import styles from './NavTabs.module.scss';
 
-function NavTabs({ routes }) {
+function NavTabs({ routes, className }) {
     return (
-        <div className={styles.tabs}>
+        <div className={`${styles.tabs} ${className ? className : ""}`} >
             <ul className="nav nav-tabs border-bottom-0">
                 {
                     routes.map(route => (

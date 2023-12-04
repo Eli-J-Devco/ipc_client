@@ -36,6 +36,8 @@ $yellow: invert(80%) sepia(17%) saturate(3222%) hue-rotate(1deg) brightness(108%
     &.white {
         background-color: var(--bg-color-white);
         color: var(--text-color-dark);
+        padding: 9px 19px;
+        border: 1px solid var(--bg-color-grey);
 
         .img {
             filter: $dark;

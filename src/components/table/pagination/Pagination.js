@@ -2,13 +2,13 @@ import ReactPagination from 'react-bootstrap/Pagination';
 import styles from "./Pagination.module.scss";
 import usePagination from './usePagination';
 
-function Pagination({ controls }) {
+function Pagination({ controls, variant }) {
     const paginationRange = usePagination({ controls });
 
     return (
         <ReactPagination
             size="sm"
-            className={styles.pagination}
+            className={`${styles.pagination} ${variant ? styles[variant] : ""}`}
         >
             <ReactPagination.Prev
                 linkClassName={styles.control}

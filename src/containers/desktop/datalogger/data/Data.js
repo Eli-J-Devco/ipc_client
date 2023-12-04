@@ -1,10 +1,9 @@
 import { Outlet } from "react-router-dom";
 import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
-import styles from './UploadChannel.module.scss';
 import NavTabs from "../../../../components/navTabs/NavTabs";
+import styles from './Data.module.scss';
 
-function UploadChannel() {
-
+function Data() {
     return (
         <div className="main">
             <Breadcrumb
@@ -14,33 +13,37 @@ function UploadChannel() {
                         name: "Dashboard"
                     },
                     {
-                        path: "/datalogger/upload",
-                        name: "Upload Channels"
+                        path: "/datalogger/data",
+                        name: "Data"
                     }
                 ]}
             />
 
-
-            <div className={styles.upload_channels}>
+            <div className={styles.data}>
                 <NavTabs
                     routes={[
                         {
-                            path: "/datalogger/upload",
-                            name: "Upload Channels"
+                            path: "/datalogger/data",
+                            name: "Data Logs"
                         },
                         {
-                            path: "/datalogger/upload/schedule",
-                            name: "Upload Schedule"
+                            path: "/datalogger/data/logging-rate",
+                            name: "Logging Rate"
+                        },
+                        {
+                            path: "/datalogger/data/sync-history",
+                            name: "Sync History"
                         }
                     ]}
+                    className={styles["nav-tabs"]}
                 />
 
                 <div className={styles.outlet}>
-                    {<Outlet />}
+                    <Outlet />
                 </div>
             </div>
         </div>
     );
 }
 
-export default UploadChannel;
+export default Data;

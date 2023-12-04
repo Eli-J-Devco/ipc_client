@@ -1,0 +1,18 @@
+.data-logs {
+    .section {
+        margin-bottom: 15px;
+        
+        .title {
+            background-color: var(--bg-color-grey);
+            padding: 7px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            line-height: 10px;
+            font-weight: bold;
+        }
+    
+        .body {
+            margin: 10px;
+        }
+    }
+}

@@ -38,7 +38,7 @@ function Advanced() {
                 <Button>
                     <Button.Text text="Apply" />
                 </Button>
-                <Button variant="light" className="mt-3 ms-3">
+                <Button variant="white" className="mt-3 ms-3">
                     <Button.Text text="Cancel" />
                 </Button>
             </div>

@@ -43,7 +43,7 @@ function RegisterBlocks() {
                 <Button.Text text="Apply" />
             </Button>
 
-            <Button className="mt-3 ms-3" variant="light">
+            <Button className="mt-3 ms-3" variant="white">
                 <Button.Text text="Cancel" />
             </Button>
         </div>
