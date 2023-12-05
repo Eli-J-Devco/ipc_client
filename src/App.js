@@ -68,7 +68,8 @@ import AutoUpdate from './containers/desktop/datalogger/system/autoUpdate/AutoUp
 import RebootShutdown from './containers/desktop/datalogger/system/rebootShutdown/RebootShutdown';
 import Synchronized from './containers/desktop/datalogger/system/synchronized/Synchronized';
 import Alarm from './containers/desktop/datalogger/system/alarm/Alarm';
-import Users from './containers/desktop/datalogger/users/Users'
+import Users from './containers/desktop/datalogger/users/Users';
+import PermissionsAndRoles from './containers/desktop/datalogger/permissionsAndRoles/PermissionsAndRoles';
 
 export default class App extends Component {
     render() {
@@ -157,6 +158,10 @@ export default class App extends Component {
                         </Route>
 
                         <Route path='users' element={<Users />} >
+
+                        </Route>
+
+                        <Route path='permissions-roles' element={<PermissionsAndRoles />} >
 
                         </Route>
                     </Route>

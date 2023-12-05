@@ -109,7 +109,6 @@ export default function Users() {
               setLimit: setLimit,
               setOffset: setOffset
           }}
-            // alert={item => <RedWarningIcon/>}
             />
       </div>
     </div>
