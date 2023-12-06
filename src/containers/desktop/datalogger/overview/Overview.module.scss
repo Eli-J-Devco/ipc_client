@@ -1,0 +1,38 @@
+.overview{
+    .status{
+        border: 1px solid var(--bg-color-light);
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,.1);
+        h2{
+            font-size: 16px;
+            padding: 7px 10px;
+            border-bottom: 1px solid var(--bg-color-light);
+
+        }
+
+        .body_group{
+            .col_md_2{
+                width: 20%;
+                flex: 0 0 auto;
+            }
+            .item{
+                text-align: center;
+            }
+        }
+    }
+
+    .group_cpu{
+        margin-top: 20px;
+        .item_group{
+            border: 1px solid var(--bg-color-light);
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,.1);
+            .title{
+                font-size: 16px;
+                padding: 7px 10px;
+                border-bottom: 1px solid var(--bg-color-light);
+            }
+            .group_cpu_usage{
+                padding: 15px;
+            }
+        }
+    }
+}

@@ -70,6 +70,7 @@ import Synchronized from './containers/desktop/datalogger/system/synchronized/Sy
 import Alarm from './containers/desktop/datalogger/system/alarm/Alarm';
 import Users from './containers/desktop/datalogger/users/Users';
 import PermissionsAndRoles from './containers/desktop/datalogger/permissionsAndRoles/PermissionsAndRoles';
+import Overview from './containers/desktop/datalogger/overview/Overview';
 
 export default class App extends Component {
     render() {
@@ -93,6 +94,7 @@ export default class App extends Component {
                                 <Route path='remote-access' element = {<RemoteAccess />} />
                                 <Route path='done' element = {<Done />} />
                         </Route>
+                        <Route path='overview' element = {<Overview />} />
                         <Route path='rs485' element = {<RS485 />} >
                             <Route index element = {<RS485OneRS />} />
                                 <Route path='2' element={<RS485TwoRS />} />
