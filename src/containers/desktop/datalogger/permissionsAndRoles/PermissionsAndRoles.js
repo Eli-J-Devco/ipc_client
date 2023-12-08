@@ -26,7 +26,7 @@ export default function PermissionsAndRoles() {
  const columnsRoles = [
   {id: 1, slug: "id", name: "Id",}, 
   {id: 2, slug: "name",name: "Name"}, 
-  {id: 3, slug: "actions", name: "Actions"}
+  {id: 3, slug: "actions", name: <div className="text-center">Actions</div>}
  ]
   const dataListRoles = [
     {id: "1", name: "Admin", action: ""},

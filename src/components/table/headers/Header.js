@@ -10,12 +10,12 @@ function Header({ variant, item, table, resizable, draggable }) {
             className={`${styles.header} ${variant ? styles[variant] : ""} ${item.column.getIsResizing() ? styles["is-resizing"] : ""}`}
             style={{ width: item.getSize() }}
         >
-            <span
+            <div
                 ref={dragRef}
                 className={draggable ? styles.draggable : ""}
             >
                 {item.column.columnDef.header}
-            </span>
+            </div>
             
             {
                 resizable &&

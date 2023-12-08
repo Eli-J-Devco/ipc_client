@@ -24,12 +24,7 @@ function useTable({ columns, data, total, setLimit, setOffset, slugProps }) {
                 cell: ({ column, row, getValue }) => {
                     const slug = column.columnDef.accessorKey;
                     const value = getValue();
-
-                    return (typeof slugProps[slug] === "function") ? (
-                        slugProps[slug](value ? value : row.original)
-                    ) : (
-                        value
-                    )
+                    return (typeof slugProps[slug] === "function") ? slugProps[slug](row.original, row.index) : value
                 }
             }))
         ) : (

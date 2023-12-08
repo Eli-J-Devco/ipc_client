@@ -34,7 +34,7 @@ function useUsers() {
         }, {
             id: 7,
             slug: "actions",
-            name: "Actions"
+            name: <div className="text-center">Actions</div>
         }
     ]);
     
