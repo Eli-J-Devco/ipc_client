@@ -18,6 +18,7 @@ a{
   overflow-x: auto;
   padding: 10px;
   flex: 1;
+  position: relative;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',

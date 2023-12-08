@@ -1,37 +1,88 @@
-.overview{
-    .status{
+.overview {
+    padding: 10px;
+    background-color: #f2f2f2;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    overflow: auto;
+
+    .system_info {
+        background-color: #FFF;
         border: 1px solid var(--bg-color-light);
-        box-shadow: 0 1px 2px 0 rgba(0,0,0,.1);
-        h2{
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .1);
+        padding: 10px;
+        vertical-align: middle;
+
+        span {
+            padding-left: 5px;
+        }
+
+        .uptime {
+            margin-left: 30px;
+        }
+    }
+
+    .status {
+        border: 1px solid var(--bg-color-light);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .1);
+        background-color: #FFF;
+        margin-top: 20px;
+
+        h2 {
             font-size: 16px;
             padding: 7px 10px;
             border-bottom: 1px solid var(--bg-color-light);
 
         }
 
-        .body_group{
-            .col_md_2{
+        .body_group {
+            .col_md_2 {
                 width: 20%;
                 flex: 0 0 auto;
             }
-            .item{
+
+            .item {
                 text-align: center;
             }
         }
     }
 
-    .group_cpu{
+    .group_cpu {
         margin-top: 20px;
-        .item_group{
+
+        .item_group {
             border: 1px solid var(--bg-color-light);
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,.1);
-            .title{
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .1);
+            background-color: #FFF;
+            height: 100%;
+
+            .title {
                 font-size: 16px;
                 padding: 7px 10px;
                 border-bottom: 1px solid var(--bg-color-light);
+
+                span {
+                    display: inline-block;
+                    padding: 0 20px;
+                    cursor: pointer;
+
+                    &.traffic {
+                        margin-right: 15px;
+                    }
+
+                    &.active {
+                        color: #FFF;
+                        background-color: var(--bg-color-dark);
+                        border-radius: 20px;
+                    }
+                }
             }
-            .group_cpu_usage{
+
+            .group_cpu_usage {
                 padding: 15px;
+                margin-top: 40px;
             }
         }
     }
