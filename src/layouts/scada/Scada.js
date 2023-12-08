@@ -10,7 +10,7 @@ function Scada(props) {
             <Header />
             <TopMenu />
             <Outlet />
-            <Footer />
+            {/* <Footer /> */}
         </div>
     );
 }

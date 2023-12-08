@@ -1,0 +1,30 @@
+.top_menu{
+  position: fixed;
+  top: 60px;
+  z-index: 9;
+  background-color: #F2F2F2;
+  width: 100%;
+  ul{
+      li{
+          display: inline-block;
+          padding: 5px 15px;
+          position: relative;
+          a{
+            text-align: center;
+            display: inline-block;
+            width: 100%;
+            border-radius: 5px;
+            padding: 7px 10px;
+            span{
+                display: inline-block;
+                margin-left: 0.5rem;
+            }
+            &:hover,
+            &.active{
+                background-color: #FFDA00;
+                color: #000;
+            }
+        }
+      }
+    }
+}
