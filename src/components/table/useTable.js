@@ -3,7 +3,7 @@ import {
     useReactTable,
 } from '@tanstack/react-table'
 import isArray from 'lodash/isArray';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 import Constants from '../../utils/Constants';
 
@@ -15,8 +15,8 @@ function useTable({ columns, data, total, setLimit, setOffset, slugProps }) {
     const dropDownsRef = useClickAway(() => setIsDropDownsShow(false));
     const [pageCount, setPageCount] = useState(-1);
     
-    const columnDef = isArray(columns) ?
-        (
+    const columnDef = useMemo(
+        () => isArray(columns) ?
             columns.map(item => ({
                 id: item.id,
                 accessorKey: item.slug,
@@ -27,9 +27,9 @@ function useTable({ columns, data, total, setLimit, setOffset, slugProps }) {
                     return (typeof slugProps[slug] === "function") ? slugProps[slug](row.original, row.index) : value
                 }
             }))
-        ) : (
-            []
-        );
+            : []
+        , []
+    );
 
     const table = useReactTable({
         data,
