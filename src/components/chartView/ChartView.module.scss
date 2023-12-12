@@ -1,0 +1,89 @@
+.chart_view {
+    height: 100%;
+    position: relative;
+    .box_charting {
+        height: 100%;
+        .charting_filter {
+            height: 36px;
+            position: relative;
+
+            .filter_date {
+                position: relative;
+                display: inline-block;
+                margin-right: 10px;
+                .arrow_down{
+                    padding-left: 10px;
+                    svg{
+                        -webkit-transition: -webkit-transform .4s ease-in-out;
+                        -ms-transition: -ms-transform .4s ease-in-out;
+                        transition: transform .4s ease-in-out;
+                    }
+                    &.on{
+                        svg{
+                            transform: rotate(180deg);
+                        }
+                    }
+                }
+                .filter_active {
+                    border: 1px solid var(--bg-color-dark);
+                    height: 30px;
+                    line-height: 30px;
+                    padding: 0 10px;
+                    border-radius: 16px;
+                    position: relative;
+                    display: inline-block;
+                }
+
+                .filter_date_dropdown {
+                    position: absolute;
+                    z-index: 9;
+                    background-color: #FFF;
+                    border: 1px solid var(--bg-color-dark);
+                    top: 35px;
+                    width: 120px;
+                    border-radius: 4px;
+                    display: none;
+                    &.on{
+                        display: block;
+                    }
+
+                    .date_item {
+                        width: 100%;
+                        padding: 3px 5px;
+                        cursor: pointer;
+
+                        &.active,
+                        &:hover {
+                            background: var(--bg-color-dark);
+                            color: var(--bg-color-yellow);
+                        }
+                    }
+                }
+            }
+
+            .download{
+                border: 1px solid var(--bg-color-dark);
+                border-radius: 4px;
+                display: inline-block;
+                height: 30px;
+                width: 30px;
+                text-align: center;
+                line-height: 30px;
+                position: absolute;
+                top: 0;
+                right: 0;
+                cursor: pointer;
+            }
+
+            .date_picker{
+                display: inline-block;
+                margin-right: 10px;
+            }
+        }
+
+        .charting {
+            height: calc(100% - 60px);
+            margin-top: 20px;
+        }
+    }
+}

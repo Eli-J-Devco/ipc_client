@@ -1,10 +1,12 @@
 .btn {
     border: none;
-    padding: 7.5px 5px;
+    padding: 0 5px;
     line-height: 14px;
     background-color: transparent;
     border: 1px solid var(--bg-color-dark);
     text-wrap: nowrap;
+    height: 30px;
+    line-height: 30px;
 
     span {
         margin: 0 5px;
