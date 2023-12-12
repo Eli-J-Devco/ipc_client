@@ -10,6 +10,7 @@ import Constants from '../../utils/Constants';
 
 /**
  * Table props
+* @property {boolean}    control                 - enable control
  * @property {string}    variant                 - style base on specific variant
  * @property {string}    className               - custom class
  * @property {string}    maxHeight               - set maxHeight inline style for table (exclude control bar) for each specific case
@@ -29,33 +30,35 @@ import Constants from '../../utils/Constants';
  * @property {string}    pagination.setOffset    - get offset from table component
  * @property {component} slugProps               - component that wrapping cell's value. when pass component in, prop's name is column's slug value
  */
-function Table({ variant, className, maxHeight, columns, data, visible, resizable, draggable, pagination, ...slugProps }) {
+function Table({ control, variant, className, maxHeight, columns, data, visible, resizable, draggable, pagination, ...slugProps }) {
     const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef, handleOnChangePageSize } = useTable({ columns, data, total: pagination?.total, setLimit: pagination?.setLimit, setOffset: pagination?.setOffset, slugProps });
 
     return (
         <div>
-            <div className={styles.control}>
-                <div className={styles.side}>
-                    {
-                        visible &&
-                        <div className="position-relative">
-                            <Button.Image
-                                image={<ColumnsIcon />}
-                                onClick={handleOpenDropDowns}
-                            />
+            {
+                control &&
+                <div className={styles.control}>
+                    <div className={styles.side}>
+                        {
+                            visible &&
+                            <div className="position-relative">
+                                <Button.Image
+                                    image={<ColumnsIcon />}
+                                    onClick={handleOpenDropDowns}
+                                />
 
-                            <DropDowns
-                                isShow={isDropDownsShow}
-                                data={table}
-                                refProp={dropDownsRef}
-                            />
-                        </div>
-                    }
-                </div>
+                                <DropDowns
+                                    isShow={isDropDownsShow}
+                                    data={table}
+                                    refProp={dropDownsRef}
+                                />
+                            </div>
+                        }
+                    </div>
 
-                <div className={styles.center}>
-                    {
-                        pagination?.enable && table.getPageCount() > 0 &&
+                    <div className={styles.center}>
+                        {
+                            pagination?.enable && table.getPageCount() > 0 &&
                             <>
                                 <select
                                     className={`${styles["page-count"]} ${variant ? styles[variant] : ""}`}
@@ -70,15 +73,18 @@ function Table({ variant, className, maxHeight, columns, data, visible, resizabl
                                         ))
                                     }
                                 </select>
-                            
+
                                 <Pagination controls={table} variant={variant} />
                             </>
-                    }
-                </div>
+                        }
+                    </div>
 
-                <div className={styles.side}>
+                    <div className={styles.side}>
+                    </div>
                 </div>
-            </div>
+            }
+
+
 
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
                 <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ minWidth: table.getTotalSize() }}>
@@ -117,7 +123,7 @@ function Table({ variant, className, maxHeight, columns, data, visible, resizabl
                             ))
                         }
                     </tbody>
-                    
+
                     <tfoot>
                         <tr className={styles["footer-row"]}>
                             {

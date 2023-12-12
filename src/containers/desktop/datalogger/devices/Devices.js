@@ -41,7 +41,7 @@ export default function Devices() {
     {id: 4, slug: "name_and_purpose", name: "Name and Purpose", width: 400},
     {id: 5, slug: "type", name: "Type", width: 300},
     {id: 6, slug: "points", name: "Points", width: 100},
-    {id: 7, slug: "actions", name: "Actions", width: 150}
+    {id: 7, slug: "actions", name: <div className="text-center">Actions</div>, width: 150}
   ]
 
   let device = data.filter((d) => {

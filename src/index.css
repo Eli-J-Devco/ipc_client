@@ -18,6 +18,7 @@ a{
   overflow-x: auto;
   padding: 10px;
   flex: 1;
+  position: relative;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -39,4 +40,9 @@ ul, li{
   --text-color-light: #FFFFFF;
   --text-color-grey: #808080;
   --text-color-red: #DC3545;
+  --text-color-blue: #0C76BC;
+  --text-color-green: #1ED300;
+  --text-color-fault: #DCA450;
+  
+  
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Constants from "../../../../utils/Constants";
-import { ReactComponent as NoAlarmIcon } from "../../../../assets/images/greencheck.svg";
+import Constants from "../../../../../utils/Constants";
+import { ReactComponent as NoAlarmIcon } from "../../../../../assets/images/greencheck.svg";
 
 function useAlarms() {
     const [total, setTotal] = useState(100);
@@ -16,21 +16,9 @@ function useAlarms() {
             slug: "opened",
             name: "Opened"
         }, {
-            id: 3,
-            slug: "closed",
-            name: "Closed"
-        }, {
             id: 4,
             slug: "open_period",
             name: "Open Period"
-        }, {
-            id: 5,
-            slug: "device",
-            name: "Device"
-        }, {
-            id: 6,
-            slug: "value",
-            name: "Value"
         }, {
             id: 7,
             slug: "error_level",
@@ -43,10 +31,6 @@ function useAlarms() {
             id: 9,
             slug: "issue",
             name: "Issue"
-        }, {
-            id: 10,
-            slug: "action",
-            name: <div className="text-center">Actions</div>
         }
     ]);
     const [alarmList, ] = useState(Array.from({length: 20}, () => ({

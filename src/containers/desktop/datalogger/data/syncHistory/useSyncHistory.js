@@ -65,7 +65,7 @@ function useSyncHistory() {
         }, {
             id: 15,
             slug: "action",
-            name: "Actions",
+            name: <div className="text-center">Actions</div>,
             width: 150
         }
     ]);

@@ -8,7 +8,9 @@ import ResetPassword from './layouts/login/resetPassword/ResetPassword';
 import Scada from './layouts/scada/Scada';
 import ScadaDashboard from './containers/desktop/scada/daskboard/Dashboard';
 import ScadaDevices from './containers/desktop/scada/devices/Devices';
-import ScadaOverview from './containers/desktop/scada/overview/Overview'
+import ScadaOverview from './containers/desktop/scada/overview/Overview';
+import ScadaSetup from './containers/desktop/scada/devices/setup/Setup';
+import ScadaDCCombiner from './containers/desktop/scada/devices/dcCombiner/DCCombiner';
 
 import Devices from './containers/desktop/datalogger/devices/Devices';
 import ConfigDevice from './containers/desktop/datalogger/devices/configDevice/ConfigDevice';
@@ -170,10 +172,15 @@ export default class App extends Component {
                     </Route>
 
                     <Route path='/scada' element = {<Scada />}>
-                        {/* <Route index element = {<ScadaDashboard />} /> */}
+                        <Route index element = {<ScadaOverview />} />
                         <Route path='overview' element = {<ScadaOverview />} />
                         <Route path='dashboard' element = {<ScadaDashboard />} />
-                        <Route path='devices' element = {<ScadaDevices />} />
+                        <Route path='devices' element = {<Scada />}>
+                            <Route index element = {<ScadaDevices />} />
+                            <Route path='setup/:id' element={<ScadaSetup />} />
+                            <Route path='dc-combiner/:id' element={<ScadaDCCombiner />} />
+                        </Route>
+                        
                     </Route>
 
                     <Route path='/*' element = {<Error />} />

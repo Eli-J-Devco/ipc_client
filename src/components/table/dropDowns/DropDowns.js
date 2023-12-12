@@ -1,6 +1,19 @@
 import FormInput from '../../formInput/FormInput';
 import styles from './DropDowns.module.scss';
 
+/**
+ * @description get text from React element
+ * @param {Element} elem 
+ * @returns text
+ */
+function textContent(elem) {
+    if (!elem) return "";
+    if (typeof elem === 'string') return elem;
+    const children = elem.props && elem.props.children;
+    if (children instanceof Array) return children.map(textContent).join('');
+    return textContent(children);
+}
+  
 function DropDowns({ data, isShow, refProp }) {
     return (
         <ul
@@ -24,7 +37,7 @@ function DropDowns({ data, isShow, refProp }) {
                 data.getAllColumns().map(item => (
                     <li key={item.id}>
                         <FormInput.Check
-                            label={item.columnDef.header}
+                            label={textContent(item.columnDef.header)}
                             name={`column-visible-${item.columnDef.accessorKey}`}
                             checked={item.getIsVisible()}
                             onChange={item.getToggleVisibilityHandler()}

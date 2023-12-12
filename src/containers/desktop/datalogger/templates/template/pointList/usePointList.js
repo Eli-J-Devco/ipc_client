@@ -52,7 +52,7 @@ function usePointList() {
         }, {
             id: 12,
             slug: "action",
-            name: "Actions"
+            name: <div className="text-center">Actions</div>
         }
     ]);
     const [pointList, ] = useState([

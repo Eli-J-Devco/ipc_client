@@ -1,16 +1,23 @@
 import React from 'react';
 import styles from './Header.module.scss';
+import TopMenu from '../topMenu/TopMenu';
 
 export default function Header() {
     return (
         <div className={styles.header}>
             <div className='container-fluid'>
                 <div className='row'>
-                    <div className='col-md-12'>
+                    <div className='col-md-8'>
+                        <div className={styles.logo}>
+                            <img src="/logo.svg" alt='Logo' />
+                        </div>
+
+                        <TopMenu />
+                        
+                    </div>
+                    <div className='col-md-4'>
                         <div className={styles.main_header}>
-                            <div className={styles.logo}>
-                                <img src="/logo.svg" alt='Logo' />
-                            </div>
+
 
                             <div className={styles.user_menu}>
                                 <ul>
@@ -57,8 +64,8 @@ export default function Header() {
                                 </ul>
                             </div>
                         </div>
-
                     </div>
+
                 </div>
             </div>
         </div>
