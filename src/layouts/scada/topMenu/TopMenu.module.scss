@@ -1,8 +1,5 @@
 .top_menu{
-  // position: fixed;
-  // top: 60px;
   z-index: 9;
-  // background-color: #F2F2F2;
   margin-left: 200px;
   ul{
       li{
@@ -16,6 +13,9 @@
             border-radius: 5px;
             padding: 7px 10px;
             color: #FFF;
+            svg{
+              filter: brightness(0) invert(1);
+            }
             span{
                 display: inline-block;
                 margin-left: 0.5rem;
@@ -24,6 +24,9 @@
             &.active{
                 background-color: #FFDA00;
                 color: #000;
+                svg{
+                  filter: none;
+                }
             }
         }
       }

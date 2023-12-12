@@ -1,32 +1,14 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styles from './Setup.module.scss';
 import Breadcrumb from '../../../../../components/breadCrumb/BreadCrumb';
 import { ReactComponent as EnergyIcon } from "../../../../../assets/images/energy.svg";
 import { ReactComponent as PowerIcon } from "../../../../../assets/images/power.svg";
-import Highcharts from 'highcharts'
-import HighchartsReact from 'highcharts-react-official';
-import highchartsGantt from "highcharts/modules/gantt";
-import HighchartsExporting from 'highcharts/modules/exporting';
-import bellcurve from "highcharts/modules/histogram-bellcurve";
-import highchartsMore from "highcharts/highcharts-more.js";
-import solidGauge from "highcharts/modules/solid-gauge.js";
-import accessibility from 'highcharts/modules/accessibility.js';
 import Table from "../../../../../components/table/Table";
-
-// init the module
-highchartsGantt(Highcharts);
-bellcurve(Highcharts);
-if (typeof Highcharts === 'object') {
-    HighchartsExporting(Highcharts)
-}
-
-highchartsMore(Highcharts);
-solidGauge(Highcharts);
-accessibility(Highcharts);
-
+import ChartView from '../../../../../components/chartView/ChartView';
 
 
 function Setup(props) {
+
     const data = [
         { id: 1, numerical_order: 1, issue: 'DC soft starting fault', opened: '08/21/2023 13:40 PM', open_period: '4 hours', error_level: 'COMM' },
         { id: 2, numerical_order: 2, issue: 'DC soft starting fault', opened: '08/21/2023 13:40 PM', open_period: '4 hours', error_level: 'COMM' },
@@ -47,12 +29,11 @@ function Setup(props) {
         { id: 5, slug: "error_level", name: "Error Level", width: 200 },
     ]
 
-
-    const optionsTraffic = {
+    const options = {
         chart: {
             "zoomType": "xy",
             "type": "column",
-            height: 300
+            height: null
         },
         title: {
             text: '',
@@ -5097,6 +5078,12 @@ function Setup(props) {
             }
         ]
     }
+
+    const refHeight = useRef(null);
+    useEffect(() => {
+        if (refHeight.current.clientHeight > 0 && options) { options.chart.height = refHeight.current.clientHeight - 60; }
+    });
+
     return (
         <div className={styles.setup}>
             <div className="container-fluid">
@@ -5242,18 +5229,33 @@ function Setup(props) {
                                     </div>
 
                                 </div>
-                                <div className={styles.box_charting}>
-                                    <div className={styles.charting_filter}>
+                                <div ref={refHeight} className={styles.main_charting}>
+                                    <ChartView
+                                        dataDate={[
+                                            { id: 1, name: "3 Days", active: 0 },
+                                            { id: 2, name: "Today", active: 1 },
+                                            { id: 3, name: "This Week", active: 0 },
+                                            { id: 4, name: "Last Week", active: 0 },
+                                            { id: 5, name: "This Month", active: 0 },
+                                            { id: 6, name: "Last Month", active: 0 },
+                                            { id: 7, name: "12 Months", active: 0 },
+                                            { id: 8, name: "Year to Date", active: 0 },
+                                            { id: 8, name: "Lifetime", active: 0 },
+                                            { id: 8, name: "Custom", active: 0 }
+                                        ]}
+                                        dataTime={[
+                                            { id: 1, name: "Minute", active: 0 },
+                                            { id: 2, name: "5 Minutes", active: 1 },
+                                            { id: 3, name: "15 Minutes", active: 0 },
+                                            { id: 4, name: "1 Hour", active: 0 },
+                                            { id: 5, name: "1 Day", active: 0 },
+                                            { id: 6, name: "7 Days", active: 0 },
+                                            { id: 7, name: "1 Month", active: 0 },
+                                            { id: 8, name: "1 Year", active: 0 },
+                                        ]}
 
-                                    </div>
-                                    <div className={styles.charting}>
-                                        <HighchartsReact
-                                            highcharts={Highcharts}
-                                            options={optionsTraffic}
-                                            allowChartUpdate={true}
-                                            immutable={true}
-                                        />
-                                    </div>
+                                        options={options}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -5555,47 +5557,8 @@ function Setup(props) {
                                                         <div className={styles.alarms_list}>
                                                             <Table columns={columns} data={data}
                                                                 maxHeight="100%"
-                                                            // actions={item => (
-                                                            //     <div className="d-flex flex-wrap justify-content-center">
-                                                            //         <Button.Image
-                                                            //             image={<ViewIcon />}
-                                                            //             onClick={() => handleConfigDevice(item)}
-                                                            //             className="mx-2"
-                                                            //         />
-                                                            //         <Button.Image
-                                                            //             image={<EditIcon />}
-                                                            //             onClick={() => handleConfigDevice(item)}
-                                                            //             className="mx-2"
-                                                            //         />
-                                                            //         <Button.Image
-                                                            //             image={<DeleteIcon />}
-                                                            //             onClick={() => handleConfigDevice(item)}
-                                                            //             className="mx-2"
-                                                            //         />
-                                                            //     </div>
-                                                            // )}
                                                             />
                                                         </div>
-
-                                                        {/* <Table
-                                                        columns={columns}
-                                                        data={alarmList}
-                                                        pagination={{
-                                                            enable: false,
-                                                            total: total,
-                                                            setLimit: setLimit,
-                                                            setOffset: setOffset
-                                                        }}
-                                                        // maxHeight={isExpand ? "calc(100vh - 650px)" : "calc(100vh)"}
-                                                    // action={item => (
-                                                    //     <div className="d-flex flex-wrap justify-content-center">
-                                                    //         <Button.Image
-                                                    //             image={<EditIcon />}
-                                                    //         />
-                                                    //     </div>
-                                                    // )}
-                                                    // alert={item => <RedWarningIcon />}
-                                                    /> */}
                                                     </div>
                                                 </div>
                                             </div>
@@ -5608,22 +5571,8 @@ function Setup(props) {
                             </div>
                         </div>
                     </div>
-                    {/* <div className="row">
-                    <div className="col-md-12">
-
-                    </div>
-
-                    <div className="col-md-12">
-
-                    </div>
-                </div> */}
                 </div>
-
             </div>
-
-
-
-
         </div>
     );
 }
