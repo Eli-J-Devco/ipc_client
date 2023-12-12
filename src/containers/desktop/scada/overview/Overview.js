@@ -18,7 +18,7 @@ import { ReactComponent as Temperature } from "../../../../assets/images/tempera
 import { ReactComponent as Co2Avoided } from "../../../../assets/images/co2_avoided.svg";
 import { ReactComponent as Humidity } from "../../../../assets/images/humidity.svg";
 import { ReactComponent as Danger } from "../../../../assets/images/danger.svg";
-import { ReactComponent as Power } from "../../../../assets/images/power.svg";
+import { ReactComponent as PowerOverview } from "../../../../assets/images/power_overview.svg";
 import { ReactComponent as SolarPanel } from "../../../../assets/images/solar_panel.svg";
 import { ReactComponent as ArrowDown } from "../../../../assets/images/arrow_down.svg";
 import { ReactComponent as DownloadYellow } from "../../../../assets/images/download_yellow.svg";
@@ -2024,7 +2024,7 @@ export default function Overview() {
                           <div className={styles.value}>331.9 kWh</div>
                           <div>Installed Power <span>365.5 kWp</span></div>
                       </div>
-                      <div className='me-3'><Power /></div>
+                      <div className='me-3'><PowerOverview /></div>
                   </div>
                   <div className={styles.energy_today}>
                       <div className={styles.group}>
