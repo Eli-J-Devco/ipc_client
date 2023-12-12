@@ -2,6 +2,19 @@
     background-color: #383434;
     height: 60px;
     padding: 5px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9;
+    .logo{
+        width: 200px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 60px;
+        line-height: 60px;
+    }
     .main_header{
         position: relative;
         .logo{

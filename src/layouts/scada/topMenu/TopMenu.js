@@ -15,45 +15,45 @@ export default function TopMenu() {
         <div className={styles.top_menu}>
             <ul>
                 <li>
-                    <NavLink to="overview" className={(navData) => navData.isActive ? styles.active : ""}>
+                    <NavLink to="/scada/overview" className={(navData) => navData.isActive ? styles.active : ""}>
                         <Overview />
                         <span>Overview</span>
                     </NavLink>
                 </li>
             
                 <li>
-                    <NavLink to="devices" className={(navData) => navData.isActive ? styles.active : ""}>
+                    <NavLink to="/scada/devices" className={(navData) => navData.isActive ? styles.active : ""}>
                         <Devices />
                         <span>Devices</span>
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="alarms" className={(navData) => navData.isActive ? styles.active : ""}>
+                    <NavLink to="/scada/alarms" className={(navData) => navData.isActive ? styles.active : ""}>
                         <Alarms />
                         <span>Alarms</span>
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="trend" className={(navData) => navData.isActive ? styles.active : ""}>
+                    <NavLink to="/scada/trend" className={(navData) => navData.isActive ? styles.active : ""}>
                         <Trend />
                         <span>Trend</span>
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="charting" className={(navData) => navData.isActive ? styles.active : ""}>
+                    <NavLink to="/scada/charting" className={(navData) => navData.isActive ? styles.active : ""}>
                         <Charting />
                         <span>Charting</span>
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="report" className={(navData) => navData.isActive ? styles.active : ""}>
+                    <NavLink to="/scada/report" className={(navData) => navData.isActive ? styles.active : ""}>
                         <Report />
 
                         <span>Report</span>
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="setup-control" className={(navData) => navData.isActive ? styles.active : ""}>
+                    <NavLink to="/scada/setup-control" className={(navData) => navData.isActive ? styles.active : ""}>
                         <Settings />
                         <span>Setup - Control</span>
                     </NavLink>
