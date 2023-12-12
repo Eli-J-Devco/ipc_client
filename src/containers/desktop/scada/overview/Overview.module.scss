@@ -1,5 +1,6 @@
 .main_overview{
   overflow-x: hidden;
+  margin-top: 60px;
   .energy_flow{
     margin: 1rem 0 1rem 1rem;
     border-radius: 10px;
@@ -113,6 +114,9 @@
   }
   .device{
     margin-top: -4px;
+    .table_device{
+      margin-top: 1.3rem;
+    }
     .energy_today{
       margin: 1.2rem 1rem 0 0;
       border-radius: 10px;
