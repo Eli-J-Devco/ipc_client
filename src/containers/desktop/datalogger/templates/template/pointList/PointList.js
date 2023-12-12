@@ -30,9 +30,11 @@ function PointList() {
                 columns={columns}
                 data={pointList}
                 action={item => (
-                    <Button onClick={() => handlePointEdit(item)}>
-                        <Button.Text text="Edit" />
-                    </Button>
+                    <div className="text-center">
+                        <Button onClick={() => handlePointEdit(item)}>
+                            <Button.Text text="Edit" />
+                        </Button>
+                    </div>
                 )}
                 id_checkbox={item => (
                     <FormInput.Check

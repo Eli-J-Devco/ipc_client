@@ -45,7 +45,7 @@ function useAlarm() {
         }, {
             id: 10,
             slug: "action",
-            name: "Actions"
+            name: <div className="text-center">Actions</div>
         }
     ]);
     const [alarmList,] = useState([
