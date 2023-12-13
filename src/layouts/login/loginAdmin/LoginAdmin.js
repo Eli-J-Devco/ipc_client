@@ -16,6 +16,10 @@ class LoginAdmin extends Component {
             permissions: []
         };
     }
+
+    loginAdmin(){
+        window.location.href = "/datalogger/quickstart";
+    }
     
     render() {
         return this.jsxTemplate.call(this)

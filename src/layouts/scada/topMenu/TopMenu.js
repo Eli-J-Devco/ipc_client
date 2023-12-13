@@ -15,7 +15,7 @@ export default function TopMenu() {
         <div className={styles.top_menu}>
             <ul>
                 <li>
-                    <NavLink to="/scada/overview" className={(navData) => navData.isActive ? styles.active : ""}>
+                    <NavLink to="/scada" className={(navData) => navData.isActive ? styles.active : ""} end>
                         <Overview />
                         <span>Overview</span>
                     </NavLink>

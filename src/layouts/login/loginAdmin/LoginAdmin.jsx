@@ -28,7 +28,7 @@ export default function LoginAdmin() {
                 inputClass="form-control"
                 inputId="email"
                 inputName="email"
-                // value={curItem.user_name}
+                value={"vanlong200880@gmail.com"}
                 // onChange={(e) => { this.handleInputChange(e); this.validateOne(e) }}
               />
               <svg width="40" height="41" viewBox="0 0 40 41" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
@@ -50,7 +50,7 @@ export default function LoginAdmin() {
                 inputClass="form-control"
                 inputId="password"
                 inputName="password"
-                // value={curItem.password}
+                value={"11111111"}
                 // onChange={(e) => { this.handleInputChange(e); this.validateOne(e) }}
                 // onKeyPress={(e) => { this.onPasswordKeyPress(e) }}
               />
@@ -85,7 +85,7 @@ export default function LoginAdmin() {
               <div className="col-xl-12 text-center">
                 <div className={styles.btn_login}>
                   <RButton className="btn btn-primary btn-app"
-                    // onClick={() => this.loginAdmin()}
+                    onClick={() => this.loginAdmin()}
                     text="Login"
                     title="Login" />
                 </div>

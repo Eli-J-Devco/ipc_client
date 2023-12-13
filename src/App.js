@@ -74,6 +74,7 @@ import Alarm from './containers/desktop/datalogger/system/alarm/Alarm';
 import Users from './containers/desktop/datalogger/users/Users';
 import PermissionsAndRoles from './containers/desktop/datalogger/permissionsAndRoles/PermissionsAndRoles';
 import Overview from './containers/desktop/datalogger/overview/Overview';
+import ScadaAlarm from './containers/desktop/scada/alarms/Alarms';
 
 export default class App extends Component {
     render() {
@@ -180,6 +181,9 @@ export default class App extends Component {
                             <Route path='setup/:id' element={<ScadaSetup />} />
                             <Route path='dc-combiner/:id' element={<ScadaDCCombiner />} />
                         </Route>
+
+                        <Route path='alarms' element = {<ScadaAlarm />} />
+                        
                         
                     </Route>
 

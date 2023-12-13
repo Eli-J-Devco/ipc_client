@@ -35,57 +35,6 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
 
     return (
         <div>
-            {
-                control &&
-                <div className={styles.control}>
-                    <div className={styles.side}>
-                        {
-                            visible &&
-                            <div className="position-relative">
-                                <Button.Image
-                                    image={<ColumnsIcon />}
-                                    onClick={handleOpenDropDowns}
-                                />
-
-                                <DropDowns
-                                    isShow={isDropDownsShow}
-                                    data={table}
-                                    refProp={dropDownsRef}
-                                />
-                            </div>
-                        }
-                    </div>
-
-                    <div className={styles.center}>
-                        {
-                            pagination?.enable && table.getPageCount() > 0 &&
-                            <>
-                                <select
-                                    className={`${styles["page-count"]} ${variant ? styles[variant] : ""}`}
-                                    value={table.getState().pagination.pageSize}
-                                    onChange={handleOnChangePageSize}
-                                >
-                                    {
-                                        Constants.PAGE_SIZES.map(pageSize => (
-                                            <option key={pageSize} value={pageSize}>
-                                                {pageSize} items/page
-                                            </option>
-                                        ))
-                                    }
-                                </select>
-
-                                <Pagination controls={table} variant={variant} />
-                            </>
-                        }
-                    </div>
-
-                    <div className={styles.side}>
-                    </div>
-                </div>
-            }
-
-
-
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
                 <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ minWidth: table.getTotalSize() }}>
                     <thead>
@@ -123,7 +72,7 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
                             ))
                         }
                     </tbody>
-
+                    
                     <tfoot>
                         <tr className={styles["footer-row"]}>
                             {
@@ -139,6 +88,55 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
                     </tfoot>
                 </table>
             </div>
+
+            {control && 
+            <div className={styles.control}>
+                <div className={styles.side}>
+                    {
+                        visible &&
+                        <div className="position-relative">
+                            <Button.Image
+                                image={<ColumnsIcon />}
+                                onClick={handleOpenDropDowns}
+                            />
+
+                            <DropDowns
+                                isShow={isDropDownsShow}
+                                data={table}
+                                refProp={dropDownsRef}
+                            />
+                        </div>
+                    }
+                </div>
+
+                <div className={styles.center}>
+                    {
+                        pagination?.enable && table.getPageCount() > 0 &&
+                            <>
+                                <select
+                                    className={`${styles["page-count"]} ${variant ? styles[variant] : ""}`}
+                                    value={table.getState().pagination.pageSize}
+                                    onChange={handleOnChangePageSize}
+                                >
+                                    {
+                                        Constants.PAGE_SIZES.map(pageSize => (
+                                            <option key={pageSize} value={pageSize}>
+                                                {pageSize} items/page
+                                            </option>
+                                        ))
+                                    }
+                                </select>
+                            
+                                <Pagination controls={table} variant={variant} />
+                            </>
+                    }
+                </div>
+
+                <div className={styles.side}>
+                </div>
+            </div>
+            }
+            
         </div>
     );
 }
