@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { NavLink } from "react-router-dom";
 import styles from './Setup.module.scss';
 import Breadcrumb from '../../../../../components/breadCrumb/BreadCrumb';
 import { ReactComponent as EnergyIcon } from "../../../../../assets/images/energy.svg";
@@ -5118,6 +5119,20 @@ function Setup(props) {
 
 
             <div className={styles.setup_body}>
+                <div className={styles.dc_com}>
+                    <NavLink to={"/scada/devices/dc-combiner/1212"} className={(navData) => `nav-link m-0 border-0 ${navData.isActive ? styles.active : ""}`} end>
+                        <svg width="14" height="9" viewBox="0 0 14 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="4" height="4" fill="#383434" />
+                            <rect x="5" width="4" height="4" fill="#383434" />
+                            <rect x="10" width="4" height="4" fill="#383434" />
+                            <rect y="5" width="4" height="4" fill="#383434" />
+                            <rect x="5" y="5" width="4" height="4" fill="#383434" />
+                            <rect x="10" y="5" width="4" height="4" fill="#383434" />
+                        </svg>
+                        DC Combiner
+                    </NavLink>
+                </div>
+
                 <div className={styles.height_row + " container-fluid"}>
                     <div className={styles.height_row + " row"}>
                         <div className="col-md-6">
@@ -5127,7 +5142,7 @@ function Setup(props) {
                                         <div className="row">
                                             <div className="col-md-7">
                                                 <p>Power Now</p>
-                                                <p><strong>110.8 kW</strong></p>
+                                                <p><strong className={styles.color_power}>110.8 kW</strong></p>
                                                 <p>Installed Power <strong>365.5 kWp</strong></p>
                                             </div>
                                             <div className="col-md-5 text-end">
@@ -5144,7 +5159,7 @@ function Setup(props) {
                                         <div className="row">
                                             <div className="col-md-7">
                                                 <p>Today's Production</p>
-                                                <p><strong>1.57 MWh</strong></p>
+                                                <p><strong className={styles.color_power}>1.57 MWh</strong></p>
                                                 <p>Total Production <strong>1.47 GWh</strong></p>
                                             </div>
                                             <div className="col-md-5 text-end">

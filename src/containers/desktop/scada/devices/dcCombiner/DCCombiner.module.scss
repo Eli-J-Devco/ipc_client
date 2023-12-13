@@ -1,0 +1,295 @@
+.dc_combiner{
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px);
+    padding: 15px 0;
+    .item_process{
+        position: relative;
+        height: 30px;
+        vertical-align: top;
+        display: flex;
+        margin-top: 30px;
+        .name{
+            width: 120px;
+            display: inline-block;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            background-color: #D9D9D9;
+        }
+        .value{
+            display: inline-block;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            background-color: #F2F2F2;
+            width: calc(100% - 248px);
+            margin-left: 4px;
+            margin-right: 4px;
+            position: relative;
+            border: 1px solid #0C76BC;
+            .value_process{
+                width: 50%;
+                height: 28px;
+                position: relative;
+                background-color: #0C76BC;
+            }
+            &.red{
+                border: 1px solid #DC3545;
+                .value_process{
+                    background-color: #DC3545;
+                }
+            }
+
+            &.purple{
+                border: 1px solid #6F4F98;
+                .value_process{
+                    background-color: #6F4F98;
+                }
+            }
+
+            &.green{
+                border: 1px solid #1ED300;
+                .value_process{
+                    background-color: #1ED300;
+                }
+            }
+        }
+        .unit{
+            width: 120px;
+            display: inline-block;
+            background-color: rgb(7, 100, 167, .2);
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+        }
+    }
+
+    .pannel{
+        display: flex;
+        .list_pi{
+            width: 70%;
+            flex: 0 0 auto;
+            .list_line{
+                margin-top: 60px;
+                display: flex;
+                .item_line_empty{
+                    width: 9.09090909091%;
+                    height: 60px;
+                    display: inline-block;
+                    margin-right: 10px;
+                    position: relative;
+                    z-index: 5;
+                }
+                .item_line{
+                    // width: 120px;
+                    width: 9.09090909091%;
+                    height: 60px;
+                    background-color: #0090D1;
+                    display: inline-block;
+                    margin-right: 10px;
+                    position: relative;
+                    background-image: url('../../../../../assets/images/pin.png');
+                    background-size: 100% 100%;
+                    z-index: 5;
+                    
+                    .wire_orange{
+                        width: 10px;
+                        height: 2px;
+                        position: absolute;
+                        top: 3px;
+                        right: -10px;
+                        background: #AD731D;
+                    }
+                    .wire_black{
+                        width: 10px;
+                        height: 2px;
+                        position: absolute;
+                        bottom: 3px;
+                        right: -10px;
+                        background: black;
+                    }
+                    &::after{
+                        width: 4px;
+                        content: "";
+                        position: absolute;
+                        bottom: -20px;
+                        background-color: #AD731D;
+                        height: 15px;
+                        border-radius: 3px;
+                        right: 10px;
+                    }
+                    img{
+                        max-width: 100%;
+                    }
+                }
+                .box_wi{
+                    width: 120px;
+                    height: 60px;
+                    display: inline-block;
+                    text-align: center;
+                    line-height: 60px;
+                    .box_co{
+                        width: 40px;
+                        height: 18px;
+                        border: 1px solid #ea00ff;
+                        position: relative;
+                        display: inline-block;
+                        &::before{
+                            content: "";
+                            position: absolute;
+                            bottom: 7px;
+                            left: -2px;
+                            width: 42px;
+                            height: 1px;
+                            background-color: #ea00ff;
+                            transform: rotate(-23deg);
+                        }
+                        .text{
+                            position: absolute;
+                            font-size: 12px;
+                            top: -22px;
+                            left: 0;
+                            width: 40px;
+                            height: 24px;
+                            line-height: 24px;
+                            color: var(--text-color-green);
+                        }
+    
+                        .line_left{
+                            width: 48px;
+                            height: 2px;
+                            background-color: #AD731D;
+                            display: inline-block;
+                            position: absolute;
+                            left: -48px;
+                            top: 7px;
+                        }
+    
+                        .line_right{
+                            width: 38px;
+                            height: 2px;
+                            background-color: #AD731D;
+                            display: inline-block;
+                            position: absolute;
+                            right: -38px;
+                            top: 7px;
+                        }
+                    }
+                }
+            }
+        }
+        .item_inv{
+            width: 30%;
+            flex: 0 0 auto;
+            position: relative;
+            .line_inv_left{
+                width: 2px;
+                height: calc(100% - 118px);
+                background-color: #AD731D;
+                display: inline-block;
+                position: relative;
+                top: 85px;
+            }
+
+            .box_line_inv{
+                width: 50%;
+                height: 50%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                border-bottom: 2px solid #AD731D;
+                border-right: 2px solid #AD731D;
+                .inv{
+                    width: 150px;
+                    height: 150px;
+                    background-color: var(--text-color-blue);
+                    border-radius: 10px;
+                    background-image: url('../../../../../assets/images/line-inv.svg');
+                    background-size: 100% 100%;
+                    position: absolute;
+                    top: -50px;
+                    right: -75px;
+                    &::before{
+                        width: 2px;
+                        height: 40px;
+                        background-color: #AD731D;
+                        content: "";
+                        position: absolute;
+                        top: -40px;
+                        left: 50%;
+                    }
+
+                    &::after{
+                        border-bottom: 10px solid #AD731D;
+                        border-left: 10px solid transparent;
+                        border-right: 10px solid transparent;
+                        content: "";
+                        position: absolute;
+                        top: -50px;
+                        left: calc(50% - 9px);
+                    }
+                }
+
+                .scb{
+                    width: 35px;
+                    height: 30px;
+                    border: 1px solid #ea00ff;
+                    position: absolute;
+                    bottom: -15px;
+                    right: 40%;
+                    .dot{
+                        display: inline-block;
+                        width: 24px;
+                        position: absolute;
+                        background: #FFF;
+                        height: 100%;
+                        left: 5px;
+                        &::before{
+                            content: "";
+                            position: absolute;
+                            width: 6px;
+                            height: 6px;
+                            border: 1px solid #ea00ff;
+                            background-color: #FFF;
+                            border-radius: 50%;
+                            left: 0px;
+                            top: 12px;
+                        }
+
+                        &::after{
+                            content: "";
+                            position: absolute;
+                            width: 6px;
+                            height: 6px;
+                            border: 1px solid #ea00ff;
+                            background-color: #FFF;
+                            border-radius: 50%;
+                            right: 0px;
+                            top: 12px;
+                        }
+                        .line_wri{
+                            width: 14px;
+                            height: 1px;
+                            background-color: #ea00ff;
+                            top: 14px;
+                            position: absolute;
+                            left: 5px;
+                        }
+                    }
+                    .dot_string{
+                        position: absolute;
+                        bottom: -25px;
+                        left: 0;
+                        width: 100%;
+                        text-align: center;
+                    }
+                }
+            }
+            
+        }
+        
+    }
+}
