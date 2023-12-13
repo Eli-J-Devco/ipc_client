@@ -1,0 +1,12 @@
+.charting {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px);
+    padding: 15px;
+
+    .alarms_body {
+        margin-top: 15px;
+    }
+}

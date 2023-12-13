@@ -20,8 +20,6 @@ import { ReactComponent as Humidity } from "../../../../assets/images/humidity.s
 import { ReactComponent as Danger } from "../../../../assets/images/danger.svg";
 import { ReactComponent as PowerOverview } from "../../../../assets/images/power_overview.svg";
 import { ReactComponent as SolarPanel } from "../../../../assets/images/solar_panel.svg";
-import { ReactComponent as ArrowDown } from "../../../../assets/images/arrow_down.svg";
-import { ReactComponent as DownloadYellow } from "../../../../assets/images/download_yellow.svg";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts/highcharts.js";
 import highchartsMore from "highcharts/highcharts-more.js"
@@ -29,8 +27,6 @@ import HighchartsExporting from 'highcharts/modules/exporting';
 import bellcurve from "highcharts/modules/histogram-bellcurve";
 import solidGauge from "highcharts/modules/solid-gauge.js";
 import Table from '../../../../components/table/Table';
-import ButtonGroup from '../../../../components/buttonGroup/ButtonGroup';
-import DatePickerButton from '../../../../components/datePickerButton/DatePickerButton';
 import useOverview from './useOverview';
 import Modal from '../../../../components/modal/Modal';
 import ChartView from '../../../../components/chartView/ChartView';

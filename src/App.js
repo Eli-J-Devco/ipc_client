@@ -82,6 +82,8 @@ import Historical from './containers/desktop/scada/trend/historical/Historical';
 import Weather from './containers/desktop/scada/trend/weather/Weather';
 import UPS from './containers/desktop/scada/trend/ups/UPS';
 import Meter from './containers/desktop/scada/trend/meter/Meter';
+import ScadaCharting from './containers/desktop/scada/charting/Charting';
+import ScadaReport from './containers/desktop/scada/report/Report';
 
 export default class App extends Component {
     render() {
@@ -198,6 +200,9 @@ export default class App extends Component {
                             <Route path='ups' element={<UPS />} />
                             <Route path='meter' element={<Meter />} />
                         </Route>
+
+                        <Route path='charting' element = {<ScadaCharting />} />
+                        <Route path='report' element = {<ScadaReport />} />
                         
                     </Route>
 
