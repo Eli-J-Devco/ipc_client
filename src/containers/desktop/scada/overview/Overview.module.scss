@@ -1,216 +1,185 @@
 .main_overview{
-  overflow-x: hidden;
-  margin-top: 60px;
-  .energy_flow{
-    margin: 1rem 0 1rem 1rem;
-    border-radius: 10px;
-    box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
-    overflow: hidden;
-    height: 277px;
-    .header_energy_flow{
-      display: flex;
-      justify-content: space-between;
-      margin: 1rem;
-      .title{
-        font-weight: bold;
-      }
-    }
-    .body_energy_flow{
-      display: flex;
-      margin-top: 30px;
-      .left{
-        display: flex;
-        position: relative;
-        height: 180px;
-        align-items: center;
-        font-size: 12px;
-        margin-left: 16px;
-        .pv_array{
-          position: relative;
-          top: -15px;
-        }
-        .line{
-          position: relative;
-          top: -25px;
-          font-size: 10px;
-        }
-        .meter{
-          position: relative;
-          text-align: center;
-        }
-        .line_45degree{
-          transform: rotate(-45deg);
-          font-size: 10px;
-          position: relative;
-          top: -35px;
-          right: 25px;
-        }
-        .line_45{
-          transform: rotate(45deg);
-          font-size: 10px;
-          position: relative;
-          top: 0;
-          right: 15px;
-        }
-      }
-      .right{
-        font-size: 12px;
-        position: relative;
-        right: 25px;
-        top: -15px;
-        .power_grid{
-          margin-bottom: 40px;
-        }
-        .consumption{
-          .consumption_title{
-            position: relative;
-          }
-        }
-      }
-    }
-  }
-  .current_pv_production{
-    margin: 1rem 0 1rem 1rem;
-    border-radius: 10px;
-    box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
-    .pv_production{
-      border: 1px solid #DDD;
-      border-radius: 10px;
-      overflow: hidden;
-      .header{
-          border-top: 10px;
-          background-color: var(--bg-color-dark);
-          padding: 5px 15px;
-          font-weight: 600;
-          color: var(--bg-color-light)
-      }  
-      .footer{
-        padding: 0 15px 0px 15px;
-        position: relative;
-        top: -15px;
-      }   
-    }
-  }
-  .detail_overview{
-    margin: 1rem 0 1rem 1rem;
-    border-radius: 10px;
-    box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
-    overflow: hidden;
-    height: 247px;
-    .group{
-      display: flex;
-      .detail{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        margin-left: 1rem;
-        .value{
-          font-size: 16px;
-          font-weight: bold;
-          color: #FFDA00;
-        }
-      }
-    }
-  }
-  .device{
-    margin-top: -4px;
-    .table_device{
-      margin-top: 1.3rem;
-    }
-    .energy_today{
-      margin: 1.2rem 1rem 0 0;
+  position: relative;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 60px);
+  overflow: hidden;
+  .left_tab{
+    height: calc(100% - 60px);
+    margin-top: 8px;
+    .energy_flow{
+      margin: 1rem 0 1rem 1rem;
       border-radius: 10px;
       box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
       overflow: hidden;
-      background-color: var(--bg-color-dark);
-      display: flex;
-      justify-content: space-between;
-      height: 129px;
-      display: flex;
-      align-items: center;
-      .group{
-        color: var(--bg-color-white);
-        margin: 1rem 0 1rem 1rem;
-        .value{
-          color: #FFDA00;
-          font-size: 20px;
-          font-weight: bold;
-          margin: 0.5rem 0;
-        }
-        span{
+      height: 30%;
+      .header_energy_flow{
+        display: flex;
+        justify-content: space-between;
+        margin: 1rem;
+        .title{
           font-weight: bold;
         }
       }
-    }
-  }
-  .charting{
-    margin: 1rem 1rem 0 0;
-    border-radius: 10px;
-    box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
-    overflow: hidden;
-    height: 614px;
-    .time_export{
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      .time{
+      .body_energy_flow{
         display: flex;
-        margin: 1rem 0.5rem;
-        .view{
-          width: 125px;
-          border: 1px solid var(--bg-color-dark);
-          border-radius: 15px;
-          padding: 4px 10px;
-          text-align: left;
+        margin-top: 25px;
+        position: relative;
+        .left{
+          display: flex;
           position: relative;
-          cursor: pointer;
-          span{
-            position: absolute;
-            right: 10px;
+          height: 180px;
+          align-items: center;
+          font-size: 12px;
+          margin-left: 16px;
+          .pv_array{
+            position: relative;
+            top: -8px;
+          }
+          .line{
+            position: relative;
+            top: -25px;
+            font-size: 10px;
+          }
+          .meter{
+            position: relative;
+            text-align: center;
+          }
+          .line_45degree{
+            transform: rotate(-45deg);
+            font-size: 10px;
+            position: relative;
+            top: -40px;
+            right: 25px;
+          }
+          .line_45{
+            transform: rotate(45deg);
+            font-size: 10px;
+            position: relative;
+            top: -5px;
+            right: 15px;
+          }
+        }
+        .right{
+          font-size: 12px;
+          position: relative;
+          right: 25px;
+          top: -15px;
+          .power_grid{
+            margin-bottom: 40px;
+          }
+          .consumption{
+            .consumption_title{
+              position: relative;
+            }
           }
         }
       }
-      .filter_dropdown{
-        position: absolute;
-        left: 10px;
-        border: 1px solid var(--bg-color-dark);
-        border-radius: 4px;
-        width: 140px;
-        z-index: 9;
-        background-color: #FFF;
-        top: 50px;
-        cursor: pointer;
-        div{
-            display: inline-block;
-            width: 100%;
+    }
+    .current_pv_production{
+      margin: 1rem 0 1rem 1rem;
+      border-radius: 10px;
+      box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
+      .pv_production{
+        border: 1px solid #DDD;
+        border-radius: 10px;
+        overflow: hidden;
+        .header{
+            border-top: 10px;
+            background-color: var(--bg-color-dark);
             padding: 5px 15px;
-            text-align: left;
-            &:hover{
-                background-color: var(--bg-color-dark);
-                color: #FFDA00;
-            }
-            &.active{
-                background-color:var(--bg-color-dark);
-                color: #FFDA00;
-            }
+            font-weight: 600;
+            color: var(--bg-color-light)
+        }  
+        .footer{
+          padding: 0 15px 0px 15px;
+          position: relative;
+          top: -15px;
         }
-      }
-      .export{
-        margin: 1rem 0.5rem;
-        border: 1px solid var(--bg-color-dark);
-        text-align: center;
-        height: 30px;
-        width: 30px;
-        border-radius: 4px;
+        div{
+          height: 40%;
+        }   
       }
     }
-    .charting_power{
-      padding-top: 35px;
-      position: relative;
+    .detail_overview{
+      margin: 1rem 0 1rem 1rem;
+      border-radius: 10px;
+      box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
+      overflow: hidden;
+      height: 30%;
+      .group{
+        display: flex;
+        .icons{
+          transform: scale(0.9);
+        }
+        .detail{
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          margin-left: 1rem;
+          .value{
+            font-size: 16px;
+            font-weight: bold;
+            color: #FFDA00;
+          }
+        }
+      }
+    } 
+  }
+  
+  .right_tab{
+    height: calc(100% - 60px);
+    .device{
+      .table_device{
+        margin-top: 1.3rem;
+      }
+      .energy_today{
+        margin: 1.2rem 1rem 0 0;
+        border-radius: 10px;
+        box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
+        overflow: hidden;
+        background-color: var(--bg-color-dark);
+        display: flex;
+        justify-content: space-between;
+        height: 43%;
+        display: flex;
+        align-items: center;
+        .group{
+          color: var(--bg-color-white);
+          margin: 1rem 0 1rem 1rem;
+          .value{
+            color: #FFDA00;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0.5rem 0;
+          }
+          span{
+            font-weight: bold;
+          }
+        }
+      }
+    }
+    .charting{
+      margin: 1rem 1rem 0 0;
+      border-radius: 10px;
+      box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
+      height: calc(100% - 320px) !important;
+      .main_charting{
+        padding: 13px;
+      }
     }
   }
 }
 
-.modal{
-  width: 100%;
-}
+// @media only screen and (min-width: 1400px) {
+//   .main_overview{
+//     .right_tab{
+//       .charting{
+//         .main_charting{
+//           padding: 25px;
+//         }
+//       }
+//     }
+//   }
+// }
