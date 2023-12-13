@@ -75,6 +75,13 @@ import Users from './containers/desktop/datalogger/users/Users';
 import PermissionsAndRoles from './containers/desktop/datalogger/permissionsAndRoles/PermissionsAndRoles';
 import Overview from './containers/desktop/datalogger/overview/Overview';
 
+import Trend from './containers/desktop/scada/trend/Trend';
+import Realtime from './containers/desktop/scada/trend/realtime/Realtime';
+import Historical from './containers/desktop/scada/trend/historical/Historical';
+import Weather from './containers/desktop/scada/trend/weather/Weather';
+import UPS from './containers/desktop/scada/trend/ups/UPS';
+import Meter from './containers/desktop/scada/trend/meter/Meter';
+
 export default class App extends Component {
     render() {
         return (
@@ -179,6 +186,14 @@ export default class App extends Component {
                             <Route index element = {<ScadaDevices />} />
                             <Route path='setup/:id' element={<ScadaSetup />} />
                             <Route path='dc-combiner/:id' element={<ScadaDCCombiner />} />
+                        </Route>
+
+                        <Route path='trend' element = {<Trend />}>
+                            <Route index element = {<Realtime />} />
+                            <Route path='historical' element={<Historical />} />
+                            <Route path='weather' element={<Weather />} />
+                            <Route path='ups' element={<UPS />} />
+                            <Route path='meter' element={<Meter />} />
                         </Route>
                         
                     </Route>

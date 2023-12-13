@@ -24,7 +24,7 @@ solidGauge(Highcharts);
 accessibility(Highcharts);
 
 
-function ChartView({ dataDate, dataTime, options }) {
+function ChartView({ dataDate, dataTime, datePickerEnabled = true, downloadEnabled = true, options }) {
     const [showDate, setShowDate] = React.useState(0);
     const [showTime, setShowTime] = React.useState(0);
 
@@ -154,24 +154,29 @@ function ChartView({ dataDate, dataTime, options }) {
                         </div>
                     </div>
                     }
-                    <div className={styles.date_picker}>
-                        <DatePickerButton
-                            prevDate="Aug 18, 2023"
-                            nextDate="Aug 20, 2023"
-                        />
-                    </div>
+                    {
+                        datePickerEnabled &&
+                        <div className={styles.date_picker}>
+                            <DatePickerButton
+                                prevDate="Aug 18, 2023"
+                                nextDate="Aug 20, 2023"
+                            />
+                        </div>
+                    }
 
-
-                    <div className={styles.download}>
-                        <DownloadYellow />
-                    </div>
+                    {
+                        downloadEnabled &&
+                        <div className={styles.download}>
+                            <DownloadYellow />
+                        </div>
+                    }
                 </div>
 
                 {options && <div className={styles.charting}>
                     <HighchartsReact
                         highcharts={Highcharts}
                         options={options}
-                        allowChartUpdate={false}
+                        allowChartUpdate={true}
                         immutable={true}
                     />
                 </div>}
