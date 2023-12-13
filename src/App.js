@@ -76,6 +76,13 @@ import PermissionsAndRoles from './containers/desktop/datalogger/permissionsAndR
 import Overview from './containers/desktop/datalogger/overview/Overview';
 import ScadaAlarm from './containers/desktop/scada/alarms/Alarms';
 
+import Trend from './containers/desktop/scada/trend/Trend';
+import Realtime from './containers/desktop/scada/trend/realtime/Realtime';
+import Historical from './containers/desktop/scada/trend/historical/Historical';
+import Weather from './containers/desktop/scada/trend/weather/Weather';
+import UPS from './containers/desktop/scada/trend/ups/UPS';
+import Meter from './containers/desktop/scada/trend/meter/Meter';
+
 export default class App extends Component {
     render() {
         return (
@@ -184,6 +191,13 @@ export default class App extends Component {
 
                         <Route path='alarms' element = {<ScadaAlarm />} />
                         
+                        <Route path='trend' element = {<Trend />}>
+                            <Route index element = {<Realtime />} />
+                            <Route path='historical' element={<Historical />} />
+                            <Route path='weather' element={<Weather />} />
+                            <Route path='ups' element={<UPS />} />
+                            <Route path='meter' element={<Meter />} />
+                        </Route>
                         
                     </Route>
 

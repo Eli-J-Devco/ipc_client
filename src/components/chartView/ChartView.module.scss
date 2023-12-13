@@ -4,8 +4,8 @@
     .box_charting {
         height: 100%;
         .charting_filter {
-            height: 36px;
             position: relative;
+            margin-bottom: 20px;
 
             .filter_date {
                 position: relative;
@@ -82,8 +82,6 @@
         }
 
         .charting {
-            height: calc(100% - 60px);
-            margin-top: 20px;
         }
     }
 }

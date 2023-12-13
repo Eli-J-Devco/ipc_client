@@ -1,0 +1,19 @@
+.chart-wrapper {
+    border: 1px solid var(--bg-color-grey);
+    border-radius: 4px;
+
+    .header {
+        background-color: rgba(56, 52, 52, 0.5);
+        color: var(--text-color-light);
+        border-top-right-radius: 3px;
+        border-top-left-radius: 3px;
+        padding: 7px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chart {
+        padding: 7px;
+    }
+}

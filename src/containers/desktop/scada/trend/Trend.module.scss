@@ -1,0 +1,23 @@
+.trend{
+    position: absolute;
+    top: 60px;
+    left: 0;
+    height: calc(100% - 80px);
+    margin: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    .tabs {
+        background-color: var(--bg-color-light);
+        padding: 7px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+
+        a {
+            border-radius: var(--bs-nav-tabs-border-radius);
+        }
+    }
+}
