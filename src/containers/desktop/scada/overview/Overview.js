@@ -120,7 +120,7 @@ export default function Overview() {
       plotBands: [{
         from: 0,
         to: 120,
-        color: '#55BF3B', // red
+        color: '#55BF3B', // green
         thickness: 20
       }, {
         from: 120,
@@ -130,14 +130,14 @@ export default function Overview() {
       }, {
         from: 165,
         to: 200,
-        color: '#DF5353', // green
+        color: '#DF5353', // red
         thickness: 20
       }]
     },
 
     series: [{
       name: 'Node meter',
-      data: [0],
+      data: [100],
       tooltip: {
         valueSuffix: ' kW'
       },
