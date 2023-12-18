@@ -9,26 +9,26 @@ import Pagination from './pagination/Pagination';
 import Constants from '../../utils/Constants';
 
 /**
- * Table props
-* @property {boolean}    control                 - enable control
- * @property {string}    variant                 - style base on specific variant
- * @property {string}    className               - custom class
- * @property {string}    maxHeight               - set maxHeight inline style for table (exclude control bar) for each specific case
- * @property {object[]}  columns                 - table columns definition
- * @property {number}    columns[].id            - column id
- * @property {string}    columns[].slug          - column slug
- * @property {string}    columns[].name          - oclumn name
- * @property {string}    columns[].width         - column width: optional, default value: 100px
- * @property {array}     data                    - fetching data
- * @property {boolean}   visible                 - enable hide/unhide columns
- * @property {boolean}   resizable               - enable resize columns
- * @property {boolean}   draggable               - enable reorder columns
- * @property {object}    pagination              - pagination
- * @property {boolean}   pagination.enable       - enable pagination
- * @property {string}    pagination.total        - total records without limit and offset
- * @property {string}    pagination.setLimit     - get limit from table component
- * @property {string}    pagination.setOffset    - get offset from table component
- * @property {component} slugProps               - component that wrapping cell's value. when pass component in, prop's name is column's slug value
+ * Table component
+ * @param {boolean}   control                 - enable control
+ * @param {string}    variant                 - style base on specific variant
+ * @param {string}    className               - custom class
+ * @param {string}    maxHeight               - set maxHeight inline style for table (exclude control bar) for each specific case
+ * @param {object[]}  columns                 - table columns definition
+ * @param {number}    columns[].id            - column id
+ * @param {string}    columns[].slug          - column slug
+ * @param {string}    columns[].name          - oclumn name
+ * @param {string}    columns[].width         - column width: optional, default value: 100px
+ * @param {array}     data                    - fetching data
+ * @param {boolean}   visible                 - enable hide/unhide columns
+ * @param {boolean}   resizable               - enable resize columns
+ * @param {boolean}   draggable               - enable reorder columns
+ * @param {object}    pagination              - pagination
+ * @param {boolean}   pagination.enable       - enable pagination
+ * @param {string}    pagination.total        - total records without limit and offset
+ * @param {string}    pagination.setLimit     - get limit from table component
+ * @param {string}    pagination.setOffset    - get offset from table component
+ * @param {component} slugProps               - component that wrapping cell's value. when pass component in, prop's name is column's slug value
  */
 function Table({ control, variant, className, maxHeight, columns, data, visible, resizable, draggable, pagination, ...slugProps }) {
     const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef, handleOnChangePageSize } = useTable({ columns, data, total: pagination?.total, setLimit: pagination?.setLimit, setOffset: pagination?.setOffset, slugProps });

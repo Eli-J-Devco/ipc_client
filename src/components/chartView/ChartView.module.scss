@@ -6,11 +6,16 @@
         .charting_filter {
             position: relative;
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
 
             .filter_date {
                 position: relative;
                 display: inline-block;
-                margin-right: 10px;
+
                 .arrow_down{
                     padding-left: 10px;
                     svg{
@@ -32,6 +37,7 @@
                     border-radius: 16px;
                     position: relative;
                     display: inline-block;
+                    cursor: pointer;
                 }
 
                 .filter_date_dropdown {
@@ -69,15 +75,17 @@
                 width: 30px;
                 text-align: center;
                 line-height: 30px;
-                position: absolute;
-                top: 0;
-                right: 0;
                 cursor: pointer;
+            }
+
+            .btn_chart {
+                border-color: var(--bg-color-dark);
+                padding: 7px 14px;
+                border-radius: 15px;
             }
 
             .date_picker{
                 display: inline-block;
-                margin-right: 10px;
             }
         }
 

@@ -1,7 +1,7 @@
 import Form from 'react-bootstrap/Form';
 import ReactSelect from 'react-select';
 import useValidate from './useValidate';
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, forwardRef, useContext, useEffect, useRef, useState } from 'react';
 import styles from "./FormInput.module.scss";
 
 const FormInputContext = createContext();
@@ -55,11 +55,12 @@ function Text({ className, label, placeholder, name, value, disabled, readOnly, 
 }
 FormInput.Text = Text;
 
-function Check({ className, label, name, checked, disabled, inline, type = "checkbox", onChange, onBlur }) {
+const Check = forwardRef(({ className, label, name, checked, disabled, inline, type = "checkbox", onChange, onBlur }, ref) => {
     const validate = useContext(FormInputContext);
 
     return (
         <Form.Check
+            ref={ref}
             type={type}
             id={name}
             name={name}
@@ -75,7 +76,7 @@ function Check({ className, label, name, checked, disabled, inline, type = "chec
             feedbackType="invalid"
         />
     );
-}
+});
 FormInput.Check = Check;
 
 function Select({ className, label, name, option, horizontal, closeMenuOnSelect, hideSelectedOptions, isClearable, isDisabled, isMulti, isSearchable, onChange, onBlur, value, placeholder }) {

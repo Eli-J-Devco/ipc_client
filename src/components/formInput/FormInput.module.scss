@@ -22,9 +22,14 @@ $box-shadow-dark: 0 0 0 0.25rem rgba(56, 52, 52, 0.25);
 
 .form-check {    
     input {
-        &:checked {
+        &:checked,
+        &[type=checkbox]:indeterminate {
             background-color: var(--bg-color-dark);
             border-color: var(--bg-color-dark);
+        }
+
+        &[type=checkbox]:indeterminate + label::before {
+            content: none;
         }
 
 /*********************** overide index.scss ************************/
