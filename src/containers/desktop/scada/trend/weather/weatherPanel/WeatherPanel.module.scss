@@ -1,0 +1,54 @@
+@import "~bootstrap/scss/bootstrap-grid.scss";
+
+.weather-panel {
+    border: 1px solid var(--bg-color-grey);
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 0 5px 1px var(--bg-color-grey);
+    height: 335px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .weather-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 5px;
+        
+        .icon {
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-light);
+            width: 60px;
+            height: 60px;
+            flex-shrink: 0;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .value {
+            margin: 0;
+            font-weight: bold;
+            color: var(--text-color-yellow);
+            font-size: 16px;
+        }
+    
+        .label {
+            margin: 0;
+        }
+    }
+}
+
+@include media-breakpoint-between(sm, lg) {
+    .weather-panel {
+        height: 235px;
+    }
+}
+
+@include media-breakpoint-between(lg, xxl) {
+    .weather-panel {
+        height: 135px;
+    }
+}
