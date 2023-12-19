@@ -1,0 +1,50 @@
+.ups {
+    .icon {
+        background-color: #0C76BC;
+        color: var(--bg-color-white);
+        height: 30px;
+        width: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .label {
+        background-color: #FF842B;
+        color: var(--text-color-light);
+        line-height: 30px;
+        padding: 0 50px;
+        margin: 0;
+    }
+
+    .block-list {
+        .block-text,
+        .block-value,
+        .block-unit {
+            line-height: 30px;
+            margin-bottom: 2px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .block-text {
+            background-color: #0C76BC;
+            color: var(--text-color-light);
+            min-width: 200px;
+        }
+
+        .block-value {
+            background-color: var(--bg-color-grey);
+            min-width: 100px;
+        }
+
+        .block-unit {
+            background-color: #C8C5C5;
+            min-width: 50px;
+
+            &.green {
+                background-color: #1ED300;
+            }
+        }
+    }
+}
