@@ -5,8 +5,11 @@
     width: 100%;
     height: calc(100% - 60px);
     padding: 15px;
-
-    .alarms_body {
-        margin-top: 15px;
+    .chart {
+        border: 1px solid var(--bg-color-grey);
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 0 5px 1px var(--bg-color-grey);
+        margin-top: 20px;
     }
 }
