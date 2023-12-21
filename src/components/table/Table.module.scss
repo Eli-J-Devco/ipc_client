@@ -108,5 +108,42 @@
                 background-color: var(--bg-color-light);
             }
         }
+        &.overview{
+            background-color: var(--bg-color-grey);
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 0;
+            thead{
+                tr{
+                    th{
+                        border-right: 1px solid var(--bg-color-grey);
+                        text-align: center;
+                        background-color: var(--bg-color-dark);
+                        color: var(--bg-color-light);
+                        &:last-child {
+                            border-right: none;
+                        }
+                    }
+                }
+            }
+            tbody{
+                tr{
+                    td{
+                        &:last-child {
+                            border-right: none;
+                        }
+                        border-right: 1px solid var(--bg-color-grey);
+                        border-bottom: 1px solid var(--bg-color-grey);
+                        
+                    }
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                }
+            }
+            tfoot{
+                display: none;
+            }
+        }
     }
 }

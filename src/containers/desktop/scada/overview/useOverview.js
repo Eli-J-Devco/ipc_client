@@ -1,20 +1,22 @@
 import { useState } from "react";
 
 function useOverview() {
-  const [isSelectTime, setIsSelectTime] = useState(false);
   const [isSingleLineDatagram, setIsSingleLineDatagram] = useState(false);
+  const [ deviceTable, setDeviceTable] = useState({total: 270, table: 240, expandMore: false});
 
-  const openSelectTime = () => setIsSelectTime(true);
 
   const openSingleLineDatagram = () => setIsSingleLineDatagram(true);
   const closeSingleLineDatagram = () => setIsSingleLineDatagram(false);
+  const expandMore = () => setDeviceTable({total: 480, table: 410 , expandMore: true});
+  const expandLess = () => setDeviceTable({total: 270, table: 240, expandMore: false});
 
     return {
-      isSelectTime,
-      openSelectTime,
       isSingleLineDatagram,
       openSingleLineDatagram,
-      closeSingleLineDatagram
+      closeSingleLineDatagram,
+      deviceTable,
+      expandMore,
+      expandLess
     };
 }
 
