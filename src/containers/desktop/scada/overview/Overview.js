@@ -20,6 +20,8 @@ import { ReactComponent as Humidity } from "../../../../assets/images/humidity.s
 import { ReactComponent as Danger } from "../../../../assets/images/danger.svg";
 import { ReactComponent as PowerOverview } from "../../../../assets/images/power_overview.svg";
 import { ReactComponent as SolarPanel } from "../../../../assets/images/solar_panel.svg";
+import { ReactComponent as ArrowDown } from "../../../../assets/images/arrow_down.svg";
+
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts/highcharts.js";
 import highchartsMore from "highcharts/highcharts-more.js"
@@ -41,7 +43,7 @@ if (typeof Highcharts === 'object') {
 }
 
 export default function Overview() {
-  const { isSelectTime, openSelectTime, isSingleLineDatagram, openSingleLineDatagram, closeSingleLineDatagram } = useOverview();
+  const { isSingleLineDatagram, openSingleLineDatagram, closeSingleLineDatagram, deviceTable, expandMore, expandLess } = useOverview();
 
   const data = [
     {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: '2023-12-12 00:12:12 AM'},
@@ -52,13 +54,23 @@ export default function Overview() {
     {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
     {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
     {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
+    {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
+    {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
+    {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
+    {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
+    {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
+    {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
+    {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
+    {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
+    {alert: "", component: "AE500NX INV1", value: '145.6 kW', last_updated: 'now'},
+    {alert: "", component: "AE500NX INV1 last", value: '145.6 kW', last_updated: 'now'},
     ]
 
   const columns = [
     {id: 1, slug: "alert", name: "", width: 50},
-    {id: 2, slug: "component", name: "Component", width: 150},
-    {id: 3, slug: "value", name: "Value", width: 50},
-    {id: 4, slug: "last_updated", name: "Last Updated", width: 100}
+    {id: 2, slug: "component", name: "Component", width: 200},
+    {id: 3, slug: "value", name: "Value", width: 100},
+    {id: 4, slug: "last_updated", name: "Last Updated", width: 150}
   ]
 
   const blue = 235.5;
@@ -72,7 +84,7 @@ export default function Overview() {
       plotBackgroundImage: null,
       plotBorderWidth: 0,
       plotShadow: false,
-      height: '235px'
+      height: '220px'
     },
 
     credits: { enabled: false },
@@ -5362,14 +5374,29 @@ const options = {
           <div className={styles.device}>
             <div className='row'>
               <div className='col-md-8'>
-                <Table columns={columns} data={data} maxHeight={265} className={styles.table_device} variant={"grey"} footer={true}
-                alert={item => (
-                  <div className="d-flex flex-wrap justify-content-center">
-                    <Danger />
-                  </div>
-                )}
+                <div className={styles.list_device}>
+                    <div className={styles.table_device} style={{height: deviceTable.total}}>
+                        <div className={styles.body}>
+                            <Table columns={columns} data={data} maxHeight={deviceTable.table} className={styles.table_device} variant={"overview"}
+                                alert={item => (
+                                <div className="d-flex flex-wrap justify-content-center">
+                                    <Danger />
+                                </div>
+                                )}
+                            />
+                        </div>
+                        {
+                            deviceTable.expandMore ? <div className={styles.expand_less} onClick={() => expandLess()}>
+                                                        Expand Less <span className='ms-2'><ArrowDown  /></span>
+                                                    </div>
+                                                    :
+                                                    <div className={styles.expand_more} onClick={() => expandMore()}>
+                                                        Expand More <span className='ms-2'><ArrowDown /></span>
+                                                    </div>
+                        }
+                    </div>
+                </div>
                 
-                />
               </div>
               <div className='col-md-4'>
                   <div className={styles.energy_today}>

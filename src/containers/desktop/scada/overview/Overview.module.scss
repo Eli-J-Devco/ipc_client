@@ -7,7 +7,6 @@
   overflow: hidden;
   .left_tab{
     height: calc(100% - 60px);
-    margin-top: 8px;
     .energy_flow{
       margin: 1rem 0 1rem 1rem;
       border-radius: 10px;
@@ -29,7 +28,7 @@
         .left{
           display: flex;
           position: relative;
-          height: 180px;
+          height: 195px;
           align-items: center;
           font-size: 12px;
           margin-left: 16px;
@@ -90,7 +89,7 @@
             background-color: var(--bg-color-dark);
             padding: 5px 15px;
             font-weight: 600;
-            color: var(--bg-color-light)
+            color: var(--bg-color-light);
         }  
         .footer{
           padding: 0 15px 0px 15px;
@@ -131,18 +130,72 @@
   .right_tab{
     height: calc(100% - 60px);
     .device{
-      .table_device{
-        margin-top: 1.3rem;
-      }
+        .list_device{
+          position: relative;
+          width: 100%;
+          height: 100%;
+          margin-top: 1rem;
+          z-index: 9;
+          
+          .table_device{
+            width: 100%;
+            position: absolute;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            max-height: 460px;
+            min-height: 240px;
+            height: fit-content;
+            .body{
+              height: 89%;
+              position: relative;
+              border: 1px solid var(--bg-color-grey);
+              border-top-right-radius: 10px;
+              border-top-left-radius: 10px;
+              box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
+              background-color: var(--bg-color-light);
+            }
+            .expand_more{
+              height: 30px;
+              background-color: #D9D9D9;
+              border-bottom-left-radius: 10px;
+              border-bottom-right-radius: 10px;
+              text-align: center;
+              position: sticky;
+              padding: 4px;
+              cursor: pointer;
+              svg{
+                -webkit-transition: -webkit-transform .4s ease-in-out;
+                -ms-transition: -ms-transform .4s ease-in-out;
+                transition: transform .4s ease-in-out;
+              }
+            }
+            .expand_less{
+              height: 30px;
+              background-color: #D9D9D9;
+              border-bottom-left-radius: 10px;
+              border-bottom-right-radius: 10px;
+              text-align: center;
+              position: sticky;
+              padding: 4px;
+              cursor: pointer;
+              svg{
+                -webkit-transition: -webkit-transform .4s ease-in-out;
+                -ms-transition: -ms-transform .4s ease-in-out;
+                transition: transform .4s ease-in-out;
+                transform: rotate(180deg);
+              }
+            }
+          }
+        }      
       .energy_today{
-        margin: 1.2rem 1rem 0 0;
+        margin: 1rem 1rem 0 0;
         border-radius: 10px;
         box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
         overflow: hidden;
         background-color: var(--bg-color-dark);
         display: flex;
         justify-content: space-between;
-        height: 43%;
+        height: 46.5%;
         display: flex;
         align-items: center;
         .group{
@@ -161,25 +214,15 @@
       }
     }
     .charting{
-      margin: 1rem 1rem 0 0;
+      margin: 2rem 1rem 0 0;
       border-radius: 10px;
       box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
-      height: calc(100% - 320px) !important;
+      height: 490px;
+      z-index: 1;
       .main_charting{
-        padding: 13px;
+        padding: 15px;
       }
     }
   }
 }
 
-// @media only screen and (min-width: 1400px) {
-//   .main_overview{
-//     .right_tab{
-//       .charting{
-//         .main_charting{
-//           padding: 25px;
-//         }
-//       }
-//     }
-//   }
-// }
