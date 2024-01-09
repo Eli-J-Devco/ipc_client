@@ -84,6 +84,12 @@ import UPS from './containers/desktop/scada/trend/ups/UPS';
 import Meter from './containers/desktop/scada/trend/meter/Meter';
 import ScadaCharting from './containers/desktop/scada/charting/Charting';
 import ScadaReport from './containers/desktop/scada/report/Report';
+import SetupControl from './containers/desktop/scada/setupControl/SetupControl';
+import Basic from './containers/desktop/scada/setupControl/basic/Basic';
+import ExportLimitationControl from './containers/desktop/scada/setupControl/exportLimitationControl/ExportLimitationControl';
+import ScheduleControl from './containers/desktop/scada/setupControl/scheduleControl/ScheduleControl';
+
+
 
 export default class App extends Component {
     render() {
@@ -203,6 +209,12 @@ export default class App extends Component {
 
                         <Route path='charting' element = {<ScadaCharting />} />
                         <Route path='report' element = {<ScadaReport />} />
+
+                        <Route path='setup-control' element = {<SetupControl />}>
+                            <Route index element = {<Basic />} />
+                            <Route path='export-limitation-control' element={<ExportLimitationControl />} />
+                            <Route path='schedule-control' element={<ScheduleControl />} />
+                        </Route>
                         
                     </Route>
 

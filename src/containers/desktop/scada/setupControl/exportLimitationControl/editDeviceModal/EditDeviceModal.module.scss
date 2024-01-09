@@ -1,0 +1,18 @@
+.check_all{
+  margin-top: 2.5rem;
+}
+
+.fieldset {
+  border: 1px solid var(--bg-color-grey);
+  border-radius: 4px;
+  padding: 0 10px;
+  overflow: auto;
+
+  .legend {
+      float: none;
+      padding: 0 2px;
+      width: unset;
+      font-size: 14px;
+      font-weight: bold;
+  }
+}

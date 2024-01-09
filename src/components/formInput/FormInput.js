@@ -23,7 +23,7 @@ function FormInput({ children, className, id, onSubmit, initialValues, validatio
     );
 }
 
-function Text({ className, label, placeholder, name, value, disabled, readOnly, autoComplete = "off", textarea, horizontal, onChange, onBlur }) {
+function Text({ className, label, placeholder, name, value, disabled, readOnly, autoComplete = "off", textarea, horizontal, onChange, onBlur, unit }) {
     const validate = useContext(FormInputContext);
 
     return (
@@ -48,7 +48,7 @@ function Text({ className, label, placeholder, name, value, disabled, readOnly, 
                 onBlur={validate && onBlur === undefined ? validate.handleBlur : onBlur}
                 isInvalid={validate ? validate.touched[name] && validate.errors[name] : false}
             />
-
+            {unit && <Form.Label className='ms-2'>{unit}</Form.Label>}
             <Form.Control.Feedback type="invalid" >{validate ? validate.errors[name] : ""}</Form.Control.Feedback>
         </Form.Group>
     );
