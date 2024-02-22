@@ -183,8 +183,6 @@ export const RButton = (props) => (
                         </svg>
                         : null
 
-
-
                 : null}
 
             {props.text !== null && typeof props.text !== 'undefined' ? <span className='string'>{props.text}</span> : null}

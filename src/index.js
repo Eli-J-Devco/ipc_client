@@ -36,6 +36,7 @@ root.render(
       <I18nextProvider i18n={i18next}>
         <DndProvider backend={HTML5Backend}>
           <App />
+          <div id="process"></div>
         </DndProvider>
       </I18nextProvider>
     </BrowserRouter>

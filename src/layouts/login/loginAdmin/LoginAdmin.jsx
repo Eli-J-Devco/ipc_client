@@ -28,7 +28,7 @@ export default function LoginAdmin() {
                 inputClass="form-control"
                 inputId="email"
                 inputName="email"
-                value={"vanlong200880@gmail.com"}
+                value={"nguyenvudtd@gmail.com"}
                 // onChange={(e) => { this.handleInputChange(e); this.validateOne(e) }}
               />
               <svg width="40" height="41" viewBox="0 0 40 41" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
