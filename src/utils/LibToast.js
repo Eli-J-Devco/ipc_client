@@ -4,6 +4,8 @@
  *
  *********************************************************/
 import { toast } from "react-toastify";
+import Constants from "./Constants";
+
 var LibToast = {};
 
 /**
@@ -20,7 +22,7 @@ LibToast.toast = (message, type, pos = "top-right") => {
     case "info":
       toast.info(message, {
         position: posistion,
-        autoClose: 3000,
+        autoClose: Constants.TOAST_AUTO_CLOSE,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -31,8 +33,8 @@ LibToast.toast = (message, type, pos = "top-right") => {
     case "error":
       toast.error(message, {
         position: posistion,
-        autoClose: 3000,
-        hideProgressBar: true,
+        autoClose: Constants.TOAST_AUTO_CLOSE,
+        hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -42,7 +44,7 @@ LibToast.toast = (message, type, pos = "top-right") => {
     case "warn":
       toast.warn(message, {
         position: posistion,
-        autoClose: 3000,
+        autoClose: Constants.TOAST_AUTO_CLOSE,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -53,8 +55,8 @@ LibToast.toast = (message, type, pos = "top-right") => {
     case "expired":
       toast.warn(message, {
         position: posistion,
-        autoClose: 3000,
-        hideProgressBar: true,
+        autoClose: Constants.TOAST_AUTO_CLOSE,
+        hideProgressBar: false,
         closeOnClick: true,
         draggable: true,
         draggablePercent: 10,

@@ -44,5 +44,10 @@ ul, li{
   --text-color-green: #1ED300;
   --text-color-fault: #DCA450;
   --text-color-yellow: #FFDA00;
-  
+}
+
+#process {
+  position: absolute;
+  top: 35%;
+  left: 48%;
 }

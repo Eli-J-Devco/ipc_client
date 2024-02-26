@@ -54,12 +54,13 @@ export const loginService = {
    * @param {data} refresh token
    * @return Object
    */
-  async refreshToken(data) {
-    return axios.post(Constants.API_URL.REFRESH, data, {
+  async refreshToken() {
+    return axios.post(Constants.API_URL.REFRESH, {
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
       },
+      withCredentials: true,
     });
   },
 

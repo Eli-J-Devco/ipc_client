@@ -37,7 +37,7 @@ const Constants = {
   },
 
   API_URL: {
-    AUTH: "/login",
+    AUTH: "/login/",
     REFRESH: "/refresh_token",
   },
 
@@ -73,5 +73,6 @@ const Constants = {
   },
   PAGE_SIZES: [10, 20, 50, 100],
   DEFAULT_PAGE_SIZE: 20,
+  TOAST_AUTO_CLOSE: 1000,
 };
 export default Constants;

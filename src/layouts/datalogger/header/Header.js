@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import styles from "./Header.module.scss";
 import { loginService } from "../../../services/loginService.js";
+import LibToast from "../../../utils/LibToast.js";
 
 const Header = () => {
   const location = useLocation();
@@ -17,6 +18,7 @@ const Header = () => {
   useEffect(() => {
     if (isLogout) {
       loginService.logout();
+      LibToast.toast("You have been logged out", "info");
       navigate(from);
     }
   }, [isLogout]);
