@@ -14,7 +14,7 @@ export const getToken = () => {
 
     return token;
   } else {
-    console.log("You are on the server");
+    return null;
   }
 };
 
@@ -26,11 +26,12 @@ export const getRefresh = () => {
     }
     return token;
   } else {
-    console.log("You are on the server");
+    return null;
   }
 };
 
 export const clearToken = () => {
+  window.localStorage.removeItem("persist");
   window.sessionStorage.removeItem("claim");
   window.sessionStorage.removeItem("refresh");
 };

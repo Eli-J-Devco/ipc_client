@@ -16,6 +16,8 @@ import en from "./languages/en.json";
 import vi from "./languages/vi.json";
 import th from "./languages/th.json";
 import { AuthProvider } from "./context/AuthProvider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const resources = {
   en: { translation: en },
@@ -39,6 +41,7 @@ root.render(
           <AuthProvider>
             <App />
             <div id="process"></div>
+            <ToastContainer />
           </AuthProvider>
         </DndProvider>
       </I18nextProvider>

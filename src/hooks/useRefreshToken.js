@@ -31,7 +31,6 @@ const useRefreshToken = () => {
         accessToken: null,
         isAuthenticated: false,
       });
-      EventBus.dispatch("logout");
       return false;
     }
   };

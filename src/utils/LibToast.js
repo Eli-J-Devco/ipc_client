@@ -27,7 +27,7 @@ LibToast.toast = (message, type, pos = "top-right") => {
       toast.error(message, {
         position: posistion,
         autoClose: true,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,

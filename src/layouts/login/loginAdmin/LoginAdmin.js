@@ -3,7 +3,7 @@
 // * All rights reserved.
 // *
 // *********************************************************/
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./LoginAdmin.module.scss";
 import { useForm } from "react-hook-form";
@@ -13,6 +13,7 @@ import Constants from "../../../utils/Constants";
 import LibToast from "../../../utils/LibToast";
 import useAuth from "../../../hooks/useAuth";
 import { loginService } from "../../../services/loginService";
+import { LoginErrors } from "../../../utils/Errors";
 
 const LoginAdmin = () => {
   const [errMsg, setErrMsg] = useState("");
@@ -22,7 +23,7 @@ const LoginAdmin = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/datalogger";
-
+  const persist = localStorage.getItem("persist");
   // const errRef = useRef();
 
   const {
@@ -50,20 +51,28 @@ const LoginAdmin = () => {
       const response = await loginService.login(params, output);
 
       setAuth({ ...response, isAuthenticated: true });
+      localStorage.setItem("persist", true);
+
       LibToast.toast("Login Successful", "info");
       navigate(from, { replace: true });
     } catch (err) {
-      if (!err?.response) {
-        setErrMsg("No Server Response");
-      } else if (err.response?.status === 400) {
-        setErrMsg("Missing Username or Password");
-      } else if (err.response?.status === 401) {
-        setErrMsg("Unauthorized");
-      } else {
-        setErrMsg("Login Failed");
-      }
+      const msg = LoginErrors(err);
+      setErrMsg(msg);
     }
+    output.innerHTML = "";
   };
+
+  useEffect(() => {
+    if (errMsg) {
+      LibToast.toast(errMsg, "error");
+    }
+  }, [errMsg]);
+
+  useEffect(() => {
+    if (persist) {
+      navigate(from, { replace: true });
+    }
+  }, [persist]);
 
   return (
     <div className={styles.main_login}>
