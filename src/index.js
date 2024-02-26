@@ -1,42 +1,45 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import 'react-tooltip/dist/react-tooltip.css';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "react-tooltip/dist/react-tooltip.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import './index.css';
-import './index.scss';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import * as serviceWorker from './serviceWorker';
-import { BrowserRouter } from 'react-router-dom';
+import "./index.css";
+import "./index.scss";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import * as serviceWorker from "./serviceWorker";
+import { BrowserRouter } from "react-router-dom";
 import { I18nextProvider, initReactI18next } from "react-i18next";
 import i18next from "i18next";
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-import en from './languages/en.json';
-import vi from './languages/vi.json';
-import th from './languages/th.json';
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import en from "./languages/en.json";
+import vi from "./languages/vi.json";
+import th from "./languages/th.json";
+import { AuthProvider } from "./context/AuthProvider";
 
 const resources = {
   en: { translation: en },
   vi: { translation: vi },
-  th: { translation: th }
+  th: { translation: th },
 };
 
 i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
-  lng: 'en', // if you're using a language detector, do not define the lng option
+  lng: "en", // if you're using a language detector, do not define the lng option
   debug: false,
-  resources
+  resources,
 });
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <I18nextProvider i18n={i18next}>
         <DndProvider backend={HTML5Backend}>
-          <App />
-          <div id="process"></div>
+          <AuthProvider>
+            <App />
+            <div id="process"></div>
+          </AuthProvider>
         </DndProvider>
       </I18nextProvider>
     </BrowserRouter>
