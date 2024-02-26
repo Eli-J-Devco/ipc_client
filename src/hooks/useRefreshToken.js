@@ -1,8 +1,18 @@
+/********************************************************
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
+
 import useAuth from "./useAuth";
 import { getRefresh } from "../utils/Token";
 import { loginService } from "../services/loginService";
-import EventBus from "../common/EventBus";
 
+/**
+ * Refresh token
+ * @author nhan.tran 2024-02-26
+ * @return Object
+ */
 const useRefreshToken = () => {
   const { setAuth } = useAuth();
 

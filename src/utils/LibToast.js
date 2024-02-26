@@ -1,3 +1,8 @@
+/********************************************************
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
 import { toast } from "react-toastify";
 var LibToast = {};
 
@@ -15,7 +20,7 @@ LibToast.toast = (message, type, pos = "top-right") => {
     case "info":
       toast.info(message, {
         position: posistion,
-        autoClose: true,
+        autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -26,7 +31,7 @@ LibToast.toast = (message, type, pos = "top-right") => {
     case "error":
       toast.error(message, {
         position: posistion,
-        autoClose: true,
+        autoClose: 3000,
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
@@ -37,7 +42,7 @@ LibToast.toast = (message, type, pos = "top-right") => {
     case "warn":
       toast.warn(message, {
         position: posistion,
-        autoClose: true,
+        autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -48,7 +53,7 @@ LibToast.toast = (message, type, pos = "top-right") => {
     case "expired":
       toast.warn(message, {
         position: posistion,
-        autoClose: false,
+        autoClose: 3000,
         hideProgressBar: true,
         closeOnClick: true,
         draggable: true,

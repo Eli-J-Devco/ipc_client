@@ -1,9 +1,20 @@
+/********************************************************
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
+
 import { axiosPrivate } from "../api/axios";
 import { useEffect } from "react";
 
 import useRefreshToken from "./useRefreshToken";
 import useAuth from "./useAuth";
 
+/**
+ * Create private call for axios
+ * @author nhan.tran 2024-02-26
+ * @return Object
+ */
 const useAxiosPrivate = () => {
   const refresh = useRefreshToken();
   const { auth } = useAuth();

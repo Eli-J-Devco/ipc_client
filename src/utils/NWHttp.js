@@ -1,3 +1,9 @@
+/********************************************************
+* Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+* All rights reserved.
+*
+*********************************************************/
+
 import Constants from "./Constants";
 import Libs from "./Libs";
 import qs from 'qs';

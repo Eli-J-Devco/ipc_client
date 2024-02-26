@@ -1,4 +1,8 @@
-// var baseUrl = window.location.protocol + "//" + window.location.host;
+/********************************************************
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
 var url = window.location.hostname;
 var serverAPI = "";
 var serverData = "";

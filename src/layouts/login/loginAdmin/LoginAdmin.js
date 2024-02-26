@@ -1,8 +1,8 @@
-// /********************************************************
-// * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
-// * All rights reserved.
-// *
-// *********************************************************/
+/********************************************************
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./LoginAdmin.module.scss";
@@ -15,6 +15,11 @@ import useAuth from "../../../hooks/useAuth";
 import { loginService } from "../../../services/loginService";
 import { LoginErrors } from "../../../utils/Errors";
 
+/**
+ * Login Admin
+ * @author nhan.tran 2024-02-26
+ * @return JSX
+ */
 const LoginAdmin = () => {
   const [errMsg, setErrMsg] = useState("");
 
@@ -24,7 +29,6 @@ const LoginAdmin = () => {
   const location = useLocation();
   const from = location.state?.from?.pathname || "/datalogger";
   const persist = localStorage.getItem("persist");
-  // const errRef = useRef();
 
   const {
     register,
@@ -38,6 +42,11 @@ const LoginAdmin = () => {
     mode: "onChange",
   });
 
+  /**
+   * Submit login form
+   * @author nhan.tran 2024-02-26
+   * @param {data} hash email and password
+   */
   const onSubmit = async (data) => {
     if (Libs.isObjectEmpty(data)) return;
 
