@@ -4,8 +4,12 @@
  *
  *********************************************************/
 
+import { time } from "highcharts";
 import axios from "../api/axios";
 import Constants from "../utils/Constants";
+import { LogoutErrors } from "../utils/Errors";
+import LibToast from "../utils/LibToast";
+import OpenProcess from "../utils/OpenProcess";
 import { clearToken } from "../utils/Token";
 
 import { jwtDecode } from "jwt-decode";
@@ -31,12 +35,10 @@ export const loginService = {
 
     if (response.data.access_token) {
       const access_token = response.data.access_token;
-      const refresh_token = response.data.refresh_token;
 
       const claim = jwtDecode(access_token);
 
       window.sessionStorage.setItem("claim", JSON.stringify(claim));
-      window.sessionStorage.setItem("refresh", JSON.stringify(refresh_token));
 
       return {
         user: response.data.user,
@@ -55,20 +57,25 @@ export const loginService = {
    * @return Object
    */
   async refreshToken() {
-    return axios.post(Constants.API_URL.REFRESH, {
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      withCredentials: true,
-    });
+    return axios.post(Constants.API_URL.REFRESH);
   },
 
   /**
    * Log out of the system
    * @author nhan.tran 2024-02-26
+   * @param {output} progress tag in html
+   * @return Boolean
    */
-  logout() {
-    clearToken();
+  async logout(output) {
+    try {
+      output.innerHTML = "<div><img src='/loading.gif' /></div>";
+      const res = await axios.post(Constants.API_URL.LOGOUT);
+      if (res.status === 200) {
+        clearToken();
+      }
+      return true;
+    } catch (error) {
+      throw new Error(LogoutErrors(error));
+    }
   },
 };

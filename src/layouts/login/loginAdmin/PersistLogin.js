@@ -8,6 +8,10 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useRefreshToken from "../../../hooks/useRefreshToken";
 import useAuth from "../../../hooks/useAuth";
+import LibToast from "../../../utils/LibToast";
+import { loginService } from "../../../services/loginService";
+import { LoginErrors } from "../../../utils/Errors";
+import { clearToken } from "../../../utils/Token";
 
 /**
  * Verify existing user token and keep user logged in
@@ -20,17 +24,24 @@ const PersistLogin = () => {
   const refresh = useRefreshToken();
 
   useEffect(() => {
+    let isMounted = true;
+
     const verifyRefreshToken = async () => {
       try {
         await refresh();
       } catch (err) {
-        console.log(err);
+        const msg = LoginErrors(err, "Pleases login to continue.");
+        LibToast.toast(msg, "info");
+        clearToken();
       } finally {
         setIsLoading(false);
       }
     };
 
     !auth?.isAuthenticated ? verifyRefreshToken() : setIsLoading(false);
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return isLoading ? <p>Loading</p> : <Outlet />;

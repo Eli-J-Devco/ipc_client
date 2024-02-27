@@ -40,7 +40,7 @@ root.render(
         <DndProvider backend={HTML5Backend}>
           <AuthProvider>
             <App />
-            <div id="process"></div>
+            <div id="progress"></div>
             <ToastContainer />
           </AuthProvider>
         </DndProvider>

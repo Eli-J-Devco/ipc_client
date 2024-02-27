@@ -3,9 +3,7 @@
  * All rights reserved.
  *
  *********************************************************/
-
 import useAuth from "./useAuth";
-import { getRefresh } from "../utils/Token";
 import { loginService } from "../services/loginService";
 
 /**
@@ -18,15 +16,7 @@ const useRefreshToken = () => {
 
   const refresh = async () => {
     try {
-      const param = {
-        refresh_token: getRefresh(),
-      };
-
-      if (!param.refresh_token) {
-        throw new Error("Refresh token is not available");
-      }
-
-      const response = await loginService.refreshToken(param);
+      const response = await loginService.refreshToken();
       setAuth((prev) => {
         return {
           ...prev,
@@ -41,7 +31,7 @@ const useRefreshToken = () => {
         accessToken: null,
         isAuthenticated: false,
       });
-      return false;
+      throw error;
     }
   };
   return refresh;

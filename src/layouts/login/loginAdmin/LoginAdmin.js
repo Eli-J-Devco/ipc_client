@@ -23,7 +23,7 @@ import { LoginErrors } from "../../../utils/Errors";
 const LoginAdmin = () => {
   const [errMsg, setErrMsg] = useState("");
 
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,10 +35,6 @@ const LoginAdmin = () => {
     formState: { errors },
     handleSubmit,
   } = useForm({
-    defaultValues: {
-      email: "nguyenvudtd@gmail.com",
-      password: "Admin123@",
-    },
     mode: "onChange",
   });
 
@@ -55,7 +51,7 @@ const LoginAdmin = () => {
       password: Libs.AESEncrypt(data.password, Constants.SECRET_KEY),
     };
 
-    var output = document.getElementById("process");
+    var output = document.getElementById("progress");
     try {
       const response = await loginService.login(params, output);
 
@@ -78,9 +74,8 @@ const LoginAdmin = () => {
   }, [errMsg]);
 
   useEffect(() => {
-    if (persist) {
-      navigate(from, { replace: true });
-    }
+    if (auth?.isAuthenticated && persist) navigate(from, { replace: true });
+    else localStorage.removeItem("persist");
   }, [persist]);
 
   return (
@@ -170,6 +165,7 @@ const LoginAdmin = () => {
                 }
                 id="password"
                 name="password"
+                type="password"
                 {...register("password", {
                   required: "You must specify a password",
                   pattern: {

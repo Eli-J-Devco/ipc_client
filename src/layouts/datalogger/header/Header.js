@@ -4,11 +4,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./Header.module.scss";
 import { loginService } from "../../../services/loginService.js";
 import LibToast from "../../../utils/LibToast.js";
+import { LogoutErrors } from "../../../utils/Errors.js";
 
 const Header = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const from = location.state?.from || { login: "/" };
 
   const [isLogout, setLogout] = useState(false);
   const logout = () => {
@@ -17,9 +16,26 @@ const Header = () => {
 
   useEffect(() => {
     if (isLogout) {
-      loginService.logout();
-      LibToast.toast("You have been logged out", "info");
-      navigate(from);
+      /**
+       * Log out of the system and remove token from storage
+       * @author nhan.tran 2024-02-27
+       */
+      const checkLogout = async () => {
+        var output = document.getElementById("progress");
+        try {
+          const res = await loginService.logout(output);
+          if (res) {
+            LibToast.toast("You have been logged out", "info");
+            navigate("/");
+            output.innerHTML = "";
+          }
+        } catch (error) {
+          const msg = LogoutErrors(error);
+          LibToast.toast(msg, "error");
+          setLogout(false);
+        }
+      };
+      checkLogout();
     }
   }, [isLogout]);
 

@@ -46,7 +46,7 @@ ul, li{
   --text-color-yellow: #FFDA00;
 }
 
-#process {
+#progress {
   position: absolute;
   top: 35%;
   left: 48%;
