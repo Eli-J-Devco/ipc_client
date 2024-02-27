@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import useAuth from "../../../hooks/useAuth.js";
+
 import styles from "./Header.module.scss";
 import { loginService } from "../../../services/loginService.js";
+
 import LibToast from "../../../utils/LibToast.js";
 import { LogoutErrors } from "../../../utils/Errors.js";
 
 const Header = () => {
+  const { auth } = useAuth();
+
   const navigate = useNavigate();
 
   const [isLogout, setLogout] = useState(false);
@@ -119,7 +124,7 @@ const Header = () => {
                       ></path>
                     </svg>
 
-                    <span className={styles.username}>Long pham</span>
+                    <span className={styles.username}> {auth?.userName} </span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="ionicon"

@@ -4,12 +4,9 @@
  *
  *********************************************************/
 
-import { time } from "highcharts";
 import axios from "../api/axios";
 import Constants from "../utils/Constants";
 import { LogoutErrors } from "../utils/Errors";
-import LibToast from "../utils/LibToast";
-import OpenProcess from "../utils/OpenProcess";
 import { clearToken } from "../utils/Token";
 
 import { jwtDecode } from "jwt-decode";
@@ -41,9 +38,9 @@ export const loginService = {
       window.sessionStorage.setItem("claim", JSON.stringify(claim));
 
       return {
-        user: response.data.user,
-        screen: response.data.screen,
-        role: response.data.role,
+        userName: `${response.data.first_name} ${response.data.last_name}`,
+        email: response.data.email,
+        permissions: response.data.permissions,
         accessToken: response.data.access_token,
       };
     }

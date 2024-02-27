@@ -17,12 +17,16 @@ const useRefreshToken = () => {
   const refresh = async () => {
     try {
       const response = await loginService.refreshToken();
-      setAuth((prev) => {
-        return {
-          ...prev,
-          accessToken: response.access_token,
-          isAuthenticated: true,
-        };
+      const userName = JSON.parse(window.sessionStorage.getItem("userName"));
+      const permissions = JSON.parse(
+        window.sessionStorage.getItem("permissions")
+      );
+
+      setAuth({
+        userName: userName,
+        permissions: permissions,
+        accessToken: response.access_token,
+        isAuthenticated: true,
       });
 
       return response.data.accessToken;

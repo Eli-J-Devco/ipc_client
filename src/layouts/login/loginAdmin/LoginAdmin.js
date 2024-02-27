@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./LoginAdmin.module.scss";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 
 import Libs from "../../../utils/Libs";
 import Constants from "../../../utils/Constants";
@@ -14,6 +14,7 @@ import LibToast from "../../../utils/LibToast";
 import useAuth from "../../../hooks/useAuth";
 import { loginService } from "../../../services/loginService";
 import { LoginErrors } from "../../../utils/Errors";
+import { setToken } from "../../../utils/Token";
 
 /**
  * Login Admin
@@ -54,6 +55,10 @@ const LoginAdmin = () => {
     var output = document.getElementById("progress");
     try {
       const response = await loginService.login(params, output);
+
+      var { userName, permissions } = response;
+      setToken("userName", userName);
+      setToken("permissions", permissions);
 
       setAuth({ ...response, isAuthenticated: true });
       localStorage.setItem("persist", true);

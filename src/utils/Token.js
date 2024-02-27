@@ -3,15 +3,14 @@
  * All rights reserved.
  *
  *********************************************************/
-export const TOKEN_STORAGE_KEY = "token";
 
 /**
  * Set token to session storage
  * @author nhan.tran 2024-02-26
  * @param {data} token
  */
-export const setToken = (data) => {
-  window.sessionStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify(data));
+export const setToken = (key, data) => {
+  window.sessionStorage.setItem(key, JSON.stringify(data));
 };
 
 /**
@@ -19,9 +18,9 @@ export const setToken = (data) => {
  * @author nhan.tran 2024-02-26
  * @return String
  */
-export const getToken = () => {
+export const getToken = (key) => {
   if (typeof window !== "undefined") {
-    let token = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    let token = window.sessionStorage.getItem(key);
 
     if (token) {
       token = JSON.parse(token);
@@ -55,7 +54,6 @@ export const getRefresh = () => {
  * @author nhan.tran 2024-02-26
  */
 export const clearToken = () => {
-  window.localStorage.removeItem("persist");
-  window.sessionStorage.removeItem("claim");
-  window.sessionStorage.removeItem("refresh");
+  window.localStorage.clear();
+  window.sessionStorage.clear();
 };
