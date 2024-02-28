@@ -16,8 +16,8 @@ switch (url) {
     serverData = "";
     break;
   default:
-    // serverAPI = "http://192.168.1.21:3001";
-    serverAPI = "http://127.0.0.1:3002";
+    serverAPI = "http://192.168.1.21:3001";
+    // serverAPI = "http://127.0.0.1:3002";
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -37,9 +37,15 @@ const Constants = {
   },
 
   API_URL: {
-    AUTH: "/login/",
-    REFRESH: "/refresh_token/",
-    LOGOUT: "/logout/",
+    AUTH: {
+      LOGIN: "/login/",
+      REFRESH: "/refresh_token/",
+      LOGOUT: "/logout/",
+    },
+    SITE: {
+      SITE_INFO: "/site_information/",
+      SITE_UPDATE: "/site_information/update/",
+    },
   },
 
   SCREEN_MODE: {

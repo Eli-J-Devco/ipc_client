@@ -28,7 +28,7 @@ const LoginAdmin = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/datalogger";
+  const from = location.state?.from?.pathname || "/datalogger/quickstart";
   const persist = localStorage.getItem("persist");
 
   const {

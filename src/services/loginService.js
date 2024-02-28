@@ -20,7 +20,7 @@ export const loginService = {
    * @return Object{user, screen, role, accessToken}
    */
   async login(data, output) {
-    const response = await axios.post(Constants.API_URL.AUTH, data, {
+    const response = await axios.post(Constants.API_URL.AUTH.LOGIN, data, {
       headers: {
         accept: "application/json",
         "Content-Type": "multipart/form-data",
@@ -54,7 +54,7 @@ export const loginService = {
    * @return Object
    */
   async refreshToken() {
-    return axios.post(Constants.API_URL.REFRESH);
+    return axios.post(Constants.API_URL.AUTH.REFRESH);
   },
 
   /**
@@ -66,7 +66,7 @@ export const loginService = {
   async logout(output) {
     try {
       output.innerHTML = "<div><img src='/loading.gif' /></div>";
-      const res = await axios.post(Constants.API_URL.LOGOUT);
+      const res = await axios.post(Constants.API_URL.AUTH.LOGOUT);
       if (res.status === 200) {
         clearToken();
       }
