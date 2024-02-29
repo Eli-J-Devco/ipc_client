@@ -21,10 +21,6 @@ export const loginService = {
    */
   async login(data, output) {
     const response = await axios.post(Constants.API_URL.AUTH.LOGIN, data, {
-      headers: {
-        accept: "application/json",
-        "Content-Type": "multipart/form-data",
-      },
       onUploadProgress: ({ loaded, total, progress }) => {
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
       },
@@ -53,8 +49,10 @@ export const loginService = {
    * @param {data} refresh token
    * @return Object
    */
-  async refreshToken() {
-    return axios.post(Constants.API_URL.AUTH.REFRESH);
+  refreshToken() {
+    const response = axios.post(Constants.API_URL.AUTH.REFRESH);
+    console.log("refresh token success!");
+    return response;
   },
 
   /**

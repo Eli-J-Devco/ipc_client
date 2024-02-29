@@ -20,7 +20,7 @@ import { clearToken } from "../../../utils/Token";
  */
 const PersistLogin = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { auth } = useAuth();
+  const { auth, setAuth } = useAuth();
   const refresh = useRefreshToken();
 
   useEffect(() => {
@@ -33,6 +33,10 @@ const PersistLogin = () => {
         const msg = LoginErrors(err, "Pleases login to continue.");
         LibToast.toast(msg, "info");
         clearToken();
+        setAuth({
+          accessToken: null,
+          isAuthenticated: false,
+        });
       } finally {
         setIsLoading(false);
       }

@@ -5,6 +5,8 @@
  *********************************************************/
 import useAuth from "./useAuth";
 import { loginService } from "../services/loginService";
+import axios from "../api/axios";
+import Constants from "../utils/Constants";
 
 /**
  * Refresh token
@@ -15,28 +17,21 @@ const useRefreshToken = () => {
   const { setAuth } = useAuth();
 
   const refresh = async () => {
-    try {
-      const response = await loginService.refreshToken();
-      const userName = JSON.parse(window.sessionStorage.getItem("userName"));
-      const permissions = JSON.parse(
-        window.sessionStorage.getItem("permissions")
-      );
+    const response = await axios.post(Constants.API_URL.AUTH.REFRESH);
 
-      setAuth({
-        userName: userName,
-        permissions: permissions,
-        accessToken: response.access_token,
-        isAuthenticated: true,
-      });
+    const userName = JSON.parse(window.sessionStorage.getItem("userName"));
+    const permissions = JSON.parse(
+      window.sessionStorage.getItem("permissions")
+    );
 
-      return response.data.accessToken;
-    } catch (error) {
-      setAuth({
-        accessToken: null,
-        isAuthenticated: false,
-      });
-      throw error;
-    }
+    setAuth({
+      userName: userName,
+      permissions: permissions,
+      accessToken: response.data.access_token,
+      isAuthenticated: true,
+    });
+
+    return response.data.access_token;
   };
   return refresh;
 };

@@ -9,9 +9,16 @@ import Constants from "../utils/Constants";
 axios.defaults.withCredentials = true;
 export default axios.create({
   baseURL: Constants.API_HOST,
+  headers: {
+    accept: "application/json",
+    "Content-Type": "multipart/form-data",
+  },
 });
 
 export const privateAxios = axios.create({
   baseURL: Constants.API_HOST,
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    accept: "application/json",
+    "Content-Type": "multipart/form-data",
+  },
 });

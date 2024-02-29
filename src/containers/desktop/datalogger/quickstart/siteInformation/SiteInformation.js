@@ -8,11 +8,17 @@ import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
+import { clearToken } from "../../../../../utils/Token";
+import { LoginErrors } from "../../../../../utils/Errors";
+import useAuth from "../../../../../hooks/useAuth";
+import { loginService } from "../../../../../services/loginService";
+import useRefreshToken from "../../../../../hooks/useRefreshToken";
 
 function SiteInformation() {
   const { t } = useTranslation();
   const [siteInformation, setSiteInformation] = useState({});
   const [isSkip, setIsSkip] = useState(false);
+  const refresh = useRefreshToken();
 
   const axiosPrivate = useAxiosPrivate();
   const isChange = useRef(false);
@@ -26,7 +32,7 @@ function SiteInformation() {
     const fetchSiteInformation = async (id) => {
       try {
         var output = document.getElementById("progress");
-        const response = await axiosPrivate.get(
+        const response = await axiosPrivate.post(
           `${Constants.API_URL.SITE.SITE_INFO}${id}`,
           {
             onDownloadProgress: ({ loaded, total, progress }) => {
@@ -35,12 +41,14 @@ function SiteInformation() {
           }
         );
         setSiteInformation({ ...response.data });
-        output.innerHTML = "";
       } catch (error) {
-        console.error(error);
+        LibToast.toast(LoginErrors(error, "Please login again!"), "error");
+        clearToken();
+        navigate("/", { replace: true });
+      } finally {
+        output.innerHTML = "";
       }
     };
-
     fetchSiteInformation(1);
   }, []);
 

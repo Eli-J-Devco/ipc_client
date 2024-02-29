@@ -16,8 +16,9 @@ switch (url) {
     serverData = "";
     break;
   default:
-    serverAPI = "http://192.168.1.21:3001";
-    // serverAPI = "http://127.0.0.1:3002";
+    // serverAPI = "http://115.78.133.129:3001";
+    // serverAPI = "http://192.168.1.21:3001";
+    serverAPI = "http://localhost:3002";
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -43,8 +44,12 @@ const Constants = {
       LOGOUT: "/logout/",
     },
     SITE: {
-      SITE_INFO: "/site_information/",
-      SITE_UPDATE: "/site_information/update/",
+      SITE_INFO: "/site_information/?id=",
+      SITE_UPDATE: "/site_information/update/?id=",
+    },
+    ETHERNET: {
+      ETHERNET_INFO: "/ethernet/?id=",
+      ETHERNET_UPDATE: "/ethernet/update/?id=",
     },
   },
 

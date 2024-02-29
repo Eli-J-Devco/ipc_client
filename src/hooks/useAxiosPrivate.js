@@ -9,6 +9,7 @@ import { useEffect } from "react";
 
 import useRefreshToken from "./useRefreshToken";
 import useAuth from "./useAuth";
+import axios from "../api/axios";
 
 /**
  * Create private call for axios
@@ -27,19 +28,23 @@ const useAxiosPrivate = () => {
         }
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => {
+        Promise.reject(error);
+      }
     );
 
     const responseIntercept = privateAxios.interceptors.response.use(
       (response) => response,
       async (error) => {
-        const prevRequest = error?.config;
-        if (error?.response?.status === 403 && !prevRequest?.sent) {
+        var prevRequest = error?.config;
+
+        if (error?.response?.status === 401 && !prevRequest?.sent) {
           prevRequest.sent = true;
           const newAccessToken = await refresh();
           prevRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
           return privateAxios(prevRequest);
         }
+
         return Promise.reject(error);
       }
     );
