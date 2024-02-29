@@ -28,16 +28,19 @@ export const loginService = {
 
     if (response.data.access_token) {
       const access_token = response.data.access_token;
+      const refresh_token = response.data.refresh_token;
 
       const claim = jwtDecode(access_token);
 
       window.sessionStorage.setItem("claim", JSON.stringify(claim));
+      window.sessionStorage.setItem("rft", refresh_token);
 
       return {
         userName: `${response.data.first_name} ${response.data.last_name}`,
         email: response.data.email,
         permissions: response.data.permissions,
         accessToken: response.data.access_token,
+        refresh_token: response.data.refresh_token,
       };
     }
     return false;
@@ -49,9 +52,15 @@ export const loginService = {
    * @param {data} refresh token
    * @return Object
    */
-  refreshToken() {
-    const response = axios.post(Constants.API_URL.AUTH.REFRESH);
-    console.log("refresh token success!");
+  refreshToken(params) {
+    const response = axios({
+      method: "post",
+      url: Constants.API_URL.AUTH.REFRESH,
+      data: params,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return response;
   },
 

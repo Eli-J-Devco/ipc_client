@@ -17,13 +17,15 @@ const useRefreshToken = () => {
   const { setAuth } = useAuth();
 
   const refresh = async () => {
-    const response = await axios.post(Constants.API_URL.AUTH.REFRESH);
+    const params = {
+      refresh_token: window.sessionStorage.getItem("rft"),
+    };
+    const response = await loginService.refreshToken(params);
 
     const userName = JSON.parse(window.sessionStorage.getItem("userName"));
     const permissions = JSON.parse(
       window.sessionStorage.getItem("permissions")
     );
-
     setAuth({
       userName: userName,
       permissions: permissions,
