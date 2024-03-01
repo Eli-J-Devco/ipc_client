@@ -21,6 +21,12 @@ const useAxiosPrivate = () => {
   const { auth } = useAuth();
 
   useEffect(() => {
+    /**
+     * Add token to header request
+     * @author nhan.tran 2024-03-01
+     * @param {config} config
+     * @return Object
+     */
     const requestIntercept = apiUser.interceptors.request.use(
       (config) => {
         if (!config.headers["Authorization"]) {
@@ -33,6 +39,12 @@ const useAxiosPrivate = () => {
       }
     );
 
+    /** 
+     * Refresh token when 401 error occurs
+     * @author nhan.tran 2024-03-01
+     * @param {error} error
+     * @return Object
+    */
     const responseIntercept = apiUser.interceptors.response.use(
       (response) => response,
       async (error) => {
@@ -42,11 +54,13 @@ const useAxiosPrivate = () => {
         if (error?.response?.status === 401 && !prevRequest?.sent) {
           console.log("Retry refreshing token");
           prevRequest.sent = true;
-          const newAccessToken = await refresh();
-
-          console.log("New access token", newAccessToken);
-          prevRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-          return axios(prevRequest);
+          try {
+            const newAccessToken = await refresh();
+            prevRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+            return axios(prevRequest);
+          } catch (error) {
+            throw new Error("Error refreshing token");
+          }
         }
         throw new Error(error);
       }

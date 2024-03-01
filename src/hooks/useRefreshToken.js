@@ -19,13 +19,6 @@ const useRefreshToken = () => {
       refresh_token: window.sessionStorage.getItem("rft"),
     };
     const response = await loginService.refreshToken(params);
-    console.log("Refresh token", response);
-    // if (!response.access_token) {
-    //   throw new Error("Error refreshing token");
-    // }
-    if (!response.access_token) {
-      return false;
-    }
     const userName = JSON.parse(window.sessionStorage.getItem("userName"));
     const permissions = JSON.parse(
       window.sessionStorage.getItem("permissions")
@@ -33,11 +26,11 @@ const useRefreshToken = () => {
     setAuth({
       userName: userName,
       permissions: permissions,
-      accessToken: response.access_token,
-      isAuthenticated: true,
+      accessToken: response.data.access_token,
+      isAuthenticated: response.data.access_token ? true : false,
     });
 
-    return response.access_token;
+    return response.data.access_token;
   };
   return refresh;
 };

@@ -27,6 +27,10 @@ function SiteInformation() {
   useEffect(() => {
     let isMounted = true;
     const abortController = new AbortController();
+    /**
+     * Fetch site information
+     * @param {int} id site id - will be remove in future
+     */
     const fetchSiteInformation = async (id) => {
       try {
         var output = document.getElementById("progress");
@@ -65,6 +69,11 @@ function SiteInformation() {
     isSkip && navigate(from, { replace: true });
   }, [isSkip]);
 
+  /**
+   * Handles the save operation for the site information.
+   * @author nhan.tran 2024-03-01
+   * @param {Event} e - The event object.
+   */
   const handleSave = (e) => {
     e.preventDefault();
     if (!isChange.current) {
@@ -78,7 +87,14 @@ function SiteInformation() {
       description: siteInformation.description,
       administrative_contact: siteInformation.administrative_contact,
     };
+
+    /** 
+     * Save site information
+     * @author nhan.tran 2024-03-01
+     * @param {int} id site id - will be remove in future
+     * */
     const saveSiteInformation = async (id) => {
+
       var output = document.getElementById("progress");
       try {
         const response = await axiosPrivate.post(

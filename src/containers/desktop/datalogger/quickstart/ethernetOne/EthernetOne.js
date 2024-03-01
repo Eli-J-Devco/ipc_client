@@ -17,10 +17,9 @@ function EthernetOne() {
   const { t } = useTranslation();
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
-  const [ethernetOne, setEthernetOne] = useState({});
   const [isSkip, setIsSkip] = useState(false);
-  const isChange = useRef(false);
-
+  const [options, setOptions] = useState([]);
+  const [optionsInfo, setOptionsInfo] = useState(null);
   const abortController = new AbortController();
   useEffect(() => {
     let isMounted = true;
@@ -28,14 +27,14 @@ function EthernetOne() {
       try {
         var output = document.getElementById("progress");
         const response = await axiosPrivate.post(
-          `${Constants.API_URL.ETHERNET.ETHERNET_INFO}${id}`,
+          `${Constants.API_URL.ETHERNET.IFCONFIG}`,
           {
             onDownloadProgress: ({ loaded, total, progress }) => {
               output.innerHTML = "<div><img src='/loading.gif' /></div>";
             },
           }
         );
-        setEthernetOne({ ...response.data });
+        setOptions(response.data.network.map((item) => ({ value: item.interface, label: item.interface })));
         output.innerHTML = "";
       } catch (error) {
         LibToast.toast(LoginErrors(error, "Please login again!"), "error");
@@ -52,15 +51,10 @@ function EthernetOne() {
       abortController.abort();
     };
   }, []);
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
-
-  var selectedOption = [];
-
-  const handleDropdownChange = (event) => {};
+  var selectedOption = null;
+  const handleDropdownChange = (event) => {
+    selectedOption = event.value;
+  };
 
   const handleInputChange = (event) => {};
 

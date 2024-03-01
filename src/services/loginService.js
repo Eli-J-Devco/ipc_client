@@ -56,36 +56,12 @@ export const loginService = {
    * @return Object
    */
   async refreshToken(params) {
-    // throw new Error("Not implemented");
-    try {
-      const response = await api.post(Constants.API_URL.AUTH.REFRESH, params, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.data.access_token) {
-        console.log("Login -> Refresh token", response.data);
-        return response.data;
-      }
-      console.log("Login -> Refresh token failed", response);
-      return false;
-    } catch (error) {
-    const response = await api.post(Constants.API_URL.AUTH.REFRESH, params, {
+    return await api.post(Constants.API_URL.AUTH.REFRESH, params, {
       headers: {
         "Content-Type": "application/json",
       },
-      onDownloadProgress: ({ loaded, total, progress }) => {
-        console.log("Loading...", progress, loaded, total);
-      },
     });
 
-    if (response.data.access_token) {
-      console.log("Login -> Refresh token", response.data);
-      return response.data;
-    }
-    console.log("Login -> Refresh token failed", response);
-    return false;
   },
 
   /**

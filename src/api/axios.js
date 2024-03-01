@@ -6,7 +6,7 @@
 import axios from "axios";
 import Constants from "../utils/Constants";
 
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 const api = axios.create({
   baseURL: Constants.API_HOST,
   headers: {
