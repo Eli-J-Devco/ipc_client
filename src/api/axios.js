@@ -7,18 +7,18 @@ import axios from "axios";
 import Constants from "../utils/Constants";
 
 axios.defaults.withCredentials = true;
-export default axios.create({
+const api = axios.create({
   baseURL: Constants.API_HOST,
   headers: {
     accept: "application/json",
-    "Content-Type": "multipart/form-data",
   },
 });
 
-export const privateAxios = axios.create({
+export default api;
+
+export const apiUser = axios.create({
   baseURL: Constants.API_HOST,
   headers: {
     accept: "application/json",
-    "Content-Type": "multipart/form-data",
   },
 });

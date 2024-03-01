@@ -21,7 +21,9 @@ function EthernetOne() {
   const [isSkip, setIsSkip] = useState(false);
   const isChange = useRef(false);
 
+  const abortController = new AbortController();
   useEffect(() => {
+    let isMounted = true;
     const fetchEthernetOne = async (id) => {
       try {
         var output = document.getElementById("progress");
@@ -45,6 +47,10 @@ function EthernetOne() {
     };
 
     fetchEthernetOne(1);
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
   }, []);
   const options = [
     { value: "chocolate", label: "Chocolate" },

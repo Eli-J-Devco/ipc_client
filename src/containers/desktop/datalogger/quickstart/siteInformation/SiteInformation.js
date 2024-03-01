@@ -10,15 +10,11 @@ import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 import { clearToken } from "../../../../../utils/Token";
 import { LoginErrors } from "../../../../../utils/Errors";
-import useAuth from "../../../../../hooks/useAuth";
-import { loginService } from "../../../../../services/loginService";
-import useRefreshToken from "../../../../../hooks/useRefreshToken";
 
 function SiteInformation() {
   const { t } = useTranslation();
   const [siteInformation, setSiteInformation] = useState({});
   const [isSkip, setIsSkip] = useState(false);
-  const refresh = useRefreshToken();
 
   const axiosPrivate = useAxiosPrivate();
   const isChange = useRef(false);
@@ -29,27 +25,40 @@ function SiteInformation() {
     location.state?.from?.pathname || "/datalogger/quickstart/ethernet-1";
 
   useEffect(() => {
+    let isMounted = true;
+    const abortController = new AbortController();
     const fetchSiteInformation = async (id) => {
       try {
         var output = document.getElementById("progress");
+        console.log("Signal", abortController.signal);
         const response = await axiosPrivate.post(
           `${Constants.API_URL.SITE.SITE_INFO}${id}`,
           {
+            signal: abortController.signal,
             onDownloadProgress: ({ loaded, total, progress }) => {
               output.innerHTML = "<div><img src='/loading.gif' /></div>";
+              console.log("progress", progress);
+              console.log("loaded", loaded);
+              console.log("total", total);
             },
           }
         );
-        setSiteInformation({ ...response.data });
+        isMounted && setSiteInformation({ ...response.data });
       } catch (error) {
         LibToast.toast(LoginErrors(error, "Please login again!"), "error");
         clearToken();
         navigate("/", { replace: true });
       } finally {
+        console.log("finally");
         output.innerHTML = "";
       }
     };
     fetchSiteInformation(1);
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
   }, []);
 
   useEffect(() => {
@@ -76,6 +85,9 @@ function SiteInformation() {
           `${Constants.API_URL.SITE.SITE_UPDATE}${id}`,
           data,
           {
+            headers: {
+              "Content-Type": "application/json",
+            },
             onUploadProgress: ({ loaded, total, progress }) => {
               output.innerHTML = "<div><img src='/loading.gif' /></div>";
             },

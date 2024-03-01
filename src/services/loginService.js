@@ -4,7 +4,7 @@
  *
  *********************************************************/
 
-import axios from "../api/axios";
+import api from "../api/axios";
 import Constants from "../utils/Constants";
 import { LogoutErrors } from "../utils/Errors";
 import { clearToken } from "../utils/Token";
@@ -20,7 +20,10 @@ export const loginService = {
    * @return Object{user, screen, role, accessToken}
    */
   async login(data, output) {
-    const response = await axios.post(Constants.API_URL.AUTH.LOGIN, data, {
+    const response = await api.post(Constants.API_URL.AUTH.LOGIN, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
       onUploadProgress: ({ loaded, total, progress }) => {
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
       },
@@ -52,16 +55,37 @@ export const loginService = {
    * @param {data} refresh token
    * @return Object
    */
-  refreshToken(params) {
-    const response = axios({
-      method: "post",
-      url: Constants.API_URL.AUTH.REFRESH,
-      data: params,
+  async refreshToken(params) {
+    // throw new Error("Not implemented");
+    try {
+      const response = await api.post(Constants.API_URL.AUTH.REFRESH, params, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.data.access_token) {
+        console.log("Login -> Refresh token", response.data);
+        return response.data;
+      }
+      console.log("Login -> Refresh token failed", response);
+      return false;
+    } catch (error) {
+    const response = await api.post(Constants.API_URL.AUTH.REFRESH, params, {
       headers: {
         "Content-Type": "application/json",
       },
+      onDownloadProgress: ({ loaded, total, progress }) => {
+        console.log("Loading...", progress, loaded, total);
+      },
     });
-    return response;
+
+    if (response.data.access_token) {
+      console.log("Login -> Refresh token", response.data);
+      return response.data;
+    }
+    console.log("Login -> Refresh token failed", response);
+    return false;
   },
 
   /**
@@ -73,7 +97,7 @@ export const loginService = {
   async logout(output) {
     try {
       output.innerHTML = "<div><img src='/loading.gif' /></div>";
-      const res = await axios.post(Constants.API_URL.AUTH.LOGOUT);
+      const res = await api.post(Constants.API_URL.AUTH.LOGOUT);
       if (res.status === 200) {
         clearToken();
       }
