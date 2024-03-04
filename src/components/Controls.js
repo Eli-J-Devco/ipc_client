@@ -29,7 +29,7 @@ export const RSwitch = (props) => (
             <label>
                 <input id={props.inputId} type="checkbox" name={props.inputName}
                     onChange={props.onChange} disabled={props.disabled} onKeyPress={props.rEnter}
-                    checked={(props.checked === 1) ? true : false}
+                    checked={props.checked ? true : false}
                 />
                 <span className="lever switch-col-darkblue" />
 

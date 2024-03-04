@@ -55,8 +55,8 @@ export const loginService = {
    * @param {data} refresh token
    * @return Object
    */
-  async refreshToken(params) {
-    return await api.post(Constants.API_URL.AUTH.REFRESH, params, {
+  refreshToken(params) {
+    return api.post(Constants.API_URL.AUTH.REFRESH, params, {
       headers: {
         "Content-Type": "application/json",
       },

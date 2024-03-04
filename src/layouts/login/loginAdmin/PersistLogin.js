@@ -21,6 +21,7 @@ const PersistLogin = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { auth, setAuth } = useAuth();
   const refresh = useRefreshToken();
+  const persist = window.localStorage.getItem("persist");
 
   useEffect(() => {
     let isMounted = true;
@@ -41,7 +42,7 @@ const PersistLogin = () => {
       }
     };
 
-    !auth?.isAuthenticated ? verifyRefreshToken() : setIsLoading(false);
+    !auth?.isAuthenticated && persist ? verifyRefreshToken() : setIsLoading(false);
     return () => {
       isMounted = false;
     };

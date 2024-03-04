@@ -66,10 +66,13 @@ const LoginAdmin = () => {
       LibToast.toast("Login Successful", "info");
       navigate(from, { replace: true });
     } catch (err) {
+      console.log(err)
       const msg = LoginErrors(err);
       setErrMsg(msg);
     }
-    output.innerHTML = "";
+    finally {
+      output.innerHTML = "";
+    }
   };
 
   useEffect(() => {
@@ -78,10 +81,11 @@ const LoginAdmin = () => {
     }
   }, [errMsg]);
 
-  useEffect(() => {
-    if (auth?.isAuthenticated && persist) navigate(from, { replace: true });
-    else localStorage.removeItem("persist");
-  }, [persist]);
+  // useEffect(() => {
+  //   const rft = window.sessionStorage.getItem("rft");
+  //   if (rft && persist) navigate(from, { replace: true });
+  //   else localStorage.removeItem("persist");
+  // }, [persist]);
 
   return (
     <div className={styles.main_login}>

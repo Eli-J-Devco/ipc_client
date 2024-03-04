@@ -1,5 +1,67 @@
-.site_information{
-    .form_body{
+.site_information {
+    .form_body {
         margin-top: 30px;
+        position: relative;
+
+        // input {
+        //     height: 34px;
+        //     width: 50%;
+        //     border-radius: (20px);
+        //     outline: none;
+        //     font-size: 14px;
+        //     border-color: #383434;
+        //     border-width: 1px;
+        // }
+
+        label {
+            margin-bottom: 0;
+        }
+
+    }
+    
+    .btn_save {
+        margin-top: 30px;
+        position: relative;
+        svg {
+            width: 40%;
+            height: 40%;
+            position: absolute;
+            top: 33%;
+            left: 0;
+        }
+        
+        button {
+            background-color: #383434;
+            color: #fff;
+            display: inline-block;
+            width: 100%;
+            border-radius: (20px);
+            box-shadow: (none);
+            text-shadow: none;
+            outline: none;
+            padding: 7px 15px;
+            font-size: 14px;
+            border: none;
+        }
+
+    }
+    .btn_skip {
+        margin-top: 30px;
+        
+        button {
+            background-color: #ffffff;
+            color: #383434;
+            display: inline-block;
+            width: 100%;
+            border-radius: (20px);
+            border-color: #383434;
+            border-width: 1px;
+            box-shadow: (none);
+            text-shadow: none;
+            outline: none;
+            padding: 7px 15px;
+            font-size: 14px;
+        }
+
     }
 }

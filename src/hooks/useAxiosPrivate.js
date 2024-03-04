@@ -4,12 +4,13 @@
  *
  *********************************************************/
 
-import apiUser from "../api/axios";
+import { apiUser } from "../api/axios";
 import { useEffect } from "react";
 
 import useRefreshToken from "./useRefreshToken";
 import useAuth from "./useAuth";
 import axios from "../api/axios";
+
 
 /**
  * Create private call for axios
@@ -19,7 +20,6 @@ import axios from "../api/axios";
 const useAxiosPrivate = () => {
   const refresh = useRefreshToken();
   const { auth } = useAuth();
-
   useEffect(() => {
     /**
      * Add token to header request
@@ -54,18 +54,13 @@ const useAxiosPrivate = () => {
         if (error?.response?.status === 401 && !prevRequest?.sent) {
           console.log("Retry refreshing token");
           prevRequest.sent = true;
-          try {
-            const newAccessToken = await refresh();
-            prevRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-            return axios(prevRequest);
-          } catch (error) {
-            throw new Error("Error refreshing token");
-          }
+          const newAccessToken = await refresh();
+          prevRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          return axios(prevRequest);
         }
-        throw new Error(error);
+        return Promise.reject(error);
       }
     );
-
     return () => {
       apiUser.interceptors.request.eject(requestIntercept);
       apiUser.interceptors.response.eject(responseIntercept);

@@ -5,6 +5,8 @@
  *********************************************************/
 import useAuth from "./useAuth";
 import { loginService } from "../services/loginService";
+import api from "../api/axios";
+import Constants from "../utils/Constants";
 
 /**
  * Refresh token
@@ -18,7 +20,9 @@ const useRefreshToken = () => {
     const params = {
       refresh_token: window.sessionStorage.getItem("rft"),
     };
+
     const response = await loginService.refreshToken(params);
+    console.log("Refresh token", response.data.access_token);
     const userName = JSON.parse(window.sessionStorage.getItem("userName"));
     const permissions = JSON.parse(
       window.sessionStorage.getItem("permissions")
