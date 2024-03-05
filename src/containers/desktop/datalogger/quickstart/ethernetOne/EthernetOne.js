@@ -40,9 +40,7 @@ function EthernetOne() {
     location.state?.from?.pathname || "/datalogger/quickstart";
   const to = "/datalogger/quickstart/ethernet-2";
 
-  const abortController = new AbortController();
   useEffect(() => {
-    let isMounted = true;
     /**
      * Fetch ethernet one data
      * @param {Int16Array} id 
@@ -50,7 +48,8 @@ function EthernetOne() {
     const fetchEthernetOne = async (id) => {
       try {
         var output = document.getElementById("progress");
-
+        setValue("name", "Ethernet-1")
+        setValue("id_type_ethernet", 249)
         /**
          * Get default ethernet config
          * return {Object}
@@ -89,10 +88,6 @@ function EthernetOne() {
     };
 
     fetchEthernetOne(1);
-    return () => {
-      isMounted = false;
-      abortController.abort();
-    };
   }, []);
 
   /**
@@ -101,13 +96,14 @@ function EthernetOne() {
    */
   useEffect(() => {
     if (optionsInfo) {
-      setValue("ethernet1", { value: optionsInfo.namekey, label: optionsInfo.namekey });
+      setValue("namekey", optionsInfo.namekey);
       setValue("ip_address", optionsInfo.ip_address);
       setValue("subnet_mask", optionsInfo.subnet_mask);
       setValue("gateway", optionsInfo.gateway);
       setValue("mtu", optionsInfo.mtu);
       setValue("dns1", optionsInfo.dns1);
       setValue("dns2", optionsInfo.dns2);
+      setValue("allow_dns", isAuto);
     }
   }, [optionsInfo]);
 
@@ -119,8 +115,6 @@ function EthernetOne() {
   */
   const handleDropdownChange = (value) => {
     setSelectedOption(value);
-    console.log(value, existedEthernet.namekey);
-    console.log(value.value !== existedEthernet.namekey);
     if (value.value !== existedEthernet.namekey) {
       setOptionsInfo(ethernet.find((item) => item.namekey === value.value));
     }
@@ -138,6 +132,37 @@ function EthernetOne() {
   }, [isSkip]);
 
   const onSubmit = (data) => {
+    const id = 1;
+    const updateEthernet = async () => {
+      try{
+        var output = document.getElementById("progress");
+        const response = await axiosPrivate.post(Constants.API_URL.ETHERNET.ETHERNET_UPDATE + id, data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          onDownloadProgress: ({ loaded, total, progress }) => {
+            output.innerHTML = "<div><img src='/loading.gif' /></div>";
+          },
+        });
+        if (response.status === 200) {
+          LibToast.toast("Ethernet-1 has been updated successfully.", "info");
+          navigate(to, { replace: true });
+        }
+      }catch(error){
+        if (error?.response?.status === 401) {
+          loginService.handleExpiredToken(error);
+          navigate("/", { replace: true });
+        }
+        else {
+          LibToast.error("Server error. Please try again later.");
+        }
+      }
+      finally{
+        output.innerHTML = "";
+      }
+      
+    };
+    updateEthernet();
   };
 
   return (
@@ -176,6 +201,8 @@ function EthernetOne() {
                       checked={isAuto}
                       onChange={() => {
                         setIsAuto(!isAuto);
+                        setValue("allow_dns", !isAuto);
+
                       }}
                     />
                   </div>
@@ -188,7 +215,7 @@ function EthernetOne() {
                     className={errors.ip_address ? "form-control input-error" : "form-control"}
                     id="ip_address"
                     name="ip_address"
-                    disabled={isAuto}
+                    // disabled={isAuto}
                     {...register("ip_address", { required: "Please fill the ip address", pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid IP address" } })}
                   />
 
@@ -204,7 +231,7 @@ function EthernetOne() {
                     className={errors.subnet_mask ? "form-control input-error" : "form-control"}
                     id="subnet_mask"
                     name="subnet_mask"
-                    disabled={isAuto}
+                    // disabled={isAuto}
                     {...register("subnet_mask", { required: "Please fill the subnet mask", pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid subnet mask" } })}
                   />
 
@@ -220,7 +247,7 @@ function EthernetOne() {
                     className={errors.gateway ? "form-control input-error" : "form-control"}
                     id="gateway"
                     name="gateway"
-                    disabled={isAuto}
+                    // disabled={isAuto}
                     {...register("gateway", { required: "Please fill the gateway", pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid gateway" } })}
                   />
 
@@ -237,8 +264,23 @@ function EthernetOne() {
                     className={errors.mtu ? "form-control input-error" : "form-control"}
                     id="mtu"
                     name="mtu"
-                    disabled={isAuto}
-                    {...register("mtu", { required: "Please fill the mtu", pattern: { value: /^\d{1,4}$/, message: "Invalid mtu" }, min: { value: 128, message: "MTU must be greater than or equal to 128" }, max: { value: 1500, message: "MTU must be less than or equal to 1500" } })}
+                    // disabled={isAuto}
+                    {...register("mtu", {
+                      validate: (value) => {
+                        if (!value) {
+                          return null;
+                        }
+                        if (!Number.isInteger(parseFloat(value))) {
+                          return "MTU must be an integer number.";
+                        }
+                        if (value > 1500) {
+                          return "MTU must be less than or equal to 1500.";
+                        }
+                        if (value < 128) {
+                          return "MTU must be greater than or equal to 128";
+                        }
+                      },
+                    })}
                   />
                   {errors.mtu && (
                     <span className="validate">{errors.mtu.message}</span>
@@ -252,8 +294,8 @@ function EthernetOne() {
                     className={errors.dns1 ? "form-control input-error" : "form-control"}
                     id="dns1"
                     name="dns1"
-                    disabled={isAuto}
-                    {...register("dns1", { required: "Please fill the dns 1", pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid DNS 1" } })}
+                    // disabled={isAuto}
+                    {...register("dns1", { pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid DNS" } })}
                   />
 
                   {errors.dns1 && (
@@ -268,8 +310,8 @@ function EthernetOne() {
                     className={errors.dns2 ? "form-control input-error" : "form-control"}
                     id="dns2"
                     name="dns2"
-                    disabled={isAuto}
-                    {...register("dns2", { required: "Please fill the dns 2", pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid DNS 2" } })}
+                    // disabled={isAuto}
+                    {...register("dns2", { pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid DNS" } })}
                   />
 
                   {errors.dns2 && (
@@ -287,12 +329,33 @@ function EthernetOne() {
                       onClick={() => navigate(from, { replace: true })}
                     />
 
-                    <RButton
-                      className="btn_save margin-left15"
-                      text="Save & Next"
-                      iClass={true}
-                      iClassType="save"
-                    />
+                      <button
+                        className="btn_save ms-2"
+                        text="Save & Next"
+                        title="save"
+                      >
+                        <span className="me-2">
+
+                          <svg version="1.1" className='icon_save' width="16" height="16" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            viewBox="0 0 256 256" style={{ enableBackground: "new 0 0 256 256", fill: "white" }} xmlSpace="preserve">
+
+                            <g transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                              <path className="st0" d="M88,90H2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h65.8c0.5,0,1,0.2,1.4,0.6l20.2,20.2c0.4,0.4,0.6,0.9,0.6,1.4V88
+          C90,89.1,89.1,90,88,90z M4,86h82V23L67,4H4V86z"/>
+                              <path className="st0" d="M71.8,90H18.2c-1.1,0-2-0.9-2-2V48.2c0-1.1,0.9-2,2-2h53.7c1.1,0,2,0.9,2,2V88C73.8,89.1,72.9,90,71.8,90z
+          M20.2,86h49.7V50.2H20.2V86z"/>
+                              <path className="st0" d="M54.4,21.6H18.2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h36.3c1.1,0,2,0.9,2,2v17.6C56.4,20.8,55.5,21.6,54.4,21.6
+          z M20.2,17.6h32.3V4H20.2V17.6z"/>
+                              <path className="st0" d="M88,90H2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h65.8c0.5,0,1,0.2,1.4,0.6l20.2,20.2c0.4,0.4,0.6,0.9,0.6,1.4V88
+          C90,89.1,89.1,90,88,90z M4,86h82V23L67,4H4V86z"/>
+                              <path className="st0" d="M62.7,60.3H27.3c-1.1,0-2-0.9-2-2s0.9-2,2-2h35.4c1.1,0,2,0.9,2,2S63.8,60.3,62.7,60.3z" />
+                              <path className="st0" d="M62.7,70.1H27.3c-1.1,0-2-0.9-2-2s0.9-2,2-2h35.4c1.1,0,2,0.9,2,2S63.8,70.1,62.7,70.1z" />
+                              <path className="st0" d="M62.7,79.8H27.3c-1.1,0-2-0.9-2-2s0.9-2,2-2h35.4c1.1,0,2,0.9,2,2S63.8,79.8,62.7,79.8z" />
+                            </g>
+                          </svg>
+                        </span>
+                        Save & Next
+                      </button>
 
                     <RButton className="btn_skip margin-left15" text="Skip" onClick={() => setIsSkip(true)} />
                   </div>
