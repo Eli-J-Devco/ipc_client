@@ -1,16 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styles from "./SiteInformation.module.scss";
 
-import { RText, RButton } from "./../../../../../components/Controls";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
+import { loginService } from "../../../../../services/loginService";
 
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
-import { clearToken } from "../../../../../utils/Token";
-import { LoginErrors } from "../../../../../utils/Errors";
-import { useForm } from "react-hook-form";
 
 function SiteInformation() {
   const { t } = useTranslation();
@@ -58,9 +56,10 @@ function SiteInformation() {
         );
         isMounted && setSiteInformation({ ...response.data });
       } catch (error) {
-        LibToast.toast(LoginErrors(error, "Please login again!"), "error");
-        clearToken();
-        navigate("/", { replace: true });
+        if (error?.response?.status === 401) {
+          loginService.handleExpiredToken(error);
+          navigate("/", { replace: true });
+        }
       } finally {
         output.innerHTML = "";
       }
@@ -73,12 +72,21 @@ function SiteInformation() {
     };
   }, []);
 
+  /** 
+   * Set value for form when site information is fetched
+   * @param {Object} siteInformation
+   */
   useEffect(() => {
     setValue("name", siteInformation.name);
     setValue("location", siteInformation.location);
     setValue("description", siteInformation.description);
     setValue("administrative_contact", siteInformation.administrative_contact);
   }, [siteInformation]);
+
+  /**
+   * Redirect to the previous page when the skip button is clicked
+   * @param {boolean} isSkip
+   */
   useEffect(() => {
     isSkip && navigate(from, { replace: true });
   }, [isSkip]);
@@ -86,20 +94,14 @@ function SiteInformation() {
   /**
    * Handles the save operation for the site information.
    * @author nhan.tran 2024-03-01
-   * @param {Event} e - The event object.
+   * @param {Object} data - The event object.
    */
   const handleSave = (data) => {
-    // e.preventDefault();
-    // if (!isChange.current) {
-    //   LibToast.toast("No change to save", "info");
-    //   return;
-    // }
     if (isSkip) {
       return;
     }
     data["id"] = siteInformation["id"];
     isChange.current = !(JSON.stringify(data) == JSON.stringify(siteInformation));
-    console.log("isChange", isChange.current);
     if(!isChange.current) {
       LibToast.toast("No change to save", "info");
       return;

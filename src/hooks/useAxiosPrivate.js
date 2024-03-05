@@ -50,9 +50,7 @@ const useAxiosPrivate = () => {
       async (error) => {
         var prevRequest = error?.config;
 
-        console.log("Refreshing token", prevRequest?.sent ? 2 : 1, "time");
         if (error?.response?.status === 401 && !prevRequest?.sent) {
-          console.log("Retry refreshing token");
           prevRequest.sent = true;
           const newAccessToken = await refresh();
           prevRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;

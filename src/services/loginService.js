@@ -6,7 +6,8 @@
 
 import api from "../api/axios";
 import Constants from "../utils/Constants";
-import { LogoutErrors } from "../utils/Errors";
+import { LoginErrors, LogoutErrors } from "../utils/Errors";
+import LibToast from "../utils/LibToast";
 import { clearToken } from "../utils/Token";
 
 import { jwtDecode } from "jwt-decode";
@@ -81,5 +82,10 @@ export const loginService = {
     } catch (error) {
       throw new Error(LogoutErrors(error));
     }
+  },
+  handleExpiredToken(error) {
+    LibToast.toast(LoginErrors(error, "Please login again!"), "error");
+    clearToken();
+    return true;
   },
 };
