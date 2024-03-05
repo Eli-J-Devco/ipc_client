@@ -51,6 +51,10 @@ const Constants = {
       ETHERNET_UPDATE: "/ethernet/update/?id=",
       IFCONFIG: "/ethernet/ifconfig/",
     },
+    RS485: {
+      RS485_INFO: "/rs485/?id=",
+      RS485_UPDATE: "/rs485/update/?id=",
+    },
   },
 
   SCREEN_MODE: {

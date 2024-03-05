@@ -22,7 +22,6 @@ const useRefreshToken = () => {
     };
 
     const response = await loginService.refreshToken(params);
-    console.log("Refresh token", response.data.access_token);
     const userName = JSON.parse(window.sessionStorage.getItem("userName"));
     const permissions = JSON.parse(
       window.sessionStorage.getItem("permissions")

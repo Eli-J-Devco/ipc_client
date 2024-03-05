@@ -37,8 +37,8 @@ function EthernetTwo() {
   const navigate = useNavigate();
   const location = useLocation();
   const from =
-    location.state?.from?.pathname || "/datalogger/quickstart";
-  const to = "/datalogger/quickstart/ethernet-2";
+    location.state?.from?.pathname || "/datalogger/quickstart/ethernet-1"
+  const to = "/datalogger/quickstart/rs485-1";
 
   const abortController = new AbortController();
   useEffect(() => {
