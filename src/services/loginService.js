@@ -4,6 +4,7 @@
  *
  *********************************************************/
 
+import { AxiosError, HttpStatusCode } from "axios";
 import api from "../api/axios";
 import Constants from "../utils/Constants";
 import { LoginErrors, LogoutErrors } from "../utils/Errors";
@@ -29,6 +30,8 @@ export const loginService = {
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
       },
     });
+    if (!response.data.project_id)
+      throw new AxiosError("Project has not been initialized. Please contact the administrator.", HttpStatusCode.NotFound);
 
     if (response.data.access_token) {
       const access_token = response.data.access_token;
@@ -45,6 +48,7 @@ export const loginService = {
         permissions: response.data.permissions,
         accessToken: response.data.access_token,
         refresh_token: response.data.refresh_token,
+        project_id: response.data.project_id,
       };
     }
     return false;
