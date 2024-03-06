@@ -1,14 +1,21 @@
+/********************************************************
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
+
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styles from "./SiteInformation.module.scss";
-
+import _ from "lodash";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 import { loginService } from "../../../../../services/loginService";
 
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
+import { getToken } from "../../../../../utils/Token";
 
 function SiteInformation() {
   const { t } = useTranslation();
@@ -48,9 +55,6 @@ function SiteInformation() {
             signal: abortController.signal,
             onDownloadProgress: ({ loaded, total, progress }) => {
               output.innerHTML = "<div><img src='/loading.gif' /></div>";
-              console.log("progress", progress);
-              console.log("loaded", loaded);
-              console.log("total", total);
             },
           }
         );
@@ -64,8 +68,9 @@ function SiteInformation() {
         output.innerHTML = "";
       }
     };
-    fetchSiteInformation(1);
-    
+    const project_id = getToken("project_id");
+    fetchSiteInformation(project_id);
+
     return () => {
       isMounted = false;
       abortController.abort();
@@ -81,6 +86,7 @@ function SiteInformation() {
     setValue("location", siteInformation.location);
     setValue("description", siteInformation.description);
     setValue("administrative_contact", siteInformation.administrative_contact);
+    setValue("serial_number", siteInformation.serial_number);
   }, [siteInformation]);
 
   /**
@@ -101,8 +107,8 @@ function SiteInformation() {
       return;
     }
     data["id"] = siteInformation["id"];
-    isChange.current = !(JSON.stringify(data) == JSON.stringify(siteInformation));
-    if(!isChange.current) {
+    isChange.current = !_.isEqual(data, siteInformation);
+    if (!isChange.current) {
       LibToast.toast("No change to save", "info");
       return;
     }
@@ -138,8 +144,8 @@ function SiteInformation() {
         LibToast.toast("Save failed", "error");
       }
     };
-
-    saveSiteInformation(1);
+    const project_id = getToken("project_id");
+    saveSiteInformation(project_id);
   };
 
   return (
@@ -173,16 +179,32 @@ function SiteInformation() {
                 </div>
                 <div className="mb-3">
                   <label className="control-label">
-                    {t("site.location")}
+                    {t("site.serial_number")}
                     <span className="required">*</span>
+                  </label>
+                  <input
+                    className={errors.name ? "form-control input-error" : "form-control"}
+                    id="serial_number"
+                    name="serial_number"
+                    {...register("serial_number", {
+                      required: "Must fill the site serial number",
+                      pattern: { value: /^[A-Z0-9]+$/g, message: "Invalid serial number. Only accept capital letter and number" }
+                    })}
+                  />
+
+                  {errors.serial_number && (
+                    <span className="validate">{errors.serial_number.message}</span>
+                  )}
+                </div>
+                <div className="mb-3">
+                  <label className="control-label">
+                    {t("site.location")}
                   </label>
                   <input
                     className={errors.location ? "form-control input-error" : "form-control"}
                     id="location"
                     name="location"
-                    {...register("location", {
-                      required: "Must fill the location",
-                    })}
+                    {...register("location")}
                   />
 
                   {errors.location && (
@@ -200,7 +222,7 @@ function SiteInformation() {
                     {...register("description")}
                   />
 
-                  {errors.description  && (
+                  {errors.description && (
                     <span className="validate">{errors.description.message}</span>
                   )}
                 </div>

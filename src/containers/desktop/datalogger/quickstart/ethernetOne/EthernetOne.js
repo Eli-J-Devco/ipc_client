@@ -1,19 +1,24 @@
+/********************************************************
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
 import { useTranslation } from "react-i18next";
 import styles from "./EthernetOne.module.scss";
-import { useEffect, useRef, useState } from "react";
-import { Tooltip } from "react-tooltip";
+import { useEffect, useState } from "react";
 
-import { RText, RButton, RSwitch } from "./../../../../../components/Controls";
+import { RButton, RSwitch } from "./../../../../../components/Controls";
 import ReactSelectDropdown from "../../../../../components/ReactSelectDropdown";
 
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
-import { LoginErrors } from "../../../../../utils/Errors";
-import { clearToken } from "../../../../../utils/Token";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { loginService } from "../../../../../services/loginService";
+import canEdit from "../../../../../utils/DisabledStateByIPMode";
+import _ from "lodash";
+import { GeneralErrors } from "../../../../../utils/Errors";
 
 function EthernetOne() {
   const {
@@ -28,10 +33,13 @@ function EthernetOne() {
   const { t } = useTranslation();
   const axiosPrivate = useAxiosPrivate();
   const [isSkip, setIsSkip] = useState(false);
-  const [options, setOptions] = useState([]);
-  const [optionsInfo, setOptionsInfo] = useState(null);
+  const [NICOptions, setNICOptions] = useState([]);
+  const [NICInfo, setNICInfo] = useState(null);
+  const [selectedNIC, setSelectedNIC] = useState(null);
+  const [modeOptions, setModeOptions] = useState([]);
+  const [modeInfo, setModeInfo] = useState(null);
   const [ethernet, setEthernet] = useState(null);
-  const [isAuto, setIsAuto] = useState(true);
+  const [isAutoDNS, setIsAutoDNS] = useState(true);
   const [existedEthernet, setExistedEthernet] = useState(null);
 
   const navigate = useNavigate();
@@ -39,6 +47,7 @@ function EthernetOne() {
   const from =
     location.state?.from?.pathname || "/datalogger/quickstart";
   const to = "/datalogger/quickstart/ethernet-2";
+
 
   useEffect(() => {
     /**
@@ -48,8 +57,6 @@ function EthernetOne() {
     const fetchEthernetOne = async (id) => {
       try {
         var output = document.getElementById("progress");
-        setValue("name", "Ethernet-1")
-        setValue("id_type_ethernet", 249)
         /**
          * Get default ethernet config
          * return {Object}
@@ -62,8 +69,10 @@ function EthernetOne() {
             },
           }
         );
+
         setEthernet(ifconfig.data.network);
-        setOptions(ifconfig.data.network.map((item) => ({ value: item.namekey, label: item.namekey })));
+        setNICOptions(ifconfig.data.network.map((item) => ({ value: item.namekey, label: item.namekey })));
+        setModeOptions(ifconfig.data.mode.map((item) => ({ value: item.id, label: t(`site.t_mode.${[item.name]}`) ? t(`site.t_mode.${[item.name]}`) : item.name })));
 
         /**
          * Get ethernet info by id
@@ -71,16 +80,25 @@ function EthernetOne() {
          * return {Object} existed ethernet info
          */
         var ethernet1 = await axiosPrivate.post(`${Constants.API_URL.ETHERNET.ETHERNET_INFO}${id}`);
-        setOptionsInfo(ethernet1.data);
+
+        setValue("name", ethernet1.data.name);
+        setValue("allow_dns", ethernet1.data.allow_dns);
+
+        setNICInfo(ethernet1.data);
+        setSelectedNIC({ value: ethernet1.data.namekey, label: ethernet1.data.namekey });
         setExistedEthernet(ethernet1.data);
-        setSelectedOption({ value: ethernet1.data.namekey, label: ethernet1.data.namekey });
+        setIsAutoDNS(ethernet1.data.allow_dns);
+        setModeInfo({ value: ethernet1.data.id_type_ethernet, label: t(`site.t_mode.${ethernet1.data.type_ethernet.name}`) ? t(`site.t_mode.${ethernet1.data.type_ethernet.name}`) : ethernet1.data.type_ethernet.name });
+
+        delete ethernet1.data.id;
+        delete ethernet1.data.type_ethernet;
       } catch (error) {
         if (error?.response?.status === 401) {
           loginService.handleExpiredToken(error);
           navigate("/", { replace: true });
         }
         else {
-          LibToast.error("Server error. Please try again later.");
+          LibToast.toast("Server error. Please try again later.", "error");
         }
       } finally {
         output.innerHTML = "";
@@ -92,34 +110,52 @@ function EthernetOne() {
 
   /**
    * Set value for ethernet info
-   * @param {Object} optionsInfo
+   * @param {Object} NICInfo
    */
   useEffect(() => {
-    if (optionsInfo) {
-      setValue("namekey", optionsInfo.namekey);
-      setValue("ip_address", optionsInfo.ip_address);
-      setValue("subnet_mask", optionsInfo.subnet_mask);
-      setValue("gateway", optionsInfo.gateway);
-      setValue("mtu", optionsInfo.mtu);
-      setValue("dns1", optionsInfo.dns1);
-      setValue("dns2", optionsInfo.dns2);
-      setValue("allow_dns", isAuto);
+    if (NICInfo) {
+      setValue("namekey", NICInfo.namekey);
+      setValue("id_type_ethernet", modeInfo?.value);
+      setValue("ip_address", NICInfo.ip_address);
+      setValue("subnet_mask", NICInfo.subnet_mask);
+      setValue("gateway", NICInfo.gateway);
+      setValue("mtu", NICInfo.mtu);
+      setValue("dns1", NICInfo.dns1);
+      setValue("dns2", NICInfo.dns2);
     }
-  }, [optionsInfo]);
-
-  const [selectedOption, setSelectedOption] = useState(null);
+  }, [NICInfo]);
 
   /**
    * Handle dropdown change
    * @param {Object} value
   */
-  const handleDropdownChange = (value) => {
-    setSelectedOption(value);
+  const handleNICDropdown = (value) => {
+    setSelectedNIC(value);
     if (value.value !== existedEthernet.namekey) {
-      setOptionsInfo(ethernet.find((item) => item.namekey === value.value));
+      setNICInfo(ethernet.find((item) => item.namekey === value.value));
     }
     else {
-      setOptionsInfo(existedEthernet);
+      setNICInfo(existedEthernet);
+    }
+  };
+
+  /**
+   * Handle mode dropdown change
+   * @param {Object} value
+   */
+  const handleModeDropdown = (value) => {
+    setModeInfo(modeOptions.find((item) => item.value === value.value));
+    setValue("id_type_ethernet", value.value);
+    if (value.label === "DHCP") {
+      setNICInfo(ethernet.find((item) => item.namekey === selectedNIC.value));
+    }
+    else {
+      if (existedEthernet.namekey === selectedNIC.value) {
+        setNICInfo(existedEthernet);
+      }
+      else {
+        setNICInfo(ethernet.find((item) => item.namekey === selectedNIC.value));
+      }
     }
   };
 
@@ -131,39 +167,67 @@ function EthernetOne() {
     isSkip && navigate(to, { replace: true });
   }, [isSkip]);
 
+  /**
+   * Submit form
+   * @param {Object} data
+   */
   const onSubmit = (data) => {
     const id = 1;
+
+    // Check if there is any change
+    if (_.isEqual(data, existedEthernet)) {
+      LibToast.toast("No changes have been made.", "info");
+      return;
+    }
+
+    /**
+     * Update ethernet
+     * @param {Int16Array} id
+     * @param {Object} data
+     * return {Object} response
+     */
     const updateEthernet = async () => {
-      try{
+      try {
         var output = document.getElementById("progress");
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         const response = await axiosPrivate.post(Constants.API_URL.ETHERNET.ETHERNET_UPDATE + id, data, {
           headers: {
             "Content-Type": "application/json",
-          },
-          onDownloadProgress: ({ loaded, total, progress }) => {
-            output.innerHTML = "<div><img src='/loading.gif' /></div>";
           },
         });
         if (response.status === 200) {
           LibToast.toast("Ethernet-1 has been updated successfully.", "info");
           navigate(to, { replace: true });
         }
-      }catch(error){
+      } catch (error) {
         if (error?.response?.status === 401) {
           loginService.handleExpiredToken(error);
           navigate("/", { replace: true });
         }
         else {
-          LibToast.error("Server error. Please try again later.");
+          const msg = GeneralErrors(error, 'Ethernet');
+          LibToast.toast(msg, "error");
         }
       }
-      finally{
+      finally {
         output.innerHTML = "";
       }
-      
+
     };
+
     updateEthernet();
   };
+
+  /**
+   * Set value for allow_dns and switch button
+   * @param {Object} modeInfo
+   */
+  useEffect(() => {
+    if (!canEdit["allow_dns"][[modeInfo?.label]]) {
+      setIsAutoDNS(canEdit["allow_dns"][[modeInfo?.label]])
+      setValue("allow_dns", canEdit["allow_dns"][[modeInfo?.label]]);
+    }
+  }, [modeInfo]);
 
   return (
     <div className={styles.ethernet}>
@@ -180,14 +244,29 @@ function EthernetOne() {
                 <div className="mb-3">
                   <div className="form_dropdown">
                     <ReactSelectDropdown
+                      label={t("site.mode")}
+                      className="mode"
+                      inputId="mode"
+                      inputName="mode"
+                      optionList={modeOptions}
+                      name="mode"
+                      value={modeInfo}
+                      onChange={(value) => handleModeDropdown(value)}
+                    />
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <div className="form_dropdown">
+                    <ReactSelectDropdown
                       label={t("site.ethernet")}
                       className="ethernet"
                       inputId="ethernet1"
                       inputName="ethernet1"
-                      optionList={options}
+                      optionList={NICOptions}
                       name="ethernet1"
-                      value={selectedOption}
-                      onChange={(value) => handleDropdownChange(value)}
+                      value={selectedNIC}
+                      isDisabled={!canEdit["ethernet"][[modeInfo?.label]]}
+                      onChange={(value) => handleNICDropdown(value)}
                     />
                   </div>
                 </div>
@@ -198,11 +277,12 @@ function EthernetOne() {
                       label={t("site.obtain_dns")}
                       inputId="kiosk_view"
                       inputName="kiosk_view"
-                      checked={isAuto}
+                      checked={isAutoDNS}
+                      disabled={!canEdit["allow_dns"][[modeInfo?.label]]}
+                      styles={isAutoDNS ? { backgroundColor: "#4CAF50" } : null}
                       onChange={() => {
-                        setIsAuto(!isAuto);
-                        setValue("allow_dns", !isAuto);
-
+                        setIsAutoDNS(!isAutoDNS);
+                        setValue("allow_dns", !isAutoDNS);
                       }}
                     />
                   </div>
@@ -215,7 +295,7 @@ function EthernetOne() {
                     className={errors.ip_address ? "form-control input-error" : "form-control"}
                     id="ip_address"
                     name="ip_address"
-                    // disabled={isAuto}
+                    disabled={!canEdit["ip_address"][[modeInfo?.label]]}
                     {...register("ip_address", { required: "Please fill the ip address", pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid IP address" } })}
                   />
 
@@ -231,7 +311,7 @@ function EthernetOne() {
                     className={errors.subnet_mask ? "form-control input-error" : "form-control"}
                     id="subnet_mask"
                     name="subnet_mask"
-                    // disabled={isAuto}
+                    disabled={!canEdit["subnet_mask"][[modeInfo?.label]]}
                     {...register("subnet_mask", { required: "Please fill the subnet mask", pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid subnet mask" } })}
                   />
 
@@ -247,7 +327,7 @@ function EthernetOne() {
                     className={errors.gateway ? "form-control input-error" : "form-control"}
                     id="gateway"
                     name="gateway"
-                    // disabled={isAuto}
+                    disabled={!canEdit["gateway"][[modeInfo?.label]]}
                     {...register("gateway", { required: "Please fill the gateway", pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid gateway" } })}
                   />
 
@@ -264,7 +344,7 @@ function EthernetOne() {
                     className={errors.mtu ? "form-control input-error" : "form-control"}
                     id="mtu"
                     name="mtu"
-                    // disabled={isAuto}
+                    disabled={!canEdit["mtu"][[modeInfo?.label]]}
                     {...register("mtu", {
                       validate: (value) => {
                         if (!value) {
@@ -294,7 +374,7 @@ function EthernetOne() {
                     className={errors.dns1 ? "form-control input-error" : "form-control"}
                     id="dns1"
                     name="dns1"
-                    // disabled={isAuto}
+                    disabled={!canEdit["dns1"][[modeInfo?.label]]}
                     {...register("dns1", { pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid DNS" } })}
                   />
 
@@ -310,7 +390,7 @@ function EthernetOne() {
                     className={errors.dns2 ? "form-control input-error" : "form-control"}
                     id="dns2"
                     name="dns2"
-                    // disabled={isAuto}
+                    disabled={!canEdit["dns2"][[modeInfo?.label]]}
                     {...register("dns2", { pattern: { value: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/, message: "Invalid DNS" } })}
                   />
 
@@ -329,33 +409,33 @@ function EthernetOne() {
                       onClick={() => navigate(from, { replace: true })}
                     />
 
-                      <button
-                        className="btn_save ms-2"
-                        text="Save & Next"
-                        title="save"
-                      >
-                        <span className="me-2">
+                    <button
+                      className="btn_save ms-2"
+                      text="Save & Next"
+                      title="save"
+                    >
+                      <span className="me-2">
 
-                          <svg version="1.1" className='icon_save' width="16" height="16" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                            viewBox="0 0 256 256" style={{ enableBackground: "new 0 0 256 256", fill: "white" }} xmlSpace="preserve">
+                        <svg version="1.1" className='icon_save' width="16" height="16" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                          viewBox="0 0 256 256" style={{ enableBackground: "new 0 0 256 256", fill: "white" }} xmlSpace="preserve">
 
-                            <g transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
-                              <path className="st0" d="M88,90H2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h65.8c0.5,0,1,0.2,1.4,0.6l20.2,20.2c0.4,0.4,0.6,0.9,0.6,1.4V88
+                          <g transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                            <path className="st0" d="M88,90H2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h65.8c0.5,0,1,0.2,1.4,0.6l20.2,20.2c0.4,0.4,0.6,0.9,0.6,1.4V88
           C90,89.1,89.1,90,88,90z M4,86h82V23L67,4H4V86z"/>
-                              <path className="st0" d="M71.8,90H18.2c-1.1,0-2-0.9-2-2V48.2c0-1.1,0.9-2,2-2h53.7c1.1,0,2,0.9,2,2V88C73.8,89.1,72.9,90,71.8,90z
+                            <path className="st0" d="M71.8,90H18.2c-1.1,0-2-0.9-2-2V48.2c0-1.1,0.9-2,2-2h53.7c1.1,0,2,0.9,2,2V88C73.8,89.1,72.9,90,71.8,90z
           M20.2,86h49.7V50.2H20.2V86z"/>
-                              <path className="st0" d="M54.4,21.6H18.2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h36.3c1.1,0,2,0.9,2,2v17.6C56.4,20.8,55.5,21.6,54.4,21.6
+                            <path className="st0" d="M54.4,21.6H18.2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h36.3c1.1,0,2,0.9,2,2v17.6C56.4,20.8,55.5,21.6,54.4,21.6
           z M20.2,17.6h32.3V4H20.2V17.6z"/>
-                              <path className="st0" d="M88,90H2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h65.8c0.5,0,1,0.2,1.4,0.6l20.2,20.2c0.4,0.4,0.6,0.9,0.6,1.4V88
+                            <path className="st0" d="M88,90H2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h65.8c0.5,0,1,0.2,1.4,0.6l20.2,20.2c0.4,0.4,0.6,0.9,0.6,1.4V88
           C90,89.1,89.1,90,88,90z M4,86h82V23L67,4H4V86z"/>
-                              <path className="st0" d="M62.7,60.3H27.3c-1.1,0-2-0.9-2-2s0.9-2,2-2h35.4c1.1,0,2,0.9,2,2S63.8,60.3,62.7,60.3z" />
-                              <path className="st0" d="M62.7,70.1H27.3c-1.1,0-2-0.9-2-2s0.9-2,2-2h35.4c1.1,0,2,0.9,2,2S63.8,70.1,62.7,70.1z" />
-                              <path className="st0" d="M62.7,79.8H27.3c-1.1,0-2-0.9-2-2s0.9-2,2-2h35.4c1.1,0,2,0.9,2,2S63.8,79.8,62.7,79.8z" />
-                            </g>
-                          </svg>
-                        </span>
-                        Save & Next
-                      </button>
+                            <path className="st0" d="M62.7,60.3H27.3c-1.1,0-2-0.9-2-2s0.9-2,2-2h35.4c1.1,0,2,0.9,2,2S63.8,60.3,62.7,60.3z" />
+                            <path className="st0" d="M62.7,70.1H27.3c-1.1,0-2-0.9-2-2s0.9-2,2-2h35.4c1.1,0,2,0.9,2,2S63.8,70.1,62.7,70.1z" />
+                            <path className="st0" d="M62.7,79.8H27.3c-1.1,0-2-0.9-2-2s0.9-2,2-2h35.4c1.1,0,2,0.9,2,2S63.8,79.8,62.7,79.8z" />
+                          </g>
+                        </svg>
+                      </span>
+                      Save & Next
+                    </button>
 
                     <RButton className="btn_skip margin-left15" text="Skip" onClick={() => setIsSkip(true)} />
                   </div>

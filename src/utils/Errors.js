@@ -6,13 +6,19 @@
 
 const LoginErrorsList = {
   400: "Missing Username or Password",
-  401: "Username or Password is incorrect",
-  403: "You do not have permission to access this resource",
+  403: "Username or Password is incorrect",
+  // 403: "You do not have permission to access this resource",
   500: "Login Failed",
 };
 
 const LogoutErrorsList = {
   500: "Logout Failed. Please try again or clear browser cache to securely logout.",
+};
+
+const GeneralErrorsList = {
+  Ethernet: {
+    409: "Duplicate network interface card detected. Please check your network settings.",
+  }
 };
 
 /**
@@ -24,6 +30,10 @@ const LogoutErrorsList = {
 export const LoginErrors = (err, msg = null) => {
   if (msg) {
     return msg;
+  }
+
+  if (err?.code) {
+    return err?.message;
   }
 
   if (!err?.response) {
@@ -41,4 +51,11 @@ export const LoginErrors = (err, msg = null) => {
  */
 export const LogoutErrors = (err) => {
   return LogoutErrorsList[500];
+};
+
+export const GeneralErrors = (err, type) => {
+  if (!err?.response) {
+    return "No Server Response";
+  }
+  return GeneralErrorsList[type][err.response.status] || "Error";
 };

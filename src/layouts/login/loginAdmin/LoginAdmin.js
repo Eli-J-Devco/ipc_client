@@ -56,9 +56,10 @@ const LoginAdmin = () => {
     try {
       const response = await loginService.login(params, output);
 
-      var { userName, permissions } = response;
+      var { userName, permissions, project_id } = response;
       setToken("userName", userName);
       setToken("permissions", permissions);
+      setToken("project_id", project_id);
 
       setAuth({ ...response, isAuthenticated: true });
       localStorage.setItem("persist", true);
@@ -66,7 +67,6 @@ const LoginAdmin = () => {
       LibToast.toast("Login Successful", "info");
       navigate(from, { replace: true });
     } catch (err) {
-      console.log(err)
       const msg = LoginErrors(err);
       setErrMsg(msg);
     }

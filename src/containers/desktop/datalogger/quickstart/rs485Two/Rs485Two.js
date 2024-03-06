@@ -1,3 +1,8 @@
+/********************************************************
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from './Rs485Two.module.scss';
@@ -25,8 +30,8 @@ function Rs485Two() {
     const [namekey, setNameKey] = useState("rs485");
 
     const selectedDropdown = { "baud": setSelectedBaudRate, "parity": setSelectedParity, "stop_bits": setSelectedStopBit, "timeout": setSelectedModbusTimeout, "debuglevel": setSelectedDebugLevel }
-    const setDropdownOption = { "baud": setBaudRates, "parity": setParity, "stop_bits": setStopBit, "timeout": setModbusTimeout, "debuglevel": setDebugLevel}
-    
+    const setDropdownOption = { "baud": setBaudRates, "parity": setParity, "stop_bits": setStopBit, "timeout": setModbusTimeout, "debuglevel": setDebugLevel }
+
     const navigate = useNavigate();
     const location = useLocation();
     const from =
@@ -34,28 +39,28 @@ function Rs485Two() {
     const to = "/datalogger/quickstart/logging-rate";
     useEffect(() => {
         const fetchRS485 = async (id) => {
-            try{
-                var index = {"baud": "id_type_baud_rates", "parity": "id_type_parity", "stop_bits": "id_type_stopbits", "timeout": "id_type_timeout", "debuglevel": "id_type_debug_level"}
+            try {
+                var index = { "baud": "id_type_baud_rates", "parity": "id_type_parity", "stop_bits": "id_type_stopbits", "timeout": "id_type_timeout", "debuglevel": "id_type_debug_level" }
                 var output = document.getElementById("progress");
                 const response = await axiosPrivate.post(Constants.API_URL.RS485.RS485_INFO + id, {
                     onDownloadProgress: ({ loaded, total, progress }) => {
-                      output.innerHTML = "<div><img src='/loading.gif' /></div>";
+                        output.innerHTML = "<div><img src='/loading.gif' /></div>";
                     },
-                  });
+                });
                 var rs4851 = response.data;
                 var rs485info = response.data.rs485Inf;
                 Object.entries(rs485info).map(([key, value]) => {
                     setDropdownOption[key](value.map((item) => {
                         return { label: item[[key]], value: item.id }
-                    } ));
+                    }));
 
                     let selected = value.filter((item) => item.id === rs4851[index[[key]]]);
-                    selectedDropdown[key]({ label: selected[0][key], value: selected[0].id});
+                    selectedDropdown[key]({ label: selected[0][key], value: selected[0].id });
                 });
                 setNameKey(rs4851.namekey);
-            }catch(error){
+            } catch (error) {
                 console.log(error);
-            }finally{
+            } finally {
                 output.innerHTML = "";
             }
         };

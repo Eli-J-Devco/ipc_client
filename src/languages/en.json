@@ -7,6 +7,7 @@
     },
     "site": {
         "site_name": "Site Name",
+        "serial_number": "Serial Number",
         "location": "Location",
         "admin_contact": "Administrative Contact",
         "description": "Description",
@@ -18,6 +19,12 @@
         "dns1": "DNS 1",
         "dns2": "DNS 2",
         "ethernet": "Ethernet",
+        "mode": "IP Assignment",
+        "t_mode": {
+            "dhcp": "DHCP",
+            "none": "Static IP",
+            "disabled": "Disabled"
+        },
         "mtu_note": "(128-1500, default 1500)",
         "rs485_parity": "RS485-1 Parity",
         "rs485_stopbit": "RS485-1 Stop bits",
