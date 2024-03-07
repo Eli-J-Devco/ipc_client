@@ -41,6 +41,7 @@ function EthernetOne() {
   const [ethernet, setEthernet] = useState(null);
   const [isAutoDNS, setIsAutoDNS] = useState(true);
   const [existedEthernet, setExistedEthernet] = useState(null);
+  const [isPlugged, setIsPlugged] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -83,7 +84,12 @@ function EthernetOne() {
          * return {Object} existed ethernet info
          */
         var ethernet1 = await axiosPrivate.post(`${Constants.API_URL.ETHERNET.ETHERNET_INFO}${id}`);
-
+        ifconfig.data.network.forEach((item) => {
+          if (item.namekey === ethernet1.data.namekey && item.ip_address !== "") {
+            setIsPlugged(false);
+            // return;
+          }
+        });
         setValue("name", ethernet1.data.name);
         setValue("allow_dns", ethernet1.data.allow_dns);
 
@@ -251,6 +257,12 @@ function EthernetOne() {
             <div className="row">
               <div className="col-md-3"></div>
               <div className="col-md-6">
+                {
+                  isPlugged &&
+                  <div className="note mb-3" style={{ color: "red" }}>/
+                    <span style={{ color: "#000" }}><strong>Note:</strong> </span>{NICInfo?.name ? NICInfo?.name : existedEthernet?.name} is unplugged
+                  </div>
+                }
                 <div className="mb-3">
                   <div className="form_dropdown">
                     <ReactSelectDropdown

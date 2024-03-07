@@ -41,6 +41,7 @@ function EthernetTwo() {
   const [ethernet, setEthernet] = useState(null);
   const [isAutoDNS, setIsAutoDNS] = useState(true);
   const [existedEthernet, setExistedEthernet] = useState(null);
+  const [isPlugged, setIsPlugged] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -83,7 +84,12 @@ function EthernetTwo() {
          * return {Object} existed ethernet info
          */
         var ethernet2 = await axiosPrivate.post(`${Constants.API_URL.ETHERNET.ETHERNET_INFO}${id}`);
-
+        ifconfig.data.network.forEach((item) => {
+          if (item.namekey === ethernet2.data.namekey && item.ip_address !== "") {
+            setIsPlugged(false);
+            // return;
+          }
+        });
         setValue("name", ethernet2.data.name);
         setValue("allow_dns", ethernet2.data.allow_dns);
 
@@ -244,13 +250,18 @@ function EthernetTwo() {
       <div className="note">
         <p> {t("site.info_note")} </p>
       </div>
-
       <div className={styles.form_body}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="container">
             <div className="row">
               <div className="col-md-3"></div>
               <div className="col-md-6">
+                {
+                  isPlugged &&
+                  <div className="note mb-3" style={{ color: "red" }}>
+                    <span style={{ color: "#000" }}><strong>Note:</strong> </span>{NICInfo?.name ? NICInfo?.name : existedEthernet?.name} is unplugged
+                  </div>
+                }
                 <div className="mb-3">
                   <div className="form_dropdown">
                     <ReactSelectDropdown
