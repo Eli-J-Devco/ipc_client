@@ -6,6 +6,7 @@
 
 import { apiUser } from "../api/axios";
 import { useEffect } from "react";
+import { AxiosError, HttpStatusCode } from "axios";
 
 import useRefreshToken from "./useRefreshToken";
 import useAuth from "./useAuth";
@@ -20,6 +21,7 @@ import axios from "../api/axios";
 const useAxiosPrivate = () => {
   const refresh = useRefreshToken();
   const { auth } = useAuth();
+
   useEffect(() => {
     /**
      * Add token to header request
@@ -29,6 +31,12 @@ const useAxiosPrivate = () => {
      */
     const requestIntercept = apiUser.interceptors.request.use(
       (config) => {
+        var project_id = sessionStorage.getItem("project_id");
+        const controller = new AbortController();
+        config.signal = controller.signal;
+        if (!project_id) {
+          controller.abort(new AxiosError("Project ID is not found", HttpStatusCode.NotFound));
+        }
         if (!config.headers["Authorization"]) {
           config.headers["Authorization"] = `Bearer ${auth?.accessToken}`;
         }
@@ -59,6 +67,8 @@ const useAxiosPrivate = () => {
         return Promise.reject(error);
       }
     );
+
+
     return () => {
       apiUser.interceptors.request.eject(requestIntercept);
       apiUser.interceptors.response.eject(responseIntercept);

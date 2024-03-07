@@ -93,5 +93,17 @@
         "add_multi_device_info": "Will skip over existing devices in the range.",
         "how_many_to_add": "How many to add?",
         "when_adding": "When adding, increment"
+    },
+    "toastMessage": {
+        "error": {
+            "fetchError": "Server error. Please try again later.",
+            "updateFailed": "An error occured when updating. Please wait and try again later."
+        },
+        "info": {
+            "noChange": "No changes have been made.",
+            "updateSuccess": "has been updated successfully.",
+            "logout": "You have been logged out",
+            "loginSuccess": "Welcome back!"
+        }
     }
 }

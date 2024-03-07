@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import styles from "./Header.module.scss";
 
 import useAuth from "../../../hooks/useAuth.js";
-
-import styles from "./Header.module.scss";
 import { loginService } from "../../../services/loginService.js";
 
 import LibToast from "../../../utils/LibToast.js";
@@ -11,7 +11,7 @@ import { LogoutErrors } from "../../../utils/Errors.js";
 
 const Header = () => {
   const { auth } = useAuth();
-
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [isLogout, setLogout] = useState(false);
@@ -30,7 +30,7 @@ const Header = () => {
         try {
           const res = await loginService.logout(output);
           if (res) {
-            LibToast.toast("You have been logged out", "info");
+            LibToast.toast(t("toastMessage.info.logout"), "info");
             navigate("/");
           }
         } catch (error) {

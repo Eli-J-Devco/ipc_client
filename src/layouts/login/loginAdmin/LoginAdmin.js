@@ -5,16 +5,18 @@
  *********************************************************/
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useForm } from "react-hook-form";
 import styles from "./LoginAdmin.module.scss";
-import { set, useForm } from "react-hook-form";
 
 import Libs from "../../../utils/Libs";
 import Constants from "../../../utils/Constants";
 import LibToast from "../../../utils/LibToast";
+import { LoginErrors } from "../../../utils/Errors";
+import { clearToken, setToken } from "../../../utils/Token";
+
 import useAuth from "../../../hooks/useAuth";
 import { loginService } from "../../../services/loginService";
-import { LoginErrors } from "../../../utils/Errors";
-import { setToken } from "../../../utils/Token";
 
 /**
  * Login Admin
@@ -22,6 +24,7 @@ import { setToken } from "../../../utils/Token";
  * @return JSX
  */
 const LoginAdmin = () => {
+  const { t } = useTranslation();
   const [errMsg, setErrMsg] = useState("");
 
   const { auth, setAuth } = useAuth();
@@ -29,7 +32,6 @@ const LoginAdmin = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/datalogger/quickstart";
-  const persist = localStorage.getItem("persist");
 
   const {
     register,
@@ -64,7 +66,7 @@ const LoginAdmin = () => {
       setAuth({ ...response, isAuthenticated: true });
       localStorage.setItem("persist", true);
 
-      LibToast.toast("Login Successful", "info");
+      LibToast.toast(t("toastMessage.info.loginSuccess") + " " + userName, "info");
       navigate(from, { replace: true });
     } catch (err) {
       const msg = LoginErrors(err);
@@ -81,6 +83,24 @@ const LoginAdmin = () => {
     }
   }, [errMsg]);
 
+  /**
+   * Check if user is already logged in and redirect to the last page
+   * @author nhan.tran 2024-03-07
+   * @param {auth} object
+   * @param {persist} string
+   * @param {project_id} integer
+   */
+  useEffect(() => {
+    const persist = localStorage.getItem("persist");
+    const project_id = sessionStorage.getItem("project_id");
+    if (auth?.isAuthenticated && persist && project_id) {
+      navigate(from, { replace: true });
+    }
+    else {
+      clearToken();
+    }
+  }, []);
+
   return (
     <div className={styles.main_login}>
       {process.env.SALT}
@@ -94,7 +114,6 @@ const LoginAdmin = () => {
         <div className={styles.body_login}>
           <div className={styles.login_title}>Login</div>
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* <div className=''>{message}</div> */}
             <div className={styles.form_group}>
               <input
                 placeholder="Email"

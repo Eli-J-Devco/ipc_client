@@ -5,11 +5,12 @@
  *********************************************************/
 
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import styles from "./SiteInformation.module.scss";
 import _ from "lodash";
+import styles from "./SiteInformation.module.scss";
+
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 import { loginService } from "../../../../../services/loginService";
 
@@ -20,15 +21,12 @@ import { getToken } from "../../../../../utils/Token";
 function SiteInformation() {
   const { t } = useTranslation();
   const [siteInformation, setSiteInformation] = useState({});
-  const [isSkip, setIsSkip] = useState(false);
 
   const axiosPrivate = useAxiosPrivate();
   const isChange = useRef(false);
 
   const navigate = useNavigate();
-  const location = useLocation();
-  const from =
-    location.state?.from?.pathname || "/datalogger/quickstart/ethernet-1";
+  const to = "/datalogger/quickstart/ethernet-1";
 
   const {
     register,
@@ -61,10 +59,9 @@ function SiteInformation() {
         );
         isMounted && setSiteInformation({ ...response.data });
       } catch (error) {
-        if (error?.response?.status === 401) {
-          loginService.handleExpiredToken(error);
-          navigate("/", { replace: true });
-        }
+        if (!loginService.handleMissingInfo(error))
+          LibToast.toast(t("toastMessage.error.fetchError"), "error");
+        else navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }
@@ -92,27 +89,15 @@ function SiteInformation() {
   }, [siteInformation]);
 
   /**
-   * Redirect to the previous page when the skip button is clicked
-   * @author: nhan.tran 2024-03-01
-   * @param {boolean} isSkip
-   */
-  useEffect(() => {
-    isSkip && navigate(from, { replace: true });
-  }, [isSkip]);
-
-  /**
    * Handles the save operation for the site information.
    * @author nhan.tran 2024-03-01
    * @param {Object} data - The event object.
    */
   const handleSave = (data) => {
-    if (isSkip) {
-      return;
-    }
     data["id"] = siteInformation["id"];
     isChange.current = !_.isEqual(data, siteInformation);
     if (!isChange.current) {
-      LibToast.toast("No change to save", "info");
+      LibToast.toast(t("toastMessage.info.noChange"), "info");
       return;
     }
 
@@ -139,12 +124,14 @@ function SiteInformation() {
         );
         if (response.status === 200) {
           output.innerHTML = "";
-          LibToast.toast("Save successfully", "info");
+          LibToast.toast("Site information " + t("toastMessage.info.updateSuccess"), "info");
           isChange.current = false;
-          navigate(from, { replace: true });
+          navigate(to, { replace: true });
         }
       } catch (error) {
-        LibToast.toast("Save failed", "error");
+        if (!loginService.handleMissingInfo(error))
+          LibToast.toast(t("toastMessage.error.updateFailed"), "error");
+        else navigate("/", { replace: true });
       }
     };
     const project_id = getToken("project_id");
@@ -288,7 +275,7 @@ function SiteInformation() {
                   // className="btn btn-primary btn-app"
                   text="Skip"
                   title="Skip"
-                  onClick={() => setIsSkip(true)}
+                  onClick={() => navigate(to, { replace: true })}
                 >
                   Skip
                 </button>

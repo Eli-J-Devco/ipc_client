@@ -8,9 +8,11 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from './LoggingRate.module.scss';
 
+import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
+import { loginService } from "../../../../../services/loginService";
+
 import { RButton } from './../../../../../components/Controls';
 import ReactSelectDropdown from '../../../../../components/ReactSelectDropdown';
-import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 
@@ -47,7 +49,9 @@ function LoggingRate() {
                 setSelectedLoggingRate({ value: response.data.id_logging_interval, label: rate.filter((item) => item.id === response.data.id_logging_interval)[0].time });
                 setExistedLoggingRate({ value: response.data.id_logging_interval, label: rate.filter((item) => item.id === response.data.id_logging_interval)[0].time });
             } catch (error) {
-                console.log(error);
+                if (!loginService.handleMissingInfo(error))
+                    LibToast.toast(t("toastMessage.error.fetchError"), "error");
+                else navigate("/", { replace: true });
             } finally {
                 output.innerHTML = "";
             }
@@ -67,7 +71,7 @@ function LoggingRate() {
 
     const handleSubmit = () => {
         if (selectedLoggingRate.value === existedLoggingRate.value) {
-            LibToast.toast("No change to update", "info");
+            LibToast.toast(t("toastMessage.info.noChange"), "info");
             return;
         }
         const data = {
@@ -83,11 +87,13 @@ function LoggingRate() {
                     },
                 });
                 if (response.status === 200) {
-                    LibToast.toast("Logging rate updated successfully", "success");
+                    LibToast.toast("Logging rate " + t("toastMessage.info.updateSuccess"), "info");
                     navigate(to, { state: { from: from } });
                 }
             } catch (error) {
-                LibToast.toast("Error updating logging rate", "error");
+                if (!loginService.handleMissingInfo(error))
+                    LibToast.toast(t("toastMessage.error.updateFailed"), "error");
+                else navigate("/", { replace: true });
             } finally {
                 output.innerHTML = "";
             }

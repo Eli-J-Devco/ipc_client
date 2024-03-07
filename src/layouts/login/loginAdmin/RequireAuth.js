@@ -4,9 +4,10 @@
  *
  *********************************************************/
 
-import { useLocation, Navigate, Outlet } from "react-router-dom";
-import useAuth from "../../../hooks/useAuth";
 import { useEffect } from "react";
+import { useLocation, Navigate, Outlet } from "react-router-dom";
+
+import useAuth from "../../../hooks/useAuth";
 import { clearToken } from "../../../utils/Token";
 
 /**
@@ -19,6 +20,12 @@ const RequiredAuth = () => {
   const location = useLocation();
   const persist = JSON.parse(localStorage.getItem("persist"));
   const project_id = window.sessionStorage.getItem("project_id");
+
+  /**
+   * Check if user is authenticated and project is existed and persist is existed
+   * If not, clear token and redirect to login page
+   * @author nhan.tran 2024-03-07
+   */
   useEffect(() => {
     if (!auth?.isAuthenticated || !persist || !project_id) {
       clearToken();

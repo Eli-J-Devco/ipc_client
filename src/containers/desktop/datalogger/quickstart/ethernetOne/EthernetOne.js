@@ -4,21 +4,21 @@
  *
  *********************************************************/
 import { useTranslation } from "react-i18next";
-import styles from "./EthernetOne.module.scss";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useLocation, useNavigate } from "react-router-dom";
+import _ from "lodash";
+import styles from "./EthernetOne.module.scss";
 
 import { RButton, RSwitch } from "./../../../../../components/Controls";
 import ReactSelectDropdown from "../../../../../components/ReactSelectDropdown";
 
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
+import { loginService } from "../../../../../services/loginService";
+
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { loginService } from "../../../../../services/loginService";
 import canEdit from "../../../../../utils/DisabledStateByIPMode";
-import _ from "lodash";
-import { GeneralErrors } from "../../../../../utils/Errors";
 
 function EthernetOne() {
   const {
@@ -32,7 +32,7 @@ function EthernetOne() {
 
   const { t } = useTranslation();
   const axiosPrivate = useAxiosPrivate();
-  const [isSkip, setIsSkip] = useState(false);
+
   const [NICOptions, setNICOptions] = useState([]);
   const [NICInfo, setNICInfo] = useState(null);
   const [selectedNIC, setSelectedNIC] = useState(null);
@@ -85,7 +85,7 @@ function EthernetOne() {
          */
         var ethernet1 = await axiosPrivate.post(`${Constants.API_URL.ETHERNET.ETHERNET_INFO}${id}`);
         ifconfig.data.network.forEach((item) => {
-          if (item.namekey === ethernet1.data.namekey && item.ip_address !== "") {
+          if (item.namekey === ethernet1.data.namekey && item.ip_address === "") {
             setIsPlugged(false);
             // return;
           }
@@ -102,13 +102,9 @@ function EthernetOne() {
         delete ethernet1.data.id;
         delete ethernet1.data.type_ethernet;
       } catch (error) {
-        if (error?.response?.status === 401) {
-          loginService.handleExpiredToken(error);
-          navigate("/", { replace: true });
-        }
-        else {
-          LibToast.toast("Server error. Please try again later.", "error");
-        }
+        if (!loginService.handleMissingInfo(error))
+          LibToast.toast(t("toastMessage.error.fetchError"), "error");
+        else navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }
@@ -171,14 +167,7 @@ function EthernetOne() {
     }
   };
 
-  /**
-   * Redirect to the previous page when the skip button is clicked
-   * @author: nhan.tran 2024-03-07
-   * @param {boolean} isSkip
-   */
-  useEffect(() => {
-    isSkip && navigate(to, { replace: true });
-  }, [isSkip]);
+
 
   /**
    * Submit form
@@ -190,7 +179,7 @@ function EthernetOne() {
 
     // Check if there is any change
     if (_.isEqual(data, existedEthernet)) {
-      LibToast.toast("No changes have been made.", "info");
+      LibToast.toast(t("toastMessage.info.noChange"), "info");
       return;
     }
 
@@ -211,18 +200,13 @@ function EthernetOne() {
           },
         });
         if (response.status === 200) {
-          LibToast.toast("Ethernet-1 has been updated successfully.", "info");
+          LibToast.toast("Ethernet-1 " + t("toastMessage.info.noChange"), "info");
           navigate(to, { replace: true });
         }
       } catch (error) {
-        if (error?.response?.status === 401) {
-          loginService.handleExpiredToken(error);
-          navigate("/", { replace: true });
-        }
-        else {
-          const msg = GeneralErrors(error, 'Ethernet');
-          LibToast.toast(msg, "error");
-        }
+        if (!loginService.handleMissingInfo(error))
+          LibToast.toast(t("toastMessage.error.updateFailed"), "error");
+        else navigate("/", { replace: true });
       }
       finally {
         output.innerHTML = "";
@@ -258,8 +242,8 @@ function EthernetOne() {
               <div className="col-md-3"></div>
               <div className="col-md-6">
                 {
-                  isPlugged &&
-                  <div className="note mb-3" style={{ color: "red" }}>/
+                  !isPlugged &&
+                  <div className="note mb-3" style={{ color: "red" }}>
                     <span style={{ color: "#000" }}><strong>Note:</strong> </span>{NICInfo?.name ? NICInfo?.name : existedEthernet?.name} is unplugged
                   </div>
                 }
@@ -459,7 +443,7 @@ function EthernetOne() {
                       Save & Next
                     </button>
 
-                    <RButton className="btn_skip margin-left15" text="Skip" onClick={() => setIsSkip(true)} />
+                    <RButton className="btn_skip margin-left15" text="Skip" onClick={() => navigate(to, { replace: true })} />
                   </div>
                 </div>
               </div>
