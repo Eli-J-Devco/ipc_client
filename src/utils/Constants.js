@@ -55,6 +55,11 @@ const Constants = {
       RS485_INFO: "/rs485/?id=",
       RS485_UPDATE: "/rs485/update/?id=",
     },
+    PROJECT: {
+      PROJECT_INFO: "/project/",
+      LOGGING_RATE: "/project/logging_interval/",
+      UPDATE_LOGGING_RATE: "/project/update_logging_rate/",
+    }
   },
 
   SCREEN_MODE: {

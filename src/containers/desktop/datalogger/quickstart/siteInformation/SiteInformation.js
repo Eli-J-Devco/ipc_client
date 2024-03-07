@@ -44,6 +44,7 @@ function SiteInformation() {
     const abortController = new AbortController();
     /**
      * Fetch site information
+     * @author: nhan.tran 2024-03-01
      * @param {int} id site id - will be remove in future
      */
     const fetchSiteInformation = async (id) => {
@@ -79,6 +80,7 @@ function SiteInformation() {
 
   /** 
    * Set value for form when site information is fetched
+   * @author: nhan.tran 2024-03-01
    * @param {Object} siteInformation
    */
   useEffect(() => {
@@ -91,6 +93,7 @@ function SiteInformation() {
 
   /**
    * Redirect to the previous page when the skip button is clicked
+   * @author: nhan.tran 2024-03-01
    * @param {boolean} isSkip
    */
   useEffect(() => {

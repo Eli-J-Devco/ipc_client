@@ -8,23 +8,26 @@ body {
   font-size: 14px;
 }
 
-a{
+a {
   text-decoration: none;
   color: #000;
 }
 
-.main{
+.main {
   height: 100%;
   overflow-x: auto;
   padding: 10px;
   flex: 1;
   position: relative;
 }
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-ul, li{
+
+ul,
+li {
   padding: 0;
   margin: 0;
   list-style-type: none;
@@ -48,6 +51,6 @@ ul, li{
 
 #progress {
   position: absolute;
-  top: 35%;
-  left: 48%;
+  top: 50%;
+  left: 50%;
 }

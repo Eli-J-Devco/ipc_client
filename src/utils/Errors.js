@@ -32,7 +32,7 @@ export const LoginErrors = (err, msg = null) => {
     return msg;
   }
 
-  if (err?.code) {
+  if (!err?.response?.status && err?.message) {
     return err?.message;
   }
 
@@ -53,6 +53,13 @@ export const LogoutErrors = (err) => {
   return LogoutErrorsList[500];
 };
 
+/**
+ * Get the error message when general error from the server response
+ * @author nhan.tran 2024-02-26
+ * @param {err} error object
+ * @param {type} string
+ * @return String
+ */
 export const GeneralErrors = (err, type) => {
   if (!err?.response) {
     return "No Server Response";

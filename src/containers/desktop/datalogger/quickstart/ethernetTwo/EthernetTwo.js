@@ -52,6 +52,7 @@ function EthernetTwo() {
   useEffect(() => {
     /**
      * Fetch ethernet one data
+     * @author: nhan.tran 2024-03-07
      * @param {Int16Array} id 
      */
     const fetchEthernetTwo = async (id) => {
@@ -59,6 +60,7 @@ function EthernetTwo() {
         var output = document.getElementById("progress");
         /**
          * Get default ethernet config
+         * @author: nhan.tran 2024-03-07
          * return {Object}
          */
         const ifconfig = await axiosPrivate.post(
@@ -76,6 +78,7 @@ function EthernetTwo() {
 
         /**
          * Get ethernet info by id
+         * @author: nhan.tran 2024-03-07
          * @param {Int16Array} id
          * return {Object} existed ethernet info
          */
@@ -110,6 +113,7 @@ function EthernetTwo() {
 
   /**
    * Set value for ethernet info
+   * @author: nhan.tran 2024-03-07
    * @param {Object} NICInfo
    */
   useEffect(() => {
@@ -127,6 +131,7 @@ function EthernetTwo() {
 
   /**
    * Handle dropdown change
+   * @author: nhan.tran 2024-03-07
    * @param {Object} value
   */
   const handleNICDropdown = (value) => {
@@ -141,6 +146,7 @@ function EthernetTwo() {
 
   /**
    * Handle mode dropdown change
+   * @author: nhan.tran 2024-03-07
    * @param {Object} value
    */
   const handleModeDropdown = (value) => {
@@ -161,6 +167,7 @@ function EthernetTwo() {
 
   /**
    * Redirect to the previous page when the skip button is clicked
+   * @author: nhan.tran 2024-03-07
    * @param {boolean} isSkip
    */
   useEffect(() => {
@@ -169,6 +176,7 @@ function EthernetTwo() {
 
   /**
    * Submit form
+   * @author: nhan.tran 2024-03-07
    * @param {Object} data
    */
   const onSubmit = (data) => {
@@ -182,6 +190,7 @@ function EthernetTwo() {
 
     /**
      * Update ethernet
+     * @author: nhan.tran 2024-03-07
      * @param {Int16Array} id
      * @param {Object} data
      * return {Object} response
@@ -220,6 +229,7 @@ function EthernetTwo() {
 
   /**
    * Set value for allow_dns and switch button
+   * @author: nhan.tran 2024-03-07
    * @param {Object} modeInfo
    */
   useEffect(() => {
