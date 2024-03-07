@@ -5,8 +5,6 @@
  *********************************************************/
 import useAuth from "./useAuth";
 import { loginService } from "../services/loginService";
-import api from "../api/axios";
-import Constants from "../utils/Constants";
 
 /**
  * Refresh token

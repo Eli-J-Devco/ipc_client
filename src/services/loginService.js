@@ -88,13 +88,18 @@ export const loginService = {
     }
   },
   /**
-   * Handle expired token error
+   * Handle missing info from the server response
    * @author nhan.tran 2024-02-26
    * @param {error} error
    * @return Boolean
    */
-  handleExpiredToken(error) {
-    LibToast.toast(LoginErrors(error, "Please login again!"), "error");
+  handleMissingInfo(error) {
+    if (!error?.response?.status === 401 || !error?.config?.signal?.reason?.message) return false;
+
+    if (error?.config?.signal?.reason?.message)
+      LibToast.toast(LoginErrors("", error?.config?.signal?.reason?.message), "error");
+    else
+      LibToast.toast(LoginErrors(error, "Please login again!"), "error");
     clearToken();
     return true;
   },

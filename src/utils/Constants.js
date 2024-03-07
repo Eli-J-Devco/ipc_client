@@ -95,5 +95,25 @@ const Constants = {
   PAGE_SIZES: [10, 20, 50, 100],
   DEFAULT_PAGE_SIZE: 20,
   TOAST_AUTO_CLOSE: 1000,
+  TIME_UNIT: {
+    TYPE: {
+      short: "short",
+      full: "full",
+    },
+    SHORT: {
+      ms: "ms",
+      s: "s",
+      m: "m",
+      h: "h",
+      d: "d",
+    },
+    FULL: {
+      ms: "milliseconds",
+      s: "seconds",
+      m: "minutes",
+      h: "hours",
+      d: "days",
+    },
+  }
 };
 export default Constants;

@@ -97,16 +97,16 @@ export default class App extends Component {
     return (
       <div className="App">
         <Routes>
-          <Route path="/" element={<LoginAdmin />}>
-            {" "}
-          </Route>
-          <Route path="/forgot-password" element={<ForgotPassword />}>
-            {" "}
-          </Route>
-          <Route path="/reset-password" element={<ResetPassword />}>
-            {" "}
-          </Route>
           <Route element={<PersistLogin />}>
+            <Route path="/" element={<LoginAdmin />}>
+              {" "}
+            </Route>
+            <Route path="/forgot-password" element={<ForgotPassword />}>
+              {" "}
+            </Route>
+            <Route path="/reset-password" element={<ResetPassword />}>
+              {" "}
+            </Route>
             <Route element={<RequiredAuth />}>
               <Route path="/datalogger" element={<Datalogger />}>
                 <Route path="quickstart" element={<QuickStart />}>
