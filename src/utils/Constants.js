@@ -59,6 +59,9 @@ const Constants = {
       PROJECT_INFO: "/project/",
       LOGGING_RATE: "/project/logging_interval/",
       UPDATE_LOGGING_RATE: "/project/update_logging_rate/",
+    },
+    DEVICES: {
+        LIST: "/device_list/all/"
     }
   },
 

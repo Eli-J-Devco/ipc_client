@@ -553,3 +553,10 @@
   .input-error{
     border-color: red !important;
   }
+  .status_error{
+    background-color: rgb(213, 0, 0);
+    color: #FFF;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
