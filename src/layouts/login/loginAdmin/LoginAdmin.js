@@ -81,12 +81,6 @@ const LoginAdmin = () => {
     }
   }, [errMsg]);
 
-  // useEffect(() => {
-  //   const rft = window.sessionStorage.getItem("rft");
-  //   if (rft && persist) navigate(from, { replace: true });
-  //   else localStorage.removeItem("persist");
-  // }, [persist]);
-
   return (
     <div className={styles.main_login}>
       {process.env.SALT}

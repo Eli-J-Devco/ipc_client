@@ -32,12 +32,14 @@ const Header = () => {
           if (res) {
             LibToast.toast("You have been logged out", "info");
             navigate("/");
-            output.innerHTML = "";
           }
         } catch (error) {
           const msg = LogoutErrors(error);
           LibToast.toast(msg, "error");
           setLogout(false);
+        }
+        finally {
+          output.innerHTML = "";
         }
       };
       checkLogout();

@@ -87,6 +87,12 @@ export const loginService = {
       throw new Error(LogoutErrors(error));
     }
   },
+  /**
+   * Handle expired token error
+   * @author nhan.tran 2024-02-26
+   * @param {error} error
+   * @return Boolean
+   */
   handleExpiredToken(error) {
     LibToast.toast(LoginErrors(error, "Please login again!"), "error");
     clearToken();

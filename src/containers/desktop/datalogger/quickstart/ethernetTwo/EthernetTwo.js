@@ -41,6 +41,7 @@ function EthernetTwo() {
   const [ethernet, setEthernet] = useState(null);
   const [isAutoDNS, setIsAutoDNS] = useState(true);
   const [existedEthernet, setExistedEthernet] = useState(null);
+  const [isPlugged, setIsPlugged] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,6 +53,7 @@ function EthernetTwo() {
   useEffect(() => {
     /**
      * Fetch ethernet one data
+     * @author: nhan.tran 2024-03-07
      * @param {Int16Array} id 
      */
     const fetchEthernetTwo = async (id) => {
@@ -59,6 +61,7 @@ function EthernetTwo() {
         var output = document.getElementById("progress");
         /**
          * Get default ethernet config
+         * @author: nhan.tran 2024-03-07
          * return {Object}
          */
         const ifconfig = await axiosPrivate.post(
@@ -76,11 +79,17 @@ function EthernetTwo() {
 
         /**
          * Get ethernet info by id
+         * @author: nhan.tran 2024-03-07
          * @param {Int16Array} id
          * return {Object} existed ethernet info
          */
         var ethernet2 = await axiosPrivate.post(`${Constants.API_URL.ETHERNET.ETHERNET_INFO}${id}`);
-
+        ifconfig.data.network.forEach((item) => {
+          if (item.namekey === ethernet2.data.namekey && item.ip_address !== "") {
+            setIsPlugged(false);
+            // return;
+          }
+        });
         setValue("name", ethernet2.data.name);
         setValue("allow_dns", ethernet2.data.allow_dns);
 
@@ -110,6 +119,7 @@ function EthernetTwo() {
 
   /**
    * Set value for ethernet info
+   * @author: nhan.tran 2024-03-07
    * @param {Object} NICInfo
    */
   useEffect(() => {
@@ -127,6 +137,7 @@ function EthernetTwo() {
 
   /**
    * Handle dropdown change
+   * @author: nhan.tran 2024-03-07
    * @param {Object} value
   */
   const handleNICDropdown = (value) => {
@@ -141,6 +152,7 @@ function EthernetTwo() {
 
   /**
    * Handle mode dropdown change
+   * @author: nhan.tran 2024-03-07
    * @param {Object} value
    */
   const handleModeDropdown = (value) => {
@@ -161,6 +173,7 @@ function EthernetTwo() {
 
   /**
    * Redirect to the previous page when the skip button is clicked
+   * @author: nhan.tran 2024-03-07
    * @param {boolean} isSkip
    */
   useEffect(() => {
@@ -169,6 +182,7 @@ function EthernetTwo() {
 
   /**
    * Submit form
+   * @author: nhan.tran 2024-03-07
    * @param {Object} data
    */
   const onSubmit = (data) => {
@@ -182,6 +196,7 @@ function EthernetTwo() {
 
     /**
      * Update ethernet
+     * @author: nhan.tran 2024-03-07
      * @param {Int16Array} id
      * @param {Object} data
      * return {Object} response
@@ -220,6 +235,7 @@ function EthernetTwo() {
 
   /**
    * Set value for allow_dns and switch button
+   * @author: nhan.tran 2024-03-07
    * @param {Object} modeInfo
    */
   useEffect(() => {
@@ -234,13 +250,18 @@ function EthernetTwo() {
       <div className="note">
         <p> {t("site.info_note")} </p>
       </div>
-
       <div className={styles.form_body}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="container">
             <div className="row">
               <div className="col-md-3"></div>
               <div className="col-md-6">
+                {
+                  isPlugged &&
+                  <div className="note mb-3" style={{ color: "red" }}>
+                    <span style={{ color: "#000" }}><strong>Note:</strong> </span>{NICInfo?.name ? NICInfo?.name : existedEthernet?.name} is unplugged
+                  </div>
+                }
                 <div className="mb-3">
                   <div className="form_dropdown">
                     <ReactSelectDropdown

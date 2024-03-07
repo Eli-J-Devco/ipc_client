@@ -26,8 +26,10 @@ const PersistLogin = () => {
   useEffect(() => {
     let isMounted = true;
 
+    const output = document.getElementById("progress");
     const verifyRefreshToken = async () => {
       try {
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         await refresh();
       } catch (err) {
         const msg = LoginErrors(err, "Pleases login to continue.");
@@ -39,6 +41,7 @@ const PersistLogin = () => {
         });
       } finally {
         setIsLoading(false);
+        output.innerHTML = "";
       }
     };
 
@@ -48,7 +51,7 @@ const PersistLogin = () => {
     };
   }, []);
 
-  return isLoading ? <p>Loading</p> : <Outlet />;
+  return isLoading ? <p></p> : <Outlet />;
 };
 
 export default PersistLogin;
