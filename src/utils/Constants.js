@@ -60,6 +60,9 @@ const Constants = {
       LOGGING_RATE: "/project/logging_interval/",
       UPDATE_LOGGING_RATE: "/project/update_logging_rate/",
     },
+    DEVICES: {
+      LIST: "/device_list/all/"
+    },
     UPLOAD_CHANNEL: {
       ALL_CHANNELS: "/upload_channel/all_channel/",
       UPDATE_CHANNEL: "/upload_channel/update/",
