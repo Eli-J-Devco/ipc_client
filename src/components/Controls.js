@@ -71,6 +71,7 @@ export const RText = (props) => (
                 autoComplete="off"
                 onBlur={props.onBlur}
                 pattern={props.pattern == null || typeof props.pattern === 'undefined' ? '.*' : props.pattern}
+                title={props.title}
             />
 
             {(props.info !== "" && typeof props.info !== 'undefined') &&
