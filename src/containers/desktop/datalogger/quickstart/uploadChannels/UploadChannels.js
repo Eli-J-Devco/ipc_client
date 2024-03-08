@@ -33,6 +33,7 @@ function UploadChannels() {
     const [devices, setDevices] = useState([]);
     const [protocol, setProtocol] = useState([]);
     const [loggingInterval, setLoggingInterval] = useState([]);
+    const defaultLoggingInterval = useRef([]);
 
     const [isShow, setIsShow] = useState([]);
 
@@ -65,6 +66,7 @@ function UploadChannels() {
             setProtocol(channelConfig?.type_protocol?.map((protocol) => ({ value: protocol.id, label: protocol.Protocol })));
             setDevices(channelConfig?.device_list?.map((device) => ({ value: device.id, label: device.name })));
             setLoggingInterval(channelConfig?.type_logging_interval?.map((interval) => ({ value: interval.id, label: interval.time })));
+            defaultLoggingInterval.current = channelConfig?.type_logging_interval?.filter((interval) => interval.time === '5 minutes');
         }, 100);
         const getAllChannels = async () => {
             try {
@@ -108,7 +110,7 @@ function UploadChannels() {
                 output.innerHTML = "<div><img src='/loading.gif' /></div>";
                 const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.UPDATE_CHANNEL, channels);
                 if (response?.status === 200) {
-                    LibToast.toast(`Upload channels ${t('toastMessage.infp.updateSuccess')}`, 'success');
+                    LibToast.toast(`Upload channels ${t('toastMessage.infp.updateSuccess')}`, 'info');
                     navigate(to, { replace: true });
                 }
             } catch (error) {
@@ -125,6 +127,32 @@ function UploadChannels() {
             updateChannels();
         }, 200);
     };
+
+    const onProtocolChange = (event, index, name) => {
+        let temp = [...channels];
+        if (event.value === channelsRef.current[index]?.type_protocol?.id) {
+            temp[index] = channelsRef.current[index];
+            setValue(`upload_url_${temp[index]?.name}`, temp[index]?.uploadurl);
+            setValue(`password_${temp[index]?.name}`, temp[index]?.password);
+        }
+        else {
+            temp[index].id_type_protocol = event.value;
+            temp[index].type_protocol.id = event.value;
+            temp[index].type_protocol.Protocol = event.label;
+            temp[index].device_list = [];
+            temp[index].id_type_logging_interval = defaultLoggingInterval.current[0]?.id;
+            temp[index].type_logging_interval.id = defaultLoggingInterval.current[0]?.id;
+            temp[index].type_logging_interval.time = defaultLoggingInterval.current[0]?.time;
+            temp[index].uploadurl = '';
+            temp[index].password = '';
+            setValue(`upload_url_${name}`, '');
+            setValue(`password_${name}`, '');
+        }
+
+        setTimeout(() => {
+            setChannels(temp);
+        }, 100);
+    }
 
     return (
         <div className={styles.upload_channels}>
@@ -185,11 +213,7 @@ function UploadChannels() {
                                                                 name="protocol"
                                                                 value={channel?.type_protocol?.id ? { value: channel?.type_protocol?.id, label: channel?.type_protocol.Protocol } : { value: '', label: '' }}
                                                                 onChange={(event) => {
-                                                                    let temp = [...channels];
-                                                                    temp[index].id_type_protocol = event.value;
-                                                                    temp[index].type_protocol.id = event.value;
-                                                                    temp[index].type_protocol.Protocol = event.label;
-                                                                    setChannels(temp);
+                                                                    onProtocolChange(event, index, channel?.name);
                                                                 }}
                                                                 optionList={protocol}
                                                             />
