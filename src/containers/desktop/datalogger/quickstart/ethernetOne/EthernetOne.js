@@ -67,7 +67,7 @@ function EthernetOne() {
         const ifconfig = await axiosPrivate.post(
           `${Constants.API_URL.ETHERNET.IFCONFIG}`,
           {
-            onDownloadProgress: ({ loaded, total, progress }) => {
+            onDownloadProgress: () => {
               output.innerHTML = "<div><img src='/loading.gif' /></div>";
             },
           }

@@ -1,45 +1,98 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
+import _ from 'lodash';
 import styles from './UploadChannels.module.scss';
+
+import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
+
 import { RButton, RSwitch, RText, RRadio } from './../../../../../components/Controls';
 import ReactSelectDropdown from '../../../../../components/ReactSelectDropdown';
+import Constants from '../../../../../utils/Constants';
+import LibToast from '../../../../../utils/LibToast';
+import { loginService } from '../../../../../services/loginService';
+import { clearToken } from '../../../../../utils/Token';
 
 function UploadChannels() {
     const { t } = useTranslation();
-    const [channel1, setChannel1] = useState(0);
-    const [channel2, setChannel2] = useState(0);
-    const [channel3, setChannel3] = useState(0);
-    const [channel4, setChannel4] = useState(0);
+    const axiosPrivate = useAxiosPrivate();
+    const [channels, setChannels] = useState([]);
+    const channelsRef = useRef([]);
+    const [channelConfig, setChannelConfig] = useState({});
 
-    const UploadChannels = [
-        { value: 0, label: '1 minutes' },
-        { value: 1, label: '5 minutes' },
-        { value: 2, label: '15 minutes' },
-    ];
-    var selectedUploadChannels = [];
+    const [devices, setDevices] = useState([]);
+    const [protocol, setProtocol] = useState([]);
+    const [loggingInterval, setLoggingInterval] = useState([]);
 
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location?.state?.from || '/datalogger/quickstart/logging-rate';
+    const to = '/datalogger/quickstart/remote-access';
 
-    const devices = [
-        { value: 0, label: 'INV 1' },
-        { value: 1, label: 'INV 2' },
-        { value: 2, label: 'INV 3' },
-    ];
-    var selectedDevices = [];
+    const output = document.getElementById('progress');
+    useEffect(() => {
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
+        const getChannelConfig = async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.CONFIG_CHANNEL);
+                if (response?.status === 200) {
+                    setTimeout(() => {
+                        setChannelConfig(response?.data);
+                    }, 100);
+                }
+            } catch (error) {
+                console.log('error', error);
+            }
+            finally { };
+        };
+        getChannelConfig();
+    }, []);
 
+    useEffect(() => {
+        setTimeout(() => {
+            setProtocol(channelConfig?.type_protocol?.map((protocol) => ({ value: protocol.id, label: protocol.Protocol })));
+            setDevices(channelConfig?.device_list?.map((device) => ({ value: device.id, label: device.name })));
+            setLoggingInterval(channelConfig?.type_logging_interval?.map((interval) => ({ value: interval.id, label: interval.time })));
+        }, 100);
+        const getAllChannels = async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.ALL_CHANNELS);
+                if (response?.status === 200) {
+                    const all_channel = response?.data?.all_channel;
+                    setTimeout(() => {
+                        setChannels(all_channel);
+                    }, 100);
+                    channelsRef.current = _.cloneDeep(all_channel);
+                }
+            } catch (error) {
+                if (!loginService.handleMissingInfo(error)) {
+                    LibToast.toast(t('toastMessage.error.fetchError'), 'error');
+                }
+            }
+            finally {
+            }
+        }
 
+        getAllChannels();
+    }, [channelConfig]);
 
-    const protocol = [
-        { value: 0, label: 'NWM (specify URL)' }
-    ];
-    var selectedProtocol = [];
-
-    const handleDropdownChange = (event) => {
-
-    }
-
-    const handleInputChange = (event) => {
-
-    }
+    const handleSave = async () => {
+        if (_.isEqual(channels, channelsRef.current)) {
+            LibToast.toast(t('toastMessage.info.noChange'), 'info');
+            return;
+        }
+        navigate(to, { replace: true });
+        // try {
+        //     const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.UPDATE_CHANNEL, changedChannels);
+        //     console.log('response', response);
+        //     if (response?.status === 200) {
+        //         console.log('response', response);
+        //     }
+        // } catch (error) {
+        //     console.log('error', error);
+        // }
+        // finally { }
+    };
 
     return (
         <div className={styles.upload_channels}>
@@ -49,491 +102,176 @@ function UploadChannels() {
             </div>
 
             <div className={styles.form_body}>
-                <div className={styles.channels}>
-                    <div className={styles.title}>
-                        <span className={styles.title_name}> {t('site.channel1')}</span>
-                        <RRadio
-                            label={t('site.enable')}
-                            inputId="enable1"
-                            inputName="enable1"
-                            checked={channel1 === 1 ? 1 : 0}
-                            onChange={() => setChannel1(1)}
-                        />
+                {channels && protocol && loggingInterval && devices && channels.map((channel, index) => {
+                    output.innerHTML = '';
 
-                        <RRadio
-                            label={t('site.disabled')}
-                            inputId="disabled1"
-                            inputName="disabled1"
-                            checked={channel1 === 1 ? 0 : 1}
-                            onChange={() => setChannel1(0)}
-                        />
+                    return (
+                        <div key={index} className={styles.channels}>
+                            <div className={styles.title}>
+                                <span className={styles.title_name}> Upload {channel?.name}</span>
+                                <RRadio
+                                    label={t('site.enable')}
+                                    inputId={`enable${index + 1}`}
+                                    inputName={`enable${index + 1}`}
+                                    checked={channel?.enable ? 1 : 0}
+                                    onChange={() => {
+                                        let temp = [...channels];
+                                        temp[index].enable = true;
+                                        setChannels(temp);
+                                    }}
+                                />
 
-
-                    </div>
-                    {channel1 === 1 ?
-                        <div className={styles.channels_body}>
-                            <div className='container'>
-                                <div className='row'>
-                                    <div className='col-md-3'>
-
-                                    </div>
-
-                                    <div className='col-md-6'>
-                                        <div className='mb-3'>
-                                            <div className='form_dropdown'>
-                                                <ReactSelectDropdown
-                                                    label={t('site.protocol')}
-                                                    className="protocol"
-                                                    inputId="protocol"
-                                                    inputName="protocol"
-                                                    name="protocol"
-                                                    value={selectedProtocol}
-                                                    onChange={handleDropdownChange}
-                                                    optionList={protocol}
-
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <RText
-                                                label={t('site.upload_url')}
-                                                inputClass="form-control"
-                                                inputId="upload_url"
-                                                inputName="upload_url"
-                                                name="upload_url"
-                                                onChange={handleInputChange}
-                                            />
-                                        </div>
+                                <RRadio
+                                    label={t('site.disabled')}
+                                    inputId={`disabled${index + 1}`}
+                                    inputName={`disabled${index + 1}`}
+                                    checked={channel?.enable ? 0 : 1}
+                                    onChange={() => {
+                                        let temp = [...channels];
+                                        temp[index].enable = false;
+                                        setChannels(temp);
+                                    }}
+                                />
 
 
-                                        <div className='mb-3'>
-                                            <RText
-                                                label={t('site.password')}
-                                                inputClass="form-control"
-                                                inputId="password"
-                                                inputName="password"
-                                                name="password"
-                                                onChange={handleInputChange}
-                                            />
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <ReactSelectDropdown
-                                                label={t('site.select_device_only')}
-                                                className="select_device_only"
-                                                inputId="select_device_only"
-                                                inputName="select_device_only"
-                                                name="select_device_only"
-                                                value={selectedDevices}
-                                                onChange={handleDropdownChange}
-                                                optionList={devices}
-                                            />
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <div className='form_dropdown'>
-                                                <ReactSelectDropdown
-                                                    label={t('site.logging_interval')}
-                                                    className="logging_interval"
-                                                    inputId="logging_interval"
-                                                    inputName="logging_interval"
-                                                    name="logging_interval"
-                                                    value={selectedUploadChannels}
-                                                    onChange={handleDropdownChange}
-                                                    optionList={UploadChannels}
-
-                                                />
-                                            </div>
-                                        </div>
-
-
-                                        <div className='mb-3'>
-                                            <div className="checkmark">
-                                                <RSwitch
-                                                    label={t('site.remote_access_channel')}
-                                                    inputId="remote_access"
-                                                    inputName="remote_access"
-                                                    checked={1}
-                                                    onChange={handleInputChange}
-                                                />
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div className='col-md-3'></div>
-                                </div>
                             </div>
-                        </div>
-                        : null}
+                            {channel?.enable ?
+                                <div className={styles.channels_body}>
+                                    <div className='container'>
+                                        <div className='row'>
+                                            <div className='col-md-3'></div>
+                                            <div className='col-md-6'>
+                                                <div className='mb-3'>
+                                                    <div className='form_dropdown'>
+                                                        <ReactSelectDropdown
+                                                            key={`${index}_protocol`}
+                                                            label={t('site.protocol')}
+                                                            className="protocol"
+                                                            inputId="protocol"
+                                                            inputName="protocol"
+                                                            name="protocol"
+                                                            value={channel?.type_protocol?.id ? { value: channel?.type_protocol?.id, label: channel?.type_protocol.Protocol } : { value: '', label: '' }}
+                                                            onChange={(event) => {
+                                                                let temp = [...channels];
+                                                                temp[index].id_type_protocol = event.value;
+                                                                temp[index].type_protocol.id = event.value;
+                                                                temp[index].type_protocol.Protocol = event.label;
+                                                                setChannels(temp);
+                                                            }}
+                                                            optionList={protocol}
+                                                        />
+                                                    </div>
+                                                </div>
 
-                </div>
+                                                <div className='mb-3'>
+                                                    <RText
+                                                        label={t('site.upload_url')}
+                                                        inputClass="form-control"
+                                                        inputId="upload_url"
+                                                        inputName="upload_url"
+                                                        name="upload_url"
+                                                        value={channel?.uploadurl}
+                                                        onChange={(event) => {
+                                                            let temp = [...channels];
+                                                            temp[index].uploadurl = event.target.value;
+                                                            setChannels(temp);
+                                                        }}
+                                                    />
+                                                </div>
 
 
+                                                <div className='mb-3'>
+                                                    <RText
+                                                        label={t('site.password')}
+                                                        inputClass="form-control"
+                                                        inputId="password"
+                                                        inputName="password"
+                                                        name="password"
+                                                        value={channel?.password}
+                                                        onChange={(event) => {
+                                                            let temp = [...channels];
+                                                            temp[index].password = event.target.value;
+                                                            setChannels(temp);
+                                                        }}
+                                                    />
+                                                </div>
 
-                <div className={styles.channels}>
-                    <div className={styles.title}>
-                        <span className={styles.title_name}> {t('site.channel2')}</span>
-                        <RRadio
-                            label={t('site.enable')}
-                            inputId="enable2"
-                            inputName="enable2"
-                            checked={channel2 === 1 ? 1 : 0}
-                            onChange={() => setChannel2(1)}
-                        />
+                                                <div className='mb-3'>
+                                                    <ReactSelectDropdown
+                                                        key={`${index}_select_device_only`}
+                                                        label={t('site.select_device_only')}
+                                                        className="select_device_only"
+                                                        inputId="select_device_only"
+                                                        inputName="select_device_only"
+                                                        name="select_device_only"
+                                                        value={channel?.selected_upload ? channel?.selected_upload.map((device) => ({ value: device.id, label: device.name })) : []}
+                                                        onChange={(event) => {
+                                                            let temp = [...channels];
+                                                            if (!temp[index].selected_upload) {
+                                                                temp[index].selected_upload = [];
+                                                            }
+                                                            temp[index].selected_upload = event.map((device) => ({ id: device.value, name: device.label }));
+                                                            setChannels(temp);
+                                                        }}
+                                                        optionList={devices}
+                                                        isMulti={true}
+                                                        isSearchable={true}
+                                                        isClearable={true}
+                                                    />
+                                                </div>
 
-                        <RRadio
-                            label={t('site.disabled')}
-                            inputId="disabled2"
-                            inputName="disabled2"
-                            checked={channel2 === 1 ? 0 : 1}
-                            onChange={() => setChannel2(0)}
-                        />
+                                                <div className='mb-3'>
+                                                    <div className='form_dropdown'>
+                                                        <ReactSelectDropdown
+                                                            key={`${index}_logging_interval`}
+                                                            label={t('site.logging_interval')}
+                                                            className="logging_interval"
+                                                            inputId="logging_interval"
+                                                            inputName="logging_interval"
+                                                            name="logging_interval"
+                                                            value={channel?.type_logging_interval?.id ? { value: channel?.type_logging_interval?.id, label: channel?.type_logging_interval?.time } : { value: '', label: '' }}
+                                                            onChange={(event) => {
+                                                                let temp = [...channels];
+                                                                temp[index].id_type_logging_interval = event.value;
+                                                                temp[index].type_logging_interval.id = event.value;
+                                                                temp[index].type_logging_interval.time = event.label;
+                                                                setChannels(temp);
+                                                            }}
+                                                            optionList={loggingInterval}
 
+                                                        />
+                                                    </div>
+                                                </div>
 
-                    </div>
-                    {channel2 === 1 ?
-                        <div className={styles.channels_body}>
-                            <div className='container'>
-                                <div className='row'>
-                                    <div className='col-md-3'>
+                                                {channel?.name.search(/^[^\d]*1[^\d]*$/g) !== -1 &&
+                                                    <div className='mb-3'>
+                                                        <div className="checkmark">
+                                                            <RSwitch
+                                                                label={t('site.remote_access_channel')}
+                                                                inputId="remote_access"
+                                                                inputName="remote_access"
+                                                                checked={channel?.allow_remote_configuration ? 1 : 0}
+                                                                onChange={() => {
+                                                                    let temp = [...channels];
+                                                                    setChannels(temp); temp[index].allow_remote_configuration = !channel?.allow_remote_configuration
+                                                                        ;
 
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                            </div>
+                                            <div className='col-md-3'></div>
+                                        </div>
                                     </div>
-
-                                    <div className='col-md-6'>
-                                        <div className='mb-3'>
-                                            <div className='form_dropdown'>
-                                                <ReactSelectDropdown
-                                                    label={t('site.protocol')}
-                                                    className="protocol2"
-                                                    inputId="protocol2"
-                                                    inputName="protocol2"
-                                                    name="protocol2"
-                                                    value={selectedProtocol}
-                                                    onChange={handleDropdownChange}
-                                                    optionList={protocol}
-
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <RText
-                                                label={t('site.upload_url')}
-                                                inputClass="form-control"
-                                                inputId="upload_url"
-                                                inputName="upload_url"
-                                                name="upload_url"
-                                                onChange={handleInputChange}
-                                            />
-                                        </div>
-
-
-                                        <div className='mb-3'>
-                                            <RText
-                                                label={t('site.password')}
-                                                inputClass="form-control"
-                                                inputId="password"
-                                                inputName="password"
-                                                name="password"
-                                                onChange={handleInputChange}
-                                            />
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <ReactSelectDropdown
-                                                label={t('site.select_device_only')}
-                                                className="select_device_only"
-                                                inputId="select_device_only"
-                                                inputName="select_device_only"
-                                                name="select_device_only"
-                                                value={selectedDevices}
-                                                onChange={handleDropdownChange}
-                                                optionList={devices}
-                                            />
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <div className='form_dropdown'>
-                                                <ReactSelectDropdown
-                                                    label={t('site.logging_interval')}
-                                                    className="logging_interval"
-                                                    inputId="logging_interval"
-                                                    inputName="logging_interval"
-                                                    name="logging_interval"
-                                                    value={selectedUploadChannels}
-                                                    onChange={handleDropdownChange}
-                                                    optionList={UploadChannels}
-
-                                                />
-                                            </div>
-                                        </div>
-
-
-                                        <div className='mb-3'>
-                                            <div className="checkmark">
-                                                <RSwitch
-                                                    label={t('site.remote_access_channel')}
-                                                    inputId="remote_access"
-                                                    inputName="remote_access"
-                                                    checked={1}
-                                                    onChange={handleInputChange}
-                                                />
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div className='col-md-3'></div>
                                 </div>
-                            </div>
+                                : null}
+
                         </div>
-                        : null}
-
-                </div>
-
-
-
-                <div className={styles.channels}>
-                    <div className={styles.title}>
-                        <span className={styles.title_name}> {t('site.channel3')}</span>
-                        <RRadio
-                            label={t('site.enable')}
-                            inputId="enable3"
-                            inputName="enable3"
-                            checked={channel3 === 1 ? 1 : 0}
-                            onChange={() => setChannel3(1)}
-                        />
-
-                        <RRadio
-                            label={t('site.disabled')}
-                            inputId="disabled3"
-                            inputName="disabled3"
-                            checked={channel3 === 1 ? 0 : 1}
-                            onChange={() => setChannel3(0)}
-                        />
-
-
-                    </div>
-                    {channel3 === 3 ?
-                        <div className={styles.channels_body}>
-                            <div className='container'>
-                                <div className='row'>
-                                    <div className='col-md-3'>
-
-                                    </div>
-
-                                    <div className='col-md-6'>
-                                        <div className='mb-3'>
-                                            <div className='form_dropdown'>
-                                                <ReactSelectDropdown
-                                                    label={t('site.protocol')}
-                                                    className="protocol"
-                                                    inputId="protocol"
-                                                    inputName="protocol"
-                                                    name="protocol"
-                                                    value={selectedProtocol}
-                                                    onChange={handleDropdownChange}
-                                                    optionList={protocol}
-
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <RText
-                                                label={t('site.upload_url')}
-                                                inputClass="form-control"
-                                                inputId="upload_url"
-                                                inputName="upload_url"
-                                                name="upload_url"
-                                                onChange={handleInputChange}
-                                            />
-                                        </div>
-
-
-                                        <div className='mb-3'>
-                                            <RText
-                                                label={t('site.password')}
-                                                inputClass="form-control"
-                                                inputId="password"
-                                                inputName="password"
-                                                name="password"
-                                                onChange={handleInputChange}
-                                            />
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <ReactSelectDropdown
-                                                label={t('site.select_device_only')}
-                                                className="select_device_only"
-                                                inputId="select_device_only"
-                                                inputName="select_device_only"
-                                                name="select_device_only"
-                                                value={selectedDevices}
-                                                onChange={handleDropdownChange}
-                                                optionList={devices}
-                                            />
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <div className='form_dropdown'>
-                                                <ReactSelectDropdown
-                                                    label={t('site.logging_interval')}
-                                                    className="logging_interval"
-                                                    inputId="logging_interval"
-                                                    inputName="logging_interval"
-                                                    name="logging_interval"
-                                                    value={selectedUploadChannels}
-                                                    onChange={handleDropdownChange}
-                                                    optionList={UploadChannels}
-
-                                                />
-                                            </div>
-                                        </div>
-
-
-                                        <div className='mb-3'>
-                                            <div className="checkmark">
-                                                <RSwitch
-                                                    label={t('site.remote_access_channel')}
-                                                    inputId="remote_access"
-                                                    inputName="remote_access"
-                                                    checked={1}
-                                                    onChange={handleInputChange}
-                                                />
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div className='col-md-3'></div>
-                                </div>
-                            </div>
-                        </div>
-                        : null}
-
-                </div>
-
-
-
-                <div className={styles.channels}>
-                    <div className={styles.title}>
-                        <span className={styles.title_name}> {t('site.channel1')}</span>
-                        <RRadio
-                            label={t('site.enable')}
-                            inputId="enable4"
-                            inputName="enable4"
-                            checked={channel4 === 1 ? 1 : 0}
-                            onChange={() => setChannel4(1)}
-                        />
-
-                        <RRadio
-                            label={t('site.disabled')}
-                            inputId="disabled4"
-                            inputName="disabled4"
-                            checked={channel4 === 1 ? 0 : 1}
-                            onChange={() => setChannel4(0)}
-                        />
-
-
-                    </div>
-                    {channel4 === 1 ?
-                        <div className={styles.channels_body}>
-                            <div className='container'>
-                                <div className='row'>
-                                    <div className='col-md-3'>
-
-                                    </div>
-
-                                    <div className='col-md-6'>
-                                        <div className='mb-3'>
-                                            <div className='form_dropdown'>
-                                                <ReactSelectDropdown
-                                                    label={t('site.protocol')}
-                                                    className="protocol"
-                                                    inputId="protocol"
-                                                    inputName="protocol"
-                                                    name="protocol"
-                                                    value={selectedProtocol}
-                                                    onChange={handleDropdownChange}
-                                                    optionList={protocol}
-
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <RText
-                                                label={t('site.upload_url')}
-                                                inputClass="form-control"
-                                                inputId="upload_url"
-                                                inputName="upload_url"
-                                                name="upload_url"
-                                                onChange={handleInputChange}
-                                            />
-                                        </div>
-
-
-                                        <div className='mb-3'>
-                                            <RText
-                                                label={t('site.password')}
-                                                inputClass="form-control"
-                                                inputId="password"
-                                                inputName="password"
-                                                name="password"
-                                                onChange={handleInputChange}
-                                            />
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <ReactSelectDropdown
-                                                label={t('site.select_device_only')}
-                                                className="select_device_only"
-                                                inputId="select_device_only"
-                                                inputName="select_device_only"
-                                                name="select_device_only"
-                                                value={selectedDevices}
-                                                onChange={handleDropdownChange}
-                                                optionList={devices}
-                                            />
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <div className='form_dropdown'>
-                                                <ReactSelectDropdown
-                                                    label={t('site.logging_interval')}
-                                                    className="logging_interval"
-                                                    inputId="logging_interval"
-                                                    inputName="logging_interval"
-                                                    name="logging_interval"
-                                                    value={selectedUploadChannels}
-                                                    onChange={handleDropdownChange}
-                                                    optionList={UploadChannels}
-
-                                                />
-                                            </div>
-                                        </div>
-
-
-                                        <div className='mb-3'>
-                                            <div className="checkmark">
-                                                <RSwitch
-                                                    label={t('site.remote_access_channel')}
-                                                    inputId="remote_access"
-                                                    inputName="remote_access"
-                                                    checked={1}
-                                                    onChange={handleInputChange}
-                                                />
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div className='col-md-3'></div>
-                                </div>
-                            </div>
-                        </div>
-                        : null}
-
-                </div>
+                    );
+                })}
 
 
 
@@ -548,6 +286,9 @@ function UploadChannels() {
                                         text="Back"
                                         iClass={true}
                                         iClassType="back"
+                                        onClick={() => {
+                                            navigate(from, { replace: true });
+                                        }}
                                     />
 
                                     <RButton
@@ -555,11 +296,15 @@ function UploadChannels() {
                                         text="Save & Next"
                                         iClass={true}
                                         iClassType="save"
+                                        onClick={handleSave}
                                     />
 
                                     <RButton
                                         className="btn_skip margin-left15"
                                         text="Skip"
+                                        onClick={() => {
+                                            navigate(to, { replace: true });
+                                        }}
                                     />
 
                                 </div>

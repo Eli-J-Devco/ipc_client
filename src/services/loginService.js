@@ -26,7 +26,7 @@ export const loginService = {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-      onUploadProgress: ({ loaded, total, progress }) => {
+      onUploadProgress: () => {
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
       },
     });
@@ -39,8 +39,8 @@ export const loginService = {
 
       const claim = jwtDecode(access_token);
 
-      window.sessionStorage.setItem("claim", JSON.stringify(claim));
-      window.sessionStorage.setItem("rft", refresh_token);
+      window.localStorage.setItem("claim", JSON.stringify(claim));
+      window.localStorage.setItem("rft", refresh_token);
 
       return {
         userName: `${response.data.first_name} ${response.data.last_name}`,

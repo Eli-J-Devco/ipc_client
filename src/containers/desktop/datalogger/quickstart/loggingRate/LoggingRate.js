@@ -40,7 +40,7 @@ function LoggingRate() {
             try {
                 var output = document.getElementById("progress");
                 const response = await axiosPrivate.post(Constants.API_URL.PROJECT.PROJECT_INFO, {
-                    onDownloadProgress: ({ loaded, total, progress }) => {
+                    onDownloadProgress: () => {
                         output.innerHTML = "<div><img src='/loading.gif' /></div>";
                     },
                 });
@@ -82,7 +82,7 @@ function LoggingRate() {
             try {
                 var output = document.getElementById("progress");
                 const response = await axiosPrivate.post(Constants.API_URL.PROJECT.UPDATE_LOGGING_RATE, data, {
-                    onDownloadProgress: ({ loaded, total, progress }) => {
+                    onDownloadProgress: () => {
                         output.innerHTML = "<div><img src='/loading.gif' /></div>";
                     },
                 });

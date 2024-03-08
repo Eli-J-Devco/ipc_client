@@ -13,7 +13,7 @@ import Libs from "../../../utils/Libs";
 import Constants from "../../../utils/Constants";
 import LibToast from "../../../utils/LibToast";
 import { LoginErrors } from "../../../utils/Errors";
-import { clearToken, setToken } from "../../../utils/Token";
+import { clearToken, getToken, setToken } from "../../../utils/Token";
 
 import useAuth from "../../../hooks/useAuth";
 import { loginService } from "../../../services/loginService";
@@ -92,7 +92,7 @@ const LoginAdmin = () => {
    */
   useEffect(() => {
     const persist = localStorage.getItem("persist");
-    const project_id = sessionStorage.getItem("project_id");
+    const project_id = getToken("project_id");
     if (auth?.isAuthenticated && persist && project_id) {
       navigate(from, { replace: true });
     }

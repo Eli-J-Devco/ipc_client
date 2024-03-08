@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { useLocation, Navigate, Outlet } from "react-router-dom";
 
 import useAuth from "../../../hooks/useAuth";
-import { clearToken } from "../../../utils/Token";
+import { clearToken, getToken } from "../../../utils/Token";
 
 /**
  * Verify authenticated user
@@ -19,7 +19,7 @@ const RequiredAuth = () => {
   const { auth } = useAuth();
   const location = useLocation();
   const persist = JSON.parse(localStorage.getItem("persist"));
-  const project_id = window.sessionStorage.getItem("project_id");
+  const project_id = getToken("project_id");
 
   /**
    * Check if user is authenticated and project is existed and persist is existed

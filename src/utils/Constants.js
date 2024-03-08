@@ -59,7 +59,12 @@ const Constants = {
       PROJECT_INFO: "/project/",
       LOGGING_RATE: "/project/logging_interval/",
       UPDATE_LOGGING_RATE: "/project/update_logging_rate/",
-    }
+    },
+    UPLOAD_CHANNEL: {
+      ALL_CHANNELS: "/upload_channel/all_channel/",
+      UPDATE_CHANNEL: "/upload_channel/update/",
+      CONFIG_CHANNEL: "/upload_channel/config/",
+    },
   },
 
   SCREEN_MODE: {

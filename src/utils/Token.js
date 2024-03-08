@@ -10,7 +10,7 @@
  * @param {data} token
  */
 export const setToken = (key, data) => {
-  window.sessionStorage.setItem(key, JSON.stringify(data));
+  window.localStorage.setItem(key, JSON.stringify(data));
 };
 
 /**
@@ -20,7 +20,7 @@ export const setToken = (key, data) => {
  */
 export const getToken = (key) => {
   if (typeof window !== "undefined") {
-    let token = window.sessionStorage.getItem(key);
+    let token = window.localStorage.getItem(key);
 
     if (token) {
       token = JSON.parse(token);
@@ -39,7 +39,7 @@ export const getToken = (key) => {
  */
 export const getRefresh = () => {
   if (typeof window !== "undefined") {
-    let token = window.sessionStorage.getItem("refresh");
+    let token = window.localStorage.getItem("refresh");
     if (token) {
       token = JSON.parse(token);
     }
@@ -55,5 +55,5 @@ export const getRefresh = () => {
  */
 export const clearToken = () => {
   window.localStorage.clear();
-  window.sessionStorage.clear();
+  window.localStorage.clear();
 };

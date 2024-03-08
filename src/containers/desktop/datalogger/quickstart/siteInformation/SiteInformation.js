@@ -38,8 +38,7 @@ function SiteInformation() {
   });
 
   useEffect(() => {
-    let isMounted = true;
-    const abortController = new AbortController();
+
     /**
      * Fetch site information
      * @author: nhan.tran 2024-03-01
@@ -51,13 +50,12 @@ function SiteInformation() {
         const response = await axiosPrivate.post(
           `${Constants.API_URL.SITE.SITE_INFO}${id}`,
           {
-            signal: abortController.signal,
-            onDownloadProgress: ({ loaded, total, progress }) => {
+            onDownloadProgress: () => {
               output.innerHTML = "<div><img src='/loading.gif' /></div>";
             },
           }
         );
-        isMounted && setSiteInformation({ ...response.data });
+        setSiteInformation({ ...response.data });
       } catch (error) {
         if (!loginService.handleMissingInfo(error))
           LibToast.toast(t("toastMessage.error.fetchError"), "error");
@@ -69,10 +67,6 @@ function SiteInformation() {
     const project_id = getToken("project_id");
     fetchSiteInformation(project_id);
 
-    return () => {
-      isMounted = false;
-      abortController.abort();
-    };
   }, []);
 
   /** 
@@ -117,7 +111,7 @@ function SiteInformation() {
             headers: {
               "Content-Type": "application/json",
             },
-            onUploadProgress: ({ loaded, total, progress }) => {
+            onUploadProgress: () => {
               output.innerHTML = "<div><img src='/loading.gif' /></div>";
             },
           }

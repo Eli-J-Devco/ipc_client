@@ -16,13 +16,13 @@ const useRefreshToken = () => {
 
   const refresh = async () => {
     const params = {
-      refresh_token: window.sessionStorage.getItem("rft"),
+      refresh_token: window.localStorage.getItem("rft"),
     };
 
     const response = await loginService.refreshToken(params);
-    const userName = JSON.parse(window.sessionStorage.getItem("userName"));
+    const userName = JSON.parse(window.localStorage.getItem("userName"));
     const permissions = JSON.parse(
-      window.sessionStorage.getItem("permissions")
+      window.localStorage.getItem("permissions")
     );
     setAuth({
       userName: userName,

@@ -13,6 +13,7 @@ import useAuth from "../../../hooks/useAuth";
 import LibToast from "../../../utils/LibToast";
 import { LoginErrors } from "../../../utils/Errors";
 import { clearToken } from "../../../utils/Token";
+import { loginService } from "../../../services/loginService";
 
 /**
  * Verify existing user token and keep user logged in
@@ -21,36 +22,32 @@ import { clearToken } from "../../../utils/Token";
  */
 const PersistLogin = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { auth, setAuth } = useAuth();
+  const { setAuth } = useAuth();
   const refresh = useRefreshToken();
   const persist = window.localStorage.getItem("persist");
 
   useEffect(() => {
-    let isMounted = true;
-
     const output = document.getElementById("progress");
     const verifyRefreshToken = async () => {
       try {
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
         await refresh();
       } catch (err) {
-        const msg = LoginErrors(err, "Pleases login to continue.");
-        LibToast.toast(msg, "info");
-        clearToken();
-        setAuth({
-          accessToken: null,
-          isAuthenticated: false,
-        });
+        if (!loginService.handleMissingInfo(err)) {
+          LibToast.toast(LoginErrors(err), "error");
+          // setAuth({
+          //   accessToken: null,
+          //   isAuthenticated: false,
+          // });
+          // clearToken();
+        }
       } finally {
         setIsLoading(false);
         output.innerHTML = "";
       }
     };
 
-    !auth?.isAuthenticated && persist ? verifyRefreshToken() : setIsLoading(false);
-    return () => {
-      isMounted = false;
-    };
+    persist ? verifyRefreshToken() : setIsLoading(false);
   }, []);
 
   return isLoading ? <p></p> : <Outlet />;
