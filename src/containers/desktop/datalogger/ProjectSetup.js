@@ -54,7 +54,7 @@ const ProjectSetupInformation = () => {
      * @author nhan.tran 2024-03-11
      */
     useEffect(() => {
-        if (projectSetup?.first_page_on_login && auth?.hasJustLoggedIn) {
+        if (projectSetup?.id && auth?.hasJustLoggedIn) {
             setAuth({ ...auth, hasJustLoggedIn: false });
             navigate(projectSetup?.first_page_on_login?.path, { replace: true, state: { from: from } });
         }
