@@ -62,7 +62,7 @@ export default function Devices() {
     { id: 2, slug: "tcp_gateway_ip", name: "Port", width: 300 },
     { id: 3, slug: "status", name: "Status", width: 100 },
     { id: 4, slug: "name", name: "Name and Purpose", width: 400 },
-    { id: 5, slug: "type", name: "Type", width: 300 },
+    { id: 5, slug: "device_type_name", name: "Type", width: 300 },
     { id: 6, slug: "points", name: "Points", width: 100 },
     { id: 7, slug: "actions", name: <div className="text-center">Actions</div>, width: 150 }
   ]
