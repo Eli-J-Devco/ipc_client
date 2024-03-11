@@ -30,10 +30,10 @@ function QuickStart() {
                                 path: "/datalogger/quickstart/ethernet-2",
                                 name: "Ethernet-2"
                             },
-                            {
-                                path: "/datalogger/quickstart/firmware",
-                                name: "Firmware"
-                            },
+                            // {
+                            //     path: "/datalogger/quickstart/firmware",
+                            //     name: "Firmware"
+                            // },
                             {
                                 path: "/datalogger/quickstart/rs485-1",
                                 name: "RS485-1"
@@ -50,10 +50,10 @@ function QuickStart() {
                                 path: "/datalogger/quickstart/upload-channels",
                                 name: "Upload Channels"
                             },
-                            {
-                                path: "/datalogger/quickstart/remote-access",
-                                name: "Remote Access"
-                            },
+                            // {
+                            //     path: "/datalogger/quickstart/remote-access",
+                            //     name: "Remote Access"
+                            // },
                             {
                                 path: "/datalogger/quickstart/done",
                                 name: "Done"

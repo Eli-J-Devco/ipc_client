@@ -112,7 +112,7 @@ function UploadChannels() {
                 output.innerHTML = "<div><img src='/loading.gif' /></div>";
                 const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.UPDATE_CHANNEL, channels);
                 if (response?.status === 200) {
-                    LibToast.toast(`Upload channels ${t('toastMessage.infp.updateSuccess')}`, 'info');
+                    LibToast.toast(`Upload channels ${t('toastMessage.info.updateSuccess')}`, 'info');
                     navigate(to, { replace: true });
                 }
             } catch (error) {
