@@ -17,9 +17,11 @@ import { loginService } from "../../../../../services/loginService";
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 import { getToken } from "../../../../../utils/Token";
+import useProjectSetup from "../../../../../hooks/useProjectSetup";
 
 function SiteInformation() {
   const { t } = useTranslation();
+  const { projectSetup, setProjectSetup } = useProjectSetup();
   const [siteInformation, setSiteInformation] = useState({});
 
   const axiosPrivate = useAxiosPrivate();
@@ -37,6 +39,8 @@ function SiteInformation() {
     mode: "onChange",
   });
 
+  const output = document.getElementById("progress");
+
   useEffect(() => {
 
     /**
@@ -44,30 +48,21 @@ function SiteInformation() {
      * @author: nhan.tran 2024-03-01
      * @param {int} id site id - will be remove in future
      */
-    const fetchSiteInformation = async (id) => {
-      try {
-        var output = document.getElementById("progress");
-        const response = await axiosPrivate.post(
-          `${Constants.API_URL.SITE.SITE_INFO}${id}`,
-          {
-            onDownloadProgress: () => {
-              output.innerHTML = "<div><img src='/loading.gif' /></div>";
-            },
-          }
-        );
-        setSiteInformation({ ...response.data });
-      } catch (error) {
-        if (!loginService.handleMissingInfo(error))
-          LibToast.toast(t("toastMessage.error.fetchError"), "error");
-        else navigate("/", { replace: true });
-      } finally {
-        output.innerHTML = "";
-      }
-    };
-    const project_id = getToken("project_id");
-    fetchSiteInformation(project_id);
+    if (_.isEmpty(projectSetup)) return;
 
-  }, []);
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+
+    setTimeout(() => {
+      setSiteInformation({
+        id: projectSetup.id,
+        name: projectSetup.name,
+        location: projectSetup.location,
+        description: projectSetup.description,
+        administrative_contact: projectSetup.administrative_contact,
+        serial_number: projectSetup.serial_number,
+      });
+    }, 300);
+  }, [projectSetup, output]);
 
   /** 
    * Set value for form when site information is fetched
@@ -75,12 +70,15 @@ function SiteInformation() {
    * @param {Object} siteInformation
    */
   useEffect(() => {
+    if (_.isEmpty(siteInformation)) return;
+
     setValue("name", siteInformation.name);
     setValue("location", siteInformation.location);
     setValue("description", siteInformation.description);
     setValue("administrative_contact", siteInformation.administrative_contact);
     setValue("serial_number", siteInformation.serial_number);
-  }, [siteInformation]);
+    output.innerHTML = "";
+  }, [siteInformation, output, setValue]);
 
   /**
    * Handles the save operation for the site information.
@@ -119,6 +117,14 @@ function SiteInformation() {
         if (response.status === 200) {
           output.innerHTML = "";
           LibToast.toast("Site information " + t("toastMessage.info.updateSuccess"), "info");
+          setProjectSetup({
+            ...projectSetup,
+            name: data.name,
+            location: data.location,
+            description: data.description,
+            administrative_contact: data.administrative_contact,
+            serial_number: data.serial_number,
+          });
           isChange.current = false;
           navigate(to, { replace: true });
         }

@@ -94,7 +94,11 @@ export const loginService = {
    * @return Boolean
    */
   handleMissingInfo(error) {
-    if (!error?.response?.status === 401 || !error?.config?.signal?.reason?.message) return false;
+    if (!error?.response?.status === 401 && !error?.response?.status === 409 && !error?.config?.signal?.reason?.message) return false;
+
+    if (error?.response?.status === 409) {
+      return "Duplicate network interface card";
+    }
 
     if (error?.config?.signal?.reason?.message)
       LibToast.toast(LoginErrors("", error?.config?.signal?.reason?.message), "error");

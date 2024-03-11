@@ -40,7 +40,7 @@ function UploadChannels() {
     const navigate = useNavigate();
     const location = useLocation();
     const from = location?.state?.from || '/datalogger/quickstart/logging-rate';
-    const to = '/datalogger/quickstart/remote-access';
+    const to = '/datalogger/quickstart/done';
 
     const output = document.getElementById('progress');
     useEffect(() => {
