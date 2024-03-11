@@ -25,6 +25,7 @@ import PointList from "./containers/desktop/datalogger/templates/template/pointL
 import RegisterBlocks from "./containers/desktop/datalogger/templates/template/registerBlocks/RegisterBlocks";
 import Advanced from "./containers/desktop/datalogger/templates/template/advanced/Advanced";
 
+import ProjectSetupInformation from "./containers/desktop/datalogger/ProjectSetup";
 import QuickStart from "./containers/desktop/datalogger/quickstart/QuickStart";
 import SiteInformation from "./containers/desktop/datalogger/quickstart/siteInformation/SiteInformation";
 import EnthernetOne from "./containers/desktop/datalogger/quickstart/ethernetOne/EthernetOne";
@@ -108,88 +109,90 @@ export default class App extends Component {
               {" "}
             </Route>
             <Route element={<RequiredAuth />}>
-              <Route path="/datalogger" element={<Datalogger />}>
-                <Route path="quickstart" element={<QuickStart />}>
-                  <Route index element={<SiteInformation />} />
-                  <Route path="ethernet-1" element={<EnthernetOne />} />
-                  <Route path="ethernet-2" element={<EnthernetTwo />} />
-                  <Route path="firmware" element={<Firmware />} />
-                  <Route path="rs485-1" element={<RS485One />} />
-                  <Route path="rs485-2" element={<RS485Two />} />
-                  <Route path="logging-rate" element={<LoggingRate />} />
-                  <Route path="upload-channels" element={<UploadChannels />} />
-                  <Route path="remote-access" element={<RemoteAccess />} />
-                  <Route path="done" element={<Done />} />
-                </Route>
-                <Route path="overview" element={<Overview />} />
-                <Route path="rs485" element={<RS485 />}>
-                  <Route index element={<RS485OneRS />} />
-                  <Route path="2" element={<RS485TwoRS />} />
-                  <Route path="options" element={<RS485Options />} />
-                </Route>
-
-                <Route path="modHoppers" element={<ModHoppers />}>
-                  <Route index element={<ModHoppersOne />} />
-                  <Route path="2" element={<ModHoppersTwo />} />
-                  <Route path="group-options" element={<GroupOptions />} />
-                </Route>
-
-                <Route path="devices" element={<Devices />} />
-                <Route path="" element={<UploadChannel />} />
-
-                <Route path="upload" element={<UploadChannel />}>
-                  <Route index element={<Channel />} />
-                  <Route path="channel" element={<Channel />} />
-                  <Route path="schedule" element={<Schedule />} />
-                </Route>
-
-                <Route path="networking" element={<Networking />}>
-                  <Route index element={<NetworkEnthernetOne />} />
-                  <Route path="ethernet-1" element={<NetworkEnthernetOne />} />
-                  <Route path="ethernet-2" element={<NetworkEnthernetTwo />} />
-                  <Route path="network-access" element={<NetworkAccess />} />
-                  <Route path="remote-acesss" element={<NWRemoteAccess />} />
-                  <Route path="static-routes" element={<StaticRoutes />} />
-                </Route>
-
-                <Route path="devices" element={<Devices />}>
-                  <Route path=":id" element={<ConfigDevice />} />
-                </Route>
-
-                <Route path="templates" element={<Templates />}>
-                  <Route index element={<TemplatesManagement />} />
-                  <Route path=":name" element={<Template />}>
-                    <Route path="points" element={<PointList />} />
-                    <Route path="registers" element={<RegisterBlocks />} />
-                    <Route path="advanced" element={<Advanced />} />
+              <Route element={<ProjectSetupInformation />}>
+                <Route path="/datalogger" element={<Datalogger />}>
+                  <Route path="quickstart" element={<QuickStart />}>
+                    <Route index element={<SiteInformation />} />
+                    <Route path="ethernet-1" element={<EnthernetOne />} />
+                    <Route path="ethernet-2" element={<EnthernetTwo />} />
+                    <Route path="firmware" element={<Firmware />} />
+                    <Route path="rs485-1" element={<RS485One />} />
+                    <Route path="rs485-2" element={<RS485Two />} />
+                    <Route path="logging-rate" element={<LoggingRate />} />
+                    <Route path="upload-channels" element={<UploadChannels />} />
+                    <Route path="remote-access" element={<RemoteAccess />} />
+                    <Route path="done" element={<Done />} />
                   </Route>
+                  <Route path="overview" element={<Overview />} />
+                  <Route path="rs485" element={<RS485 />}>
+                    <Route index element={<RS485OneRS />} />
+                    <Route path="2" element={<RS485TwoRS />} />
+                    <Route path="options" element={<RS485Options />} />
+                  </Route>
+
+                  <Route path="modHoppers" element={<ModHoppers />}>
+                    <Route index element={<ModHoppersOne />} />
+                    <Route path="2" element={<ModHoppersTwo />} />
+                    <Route path="group-options" element={<GroupOptions />} />
+                  </Route>
+
+                  <Route path="devices" element={<Devices />} />
+                  <Route path="" element={<UploadChannel />} />
+
+                  <Route path="upload" element={<UploadChannel />}>
+                    <Route index element={<Channel />} />
+                    <Route path="channel" element={<Channel />} />
+                    <Route path="schedule" element={<Schedule />} />
+                  </Route>
+
+                  <Route path="networking" element={<Networking />}>
+                    <Route index element={<NetworkEnthernetOne />} />
+                    <Route path="ethernet-1" element={<NetworkEnthernetOne />} />
+                    <Route path="ethernet-2" element={<NetworkEnthernetTwo />} />
+                    <Route path="network-access" element={<NetworkAccess />} />
+                    <Route path="remote-acesss" element={<NWRemoteAccess />} />
+                    <Route path="static-routes" element={<StaticRoutes />} />
+                  </Route>
+
+                  <Route path="devices" element={<Devices />}>
+                    <Route path=":id" element={<ConfigDevice />} />
+                  </Route>
+
+                  <Route path="templates" element={<Templates />}>
+                    <Route index element={<TemplatesManagement />} />
+                    <Route path=":name" element={<Template />}>
+                      <Route path="points" element={<PointList />} />
+                      <Route path="registers" element={<RegisterBlocks />} />
+                      <Route path="advanced" element={<Advanced />} />
+                    </Route>
+                  </Route>
+
+                  <Route path="data" element={<Data />}>
+                    <Route index element={<DataLogs />} />
+                    <Route path="logging-rate" element={<DataLoggingRate />} />
+                    <Route path="sync-history" element={<SyncHistory />} />
+                  </Route>
+
+                  <Route path="alarms" element={<Alarms />} />
+
+                  <Route path="system" element={<System />}>
+                    <Route index element={<SystemSiteInformation />} />
+                    <Route path="datetime" element={<DateTime />} />
+                    <Route path="backup-restore" element={<BackupRestore />} />
+                    <Route path="firmware" element={<SystemFirmware />} />
+                    <Route path="auto-update" element={<AutoUpdate />} />
+                    <Route path="reboot-shutdown" element={<RebootShutdown />} />
+                    <Route path="synchronized" element={<Synchronized />} />
+                    <Route path="alarm" element={<Alarm />} />
+                  </Route>
+
+                  <Route path="users" element={<Users />}></Route>
+
+                  <Route
+                    path="permissions-roles"
+                    element={<PermissionsAndRoles />}
+                  ></Route>
                 </Route>
-
-                <Route path="data" element={<Data />}>
-                  <Route index element={<DataLogs />} />
-                  <Route path="logging-rate" element={<DataLoggingRate />} />
-                  <Route path="sync-history" element={<SyncHistory />} />
-                </Route>
-
-                <Route path="alarms" element={<Alarms />} />
-
-                <Route path="system" element={<System />}>
-                  <Route index element={<SystemSiteInformation />} />
-                  <Route path="datetime" element={<DateTime />} />
-                  <Route path="backup-restore" element={<BackupRestore />} />
-                  <Route path="firmware" element={<SystemFirmware />} />
-                  <Route path="auto-update" element={<AutoUpdate />} />
-                  <Route path="reboot-shutdown" element={<RebootShutdown />} />
-                  <Route path="synchronized" element={<Synchronized />} />
-                  <Route path="alarm" element={<Alarm />} />
-                </Route>
-
-                <Route path="users" element={<Users />}></Route>
-
-                <Route
-                  path="permissions-roles"
-                  element={<PermissionsAndRoles />}
-                ></Route>
               </Route>
 
               <Route path="/scada" element={<Scada />}>

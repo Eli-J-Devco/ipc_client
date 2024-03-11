@@ -18,6 +18,7 @@ import th from "./languages/th.json";
 import { AuthProvider } from "./context/AuthProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { DataloggerProvider } from "./context/DataloggerProvider";
 
 const resources = {
   en: { translation: en },
@@ -39,9 +40,11 @@ root.render(
       <I18nextProvider i18n={i18next}>
         <DndProvider backend={HTML5Backend}>
           <AuthProvider>
-            <App />
-            <div id="progress"></div>
-            <ToastContainer />
+            <DataloggerProvider>
+              <App />
+              <div id="progress"></div>
+              <ToastContainer />
+            </DataloggerProvider>
           </AuthProvider>
         </DndProvider>
       </I18nextProvider>

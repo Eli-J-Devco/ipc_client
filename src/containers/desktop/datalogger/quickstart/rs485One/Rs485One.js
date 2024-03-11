@@ -49,11 +49,8 @@ function Rs485One() {
             try {
                 var index = { "baud": "id_type_baud_rates", "parity": "id_type_parity", "stop_bits": "id_type_stopbits", "timeout": "id_type_timeout", "debuglevel": "id_type_debug_level" }
                 var output = document.getElementById("progress");
-                const response = await axiosPrivate.post(Constants.API_URL.RS485.RS485_INFO + id, {
-                    onDownloadProgress: () => {
-                        output.innerHTML = "<div><img src='/loading.gif' /></div>";
-                    },
-                });
+                output.innerHTML = "<div><img src='/loading.gif' /></div>";
+                const response = await axiosPrivate.post(Constants.API_URL.RS485.RS485_INFO + id);
                 var rs4851 = response.data;
                 var rs485info = response.data.rs485Inf;
 

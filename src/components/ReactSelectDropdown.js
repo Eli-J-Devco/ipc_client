@@ -186,6 +186,7 @@ class ReactSelectDropdown extends Component {
                     styles={customStyles}
                     hideSelectedOptions={hideSelectedOptions}
                     closeMenuOnSelect={closeMenuOnSelect}
+                    menuPlacement="auto"
                     components={{
                         IndicatorSeparator,
                         MultiValue,

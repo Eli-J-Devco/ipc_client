@@ -63,7 +63,7 @@ const LoginAdmin = () => {
       setToken("permissions", permissions);
       setToken("project_id", project_id);
 
-      setAuth({ ...response, isAuthenticated: true });
+      setAuth({ ...response, isAuthenticated: true, hasJustLoggedIn: true });
       localStorage.setItem("persist", true);
 
       LibToast.toast(t("toastMessage.info.loginSuccess") + " " + userName, "info");
@@ -192,7 +192,7 @@ const LoginAdmin = () => {
                   required: "You must specify a password",
                   pattern: {
                     value:
-                      /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹])[a-zA-Z0-9~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]{7,}$/,
+                      /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹])[a-zA-Z0-9~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]{7,}$/,
                     message:
                       "Password should include at least one uppercase, one numeric value and one special character",
                   },

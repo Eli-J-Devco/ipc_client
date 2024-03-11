@@ -4,7 +4,7 @@
  *
  *********************************************************/
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import _ from "lodash";
@@ -40,7 +40,7 @@ function EthernetTwo() {
   const [modeInfo, setModeInfo] = useState(null);
   const [ethernet, setEthernet] = useState(null);
   const [isAutoDNS, setIsAutoDNS] = useState(true);
-  const [existedEthernet, setExistedEthernet] = useState(null);
+  const existedEthernet = useRef(null);
   const [isPlugged, setIsPlugged] = useState(true);
 
   const navigate = useNavigate();
@@ -53,7 +53,6 @@ function EthernetTwo() {
   useEffect(() => {
     /**
      * Fetch ethernet one data
-     * @author: nhan.tran 2024-03-07
      * @param {Int16Array} id 
      */
     const fetchEthernetTwo = async (id) => {
@@ -61,8 +60,7 @@ function EthernetTwo() {
         var output = document.getElementById("progress");
         /**
          * Get default ethernet config
-         * @author: nhan.tran 2024-03-07
-         * return {Object}
+         * @return {Object}
          */
         const ifconfig = await axiosPrivate.post(
           `${Constants.API_URL.ETHERNET.IFCONFIG}`,
@@ -79,27 +77,26 @@ function EthernetTwo() {
 
         /**
          * Get ethernet info by id
-         * @author: nhan.tran 2024-03-07
          * @param {Int16Array} id
-         * return {Object} existed ethernet info
+         * @return {Object} existed ethernet info
          */
-        var ethernet2 = await axiosPrivate.post(`${Constants.API_URL.ETHERNET.ETHERNET_INFO}${id}`);
+        var ethernet1 = await axiosPrivate.post(`${Constants.API_URL.ETHERNET.ETHERNET_INFO}${id}`);
         ifconfig.data.network.forEach((item) => {
-          if (item.namekey === ethernet2.data.namekey && item.ip_address === "") {
+          if (item.namekey === ethernet1.data.namekey && item.ip_address === "") {
             setIsPlugged(false);
           }
         });
-        setValue("name", ethernet2.data.name);
-        setValue("allow_dns", ethernet2.data.allow_dns);
+        setValue("name", ethernet1.data.name);
+        setValue("allow_dns", ethernet1.data.allow_dns);
 
-        setNICInfo(ethernet2.data);
-        setSelectedNIC({ value: ethernet2.data.namekey, label: ethernet2.data.namekey });
-        setExistedEthernet(ethernet2.data);
-        setIsAutoDNS(ethernet2.data.allow_dns);
-        setModeInfo({ value: ethernet2.data.id_type_ethernet, label: t(`site.t_mode.${ethernet2.data.type_ethernet.name}`) ? t(`site.t_mode.${ethernet2.data.type_ethernet.name}`) : ethernet2.data.type_ethernet.name });
+        setNICInfo(ethernet1.data);
+        setSelectedNIC({ value: ethernet1.data.namekey, label: ethernet1.data.namekey });
+        existedEthernet.current = _.cloneDeep(ethernet1.data);
+        setIsAutoDNS(ethernet1.data.allow_dns);
+        setModeInfo({ value: ethernet1.data.id_type_ethernet, label: t(`site.t_mode.${ethernet1.data.type_ethernet.name}`) ? t(`site.t_mode.${ethernet1.data.type_ethernet.name}`) : ethernet1.data.type_ethernet.name });
 
-        delete ethernet2.data.id;
-        delete ethernet2.data.type_ethernet;
+        delete ethernet1.data.id;
+        delete ethernet1.data.type_ethernet;
       } catch (error) {
         if (!loginService.handleMissingInfo(error))
           LibToast.toast(t("toastMessage.error.fetchError"), "error");
@@ -127,8 +124,9 @@ function EthernetTwo() {
       setValue("mtu", NICInfo.mtu);
       setValue("dns1", NICInfo.dns1);
       setValue("dns2", NICInfo.dns2);
+      setValue("allow_dns", NICInfo?.allow_dns);
     }
-  }, [NICInfo]);
+  }, [NICInfo, setValue, modeInfo]);
 
   /**
    * Handle dropdown change
@@ -137,11 +135,11 @@ function EthernetTwo() {
   */
   const handleNICDropdown = (value) => {
     setSelectedNIC(value);
-    if (value.value !== existedEthernet.namekey) {
+    if (value.value !== existedEthernet.current?.namekey) {
       setNICInfo(ethernet.find((item) => item.namekey === value.value));
     }
     else {
-      setNICInfo(existedEthernet);
+      setNICInfo(existedEthernet.current);
     }
   };
 
@@ -151,22 +149,12 @@ function EthernetTwo() {
    * @param {Object} value
    */
   const handleModeDropdown = (value) => {
-    setModeInfo(modeOptions.find((item) => item.value === value.value));
-    setValue("id_type_ethernet", value.value);
-    if (value.label === "DHCP") {
-      setNICInfo(ethernet.find((item) => item.namekey === selectedNIC.value));
-    }
-    else {
-      if (existedEthernet.namekey === selectedNIC.value) {
-        setNICInfo(existedEthernet);
-      }
-      else {
-        setNICInfo(ethernet.find((item) => item.namekey === selectedNIC.value));
-      }
-    }
+    setTimeout(() => {
+      setModeInfo(modeOptions.find((item) => item.value === value.value));
+      setValue("id_type_ethernet", value.value);
+      // setNICInfo(selectedNIC.label === existedEthernet.current?.namekey ? existedEthernet.current : ethernet.find((item) => item.namekey === selectedNIC.value));
+    }, 100);
   };
-
-
 
   /**
    * Submit form
@@ -174,7 +162,7 @@ function EthernetTwo() {
    * @param {Object} data
    */
   const onSubmit = (data) => {
-    const id = 2;
+    const id = 1;
 
     // Check if there is any change
     if (_.isEqual(data, existedEthernet)) {
@@ -199,13 +187,19 @@ function EthernetTwo() {
           },
         });
         if (response.status === 200) {
-          LibToast.toast("Ethernet-2 " + t("toastMessage.info.noChange"), "info");
+          LibToast.toast("Ethernet-2 " + t("toastMessage.info.updateSuccess"), "info");
           navigate(to, { replace: true });
         }
       } catch (error) {
-        if (!loginService.handleMissingInfo(error))
-          LibToast.toast(t("toastMessage.error.updateFailed"), "error");
-        else navigate("/", { replace: true });
+        const msg = loginService.handleMissingInfo(error);
+        if (typeof msg === "string") {
+          LibToast.toast(msg, "error");
+        }
+        else {
+          if (!msg)
+            LibToast.toast(t("toastMessage.error.updateFailed"), "error");
+          else navigate("/", { replace: true });
+        }
       }
       finally {
         output.innerHTML = "";
@@ -222,11 +216,10 @@ function EthernetTwo() {
    * @param {Object} modeInfo
    */
   useEffect(() => {
-    if (!canEdit["allow_dns"][[modeInfo?.label]]) {
-      setIsAutoDNS(canEdit["allow_dns"][[modeInfo?.label]])
-      setValue("allow_dns", canEdit["allow_dns"][[modeInfo?.label]]);
-    }
-  }, [modeInfo]);
+    var isAuto = modeInfo?.label === t(`site.t_mode.${existedEthernet.current?.type_ethernet?.name}`) ? existedEthernet.current?.allow_dns : canEdit["allow_dns"][[modeInfo?.label]];
+    setIsAutoDNS(isAuto)
+    setValue("allow_dns", isAuto);
+  }, [modeInfo, setValue]);
 
   return (
     <div className={styles.ethernet}>

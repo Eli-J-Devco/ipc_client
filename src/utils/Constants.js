@@ -59,6 +59,7 @@ const Constants = {
       PROJECT_INFO: "/project/",
       LOGGING_RATE: "/project/logging_interval/",
       UPDATE_LOGGING_RATE: "/project/update_logging_rate/",
+      UPDATE_FIRST_PAGE: "/project/update_first_page_login/",
     },
     DEVICES: {
       LIST: "/device_list/all/"

@@ -2,7 +2,6 @@ import { Outlet } from "react-router-dom";
 import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
 import NavTabs from '../../../../components/navTabs/NavTabs';
 import styles from './QuickStart.module.scss';
-
 function QuickStart() {
     return (
         <div className="main">
