@@ -79,9 +79,9 @@ function UploadChannels() {
                             setValue(`upload_url_${channel?.name}`, channel?.uploadurl);
                             setValue(`password_${channel?.name}`, channel?.password);
                         });
+                        channelsRef.current = _.cloneDeep(all_channel);
+                        setIsShow(new Array(all_channel.length).fill(false));
                     }, 100);
-                    channelsRef.current = _.cloneDeep(all_channel);
-                    setIsShow(new Array(all_channel.length).fill(false));
                 }
             } catch (error) {
                 if (!loginService.handleMissingInfo(error)) {
@@ -90,6 +90,7 @@ function UploadChannels() {
                 else navigate("/", { replace: true });
             }
             finally {
+                output.innerHTML = '';
             }
         }
 
@@ -97,6 +98,7 @@ function UploadChannels() {
     }, [channelConfig]);
 
     const handleSave = (data) => {
+        console.log('data', data);
         channels.forEach((channel, index) => {
             channel.uploadurl = data[`upload_url_${channel?.name}`];
             channel.password = data[`password_${channel?.name}`];
@@ -131,20 +133,28 @@ function UploadChannels() {
     const onProtocolChange = (event, index, name) => {
         let temp = [...channels];
         if (event.value === channelsRef.current[index]?.type_protocol?.id) {
-            temp[index] = channelsRef.current[index];
+            temp[index] = _.cloneDeep(channelsRef.current[index]);
             setValue(`upload_url_${temp[index]?.name}`, temp[index]?.uploadurl);
             setValue(`password_${temp[index]?.name}`, temp[index]?.password);
         }
         else {
-            temp[index].id_type_protocol = event.value;
-            temp[index].type_protocol.id = event.value;
-            temp[index].type_protocol.Protocol = event.label;
-            temp[index].device_list = [];
-            temp[index].id_type_logging_interval = defaultLoggingInterval.current[0]?.id;
-            temp[index].type_logging_interval.id = defaultLoggingInterval.current[0]?.id;
-            temp[index].type_logging_interval.time = defaultLoggingInterval.current[0]?.time;
-            temp[index].uploadurl = '';
-            temp[index].password = '';
+            temp[index] = {
+                ...temp[index],
+                id_type_protocol: event.value,
+                type_protocol: {
+                    id: event.value,
+                    Protocol: event.label,
+                },
+                device_list: [],
+                id_type_logging_interval: defaultLoggingInterval.current[0]?.id,
+                type_logging_interval: {
+                    id: defaultLoggingInterval.current[0]?.id,
+                    time: defaultLoggingInterval.current[0]?.time,
+                },
+                uploadurl: '',
+                password: '',
+            };
+
             setValue(`upload_url_${name}`, '');
             setValue(`password_${name}`, '');
         }
@@ -163,8 +173,6 @@ function UploadChannels() {
 
             <div className={styles.form_body}>
                 {channels && protocol && loggingInterval && devices && channels.map((channel, index) => {
-                    output.innerHTML = '';
-
                     return (
                         <div key={index} className={styles.channels}>
                             <div className={styles.title}>
