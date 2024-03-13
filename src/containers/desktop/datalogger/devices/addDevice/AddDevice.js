@@ -42,12 +42,12 @@ export default function AddDevice(props) {
         setDeviceType(deviceConfig.device_type.map(item => ({ value: item.id, label: item.name })));
         setSelectedDeviceType({ value: deviceConfig.device_type[0].id, label: deviceConfig.device_type[0].name });
         methods.setValue("id_device_type", deviceConfig.device_type[0].id);
-        setDeviceGroup(deviceConfig.device_group.map(item => ({ value: item.id, label: item.name })));
-        setSelectedDeviceGroup({ value: deviceConfig.device_group[0].id, label: deviceConfig.device_group[0].name });
+        setDeviceGroup(deviceConfig.device_group.map(item => ({ value: { id_group: item.id, id_device_type: item.id_device_type }, label: item.name })));
+        setSelectedDeviceGroup(deviceGroup.filter(item => item.value.id_device_type === deviceConfig.device_type[0].id)[0]);
         methods.setValue("id_device_group", deviceConfig.device_group[0].id);
-        setTemplateLibrary(deviceConfig.template_library.map(item => ({ value: item.id, label: item.name })));
-        setSelectedTemplateLibrary({ value: deviceConfig.template_library[0].id, label: deviceConfig.template_library[0].name });
-        methods.setValue("id_template_library", deviceConfig.template_library[0].id);
+        setTemplateLibrary(deviceConfig.template.map(item => ({ value: item.id, label: item.name })));
+        setSelectedTemplateLibrary({ value: deviceConfig.template[0].id, label: deviceConfig.template[0].name });
+        methods.setValue("id_template", deviceConfig.template[0].id);
         methods.setValue("in_addmode", selectedAddMode.value);
       }, 100);
     }
@@ -211,8 +211,12 @@ export default function AddDevice(props) {
                   name="device_type"
                   value={selectedDeviceType}
                   onChange={(e) => {
-                    setSelectedDeviceType(e);
-                    methods.setValue("id_device_type", e.value);
+                    setTimeout(() => {
+                      let selectedDeviceGroup = deviceGroup.filter(item => item.value.id_device_type === e.value)[0];
+                      setSelectedDeviceType(e);
+                      setSelectedDeviceGroup(selectedDeviceGroup ? selectedDeviceGroup : []);
+                      methods.setValue("id_device_type", e.value);
+                    }, 100);
                   }}
                   optionList={deviceType}
                 />
@@ -231,7 +235,7 @@ export default function AddDevice(props) {
                     setSelectedDeviceGroup(e);
                     methods.setValue("id_device_group", e.value);
                   }}
-                  optionList={deviceGroup}
+                  optionList={deviceGroup.filter(item => item.value.id_device_type === selectedDeviceType.value)}
                 />
               </div>
             </div>

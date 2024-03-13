@@ -136,7 +136,7 @@ const LoginAdmin = () => {
               {errors.email && (
                 <span className={styles.validate}>{errors.email.message}</span>
               )}
-              <svg style={{ padding: 4 }} fill="none" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="m0 0h48v48h-48z" fill="#494c4e" fill-opacity=".01" /><g stroke="#494c4e" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"><circle cx="24" cy="12" r="8" /><path d="m42 44c0-9.9411-8.0589-18-18-18s-18 8.0589-18 18" /></g></svg>
+              <svg style={{ padding: 4 }} fill="none" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="m0 0h48v48h-48z" fill="#494c4e" fillOpacity=".01" /><g stroke="#494c4e" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4"><circle cx="24" cy="12" r="8" /><path d="m42 44c0-9.9411-8.0589-18-18-18s-18 8.0589-18 18" /></g></svg>
             </div>
 
             <div className={styles.form_group}>

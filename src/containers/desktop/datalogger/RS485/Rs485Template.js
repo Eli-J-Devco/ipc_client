@@ -113,8 +113,7 @@ function Rs485Template({ id, isBack, from, to, selectedDropdown, selectedOption,
 
                             <div className='form-footer'>
                                 <div className='mb-3'>
-                                    {isBack ?
-
+                                    {isBack &&
                                         <RButton
                                             className="btn_back"
                                             text="Back"
@@ -122,22 +121,22 @@ function Rs485Template({ id, isBack, from, to, selectedDropdown, selectedOption,
                                             iClassType="back"
                                             onClick={() => back(from)}
                                         />
-                                        : null}
+                                    }
 
                                     <RButton
                                         className="btn_save margin-left15"
-                                        text="Save & Next"
+                                        text={to ? "Save & Next" : "Save"}
                                         iClass={true}
                                         iClassType="save"
                                         onClick={() => handleSave(id, to)}
                                     />
 
-                                    <RButton
+                                    {to && <RButton
                                         className="btn_skip margin-left15"
                                         text="Skip"
                                         onClick={() => save(to)}
                                     />
-
+                                    }
                                 </div>
                             </div>
                         </div>
