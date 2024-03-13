@@ -71,6 +71,13 @@ const Constants = {
       UPDATE_CHANNEL: "/upload_channel/update/",
       CONFIG_CHANNEL: "/upload_channel/config/",
     },
+    USERS: {
+      LIST: "/users/all_user",
+      GET_ONE: "/users/only_user",
+      UPDATE: "/users/update_user/",
+      DELETE: "/users/delete/user/",
+      ADD: "/users/add/",
+    },
   },
 
   SCREEN_MODE: {

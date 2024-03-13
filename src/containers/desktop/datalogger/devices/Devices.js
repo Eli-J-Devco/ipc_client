@@ -34,10 +34,10 @@ export default function Devices() {
   const [device, setDevice] = useState([]);
 
   useEffect(() => {
+    var output = document.getElementById("progress");
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        var output = document.getElementById("progress");
-        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         const { data } = await axiosPrivate.post(Constants.API_URL.DEVICES.LIST);
         setdataDevices(data);
         const { data: deviceConfig } = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG);
@@ -139,9 +139,7 @@ export default function Devices() {
           />
       }
 
-
       <div className={styles.pagging_devices}>
-
       </div>
     </div>
   );

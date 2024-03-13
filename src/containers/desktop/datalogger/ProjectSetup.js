@@ -36,7 +36,6 @@ const ProjectSetupInformation = () => {
                     setProjectSetup(response.data);
                 }, 300);
             } catch (error) {
-                console.log(error);
                 if (!loginService.handleMissingInfo(error)) {
                     LibToast.toast("Error fetching project setup", "error");
                 }

@@ -88,7 +88,7 @@ export const RText = (props) => (
 )
 
 export const RTextForm = (props) => {
-    const { register, formState: { errors } } = useFormContext({ mode: 'onChange' })
+    const { register, formState: { errors } } = useFormContext()
     return (
         <>
             {(props.label !== "" && typeof props.label != 'undefined') &&

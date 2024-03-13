@@ -94,8 +94,6 @@ export default function useEthernet() {
      * @param {Object} data
      */
     const onSubmit = (data) => {
-        console.log(data);
-        console.log("Submit form", existedEthernet.current);
         // Check if there is any change
         if (_.isEqual(data, existedEthernet.current)) {
             LibToast.toast(t("toastMessage.info.noChange"), "info");
@@ -113,13 +111,11 @@ export default function useEthernet() {
             try {
                 var output = document.getElementById("progress");
                 output.innerHTML = "<div><img src='/loading.gif' /></div>";
-                // console.log("Update ethernet", data);
                 const response = await axiosPrivate.post(Constants.API_URL.ETHERNET.ETHERNET_UPDATE + id, data, {
                     headers: {
                         "Content-Type": "application/json",
                     },
                 });
-                console.log(response);
                 if (response.status === 200) {
                     LibToast.toast("Ethernet-1 " + t("toastMessage.info.updateSuccess"), "info");
                     to && navigate(to, { replace: true });

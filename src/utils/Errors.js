@@ -31,7 +31,6 @@ export const LoginErrors = (err, msg = null) => {
   if (msg) {
     return msg;
   }
-  console.log(err);
   if (!err?.response?.status && err?.message) {
     return err?.message;
   }

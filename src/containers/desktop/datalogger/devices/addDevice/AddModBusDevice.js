@@ -55,10 +55,9 @@ export const AddModBusDevice = ({ communication }) => {
                         inputName="bus_address"
                         name="bus_address"
                         info="0-255"
-                        type="number"
                         required={{ value: true, message: "RTU Bus-Address is required" }}
                         pattern={{ value: /^\d{1,3}$/, message: "Invalid Bus-Address" }}
-                        max={{ value: 255, message: "Bus-Address must less than or euqal to 255" }}
+                        max={{ value: 254, message: "Bus-Address must less than or euqal to 254" }}
                         min={{ value: 0, message: "Bus-Address must greater than or euqal to 0" }}
                     />
                 </div>
@@ -72,7 +71,6 @@ export const AddModBusDevice = ({ communication }) => {
                                 inputName="tcp_gateway_port"
                                 name="tcp_gateway_port"
                                 info="MB/TCP Gateway Port"
-                                type="number"
                                 required={{ value: true, message: "MB/TCP Gateway Port is required" }}
                                 pattern={{ value: /^\d{1,5}$/, message: "Invalid Port" }}
                                 max={{ value: 65535, message: "Port must less than or euqal to 65535" }}
