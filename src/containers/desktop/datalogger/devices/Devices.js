@@ -4,6 +4,7 @@
 * 
 *********************************************************/
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import styles from './Devices.module.scss';
 import Table from '../../../../components/table/Table';
 import AddDevice from './addDevice/AddDevice';
@@ -14,80 +15,80 @@ import { ReactComponent as ExportIcon } from "../../../../assets/images/export.s
 import { ReactComponent as AddIcon } from "../../../../assets/images/add.svg";
 import Button from '../../../../components/button/Button';
 import useDevices from './useDevices';
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ConfigDevice from './configDevice/ConfigDevice';
 import Constants from "../../../../utils/Constants";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
+import _ from "lodash";
+import { loginService } from "../../../../services/loginService";
+import LibToast from "../../../../utils/LibToast";
 
 export default function Devices() {
+  const { t } = useTranslation();
   const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
   const { isAddDevice, openAddDevice, closeAddDevice, handleConfigDevice } = useDevices();
   const { id } = useParams();
   const [dataDevices, setdataDevices] = useState([]);
+  const [deviceConfig, setDeviceConfig] = useState([]);
+  const [device, setDevice] = useState([]);
+
   useEffect(() => {
-    const fetchDataDevices = async (id) => {
+    setTimeout(async () => {
       try {
         var output = document.getElementById("progress");
-        const { data } = await axiosPrivate.post(Constants.API_URL.DEVICES.LIST, {
-          onDownloadProgress: ({ loaded, total, progress }) => {
-            output.innerHTML = "<div><img src='/loading.gif' /></div>";
-          },
-        });
-        console.log(data);
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
+        const { data } = await axiosPrivate.post(Constants.API_URL.DEVICES.LIST);
         setdataDevices(data);
+        const { data: deviceConfig } = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG);
+        setDeviceConfig(deviceConfig);
       } catch (error) {
-        console.log(error);
+        let msg = loginService.handleMissingInfo(error);
+        if (typeof msg === "string") {
+          LibToast.toast(msg, "error");
+        }
+        else {
+          if (!loginService.handleMissingInfo(error))
+            LibToast.toast(t("toastMessage.error.fetchError"), "error");
+          else
+            navigate("/");
+        }
       } finally {
         output.innerHTML = "";
       }
-    };
+    }, 1000);
 
-    fetchDataDevices(1);
   }, []);
 
-  const data = [
-    { id: 1, serial_number: 1, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS 1 INV', type: 'SolarEdge 3 Phase Inverter', points: 37 },
-    { id: 2, serial_number: 2, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS 2 INV', type: 'SolarEdge 3 Phase Inverter', points: 37 },
-    { id: 3, serial_number: 3, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS 3 INV', type: 'SolarEdge 3 Phase Inverter', points: 37 },
-    { id: 4, serial_number: 4, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS 4 INV', type: 'SolarEdge 3 Phase Inverter', points: 37 },
-    { id: 5, serial_number: 5, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS 5 INV', type: 'SolarEdge 3 Phase Inverter', points: 37 },
-    { id: 6, serial_number: 6, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS 6 INV', type: 'SolarEdge 3 Phase Inverter', points: 37 },
-    { id: 7, serial_number: 7, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS 7 INV', type: 'SolarEdge 3 Phase Inverter', points: 37 },
-    { id: 8, serial_number: 8, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS 8 INV', type: 'SolarEdge 3 Phase Inverter', points: 37 },
-    { id: 9, serial_number: 9, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS 9 INV', type: 'SolarEdge 3 Phase Inverter', points: 37 },
-    { id: 10, serial_number: 10, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS INV', type: 'SolarEdge 3 Phase Inverter', points: 37 }
-  ]
   const columns = [
     { id: 1, slug: "id", name: "Serial Number", width: 100 },
-    { id: 2, slug: "tcp_gateway_ip", name: "Port", width: 300 },
+    { id: 2, slug: "tcp_gateway_ip", name: "Port", width: 200 },
     { id: 3, slug: "status", name: "Status", width: 100 },
-    { id: 4, slug: "name", name: "Name and Purpose", width: 400 },
-    { id: 5, slug: "type", name: "Type", width: 300 },
-    { id: 6, slug: "points", name: "Points", width: 100 },
-    { id: 7, slug: "actions", name: <div className="text-center">Actions</div>, width: 150 }
+    { id: 4, slug: "name", name: "Name and Purpose", width: 200 },
+    { id: 5, slug: "driver_type", name: "Type", width: 200 },
+    { id: 6, slug: "actions", name: <div className="text-center">Actions</div>, width: 150 }
   ]
 
-  let device = data.filter((d) => {
-    if (d.id === parseInt(id)) {
-      return d;
-    }
-  })
-  if (device.length === 0) device.push({ id: 1, serial_number: 1, port: '192.168.1.20.502 @001', status: 'Ok', name_and_purpose: 'SolarEdge SE42.2KUS 1 INV', type: 'SolarEdge 3 Phase Inverter', points: 37 })
-
+  useEffect(() => {
+    if (_.isEmpty(dataDevices) || !id) return;
+    setTimeout(() => {
+      setDevice(dataDevices.filter((d) => d.id === parseInt(id))[0])
+    }, 100);
+  }, [dataDevices, id]);
 
   return (
     <div className={`main ${styles.main_devices}`}>
-      {isAddDevice && <AddDevice closeAddDevice={closeAddDevice} />}
+      {isAddDevice && <AddDevice closeAddDevice={closeAddDevice} deviceConfig={deviceConfig} />}
       <div className={styles.header_devices}>
         <div className='row'>
           <div className='col-xl-6 col-lg-6 col-md-6 col-6'>
             <div className={styles.title}>
-              Dashboard &gt; Devices {id ? `> ${id} ${device[0].name_and_purpose}` : ''}
+              Dashboard &gt; Devices {id ? `> ${id} ${device?.name}` : ''}
             </div>
           </div>
           <div className='col-xl-6 col-lg-6 col-md-6 col-6'>
             <div className={styles.button}>
-              <div className={styles.export}>
+              {/* <div className={styles.export}>
                 <ExportIcon />
                 <span>Export XML</span>
               </div>
@@ -95,7 +96,7 @@ export default function Devices() {
               <div className={styles.export}>
                 <ExportIcon />
                 <span>Export CSV</span>
-              </div>
+              </div> */}
 
               {id ? <div className={styles.export}>
                 <span>Configure</span>
@@ -114,7 +115,7 @@ export default function Devices() {
               <p>{item.status === true ? <span>Ok</span> : <span className="status_error">Error</span>}</p>
             )}
             tcp_gateway_ip={item => (
-              <p>{item.tcp_gateway_ip}@ <strong>{item.tcp_gateway_port}</strong></p>
+              <p>{item.driver_type === "RS485" ? item.driver_type : `${item.tcp_gateway_ip}:${item.tcp_gateway_port}`} @<strong>{item.rtu_bus_address}</strong></p>
             )}
             actions={item => (
               <div className="d-flex flex-wrap justify-content-center">

@@ -4,6 +4,7 @@ import styles from './Options.module.scss';
 
 function Options() {
     const { t } = useTranslation();
+
     const handleInputChange = (event) => {
 
     }
@@ -18,8 +19,8 @@ function Options() {
                     <div className='row'>
                         <div className='col-md-3'></div>
                         <div className='col-md-6'>
-                                
-                        <div className='mb-3'>
+
+                            <div className='mb-3'>
                                 <div className="checkmark">
                                     <RSwitch
                                         label={t('site.search_mbrtu')}
@@ -32,21 +33,18 @@ function Options() {
 
                             </div>
 
-                                
-                                
+                            <div className='form-footer'>
+                                <div className='mb-3'>
 
-                                <div className='form-footer'>
-                                    <div className='mb-3'>
+                                    <RButton
+                                        className="btn_save"
+                                        text="Save"
+                                        iClass={true}
+                                        iClassType="save"
+                                    />
 
-                                        <RButton
-                                            className="btn_save"
-                                            text="Save"
-                                            iClass={true}
-                                            iClassType="save"
-                                        />
-
-                                    </div>
                                 </div>
+                            </div>
                         </div>
                         <div className='col-md-3'></div>
                     </div>
