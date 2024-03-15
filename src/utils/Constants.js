@@ -17,7 +17,7 @@ switch (url) {
     break;
   default:
     serverAPI = "http://115.78.133.129:3001";
-    // serverAPI = "http://127.0.0.1:3002";
+    // serverAPI = "http://127.0.0.1:3001";
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -62,7 +62,9 @@ const Constants = {
       UPDATE_FIRST_PAGE: "/project/update_first_page_login/",
     },
     DEVICES: {
-      LIST: "/device_list/all/"
+      LIST: "/device_list/all/",
+      GET_ONE: "/device_list/?id=",
+      CONFIG: "/device_list/config/",
     },
     UPLOAD_CHANNEL: {
       ALL_CHANNELS: "/upload_channel/all_channel/",

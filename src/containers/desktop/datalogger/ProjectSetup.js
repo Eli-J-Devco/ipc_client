@@ -22,6 +22,7 @@ const ProjectSetupInformation = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/datalogger/quickstart";
+    const output = document.getElementById("progress");
 
     /**
      * Fetch project setup information from server
@@ -29,7 +30,6 @@ const ProjectSetupInformation = () => {
      */
     useEffect(() => {
         const fetchProjectSetup = async () => {
-            var output = document.getElementById("progress");
             try {
                 const response = await axiosPrivate.post(Constants.API_URL.PROJECT.PROJECT_INFO);
                 setTimeout(() => {
@@ -42,7 +42,6 @@ const ProjectSetupInformation = () => {
                 }
                 else navigate("/", { replace: true });
             } finally {
-                output.innerHTML = "";
             }
         };
 
@@ -58,7 +57,9 @@ const ProjectSetupInformation = () => {
             setAuth({ ...auth, hasJustLoggedIn: false });
             navigate(projectSetup?.first_page_on_login?.path, { replace: true, state: { from: from } });
         }
-    }, [from, auth, projectSetup, navigate, setAuth]);
+        output.innerHTML = "";
+
+    }, [from, auth, projectSetup, navigate, setAuth, output]);
 
     return (
         <div>
