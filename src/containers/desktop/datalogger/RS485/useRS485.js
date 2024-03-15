@@ -68,7 +68,7 @@ export default function useRS485() {
             setExistedRS485(rs4851)
         } catch (error) {
             if (!loginService.handleMissingInfo(error))
-                LibToast.toast(t("toastMessage.error.fetchError"), "error");
+                LibToast.toast(t("toastMessage.error.fetch"), "error");
             else navigate("/", { replace: true });
         } finally {
             output.innerHTML = "";
@@ -97,12 +97,12 @@ export default function useRS485() {
                 output.innerHTML = "<div><img src='/loading.gif' /></div>";
                 const response = await axiosPrivate.post(Constants.API_URL.RS485.RS485_UPDATE + 1, rs485);
                 if (response.status === 200) {
-                    LibToast.toast("RS485 " + t("toastMessage.info.updateSuccess"), "info")
+                    LibToast.toast("RS485 " + t("toastMessage.info.update"), "info")
                     navigate(to, { replace: true });
                 }
             } catch (error) {
                 if (!loginService.handleMissingInfo(error))
-                    LibToast.toast(t("toastMessage.error.updateFailed"), "error");
+                    LibToast.toast(t("toastMessage.error.update"), "error");
                 else navigate("/", { replace: true });
             }
             finally {

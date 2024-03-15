@@ -65,6 +65,7 @@ const Constants = {
       LIST: "/device_list/all/",
       GET_ONE: "/device_list/?id=",
       CONFIG: "/device_list/config/",
+      CREATE: "/device_list/create_multiple/",
     },
     UPLOAD_CHANNEL: {
       ALL_CHANNELS: "/upload_channel/all_channel/",
@@ -72,11 +73,17 @@ const Constants = {
       CONFIG_CHANNEL: "/upload_channel/config/",
     },
     USERS: {
-      LIST: "/users/all_user",
+      LIST: "/users/all_user/",
       GET_ONE: "/users/only_user",
       UPDATE: "/users/update_user/",
       DELETE: "/users/delete/user/",
       ADD: "/users/add/",
+      ALL_ROLE: "/users/all_role",
+      ROLE_SCREEN: "/users/get/role_screen/",
+      UPDATE_ROLE: "/users/update/role/",
+      DELETE_ROLE: "/users/delete/role/",
+      ADD_ROLE: "/users/create/role/",
+      UPDATE_ROLE_SCREEN: "/users/update/role_screen/",
     },
   },
 

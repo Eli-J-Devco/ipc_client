@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  *********************************************************/
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Tooltip } from "react-tooltip"
 
 import { RTextForm } from "../../../../../components/Controls"
@@ -12,17 +12,12 @@ import { useFormContext } from "react-hook-form"
 
 export const AddModBusDevice = ({ communication }) => {
     const { setValue } = useFormContext();
-    const [communicationProtocol, setCommunicationProtocol] = useState([]);
-    const [selectedCommunicationProtocol, setSelectedCommunicationProtocol] = useState([]);
+    const { communicationProtocol, selectedCommunicationProtocol, setSelectedCommunicationProtocol } = communication;
 
     useEffect(() => {
-        if (communication) {
-            setTimeout(() => {
-                setCommunicationProtocol(communication.map(item => ({ value: item.id, label: item.name })))
-                setSelectedCommunicationProtocol({ value: communication[0].id, label: communication[0].name })
-            }, 100);
-        }
-    }, [communication]);
+        setValue("tcp_gateway_ip", "")
+        setValue("tcp_gateway_port", "")
+    }, []);
 
     return (
         <>
@@ -51,9 +46,11 @@ export const AddModBusDevice = ({ communication }) => {
                     <RTextForm
                         label="RTU Bus-Address"
                         inputClass="form-control"
-                        inputId="bus_address"
-                        inputName="bus_address"
-                        name="bus_address"
+                        inputId="rtu_bus_address"
+                        inputName="rtu_bus_address"
+                        name="rtu_bus_address"
+                        valueAsNumber={true}
+                        type="number"
                         info="0-255"
                         required={{ value: true, message: "RTU Bus-Address is required" }}
                         pattern={{ value: /^\d{1,3}$/, message: "Invalid Bus-Address" }}
@@ -70,6 +67,8 @@ export const AddModBusDevice = ({ communication }) => {
                                 inputId="tcp_gateway_port"
                                 inputName="tcp_gateway_port"
                                 name="tcp_gateway_port"
+                                valueAsNumber={true}
+                                type="number"
                                 info="MB/TCP Gateway Port"
                                 required={{ value: true, message: "MB/TCP Gateway Port is required" }}
                                 pattern={{ value: /^\d{1,5}$/, message: "Invalid Port" }}

@@ -99,7 +99,7 @@ function SiteInformation() {
                 );
                 if (response.status === 200) {
                     output.innerHTML = "";
-                    LibToast.toast("Site information " + t("toastMessage.info.updateSuccess"), "info");
+                    LibToast.toast("Site information " + t("toastMessage.info.update"), "info");
                     setProjectSetup({
                         ...projectSetup,
                         name: data.name,
@@ -112,7 +112,7 @@ function SiteInformation() {
                 }
             } catch (error) {
                 if (!loginService.handleMissingInfo(error))
-                    LibToast.toast(t("toastMessage.error.updateFailed"), "error");
+                    LibToast.toast(t("toastMessage.error.update"), "error");
                 else navigate("/", { replace: true });
             }
         };

@@ -10,6 +10,8 @@ import ModalDefault from 'react-bootstrap/Modal';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
+import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate'
+
 import useAddDevice from './useAddDevice';
 import { AddModBusDevice } from './AddModBusDevice';
 
@@ -17,11 +19,16 @@ import Modal from '../../../../../components/modal/Modal';
 import { RCheckbox, RTextForm } from '../../../../../components/Controls'
 import ReactSelectDropdown from '../../../../../components/ReactSelectDropdown';
 import Button from '../../../../../components/button/Button';
+import Constants from '../../../../../utils/Constants';
+import LibToast from '../../../../../utils/LibToast';
+import { loginService } from '../../../../../services/loginService';
+import AddMultipleDevice from './AddMultipleDevice';
 
 
 export default function AddDevice(props) {
   const methods = useForm({ mode: "onChange" });
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
 
   const { closeAddDevice, deviceConfig } = props;
   const { isAddMultipleDevice, openAddMultipleDevice, closeAddMultipleDevice, curItem } = useAddDevice();
@@ -35,26 +42,32 @@ export default function AddDevice(props) {
   const [selectedDeviceGroup, setSelectedDeviceGroup] = useState([]);
   const [templateLibrary, setTemplateLibrary] = useState([]);
   const [selectedTemplateLibrary, setSelectedTemplateLibrary] = useState([]);
-  const [addMode, setAddMode] = useState([{ value: 1, label: "Network address" }, { value: 2, label: "Bus address" }]);
-  const [selectedAddMode, setSelectedAddMode] = useState({ value: 1, label: "Network address" });
+  const [communicationProtocol, setCommunicationProtocol] = useState([]);
+  const [selectedCommunicationProtocol, setSelectedCommunicationProtocol] = useState([]);
 
   useEffect(() => {
     if (deviceConfig) {
       setTimeout(() => {
-        setDeviceType(deviceConfig.device_type.map(item => ({ value: item.id, label: item.name })));
-        setSelectedDeviceType({ value: deviceConfig.device_type[0].id, label: deviceConfig.device_type[0].name });
-        methods.setValue("id_device_type", deviceConfig.device_type[0].id);
-        setDeviceGroup(deviceConfig.device_group.map(item => ({ value: { id_group: item.id, id_device_type: item.id_device_type }, label: item.name })));
-        setTemplateLibrary(deviceConfig.template.map(item => ({ value: { id_template: item.id, id_device_group: item.id_device_group }, label: item.name })));
-        methods.setValue("in_addmode", selectedAddMode.value);
+        const { device_type, device_group, template, communication } = deviceConfig;
+        setDeviceType(device_type.map(item => ({ value: item.id, label: item.name })));
+        setSelectedDeviceType({ value: device_type[0].id, label: device_type[0].name });
+        setDeviceGroup(device_group.map(item => ({ value: { id_group: item.id, id_device_type: item.id_device_type }, label: item.name })));
+        setTemplateLibrary(template.map(item => ({ value: { id_template: item.id, id_device_group: item.id_device_group }, label: item.name })));
+        setCommunicationProtocol(communication.map(item => ({ value: item.id, label: item.name })));
+        setSelectedCommunicationProtocol({ value: communication[0].id, label: communication[0].name });
+
+        methods.setValue("id_device_type", device_type[0].id);
+        methods.setValue("device_virtual", false);
+        methods.setValue("in_mode", 0);
+        methods.setValue("add_count", 1);
       }, 100);
     }
-  }, [deviceConfig, methods, selectedAddMode]);
+  }, [deviceConfig, methods]);
 
   useEffect(() => {
     setTimeout(() => {
       setSelectedDeviceGroup(deviceGroup.filter(item => item.value.id_device_type === deviceConfig.device_type[0].id)[0]);
-      methods.setValue("id_device_group", deviceConfig.device_group[0].id);
+      // methods.setValue("id_device_group", deviceConfig.device_group[0].id);
     }, 100);
   }, [methods, deviceConfig, deviceGroup]);
 
@@ -66,17 +79,42 @@ export default function AddDevice(props) {
   }, [methods, deviceConfig, templateLibrary]);
 
   const handleSave = methods.handleSubmit((data) => {
-    console.log(data);
-    if (isAddMultipleDevice) {
-      closeAddMultipleDevice();
-    }
-    closeAddDevice();
+    const output = document.getElementById("progress");
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    setTimeout(async () => {
+      try {
+        const response = await axiosPrivate.post(Constants.API_URL.DEVICES.CREATE, data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log(response);
+        LibToast.toast("Device added successfully", "info")
+      } catch (error) {
+        let msg = loginService.handleMissingInfo(error);
+        if (typeof msg === "string") {
+          LibToast.toast(msg, "error");
+        }
+        else {
+          if (!loginService.handleMissingInfo(error))
+            LibToast.toast("Error adding device", "error");
+          else
+            navigate("/");
+        }
+      }
+      finally {
+        output.innerHTML = "";
+        if (isAddMultipleDevice) {
+          closeAddMultipleDevice();
+        }
+        closeAddDevice();
+      }
+    }, 500);
   });
 
   const footer = <div>
-    <Button variant="dark" onClick={() => {
-      handleSave();
-    }} >
+    <Button variant="dark" onClick={() => handleSave()} >
       <Button.Text text="Add" />
     </Button>
     <Button
@@ -86,13 +124,24 @@ export default function AddDevice(props) {
         let isValid = true;
         Object.entries(data).forEach(([key, value]) => {
           if (!isValid) return;
-          if (!value) {
-            methods.setError(key, { type: "required", message: "This field is required" });
-            methods.setFocus(key);
-            isValid = false;
+          if (selectedCommunicationProtocol?.label.search(/RS485/g) === -1) {
+            const allowedKeys = ["device_virtual", "in_mode", "add_count"];
+            if (!value && !allowedKeys.includes(key)) {
+              LibToast.toast(`Please fill in ${key.replace("_", " ").toUpperCase()}`, "error");
+              isValid = false;
+            }
+          } else {
+            const allowedKeys = ["tcp_gateway_ip", "tcp_gateway_port", "device_virtual", "in_mode", "add_count"];
+            if (!value && !allowedKeys.includes(key)) {
+              LibToast.toast(`Please fill in ${key.replace("_", " ").toUpperCase()}`, "error");
+              isValid = false;
+            }
           }
         });
-        isValid && openAddMultipleDevice()
+        if (isValid) {
+          methods.setValue("in_mode", 1);
+          openAddMultipleDevice()
+        }
       }}>
       <Button.Text text="Add Multiple" />
     </Button>
@@ -120,52 +169,7 @@ export default function AddDevice(props) {
             <ModalDefault show={isAddMultipleDevice} style={{ top: '100px' }} onHide={() => closeAddMultipleDevice()}>
               <ModalDefault.Header style={{ backgroundColor: "#383434", color: "#fff" }}>Add Multiple Device</ModalDefault.Header>
               <ModalDefault.Body >
-                <div className='my-3'>
-                  <div className='col-md-6'>
-                    <RTextForm
-                      label="How many to add?"
-                      inputClass="form-control"
-                      inputId="in_addcount"
-                      inputName="in_addcount"
-                      name="in_addcount"
-                      required={{ value: true, message: "Please enter a number" }}
-                      pattern={{ value: /^\d+$/, message: "Invalid number" }}
-                      min={{ value: 2, message: "Number must be greater than 1" }}
-                      max={{ value: 20, message: "Number must be less than 20" }}
-                      info="2-20"
-                    />
-                    <Tooltip id="my-tooltip" />
-                  </div>
-
-                  <div className='col-md-6 form_dropdown'>
-                    <ReactSelectDropdown
-                      label="When adding, increment"
-                      className="in_addmode"
-                      inputId="in_addmode"
-                      inputName="in_addmode"
-                      name="in_addmode"
-                      value={selectedAddMode}
-                      onChange={(e) => {
-                        setTimeout(() => {
-                          setSelectedAddMode(e);
-                          methods.setValue("in_addmode", e.value);
-                        }, 100);
-                      }}
-                      optionList={addMode}
-                    />
-                  </div>
-
-                  <div className='mt-5 mb-2'>
-                    <Button variant="dark" onClick={() => {
-                      handleSave();
-                    }}>
-                      <Button.Text text="Add" />
-                    </Button>
-                    <Button variant="grey" className="ms-3" onClick={() => closeAddMultipleDevice()}>
-                      <Button.Text text="Cancel" />
-                    </Button>
-                  </div>
-                </div>
+                <AddMultipleDevice handleSave={handleSave} closeAddMultipleDevice={closeAddMultipleDevice} />
               </ModalDefault.Body>
             </ModalDefault>
 
@@ -222,7 +226,7 @@ export default function AddDevice(props) {
               </div>
             </div>
 
-            {protocol.Physical === 1 ? <AddModBusDevice curItem={curItem} communication={deviceConfig.communication} /> :
+            {protocol.Physical === 1 ? <AddModBusDevice communication={{ communicationProtocol, selectedCommunicationProtocol, setSelectedCommunicationProtocol }} /> :
               ""}
 
             <div>Auto-detect requires \"Search for Modbus Devices\" be enable in <u>RS485 Options</u>.</div>
@@ -267,7 +271,7 @@ export default function AddDevice(props) {
                             let selectedTemplateLibrary = templateLibrary.filter(item => item.value.id_device_group === e.value.id_group)[0];
                             setSelectedDeviceGroup(e);
                             setSelectedTemplateLibrary(selectedTemplateLibrary ? selectedTemplateLibrary : []);
-                            methods.setValue("id_device_group", e.value);
+                            // methods.setValue("id_device_group", e.value);
                           }, 100);
                         }}
                         optionList={deviceGroup.filter(item => item.value.id_device_type === selectedDeviceType?.value)}

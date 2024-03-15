@@ -84,13 +84,13 @@ function Done() {
                     { headers: { "Content-Type": "application/json" } }
                 );
                 if (response.status === 200) {
-                    LibToast.toast("Your fisrt page when login " + t("toastMessage.info.updateSuccess"), "info");
+                    LibToast.toast("Your fisrt page when login " + t("toastMessage.info.update"), "info");
                     setProjectSetup({ ...projectSetup, id_first_page_on_login: selectedDone.value.id, first_page_on_login: { id: selectedDone.value.id, path: selectedDone.value.path, screen_name: selectedDone.label } });
                     navigate(selectedDone?.value?.path, { state: { from: from } });
                 }
             } catch (error) {
                 if (!loginService.handleMissingInfo(error))
-                    LibToast.toast(t("toastMessage.error.updateFailed"), "error");
+                    LibToast.toast(t("toastMessage.error.update"), "error");
                 else navigate("/", { replace: true });
             } finally {
                 output.innerHTML = "";

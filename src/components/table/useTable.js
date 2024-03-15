@@ -1,6 +1,7 @@
 import {
     getCoreRowModel,
     useReactTable,
+    RowSelectionState
 } from '@tanstack/react-table'
 import isArray from 'lodash/isArray';
 import { useEffect, useMemo, useState } from 'react';
@@ -8,13 +9,13 @@ import { useClickAway } from "@uidotdev/usehooks";
 import Constants from '../../utils/Constants';
 
 function useTable({ columns, data, total, setLimit, setOffset, slugProps }) {
-    const [columnVisibility, setColumnVisibility] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: true}), {}));
-    const [columnSizing, setColumnSizing] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: cur.width ? cur.width : 100}), {}));
+    const [columnVisibility, setColumnVisibility] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: true }), {}));
+    const [columnSizing, setColumnSizing] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: cur.width ? cur.width : 100 }), {}));
     const [columnOrder, setColumnOrder] = useState(columns.map(column => column.id.toString()));
     const [isDropDownsShow, setIsDropDownsShow] = useState(false);
     const dropDownsRef = useClickAway(() => setIsDropDownsShow(false));
     const [pageCount, setPageCount] = useState(-1);
-    
+
     const columnDef = useMemo(
         () => isArray(columns) ?
             columns.map(item => ({
@@ -38,12 +39,14 @@ function useTable({ columns, data, total, setLimit, setOffset, slugProps }) {
         state: {
             columnVisibility,
             columnSizing,
-            columnOrder
+            columnOrder,
         },
         onColumnVisibilityChange: setColumnVisibility,
         columnResizeMode: "onChange",
         onColumnSizingChange: setColumnSizing,
         onColumnOrderChange: setColumnOrder,
+        enableRowSelection: true,
+        enableMultiRowSelection: false,
         manualPagination: true,
         pageCount
     });

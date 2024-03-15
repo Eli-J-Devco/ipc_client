@@ -96,12 +96,14 @@
     },
     "toastMessage": {
         "error": {
-            "fetchError": "Server error. Please try again later.",
-            "updateFailed": "An error occured when updating. Please wait and try again later."
+            "fetch": "Server error. Please try again later.",
+            "update": "An error occured when updating. Please wait and try again later.",
+            "delete": "An error occured when deleting. Please wait and try again later."
         },
         "info": {
             "noChange": "No changes have been made.",
-            "updateSuccess": "has been updated successfully.",
+            "update": "has been updated successfully.",
+            "delete": "has been deleted successfully.",
             "logout": "You have been logged out",
             "loginSuccess": "Welcome back!"
         }

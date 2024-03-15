@@ -73,12 +73,12 @@ function LoggingRate() {
                     },
                 });
                 if (response.status === 200) {
-                    LibToast.toast("Logging rate " + t("toastMessage.info.updateSuccess"), "info");
+                    LibToast.toast("Logging rate " + t("toastMessage.info.update"), "info");
                     setProjectSetup({ ...projectSetup, id_logging_interval: selectedLoggingRate.value, logging_interval: { id: selectedLoggingRate.value, time: selectedLoggingRate.label } });
                 }
             } catch (error) {
                 if (!loginService.handleMissingInfo(error))
-                    LibToast.toast(t("toastMessage.error.updateFailed"), "error");
+                    LibToast.toast(t("toastMessage.error.update"), "error");
                 else navigate("/", { replace: true });
             } finally {
                 output.innerHTML = "";

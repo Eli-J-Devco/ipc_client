@@ -62,7 +62,7 @@ function Channel() {
                 }
             } catch (error) {
                 if (!loginService.handleMissingInfo(error)) {
-                    LibToast.toast(t('toastMessage.error.fetchError'), 'error');
+                    LibToast.toast(t('toastMessage.error.fetch'), 'error');
                 }
                 else navigate("/", { replace: true });
             }
@@ -107,7 +107,7 @@ function Channel() {
                 }
             } catch (error) {
                 if (!loginService.handleMissingInfo(error)) {
-                    LibToast.toast(t('toastMessage.error.fetchError'), 'error');
+                    LibToast.toast(t('toastMessage.error.fetch'), 'error');
                 }
                 else navigate("/", { replace: true });
             }
@@ -139,7 +139,7 @@ function Channel() {
                 output.innerHTML = "<div><img src='/loading.gif' /></div>";
                 const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.UPDATE_CHANNEL, channels);
                 if (response?.status === 200) {
-                    LibToast.toast(`Upload channels ${t('toastMessage.info.updateSuccess')}`, 'info');
+                    LibToast.toast(`Upload channels ${t('toastMessage.info.update')}`, 'info');
                 }
             } catch (error) {
                 if (!loginService.handleMissingInfo(error)) {

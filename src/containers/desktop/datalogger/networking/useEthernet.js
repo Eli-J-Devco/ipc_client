@@ -81,7 +81,7 @@ export default function useEthernet() {
             delete ethernet1.data.type_ethernet;
         } catch (error) {
             if (!loginService.handleMissingInfo(error))
-                LibToast.toast(t("toastMessage.error.fetchError"), "error");
+                LibToast.toast(t("toastMessage.error.fetch"), "error");
             else navigate("/", { replace: true });
         } finally {
         }
@@ -117,7 +117,7 @@ export default function useEthernet() {
                     },
                 });
                 if (response.status === 200) {
-                    LibToast.toast("Ethernet-1 " + t("toastMessage.info.updateSuccess"), "info");
+                    LibToast.toast("Ethernet-1 " + t("toastMessage.info.update"), "info");
                     to && navigate(to, { replace: true });
                 }
             } catch (error) {
@@ -127,7 +127,7 @@ export default function useEthernet() {
                 }
                 else {
                     if (!msg)
-                        LibToast.toast(t("toastMessage.error.updateFailed"), "error");
+                        LibToast.toast(t("toastMessage.error.update"), "error");
                     else navigate("/", { replace: true });
                 }
             }
