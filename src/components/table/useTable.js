@@ -1,7 +1,6 @@
 import {
     getCoreRowModel,
     useReactTable,
-    RowSelectionState
 } from '@tanstack/react-table'
 import isArray from 'lodash/isArray';
 import { useEffect, useMemo, useState } from 'react';

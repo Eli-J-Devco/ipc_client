@@ -7,6 +7,7 @@ import DropDowns from './dropDowns/DropDowns';
 import Header from './headers/Header';
 import Pagination from './pagination/Pagination';
 import Constants from '../../utils/Constants';
+import { useState } from 'react';
 
 /**
  * Table component
@@ -32,7 +33,6 @@ import Constants from '../../utils/Constants';
  */
 function Table({ control, variant, className, maxHeight, columns, data, visible, resizable, draggable, pagination, selectRow, ...slugProps }) {
     const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef, handleOnChangePageSize } = useTable({ columns, data, total: pagination?.total, setLimit: pagination?.setLimit, setOffset: pagination?.setOffset, slugProps });
-
     return (
         <div>
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
@@ -67,7 +67,9 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
                                         onClick={() => {
                                             if (selectRow?.enable) {
                                                 row.toggleSelected(true);
-                                                selectRow?.onSelect(row.original);
+                                                setTimeout(() => {
+                                                    selectRow?.onSelect(row.original);
+                                                }, 100);
                                             }
                                         }}
                                         className={`${styles["body-row"]} ${variant ? styles[variant] : ""}`}

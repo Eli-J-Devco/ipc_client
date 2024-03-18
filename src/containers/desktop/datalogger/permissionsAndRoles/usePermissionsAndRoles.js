@@ -7,15 +7,19 @@ import { useState } from "react";
 
 
 export default function usePermissionsAndRoles() {
-  const [isAddRoles, setIsAddRoles] = useState(false);
+  const [isOpenRolesModal, setIsOpenRolesModal] = useState({});
 
-  const openAddRoles = () => setIsAddRoles(true);
-  const closeAddRoles = () => setIsAddRoles(false);
+  const openAddRoles = () => setIsOpenRolesModal({ add: true, isCancel: true });
+  const closeAddRoles = (isCancel) => setIsOpenRolesModal({ add: false, isCancel: typeof isCancel === "boolean" ? isCancel : true });
 
+  const openEditRoles = () => setIsOpenRolesModal({ edit: true, isCancel: true });
+  const closeEditRoles = (isCancel) => setIsOpenRolesModal({ edit: false, isCancel: isCancel });
 
   return {
-    isAddRoles,
+    isOpenRolesModal,
     openAddRoles,
-    closeAddRoles
+    closeAddRoles,
+    openEditRoles,
+    closeEditRoles,
   }
 }

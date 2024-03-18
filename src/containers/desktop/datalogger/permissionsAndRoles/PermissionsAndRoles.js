@@ -3,269 +3,263 @@
 * All rights reserved.
 * 
 *********************************************************/
-import React from 'react';
-import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styles from './PermissionsAndRoles.module.scss';
+
+import useAxiosPrivate from '../../../../hooks/useAxiosPrivate';
+import { loginService } from '../../../../services/loginService';
+import usePermissionsAndRoles from './usePermissionsAndRoles';
+
+import RolesModal from './rolesModal/RolesModal';
+import Permissions from './permissions/Permissions';
+
+import Constants from '../../../../utils/Constants';
+import LibToast from '../../../../utils/LibToast';
+import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
 import Table from '../../../../components/table/Table';
+import Button from '../../../../components/button/Button';
+
 import { ReactComponent as EditIcon } from "../../../../assets/images/edit.svg";
 import { ReactComponent as DeleteIcon } from "../../../../assets/images/delete.svg";
 import { ReactComponent as StatusIcon } from "../../../../assets/images/status-circle.svg";
 import { ReactComponent as ExportIcon } from "../../../../assets/images/export.svg";
 import { ReactComponent as AddIcon } from "../../../../assets/images/add.svg";
-import Button from '../../../../components/button/Button';
-import { RCheckbox } from './../../../../components/Controls';
-import usePermissionsAndRoles from './usePermissionsAndRoles';
-import AddRoles from './addRoles/AddRoles';
-
-
 
 export default function PermissionsAndRoles() {
-  const { isAddRoles, openAddRoles, closeAddRoles } = usePermissionsAndRoles();
+  const { t } = useTranslation();
+  const axiosPrivate = useAxiosPrivate();
+  const { isOpenRolesModal, openAddRoles, closeAddRoles, openEditRoles, closeEditRoles } = usePermissionsAndRoles();
+  const [needRefresh, setNeedRefresh] = useState(true);
+  const isDelete = useRef(false);
 
+  const [roles, setRoles] = useState([]);
+  const [selectedRole, setSelectedRole] = useState(null);
+  const [permissions, setPermissions] = useState([]);
+  const navigate = useNavigate();
 
- const columnsRoles = [
-  {id: 1, slug: "id", name: "Id",}, 
-  {id: 2, slug: "name",name: "Name"}, 
-  {id: 3, slug: "actions", name: <div className="text-center">Actions</div>}
- ]
-  const dataListRoles = [
-    {id: "1", name: "Admin", action: ""},
-    {id: "2", name: "Manager", action: ""},
-    {id: "3", name: "Customer", action: ""},
-    {id: "4", name: "User", action: ""},
-  ]
+  /**
+   * Fetch permissions of selected role
+   * @author nhan.tran 2024-03-18
+   * @param {Object} selectedRole selected role
+   */
+  useEffect(() => {
+    !isDelete.current && selectedRole && !permissions[selectedRole?.id] && setTimeout(async () => {
+      try {
+        const response = await axiosPrivate.post(Constants.API_URL.USERS.ROLE_SCREEN, {
+          id_role: selectedRole?.id
+        },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+        if (response.status === 200) {
+          // Set permissions for selected role to reduce fetching data
+          setPermissions(prevState => ({ ...prevState, [selectedRole?.id]: response.data }));
+        }
+      }
+      catch (error) {
+        let msg = loginService.handleMissingInfo(error);
+        if (typeof msg === 'string') {
+          LibToast.toast(msg, 'error');
+        }
+        else {
+          if (!msg) {
+            LibToast.toast(t('toastMessage.error.fetch'), 'error');
+          }
+          else {
+            navigate('/');
+          }
+        }
+      }
+      finally {
+        isDelete.current = false;
+      }
+    }, 300);
+  }, [selectedRole, axiosPrivate, navigate, t, permissions]);
 
-  const columnsPermissions = [
-    {id: 1, slug: "screen_name", name: "Screen Name", width: '400px'},
-    {id: 2, slug: "full", name: "Full", width: '100px'},
-    {id: 3, slug: "add", name: "Add", width: '100px'},
-    {id: 4, slug: "edit", name: "Edit", width: '100px'},
-    {id: 5, slug: "del", name: "Del", width: '100px'},
-    {id: 6, slug: "view", name: "View", width: '100px'},
-    {id: 7, slug: "print", name: "Print", width: '100px'},
-    {id: 8, slug: "approval", name: "Approval", width: '100px'},
-    {id: 10, slug: "pdf", name: "Pdf", width: '100px'},
-    {id: 11, slug: "excel", name: "Excel", width: '100px'},
-    {id: 12, slug: "translate", name: "Translate", width: '100px'}
-   ]
+  /**
+   * Fetch all roles and set selected role to the first role in the list
+   * If it's delete action, set selected role to the first role in the list
+   * If it's add action, set selected role to the last role in the list
+   * If it's edit action, set selected role to the role that is being edited
+   * If it's not any action, set selected role to the first role in the list
+   * @author nhan.tran 2024-03-18
+   * @param {Boolean} needRefresh need to refresh roles
+   * @param {Object} isOpenRolesModal open roles modal
+   */
+  useEffect(() => {
+    needRefresh && setTimeout(async () => {
+      try {
+        const response = await axiosPrivate.post(Constants.API_URL.USERS.ALL_ROLE);
+        if (response.status === 200) {
+          let data = response.data.map(role => ({ id: role?.id, name: role?.name, description: role?.description }));
+          setRoles(data);
 
-   const dataListPermissions = [
-    {screen_name: "SCADA", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "RS485", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "Devices", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "Templates", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "ModHoppers", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "Data", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "Uploads", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "Alarms", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "Networking", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "Users", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "Permissions & Roles", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "System", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "Diagnostics", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
-    {screen_name: "Online Guild", full: "", add: "", edit: "", del: "", view: "", print: "", approval: "", pdf: "", excel: "", translate: ""},
+          if (isDelete.current) {
+            setSelectedRole(data[0]);
+          } else if (isOpenRolesModal?.add !== undefined) {
+            setSelectedRole(data[data.length - 1]);
+          } else if (isOpenRolesModal?.edit !== undefined) {
+            setSelectedRole(data.find(role => role?.id === selectedRole?.id));
+          } else {
+            setSelectedRole(data[0]);
+          }
+          setNeedRefresh(false);
+          isDelete.current = false;
+        }
+      }
+      catch (error) {
+        let msg = loginService.handleMissingInfo(error);
+        if (typeof msg === 'string') {
+          LibToast.toast(msg, 'error');
+        }
+        else {
+          if (!msg) {
+            LibToast.toast(t('toastMessage.error.fetch'), 'error');
+          }
+          else {
+            navigate('/');
+          }
+        }
+      }
+    }, 300);
+  }, [needRefresh]);
+
+  /**
+   * Delete role
+   * @author nhan.tran 2024-03-18
+   * @param {Object} role selected role to delete
+   */
+  const deleteRole = (role) => {
+    var output = document.getElementById("progress");
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    isDelete.current = true;
+    setTimeout(async () => {
+      try {
+        const response = await axiosPrivate.post(Constants.API_URL.USERS.DELETE_ROLE, { id: role?.id });
+        if (response.status === 200) {
+          LibToast.toast(`Role ${t('toastMessage.info.delete')}`, 'info');
+        }
+      }
+      catch (error) {
+        let msg = loginService.handleMissingInfo(error);
+        if (typeof msg === 'string') {
+          LibToast.toast(msg, 'error');
+        }
+        else {
+          if (!msg) {
+            LibToast.toast(t('toastMessage.error.delete'), 'error');
+          }
+          else {
+            navigate('/');
+          }
+        }
+      }
+      finally {
+        output.innerHTML = "";
+        setNeedRefresh(true);
+      }
+    }, 100);
+  }
+
+  const columnsRoles = [
+    { id: 1, slug: "id", name: "Id", },
+    { id: 2, slug: "name", name: "Name" },
+    { id: 3, slug: "actions", name: <div className="text-center">Actions</div> }
   ]
 
   return (
     <div className="main">
-      {isAddRoles && <AddRoles  closeAddRoles={closeAddRoles} />}
+      {isOpenRolesModal?.add && <RolesModal closeRolesModal={closeAddRoles} action={{ text: "Add" }} setNeedRefresh={setNeedRefresh} />}
+      {isOpenRolesModal?.edit && <RolesModal closeRolesModal={closeEditRoles} action={{ text: "Edit" }} role={selectedRole} setNeedRefresh={setNeedRefresh} />}
+
       <div className={styles.header}>
         <Breadcrumb
           routes={[
-              {
-                  path: "/datalogger",
-                  name: "Dashboard"
-              },
-              {
-                  path: "/datalogger/permissions-roles",
-                  name: "Permissions & Roles"
-              }
-          ]}    
+            {
+              path: "/datalogger",
+              name: "Dashboard"
+            },
+            {
+              path: "/datalogger/permissions-roles",
+              name: "Permissions & Roles"
+            }
+          ]}
         />
         <div className={styles.right_header}>
-            <div className={styles.button}>
-              <div className={styles.export}>
-                <ExportIcon />
-                <span>Export</span>
-              </div>
-        
-              <div className={styles.add}>
-                <AddIcon />
-              </div>
+          <div className={styles.button}>
+            <div className={styles.export}>
+              <ExportIcon />
+              <span>Export</span>
             </div>
+
+            <div className={styles.add}>
+              <AddIcon />
+            </div>
+          </div>
         </div>
-        
+
       </div>
 
       <div className='row'>
-          <div className='col-xl-4 col-lg-4 col-md-4 col-4'>
-            <div className={styles.roles}>
-              <div className={styles.roles_header}>
-                  <div className={styles.roles_title}>
-                      Roles
-                  </div>
-                  <div className={styles.add_roles} onClick={() => openAddRoles()}>
-                        <AddIcon />
-                  </div>
+        <div className='col-xl-4 col-lg-4 col-md-4 col-4'>
+          <div className={styles.roles}>
+            <div className={styles.roles_header}>
+              <div className={styles.roles_title}>
+                Roles
               </div>
-              <div className={styles.table_roles}>
-                <Table
-                  columns={columnsRoles}
-                  data={dataListRoles}
-
-                  status={item => (
-                    <div >
-                        <Button.Image
-                            image={<StatusIcon />}
-                        />
-                    </div>
-                  )}
-                  
-                  actions={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                        <Button.Image
-                            image={<EditIcon />}
-                            className="mx-2"
-                        />
-                        <Button.Image
-                            image={<DeleteIcon />}
-                            className="mx-2"
-                        />
-                    </div>
-                  )}
-                />
+              <div className={styles.add_roles} onClick={() => openAddRoles()}>
+                <AddIcon />
               </div>
             </div>
-          </div>
-
-          <div className='col-xl-8 col-lg-8 col-md-8 col-8'>
-          <div className={styles.permissions}>
-              <div className={styles.permissions_header}>
-                  <div className={styles.permissions_title}>
-                      Permissions
+            <div className={styles.table_roles}>
+              <Table
+                columns={columnsRoles}
+                data={roles}
+                selectRow={
+                  {
+                    enable: true,
+                    selectedRow: selectedRole,
+                    onSelect: setSelectedRole
+                  }
+                }
+                status={item => (
+                  <div >
+                    <Button.Image
+                      image={<StatusIcon />}
+                    />
                   </div>
-                  <div className={styles.save_permissions}>
-                        Save
-                  </div>
-              </div>
-              <div className={styles.table_permissions}>
-                <Table
-                  columns={columnsPermissions}
-                  data={dataListPermissions}
+                )}
 
-                  status={item => (
-                    <div >
-                        <Button.Image
-                            image={<StatusIcon />}
-                        />
-                    </div>
-                  )}
-                  
-                  full={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <RCheckbox
-                          inputId="full"
-                          inputName="full"
-                          labelClass="no-label"
-                          checked={1}
-                      />
-                    </div>
-                  )}
-                  add={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <RCheckbox
-                          inputId="add"
-                          inputName="add"
-                          labelClass="no-label"
-                          checked={1}
-                      />
-                    </div>
-                  )}
-                  edit={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <RCheckbox
-                          inputId="edit"
-                          inputName="edit"
-                          labelClass="no-label"
-                          checked={1}
-                      />
-                    </div>
-                  )}
-                  del={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <RCheckbox
-                          inputId="del"
-                          inputName="del"
-                          labelClass="no-label"
-                          checked={1}
-                      />
-                    </div>
-                  )}
-                  view={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <RCheckbox
-                          inputId="view"
-                          inputName="view"
-                          labelClass="no-label"
-                          checked={1}
-                      />
-                    </div>
-                  )}
-                  print={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <RCheckbox
-                          inputId="print"
-                          inputName="print"
-                          labelClass="no-label"
-                          checked={1}
-                      />
-                    </div>
-                  )}
-                  approval={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <RCheckbox
-                          inputId="approval"
-                          inputName="approval"
-                          labelClass="no-label"
-                          checked={1}
-                      />
-                    </div>
-                  )}
-                  pdf={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <RCheckbox
-                          inputId="pdf"
-                          inputName="pdf"
-                          labelClass="no-label"
-                          checked={1}
-                      />
-                    </div>
-                  )}
-                  excel={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <RCheckbox
-                          inputId="excel"
-                          inputName="excel"
-                          labelClass="no-label"
-                          checked={1}
-                      />
-                    </div>
-                  )}
-                  translate={item => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <RCheckbox
-                          inputId="translate"
-                          inputName="translate"
-                          labelClass="no-label"
-                          checked={1}
-                      />
-                    </div>
-                  )}
-                />
-                
-              </div>
+                actions={item => (
+                  <div className="d-flex flex-wrap justify-content-center">
+                    <Button.Image
+                      image={<EditIcon />}
+                      className="mx-2"
+                      onClick={() => {
+                        setTimeout(() => {
+                          setSelectedRole(item);
+                          openEditRoles()
+                        }, 100);
+                      }}
+                    />
+                    <Button.Image
+                      image={<DeleteIcon />}
+                      className="mx-2"
+                      onClick={() => {
+                        setTimeout(() => {
+                          setSelectedRole(item);
+                          deleteRole(item);
+                        }, 100);
+                      }}
+                    />
+                  </div>
+                )}
+              />
             </div>
           </div>
+        </div>
+        <Permissions permissions={permissions} setPermissions={setPermissions} selectedRole={selectedRole} />
       </div>
     </div>
   );
