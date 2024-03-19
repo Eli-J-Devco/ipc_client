@@ -100,9 +100,6 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                 <div className={styles.permissions_title}>
                     Permissions
                 </div>
-                <button className={styles.save_permissions} type="submit">
-                    Save
-                </button>
             </div>
             <div className={styles.table_permissions}>
 

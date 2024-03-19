@@ -26,13 +26,13 @@ import { ReactComponent as DeleteIcon } from "../../../../assets/images/delete.s
 import { ReactComponent as StatusIcon } from "../../../../assets/images/status-circle.svg";
 import { ReactComponent as ExportIcon } from "../../../../assets/images/export.svg";
 import { ReactComponent as AddIcon } from "../../../../assets/images/add.svg";
+import ConfirmDeleteModal from './rolesModal/ConfirmDeleteModal';
 
 export default function PermissionsAndRoles() {
   const { t } = useTranslation();
   const axiosPrivate = useAxiosPrivate();
-  const { isOpenRolesModal, openAddRoles, closeAddRoles, openEditRoles, closeEditRoles } = usePermissionsAndRoles();
+  const { isOpenRolesModal, openAddRoles, closeAddRoles, openEditRoles, closeEditRoles, openConfirmDeleteRoles, closeConfirmDeleteRoles } = usePermissionsAndRoles();
   const [needRefresh, setNeedRefresh] = useState(true);
-  const isDelete = useRef(false);
 
   const [roles, setRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
@@ -45,7 +45,7 @@ export default function PermissionsAndRoles() {
    * @param {Object} selectedRole selected role
    */
   useEffect(() => {
-    !isDelete.current && selectedRole && !permissions[selectedRole?.id] && setTimeout(async () => {
+    selectedRole && !permissions[selectedRole?.id] && setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(Constants.API_URL.USERS.ROLE_SCREEN, {
           id_role: selectedRole?.id
@@ -71,9 +71,6 @@ export default function PermissionsAndRoles() {
           }
         }
       }
-      finally {
-        isDelete.current = false;
-      }
     }, 300);
   }, [selectedRole, axiosPrivate, navigate, t, permissions]);
 
@@ -95,7 +92,7 @@ export default function PermissionsAndRoles() {
           let data = response.data.map(role => ({ id: role?.id, name: role?.name, description: role?.description }));
           setRoles(data);
 
-          if (isDelete.current) {
+          if (isOpenRolesModal?.delete !== undefined) {
             setSelectedRole(data[0]);
           } else if (isOpenRolesModal?.add !== undefined) {
             setSelectedRole(data[data.length - 1]);
@@ -104,8 +101,6 @@ export default function PermissionsAndRoles() {
           } else {
             setSelectedRole(data[0]);
           }
-          setNeedRefresh(false);
-          isDelete.current = false;
         }
       }
       catch (error) {
@@ -122,6 +117,9 @@ export default function PermissionsAndRoles() {
           }
         }
       }
+      finally {
+        setNeedRefresh(false);
+      }
     }, 300);
   }, [needRefresh]);
 
@@ -130,37 +128,6 @@ export default function PermissionsAndRoles() {
    * @author nhan.tran 2024-03-18
    * @param {Object} role selected role to delete
    */
-  const deleteRole = (role) => {
-    var output = document.getElementById("progress");
-    output.innerHTML = "<div><img src='/loading.gif' /></div>";
-    isDelete.current = true;
-    setTimeout(async () => {
-      try {
-        const response = await axiosPrivate.post(Constants.API_URL.USERS.DELETE_ROLE, { id: role?.id });
-        if (response.status === 200) {
-          LibToast.toast(`Role ${t('toastMessage.info.delete')}`, 'info');
-        }
-      }
-      catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === 'string') {
-          LibToast.toast(msg, 'error');
-        }
-        else {
-          if (!msg) {
-            LibToast.toast(t('toastMessage.error.delete'), 'error');
-          }
-          else {
-            navigate('/');
-          }
-        }
-      }
-      finally {
-        output.innerHTML = "";
-        setNeedRefresh(true);
-      }
-    }, 100);
-  }
 
   const columnsRoles = [
     { id: 1, slug: "id", name: "Id", },
@@ -172,7 +139,7 @@ export default function PermissionsAndRoles() {
     <div className="main">
       {isOpenRolesModal?.add && <RolesModal closeRolesModal={closeAddRoles} action={{ text: "Add" }} setNeedRefresh={setNeedRefresh} />}
       {isOpenRolesModal?.edit && <RolesModal closeRolesModal={closeEditRoles} action={{ text: "Edit" }} role={selectedRole} setNeedRefresh={setNeedRefresh} />}
-
+      {isOpenRolesModal?.delete && <ConfirmDeleteModal closeRolesModal={closeConfirmDeleteRoles} action={{ text: "Confirm" }} role={selectedRole} setNeedRefresh={setNeedRefresh} />}
       <div className={styles.header}>
         <Breadcrumb
           routes={[
@@ -186,19 +153,6 @@ export default function PermissionsAndRoles() {
             }
           ]}
         />
-        <div className={styles.right_header}>
-          <div className={styles.button}>
-            <div className={styles.export}>
-              <ExportIcon />
-              <span>Export</span>
-            </div>
-
-            <div className={styles.add}>
-              <AddIcon />
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <div className='row'>
@@ -249,7 +203,7 @@ export default function PermissionsAndRoles() {
                       onClick={() => {
                         setTimeout(() => {
                           setSelectedRole(item);
-                          deleteRole(item);
+                          openConfirmDeleteRoles();
                         }, 100);
                       }}
                     />

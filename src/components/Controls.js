@@ -93,7 +93,7 @@ export const RTextForm = (props) => {
         <>
             {(props.label !== "" && typeof props.label != 'undefined') &&
                 <label className="control-label">{props.label}
-                    {props.required === 'required' ? <span className="required">*</span> : null}
+                    {props.required ? <span className="required">*</span> : null}
                 </label>}
             {props.labelIcon &&
                 <i className={"icon-tip-help " + props.iconClass} onClick={props.iconClick} aria-hidden="true" data-tip={props.dataTooktip}></i>

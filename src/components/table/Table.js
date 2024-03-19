@@ -56,7 +56,7 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
 
                     <tbody>
                         {
-                            table.getRowModel().rows.map(row => {
+                            data?.length > 0 ? table.getRowModel().rows.map(row => {
                                 let isSelected = false;
                                 if (selectRow && row?.original?.id === selectRow?.selectedRow?.id) {
                                     isSelected = true;
@@ -88,7 +88,12 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
                                     </tr>
                                 )
                             }
-                            )
+                            ) :
+                                <tr>
+                                    <td colSpan={table.getFlatHeaders().length} className={styles["empty-data"]}>
+                                        Data is empty!
+                                    </td>
+                                </tr>
                         }
                     </tbody>
 

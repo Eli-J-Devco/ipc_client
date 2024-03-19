@@ -100,10 +100,7 @@ export default function RolesModal(props) {
               inputName="name"
               name="name"
               required={"Name is required"}
-              info="Name Note"
             > </RTextForm>
-
-            <Tooltip id="my-tooltip" />
           </div>
 
           <div >
@@ -113,13 +110,8 @@ export default function RolesModal(props) {
               inputId="description"
               inputName="description"
               name="description"
-              info="Description Note"
             > </RTextForm>
-
-            <Tooltip id="my-tooltip" />
           </div>
-
-
         </div>
       </Modal>
     </FormProvider>
