@@ -1,9 +1,8 @@
 import { useState } from "react";
 import Constants from "../../../../utils/Constants";
-import { ReactComponent as NoAlarmIcon } from "../../../../assets/images/greencheck.svg";
 
 function useUsers() {
-    const [total, setTotal] = useState(100);
+    const [total, setTotal] = useState(0);
     const [limit, setLimit] = useState(Constants.DEFAULT_PAGE_SIZE);
     const [offset, setOffset] = useState(0);
     const [columns,] = useState([

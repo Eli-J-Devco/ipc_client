@@ -3,7 +3,7 @@ import {
     useReactTable,
 } from '@tanstack/react-table'
 import isArray from 'lodash/isArray';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 import Constants from '../../utils/Constants';
 
@@ -14,6 +14,7 @@ function useTable({ columns, data, total, setLimit, setOffset, slugProps }) {
     const [isDropDownsShow, setIsDropDownsShow] = useState(false);
     const dropDownsRef = useClickAway(() => setIsDropDownsShow(false));
     const [pageCount, setPageCount] = useState(-1);
+    const pageCountRef = useRef(-1);
 
     const columnDef = useMemo(
         () => isArray(columns) ?
@@ -56,13 +57,29 @@ function useTable({ columns, data, total, setLimit, setOffset, slugProps }) {
     const { pageIndex, pageSize } = table.getState().pagination;
 
     useEffect(() => {
-        table.setPageSize(Constants.DEFAULT_PAGE_SIZE);
-        if (setLimit) setLimit(Constants.DEFAULT_PAGE_SIZE);
+        setTimeout(() => {
+            table.setPageSize(Constants.DEFAULT_PAGE_SIZE);
+            table.setPageIndex(0);
+            if (setLimit) setLimit(Constants.DEFAULT_PAGE_SIZE);
+        }, 100);
     }, []);
 
     useEffect(() => {
-        if (total) setPageCount(() => Math.ceil(total / pageSize));
-    }, [total]);
+        if (pageCount === -1) return;
+        if (pageCount === 0) return;
+        if (pageIndex === 0) return;
+        if (pageCount < pageCountRef.current) {
+            pageCountRef.current = pageCount;
+            table.setPageIndex(pageIndex - 1);
+        }
+    }, [pageCount]);
+
+    useEffect(() => {
+        total && setTimeout(() => {
+            setPageCount(Math.ceil(total / pageSize));
+            if (pageCountRef.current === -1) pageCountRef.current = Math.ceil(total / pageSize);
+        }, 100);
+    }, [total, pageSize]);
 
     useEffect(() => {
         if (setOffset) setOffset(pageIndex * pageSize);
