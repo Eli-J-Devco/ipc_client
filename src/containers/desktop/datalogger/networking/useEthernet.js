@@ -81,7 +81,7 @@ export default function useEthernet() {
             delete ethernet1.data.type_ethernet;
         } catch (error) {
             if (!loginService.handleMissingInfo(error))
-                LibToast.toast(t("toastMessage.error.fetchError"), "error");
+                LibToast.toast(t("toastMessage.error.fetch"), "error");
             else navigate("/", { replace: true });
         } finally {
         }
@@ -94,8 +94,6 @@ export default function useEthernet() {
      * @param {Object} data
      */
     const onSubmit = (data) => {
-        console.log(data);
-        console.log("Submit form", existedEthernet.current);
         // Check if there is any change
         if (_.isEqual(data, existedEthernet.current)) {
             LibToast.toast(t("toastMessage.info.noChange"), "info");
@@ -113,15 +111,13 @@ export default function useEthernet() {
             try {
                 var output = document.getElementById("progress");
                 output.innerHTML = "<div><img src='/loading.gif' /></div>";
-                // console.log("Update ethernet", data);
                 const response = await axiosPrivate.post(Constants.API_URL.ETHERNET.ETHERNET_UPDATE + id, data, {
                     headers: {
                         "Content-Type": "application/json",
                     },
                 });
-                console.log(response);
                 if (response.status === 200) {
-                    LibToast.toast("Ethernet-1 " + t("toastMessage.info.updateSuccess"), "info");
+                    LibToast.toast("Ethernet-1 " + t("toastMessage.info.update"), "info");
                     to && navigate(to, { replace: true });
                 }
             } catch (error) {
@@ -131,7 +127,7 @@ export default function useEthernet() {
                 }
                 else {
                     if (!msg)
-                        LibToast.toast(t("toastMessage.error.updateFailed"), "error");
+                        LibToast.toast(t("toastMessage.error.update"), "error");
                     else navigate("/", { replace: true });
                 }
             }

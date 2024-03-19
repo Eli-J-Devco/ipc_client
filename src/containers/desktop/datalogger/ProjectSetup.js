@@ -29,23 +29,19 @@ const ProjectSetupInformation = () => {
      * @author nhan.tran 2024-03-11
      */
     useEffect(() => {
-        const fetchProjectSetup = async () => {
+        output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
+        setTimeout(async () => {
             try {
                 const response = await axiosPrivate.post(Constants.API_URL.PROJECT.PROJECT_INFO);
-                setTimeout(() => {
-                    setProjectSetup(response.data);
-                }, 300);
+                setProjectSetup(response.data);
             } catch (error) {
-                console.log(error);
                 if (!loginService.handleMissingInfo(error)) {
                     LibToast.toast("Error fetching project setup", "error");
                 }
                 else navigate("/", { replace: true });
             } finally {
             }
-        };
-
-        fetchProjectSetup();
+        }, 300);
     }, []);
 
     /**
@@ -63,7 +59,7 @@ const ProjectSetupInformation = () => {
 
     return (
         <div>
-            {projectSetup ? (
+            {projectSetup && !auth?.hasJustLoggedIn ? (
                 <Outlet />
             ) : (
                 <p></p>

@@ -6,7 +6,7 @@ function useUsers() {
     const [total, setTotal] = useState(100);
     const [limit, setLimit] = useState(Constants.DEFAULT_PAGE_SIZE);
     const [offset, setOffset] = useState(0);
-    const [columns, ] = useState([
+    const [columns,] = useState([
         {
             id: 1,
             slug: "id",
@@ -37,12 +37,15 @@ function useUsers() {
             name: <div className="text-center">Actions</div>
         }
     ]);
-    
+
     return {
         columns,
         total,
+        limit,
+        offset,
         setLimit,
         setOffset,
+        setTotal
     };
 }
 

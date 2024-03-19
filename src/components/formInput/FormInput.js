@@ -6,6 +6,8 @@ import styles from "./FormInput.module.scss";
 
 const FormInputContext = createContext();
 
+export const useFormInput = () => useContext(FormInputContext);
+
 function FormInput({ children, className, id, onSubmit, initialValues, validationSchema }) {
     const validate = useValidate(onSubmit, initialValues, validationSchema);
 
@@ -109,11 +111,11 @@ function Select({ className, label, name, option, horizontal, closeMenuOnSelect,
             minHeight: 31
         })
     };
-    
+
     return (
         <div className={`${styles["form-select"]} ${className ? className : ""} ${horizontal ? styles.horizontal : ""}`}>
             {label && <label>{label}</label>}
-            
+
             <ReactSelect
                 name={name}
                 className={styles.select}

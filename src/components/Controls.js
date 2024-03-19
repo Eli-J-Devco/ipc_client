@@ -88,7 +88,7 @@ export const RText = (props) => (
 )
 
 export const RTextForm = (props) => {
-    const { register, formState: { errors } } = useFormContext({ mode: 'onChange' })
+    const { register, formState: { errors } } = useFormContext()
     return (
         <>
             {(props.label !== "" && typeof props.label != 'undefined') &&
@@ -111,7 +111,7 @@ export const RTextForm = (props) => {
                         onKeyDown={props.onKeyDown}
                         autoComplete="off"
                         type={props.type ? props.type : "text"}
-                        {...register(props.inputName, props.required && { required: props.required, pattern: props.pattern, max: props.max, min: props.min, maxLength: props.maxLength, minLength: props.minLength })}
+                        {...register(props.inputName, props.required && { required: props.required, pattern: props.pattern, max: props.max, min: props.min, maxLength: props.maxLength, minLength: props.minLength, valueAsNumber: props.valueAsNumber ? true : false, valueAsDate: props.valueAsDate ? true : false })}
                     />
 
                     {(props.info !== "" && typeof props.info !== 'undefined') &&

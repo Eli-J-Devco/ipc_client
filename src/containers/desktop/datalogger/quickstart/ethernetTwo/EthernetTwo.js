@@ -22,10 +22,10 @@ function EthernetTwo() {
     var output = document.getElementById("progress");
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
-      ethernet.setId(1);
+      ethernet.setId(2);
       ethernet.setFrom(from);
       ethernet.setTo(to);
-      await ethernet.fetchEthernetOne(1);
+      await ethernet.fetchEthernetOne(2);
       output.innerHTML = "";
     }, 500);
   }, []);

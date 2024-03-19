@@ -34,10 +34,12 @@ export default function Devices() {
   const [device, setDevice] = useState([]);
 
   useEffect(() => {
+    if (isAddDevice) return;
+
+    var output = document.getElementById("progress");
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        var output = document.getElementById("progress");
-        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         const { data } = await axiosPrivate.post(Constants.API_URL.DEVICES.LIST);
         setdataDevices(data);
         const { data: deviceConfig } = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG);
@@ -49,7 +51,7 @@ export default function Devices() {
         }
         else {
           if (!loginService.handleMissingInfo(error))
-            LibToast.toast(t("toastMessage.error.fetchError"), "error");
+            LibToast.toast(t("toastMessage.error.fetch"), "error");
           else
             navigate("/");
         }
@@ -58,7 +60,7 @@ export default function Devices() {
       }
     }, 1000);
 
-  }, []);
+  }, [isAddDevice, navigate, t, axiosPrivate]);
 
   const columns = [
     { id: 1, slug: "id", name: "Serial Number", width: 100 },
@@ -139,9 +141,7 @@ export default function Devices() {
           />
       }
 
-
       <div className={styles.pagging_devices}>
-
       </div>
     </div>
   );

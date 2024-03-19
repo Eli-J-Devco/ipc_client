@@ -1,3 +1,8 @@
+/********************************************************
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
@@ -45,6 +50,11 @@ function UploadChannels() {
     const output = document.getElementById('progress');
     useEffect(() => {
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
+        /**
+         * Get channel config
+         * @author nhan.tran 2024-03-13
+         * @return {Object}
+         */
         const getChannelConfig = async () => {
             try {
                 const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.CONFIG_CHANNEL);
@@ -54,7 +64,10 @@ function UploadChannels() {
                     }, 100);
                 }
             } catch (error) {
-                console.log('error', error);
+                if (!loginService.handleMissingInfo(error)) {
+                    LibToast.toast(t('toastMessage.error.fetch'), 'error');
+                }
+                else navigate("/", { replace: true });
             }
             finally { };
         };
@@ -62,12 +75,24 @@ function UploadChannels() {
     }, []);
 
     useEffect(() => {
+        /**
+         * Set value for channel config when it is available
+         * @author nhan.tran 2024-03-13
+         * @param {Object} channelConfig
+         * @return {Object}
+         */
         setTimeout(() => {
             setProtocol(channelConfig?.type_protocol?.map((protocol) => ({ value: protocol.id, label: protocol.Protocol })));
             setDevices(channelConfig?.device_list?.map((device) => ({ value: device.id, label: device.name })));
             setLoggingInterval(channelConfig?.type_logging_interval?.map((interval) => ({ value: interval.id, label: interval.time })));
             defaultLoggingInterval.current = channelConfig?.type_logging_interval?.filter((interval) => interval.time === '5 minutes');
         }, 100);
+
+        /**
+         * Get all channels from server and set value for each channel when it is available
+         * @author nhan.tran 2024-03-13
+         * @return {Object}
+         */
         const getAllChannels = async () => {
             try {
                 const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.ALL_CHANNELS);
@@ -85,7 +110,7 @@ function UploadChannels() {
                 }
             } catch (error) {
                 if (!loginService.handleMissingInfo(error)) {
-                    LibToast.toast(t('toastMessage.error.fetchError'), 'error');
+                    LibToast.toast(t('toastMessage.error.fetch'), 'error');
                 }
                 else navigate("/", { replace: true });
             }
@@ -97,8 +122,13 @@ function UploadChannels() {
         getAllChannels();
     }, [channelConfig]);
 
+    /**
+     * Handle save channel information when user click on save button
+     * @author nhan.tran 2024-03-13
+     * @param {Object} data
+     * @return {Object}
+     */
     const handleSave = (data) => {
-        console.log('data', data);
         channels.forEach((channel, index) => {
             channel.uploadurl = data[`upload_url_${channel?.name}`];
             channel.password = data[`password_${channel?.name}`];
@@ -112,7 +142,7 @@ function UploadChannels() {
                 output.innerHTML = "<div><img src='/loading.gif' /></div>";
                 const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.UPDATE_CHANNEL, channels);
                 if (response?.status === 200) {
-                    LibToast.toast(`Upload channels ${t('toastMessage.info.updateSuccess')}`, 'info');
+                    LibToast.toast(`Upload channels ${t('toastMessage.info.update')}`, 'info');
                     navigate(to, { replace: true });
                 }
             } catch (error) {
@@ -130,6 +160,14 @@ function UploadChannels() {
         }, 200);
     };
 
+    /**
+     * Handle change protocol when user select a protocol from dropdown list
+     * @author nhan.tran 2024-03-13
+     * @param {Object} event
+     * @param {Number} index
+     * @param {String} name
+     * @return {Object}
+     */
     const onProtocolChange = (event, index, name) => {
         let temp = [...channels];
         if (event.value === channelsRef.current[index]?.type_protocol?.id) {

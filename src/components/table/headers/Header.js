@@ -8,7 +8,7 @@ function Header({ variant, item, table, resizable, draggable }) {
         <th
             ref={dropRef}
             className={`${styles.header} ${variant ? styles[variant] : ""} ${item.column.getIsResizing() ? styles["is-resizing"] : ""}`}
-            style={{ width: item.getSize() }}
+            style={{ width: item.getSize() ? item.getSize() : "100px" }}
         >
             <div
                 ref={dragRef}
@@ -16,7 +16,7 @@ function Header({ variant, item, table, resizable, draggable }) {
             >
                 {item.column.columnDef.header}
             </div>
-            
+
             {
                 resizable &&
                 <div
