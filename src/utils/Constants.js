@@ -16,8 +16,8 @@ switch (url) {
     serverData = "";
     break;
   default:
-    serverAPI = "http://115.78.133.129:3001";
-    // serverAPI = "http://127.0.0.1:3001";
+    // serverAPI = "http://115.78.133.129:3001";
+    serverAPI = "http://127.0.0.1:3001";
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -117,8 +117,8 @@ const Constants = {
     APPROVAL: "approval",
     FULL: "auths",
   },
-  PAGE_SIZES: [10, 20, 50, 100],
-  DEFAULT_PAGE_SIZE: 20,
+  PAGE_SIZES: [5, 10, 20, 50, 100],
+  DEFAULT_PAGE_SIZE: 5,
   TOAST_AUTO_CLOSE: 1000,
   TIME_UNIT: {
     TYPE: {

@@ -146,7 +146,7 @@ const Permissions = ({ permissions, setPermissions, selectedRole }) => {
             finally {
                 output.innerHTML = "";
             }
-        }, 500);
+        }, 100);
     };
 
     /**
@@ -156,8 +156,14 @@ const Permissions = ({ permissions, setPermissions, selectedRole }) => {
      * @param {Array} tableData data of table before saving
      */
     useEffect(() => {
-        if (!screensData || tableData.current.length > 0)
+        if (!screensData)
             return;
+
+        if (tableData.current.length > 0) {
+            onSave(screensData);
+            return;
+        }
+
         tableData.current = _.cloneDeep(screensData);
     }, [screensData]);
 

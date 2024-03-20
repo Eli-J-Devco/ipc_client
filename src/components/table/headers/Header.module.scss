@@ -36,7 +36,7 @@
     }
 
     &.is-resizing {
-        + th {
+        +th {
             .resizer {
                 opacity: 0;
             }

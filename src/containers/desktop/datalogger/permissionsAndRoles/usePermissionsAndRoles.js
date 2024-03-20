@@ -15,11 +15,16 @@ export default function usePermissionsAndRoles() {
   const openEditRoles = () => setIsOpenRolesModal({ edit: true, isCancel: true });
   const closeEditRoles = (isCancel) => setIsOpenRolesModal({ edit: false, isCancel: isCancel });
 
+  const openConfirmDeleteRoles = () => setIsOpenRolesModal({ delete: true, isCancel: true });
+  const closeConfirmDeleteRoles = (isCancel) => setIsOpenRolesModal({ delete: false, isCancel: isCancel });
+
   return {
     isOpenRolesModal,
     openAddRoles,
     closeAddRoles,
     openEditRoles,
     closeEditRoles,
+    openConfirmDeleteRoles,
+    closeConfirmDeleteRoles
   }
 }
