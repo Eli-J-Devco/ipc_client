@@ -77,7 +77,7 @@ const Constants = {
       GET_ONE: "/users/only_user",
       UPDATE: "/users/update_user/",
       DELETE: "/users/delete/user/",
-      ADD: "/users/add/",
+      ADD: "/users/create_user/",
       ALL_ROLE: "/users/all_role",
       ROLE_SCREEN: "/users/get/role_screen/",
       UPDATE_ROLE: "/users/update/role/",

@@ -34,8 +34,6 @@ const Permissions = ({ permissions, setPermissions, selectedRole }) => {
      */
     useEffect(() => {
         if (!permissions[selectedRole?.id] || !selectedRole) return;
-        var output = document.getElementById("progress");
-        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         setTimeout(() => {
             setScreensData([]);
             tableData.current = [];
@@ -66,7 +64,6 @@ const Permissions = ({ permissions, setPermissions, selectedRole }) => {
                     setScreensData(prevState => [...prevState, screen]);
                 }
             });
-            output.innerHTML = "";
         }, 100);
     }, [permissions, selectedRole]);
 
