@@ -104,6 +104,7 @@
             "noChange": "No changes have been made.",
             "update": "has been updated successfully.",
             "delete": "has been deleted successfully.",
+            "add": "has been added successfully.",
             "logout": "You have been logged out",
             "loginSuccess": "Welcome back!"
         }

@@ -3,6 +3,8 @@ import ReactSelect from 'react-select';
 import useValidate from './useValidate';
 import { createContext, forwardRef, useContext, useEffect, useRef, useState } from 'react';
 import styles from "./FormInput.module.scss";
+import { ReactComponent as LockIcon } from "../../assets/images/lock.svg";
+import { ReactComponent as UnlockIcon } from "../../assets/images/unlock.svg";
 
 const FormInputContext = createContext();
 
@@ -25,8 +27,9 @@ function FormInput({ children, className, id, onSubmit, initialValues, validatio
     );
 }
 
-function Text({ className, label, placeholder, name, value, disabled, readOnly, autoComplete = "off", textarea, horizontal, onChange, onBlur, unit }) {
+function Text({ className, label, placeholder, name, value, type = "text", disabled, readOnly, autoComplete = "off", textarea, horizontal, onChange, onBlur, onClick, unit }) {
     const validate = useContext(FormInputContext);
+    const [showPassword, setShowPassword] = useState(false);
 
     return (
         <Form.Group
@@ -34,24 +37,43 @@ function Text({ className, label, placeholder, name, value, disabled, readOnly, 
             className={`${styles["form-text-wrapper"]} ${className ? className : ""} ${horizontal ? styles.horizontal : ""}`}
         >
             {label && <Form.Label>{label}</Form.Label>}
-
-            <Form.Control
-                className={styles["form-text"]}
-                placeholder={placeholder}
-                size="sm"
-                name={name}
-                disabled={disabled}
-                readOnly={readOnly}
-                autoComplete={autoComplete}
-                as={textarea ? "textarea" : "input"}
-                rows={3}
-                value={validate && value === undefined ? validate.values[name] : value}
-                onChange={validate && onChange === undefined ? validate.handleChange : onChange}
-                onBlur={validate && onBlur === undefined ? validate.handleBlur : onBlur}
-                isInvalid={validate ? validate.touched[name] && validate.errors[name] : false}
-            />
+            <div style={{ position: "relative" }}>
+                <div>
+                    <Form.Control
+                        className={styles["form-text"]}
+                        placeholder={placeholder}
+                        size="sm"
+                        name={name}
+                        type={type === "password" && !showPassword ? "password" : "text"}
+                        disabled={disabled}
+                        readOnly={readOnly}
+                        autoComplete={autoComplete}
+                        as={textarea ? "textarea" : "input"}
+                        rows={3}
+                        value={validate && value === undefined ? validate.values[name] : value}
+                        onClick={validate && onClick === undefined ? validate.handleFocus : onClick}
+                        onChange={validate && onChange === undefined ? validate.handleChange : onChange}
+                        onBlur={validate && onBlur === undefined ? validate.handleBlur : onBlur}
+                        isInvalid={validate ? validate.touched[name] && validate.errors[name] : false}
+                    />
+                    <Form.Control.Feedback type="invalid" >{validate ? validate.errors[name] : ""}</Form.Control.Feedback>
+                </div>
+                {
+                    type === "password" ?
+                        <span style={{ position: "absolute", top: '10%', right: 0 }} onClick={() => setShowPassword(!showPassword)}>
+                            {!showPassword ?
+                                (
+                                    <LockIcon style={{ padding: 4 }} />
+                                ) :
+                                (
+                                    <UnlockIcon style={{ padding: 4 }} />
+                                )
+                            }
+                        </span>
+                        : ""
+                }
+            </div>
             {unit && <Form.Label className='ms-2'>{unit}</Form.Label>}
-            <Form.Control.Feedback type="invalid" >{validate ? validate.errors[name] : ""}</Form.Control.Feedback>
         </Form.Group>
     );
 }

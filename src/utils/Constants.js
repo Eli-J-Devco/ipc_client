@@ -78,6 +78,8 @@ const Constants = {
       UPDATE: "/users/update_user/",
       DELETE: "/users/delete/user/",
       ADD: "/users/create_user/",
+      CHANGE_PASSWORD: "/users/change_password/",
+      RESET_PASSWORD: "/users/reset_password/",
       ALL_ROLE: "/users/all_role",
       ROLE_SCREEN: "/users/get/role_screen/",
       UPDATE_ROLE: "/users/update/role/",

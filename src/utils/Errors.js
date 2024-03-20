@@ -6,8 +6,8 @@
 
 const LoginErrorsList = {
   400: "Missing Username or Password",
-  403: "Username or Password is incorrect",
-  // 403: "You do not have permission to access this resource",
+  403: "Your account is locked. Please contact your administrator.",
+  404: "Username or Password is incorrect",
   500: "Login Failed",
 };
 
