@@ -171,6 +171,7 @@ export default function Users() {
           pagination={{
             enable: true,
             total: total,
+            offset: offset,
             setLimit: setLimit,
             setOffset: setOffset
           }}

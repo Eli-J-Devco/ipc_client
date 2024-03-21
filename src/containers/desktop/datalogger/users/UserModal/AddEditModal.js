@@ -23,10 +23,11 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
     const schema = yup.object().shape({
         first_name: yup.string().required("First Name is required"),
         last_name: yup.string().required("Last Name is required"),
-        email: yup.string().matches(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, "Email is not valid").required("Email is required"),
-        phone: yup.string().matches(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/, "Phone number is not valid").required("Phone number is required"),
-        ...(isOpenModal?.action === "Add" && {
+        roles_id: yup.array().min(1, "Role is required"),
+        ...(isOpenModal?.action === actionOption.Add.action && {
+            email: yup.string().matches(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, "Email is not valid").required("Email is required"),
             password: yup.string().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character").required("Password is required").min(8, "Password must be at least 8 characters"),
+            confirmPassword: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match').required("Confirm password is required")
         }),
     });
 
@@ -36,7 +37,7 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
             return;
         }
 
-        let url = isOpenModal?.action === actionOption.Add ? Constants.API_URL.USERS.ADD : Constants.API_URL.USERS.UPDATE;
+        let url = isOpenModal?.action === actionOption.Add.action ? Constants.API_URL.USERS.ADD : Constants.API_URL.USERS.UPDATE;
         const { id, first_name, last_name, phone, roles_id, status } = data;
         const role = roles_id?.map(role => ({ id: role.value })) || [];
 
@@ -47,7 +48,7 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
             phone: phone || "",
             role,
             status: status?.value,
-            ...(isOpenModal?.action === actionOption.Add && { email: data?.email, password: data?.password })
+            ...(isOpenModal?.action === actionOption.Add.action && { email: data?.email, password: data?.password })
         };
 
         var output = document.getElementById("progress");
@@ -87,7 +88,7 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
     </div>
 
     useEffect(() => {
-        !allRoles.length && isOpenModal?.action !== actionOption.ConfirmDelete && setTimeout(async () => {
+        !allRoles.length && setTimeout(async () => {
             try {
                 const response = await axiosPrivate.post(Constants.API_URL.USERS.ALL_ROLE);
                 if (response?.status === 200) {
@@ -124,22 +125,26 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
                             name="first_name"
                             placeholder="First Name"
                             className="mb-3"
+                            required={true}
                         />
                         <FormInput.Text
                             label="Email"
                             name="email"
                             placeholder="Email"
                             className="mb-3"
-                            disabled={isOpenModal?.action === actionOption.Edit}
+                            disabled={isOpenModal?.action === actionOption.Edit.action}
+                            required={isOpenModal?.action === actionOption.Add.action}
                         />
                         {
-                            isOpenModal?.action === actionOption.Add &&
+                            isOpenModal?.action === actionOption.Add.action &&
                             <FormInput.Text
                                 label="Password"
                                 name="password"
                                 type='password'
                                 placeholder="Password"
                                 className="mb-3"
+                                required={true}
+                                isRandom={true}
                             />
                         }
                         <FormInput.Select
@@ -150,6 +155,7 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
                             isSearchable={true}
                             option={allRoles}
                             className="mb-3"
+                            required={true}
                         />
                     </div>
                     <div className='col-5 m-3'>
@@ -158,6 +164,7 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
                             name="last_name"
                             placeholder="Last Name"
                             className="mb-3"
+                            required={true}
                         />
                         <FormInput.Text
                             label="Phone Number"
@@ -165,11 +172,23 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
                             placeholder="Phone Number"
                             className="mb-3"
                         />
+                        {
+                            isOpenModal?.action === actionOption.Add.action &&
+                            <FormInput.Text
+                                label="Confirm password"
+                                name="confirmPassword"
+                                type='password'
+                                placeholder="Confirm password"
+                                className="mb-3"
+                                required={true}
+                            />
+                        }
                         <FormInput.Select
                             label="Status"
                             name="status"
                             option={statusOption}
                             className="mb-3"
+                            required={true}
                         />
                     </div>
                 </div>

@@ -7,14 +7,13 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 import Constants from '../../utils/Constants';
 
-function useTable({ columns, data, total, setLimit, setOffset, slugProps }) {
+function useTable({ columns, data, total, offset, setLimit, setOffset, slugProps }) {
     const [columnVisibility, setColumnVisibility] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: true }), {}));
     const [columnSizing, setColumnSizing] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: cur.width ? cur.width : 100 }), {}));
     const [columnOrder, setColumnOrder] = useState(columns.map(column => column.id.toString()));
     const [isDropDownsShow, setIsDropDownsShow] = useState(false);
     const dropDownsRef = useClickAway(() => setIsDropDownsShow(false));
     const [pageCount, setPageCount] = useState(-1);
-    const pageCountRef = useRef(-1);
 
     const columnDef = useMemo(
         () => isArray(columns) ?
@@ -65,19 +64,12 @@ function useTable({ columns, data, total, setLimit, setOffset, slugProps }) {
     }, []);
 
     useEffect(() => {
-        if (pageCount === -1) return;
-        if (pageCount === 0) return;
-        if (pageIndex === 0) return;
-        if (pageCount < pageCountRef.current) {
-            pageCountRef.current = pageCount;
-            table.setPageIndex(pageIndex - 1);
-        }
-    }, [pageCount]);
+        table.setPageIndex(offset / pageSize);
+    }, [offset, pageSize, table]);
 
     useEffect(() => {
         total && setTimeout(() => {
             setPageCount(Math.ceil(total / pageSize));
-            if (pageCountRef.current === -1) pageCountRef.current = Math.ceil(total / pageSize);
         }, 100);
     }, [total, pageSize]);
 

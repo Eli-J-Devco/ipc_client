@@ -50,3 +50,15 @@ export const formatTimeUnit = (time, timeUnit, format, needConvert, from, to) =>
     }
     return `${time} ${timeUnits[needConvert ? to : timeUnit][format]}`;
 };
+
+
+export const generateRandomPassword = () => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*?&';
+    let password = '';
+    for (let i = 0; i < 10; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        password += characters[randomIndex];
+    }
+    return regex.test(password) ? password : generateRandomPassword();
+};
