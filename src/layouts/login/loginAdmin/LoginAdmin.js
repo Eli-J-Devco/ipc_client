@@ -18,6 +18,9 @@ import { clearToken, getToken, setToken } from "../../../utils/Token";
 import useAuth from "../../../hooks/useAuth";
 import { loginService } from "../../../services/loginService";
 
+import { ReactComponent as LockIcon } from "../../../assets/images/lock.svg";
+import { ReactComponent as UnlockIcon } from "../../../assets/images/unlock.svg";
+
 /**
  * Login Admin
  * @author nhan.tran 2024-02-26
@@ -48,7 +51,7 @@ const LoginAdmin = () => {
    * @author nhan.tran 2024-02-26
    * @param {data} hash email and password
    */
-  const onSubmit = async (data) => {
+  const onSubmit = (data) => {
     if (Libs.isObjectEmpty(data)) return;
 
     var params = {
@@ -57,31 +60,35 @@ const LoginAdmin = () => {
     };
 
     var output = document.getElementById("progress");
-    try {
-      const response = await loginService.login(params, output);
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    setTimeout(async () => {
+      try {
+        const response = await loginService.login(params, output);
 
-      var { userName, permissions, project_id } = response;
-      setToken("userName", userName);
-      setToken("permissions", permissions);
-      setToken("project_id", project_id);
+        var { userName, permissions, project_id } = response;
+        setToken("userName", userName);
+        setToken("permissions", permissions);
+        setToken("project_id", project_id);
 
-      setAuth({ ...response, isAuthenticated: true, hasJustLoggedIn: true });
-      localStorage.setItem("persist", true);
+        setAuth({ ...response, isAuthenticated: true, hasJustLoggedIn: true });
+        localStorage.setItem("persist", true);
 
-      LibToast.toast(t("toastMessage.info.loginSuccess") + " " + userName, "info");
-      navigate(from, { replace: true });
-    } catch (err) {
-      const msg = LoginErrors(err);
-      setErrMsg(msg);
-    }
-    finally {
-      output.innerHTML = "";
-    }
+        LibToast.toast(t("toastMessage.info.loginSuccess") + " " + userName, "info");
+        navigate(from, { replace: true });
+      } catch (err) {
+        const msg = LoginErrors(err);
+        setErrMsg(msg);
+      }
+      finally {
+        output.innerHTML = "";
+      }
+    }, 300);
   };
 
   useEffect(() => {
     if (errMsg) {
       LibToast.toast(errMsg, "error");
+      setErrMsg("");
     }
   }, [errMsg]);
 
@@ -177,9 +184,9 @@ const LoginAdmin = () => {
               >
                 {
                   !showPassword ? (
-                    <svg style={{ padding: 4 }} height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><g fill="#494c4e"><path d="m14 15c0 .74-.4 1.38-1 1.73v2.27c0 .55-.45 1-1 1s-1-.45-1-1v-2.27c-.6-.35-1-.99-1-1.73 0-1.1.9-2 2-2s2 .9 2 2z" /><path d="m19 9h-1v-4c0-2.76-2.24-5-5-5h-2c-2.76 0-5 2.24-5 5v4h-1c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-11c0-1.1-.9-2-2-2zm-11-4c0-1.65 1.35-3 3-3h2c1.65 0 3 1.35 3 3v4h-8zm11 16.5c0 .28-.22.5-.5.5h-13c-.28 0-.5-.22-.5-.5v-10c0-.28.22-.5.5-.5h13c.28 0 .5.22.5.5z" /></g></svg>
+                    <LockIcon style={{ padding: 4 }} />
                   ) : (
-                    <svg style={{ padding: 4 }} height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><g fill="#494c4e"><path d="m19 1h-1c-2.76 0-5 2.24-5 5v3h-11c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-11c0-1.1-.9-2-2-2h-1v-3c0-1.65 1.35-3 3-3h1c1.65 0 3 1.35 3 3v6c0 .55.45 1 1 1s1-.45 1-1v-6c0-2.76-2.24-5-5-5zm-3.5 10c.28 0 .5.22.5.5v10c0 .27-.22.5-.5.5h-13c-.28 0-.5-.22-.5-.5v-10c0-.27.22-.5.5-.5z" /><path d="m11 15c0 .74-.4 1.38-1 1.73v2.27c0 .55-.45 1-1 1s-1-.45-1-1v-2.27c-.6-.35-1-.99-1-1.73 0-1.1.9-2 2-2s2 .9 2 2z" /></g></svg>
+                    <UnlockIcon style={{ padding: 4 }} />
                   )
                 }
               </div>

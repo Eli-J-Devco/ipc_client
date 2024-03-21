@@ -3,14 +3,14 @@
 * All rights reserved.
 * 
 *********************************************************/
-import React, { useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
 import styles from './Users.module.scss';
 import Table from '../../../../components/table/Table';
 import { ReactComponent as EditIcon } from "../../../../assets/images/edit.svg";
 import { ReactComponent as DeleteIcon } from "../../../../assets/images/delete.svg";
 import { ReactComponent as StatusIcon } from "../../../../assets/images/status-circle.svg";
-import { ReactComponent as ExportIcon } from "../../../../assets/images/export.svg";
+import { ReactComponent as ResetPassword } from "../../../../assets/images/reset-password.svg";
 import { ReactComponent as AddIcon } from "../../../../assets/images/add.svg";
 import Button from '../../../../components/button/Button';
 import FormInput from "../../../../components/formInput/FormInput";
@@ -22,14 +22,18 @@ import { loginService } from '../../../../services/loginService';
 import LibToast from '../../../../utils/LibToast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import useUserModal from './useUserModal';
+import UserModal from './UserModal/UserModal';
 
 export default function Users() {
   const { t } = useTranslation();
 
   const { columns, total, limit, offset, setLimit, setOffset, setTotal } = useUsers();
+  const { actionOption, isOpenModal, openModal, closeModal } = useUserModal();
+  const [statusFilter, setStatusFilter] = useState(undefined); // 1: Active, 0: Inactive
   const axiosPrivate = useAxiosPrivate();
 
-  const [isDelete, setIsDelete] = useState(false);
+  const [needRefresh, setNeedRefresh] = useState(false);
   const [dataList, setDataList] = useState([]);
   const navigate = useNavigate();
 
@@ -38,7 +42,7 @@ export default function Users() {
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        const response = await axiosPrivate.post(Constants.API_URL.USERS.LIST + `?page=${offset}&limit=${limit}`);
+        const response = await axiosPrivate.post(Constants.API_URL.USERS.LIST + `?page=${offset}&limit=${limit}${statusFilter !== undefined ? `&status=${statusFilter}` : ""}`);
 
         if (response?.status === 204) {
           throw response;
@@ -53,7 +57,8 @@ export default function Users() {
             email: item?.email,
             phone: item?.phone,
             roles: item?.role.map(role => role.name).join(", "),
-            status: item?.status ? 1 : 0,
+            roles_id: item?.role.map(role => ({ value: role.id, label: role.name })),
+            status: { value: item?.status ? 1 : 0, label: item?.status ? "Active" : "Inactive" },
             actions: ""
           }
         });
@@ -76,40 +81,15 @@ export default function Users() {
           navigate("/");
         }
       } finally {
-        setIsDelete(false);
+        needRefresh && setNeedRefresh(false);
         output.innerHTML = "";
       }
     }, 100);
-  }, [offset, limit, isDelete]);
-
-  const handleDelete = (id) => {
-    setTimeout(async () => {
-      try {
-        const response = await axiosPrivate.post(Constants.API_URL.USERS.DELETE, {
-          id: id
-        });
-        if (response?.status === 200) {
-          setIsDelete(true);
-          setTotal(total - 1);
-          LibToast.toast(`User with id: ${id} ${t('toastMessage.info.delete')}`, 'info');
-        }
-      } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === 'string') {
-          LibToast.toast(msg, 'error');
-        }
-        else if (!msg) {
-          LibToast.toast(t('toastMessage.error.delete'), 'error');
-        }
-        else {
-          navigate("/");
-        }
-      }
-    }, 300);
-  }
+  }, [offset, limit, statusFilter, needRefresh]);
 
   return (
     <div className="main">
+      {isOpenModal && <UserModal isOpenModal={isOpenModal} closeModal={closeModal} setNeedRefresh={setNeedRefresh} />}
       <div className={styles.header}>
         <Breadcrumb
           routes={[
@@ -123,26 +103,34 @@ export default function Users() {
             }
           ]}
         />
-        <div className={styles.right_header}>
-          <div>
-            <FormInput.Text
+        <FormInput>
+          <div className={styles.right_header}>
+            {/* <FormInput.Text
+              name="search"
               className={styles.search}
               placeholder="Keyword..."
+            /> */}
+            <FormInput.Select
+              className='me-3'
+              name={"statusFilter"}
+              option={[
+                { value: 1, label: "Active" },
+                { value: 0, label: "Inactive" }
+              ]}
+              onChange={e => setStatusFilter(e?.value)}
+              isClearable={true}
+              placeholder={"Status"}
             />
-          </div>
-          <div>
-            <div className={styles.button}>
-              <div className={styles.export}>
-                <ExportIcon />
-                <span>Export</span>
-              </div>
-
+            <div className={styles.button} onClick={() => openModal(actionOption.Add.action)}>
               <div className={styles.add}>
-                <AddIcon />
+                <Button.Image
+                  image={<AddIcon />}
+                  title="Add new user"
+                />
               </div>
             </div>
           </div>
-        </div>
+        </FormInput>
 
       </div>
 
@@ -153,9 +141,7 @@ export default function Users() {
 
           status={item => (
             <div >
-              <Button.Image
-                image={<StatusIcon />}
-              />
+              {<StatusIcon fill={item?.status?.value ? "#38FF49" : "red"} />}
             </div>
           )}
           control={true}
@@ -164,11 +150,20 @@ export default function Users() {
               <Button.Image
                 image={<EditIcon />}
                 className="mx-2"
+                title="Edit"
+                onClick={() => openModal(actionOption.Edit.action, { ...item, first_name: item?.full_name.split(" ")[0], last_name: item?.full_name.split(" ")[1] })}
               />
               <Button.Image
                 image={<DeleteIcon />}
                 className="mx-2"
-                onClick={() => handleDelete(item?.id)}
+                title="Delete"
+                onClick={() => openModal(actionOption.ConfirmDelete.action, { id: item?.id })}
+              />
+              <Button.Image
+                image={<ResetPassword />}
+                className="mx-2"
+                title="Reset Password"
+                onClick={() => openModal(actionOption.ResetPassword.action, { ...item })}
               />
             </div>
           )}

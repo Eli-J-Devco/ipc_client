@@ -16,8 +16,8 @@ switch (url) {
     serverData = "";
     break;
   default:
-    // serverAPI = "http://115.78.133.129:3001";
-    serverAPI = "http://127.0.0.1:3001";
+    serverAPI = "http://115.78.133.129:3001";
+    // serverAPI = "http://127.0.0.1:3001";
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -77,7 +77,9 @@ const Constants = {
       GET_ONE: "/users/only_user",
       UPDATE: "/users/update_user/",
       DELETE: "/users/delete/user/",
-      ADD: "/users/add/",
+      ADD: "/users/create_user/",
+      CHANGE_PASSWORD: "/users/change_password/",
+      RESET_PASSWORD: "/users/reset_password/",
       ALL_ROLE: "/users/all_role",
       ROLE_SCREEN: "/users/get/role_screen/",
       UPDATE_ROLE: "/users/update/role/",

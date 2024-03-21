@@ -45,33 +45,41 @@ export default function PermissionsAndRoles() {
    * @param {Object} selectedRole selected role
    */
   useEffect(() => {
-    selectedRole && !permissions[selectedRole?.id] && setTimeout(async () => {
-      try {
-        const response = await axiosPrivate.post(Constants.API_URL.USERS.ROLE_SCREEN, {
-          id_role: selectedRole?.id
-        },
-          { headers: { 'Content-Type': 'application/json' } }
-        );
-        if (response.status === 200) {
-          // Set permissions for selected role to reduce fetching data
-          setPermissions(prevState => ({ ...prevState, [selectedRole?.id]: response.data }));
+    var output = document.getElementById("progress");
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    if (selectedRole && !permissions[selectedRole?.id]) {
+      setTimeout(async () => {
+        try {
+          const response = await axiosPrivate.post(Constants.API_URL.USERS.ROLE_SCREEN, {
+            id_role: selectedRole?.id
+          },
+            { headers: { 'Content-Type': 'application/json' } }
+          );
+          if (response.status === 200) {
+            // Set permissions for selected role to reduce fetching data
+            setPermissions(prevState => ({ ...prevState, [selectedRole?.id]: response.data }));
+          }
         }
-      }
-      catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === 'string') {
-          LibToast.toast(msg, 'error');
-        }
-        else {
-          if (!msg) {
-            LibToast.toast(t('toastMessage.error.fetch'), 'error');
+        catch (error) {
+          let msg = loginService.handleMissingInfo(error);
+          if (typeof msg === 'string') {
+            LibToast.toast(msg, 'error');
           }
           else {
-            navigate('/');
+            if (!msg) {
+              LibToast.toast(t('toastMessage.error.fetch'), 'error');
+            }
+            else {
+              navigate('/');
+            }
           }
         }
-      }
-    }, 300);
+        finally {
+          output.innerHTML = "";
+        }
+      }, 300);
+    }
+    output.innerHTML = "";
   }, [selectedRole, axiosPrivate, navigate, t, permissions]);
 
   /**

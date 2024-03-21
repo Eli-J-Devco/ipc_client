@@ -1,21 +1,27 @@
-.header{
+.header {
   position: relative;
   text-align: right;
-  .right_header{
+
+  .right_header {
     display: flex;
     position: absolute;
     right: 10px;
     top: 2px;
+    text-align: left;
+
     .search {
       input {
-          border-radius: 15px;
-          border-color: var(--bg-color-dark);
+        border-radius: 15px;
+        border-color: var(--bg-color-dark);
       }
+
       margin-right: 1rem;
     }
-    .button{
+
+    .button {
       display: flex;
-      .export{
+
+      .export {
         border-radius: 15px;
         background-color: #D3D3D3;
         width: auto;
@@ -24,15 +30,18 @@
         cursor: pointer;
         display: inline-block;
         margin-right: 16px;
-        span{
+
+        span {
           margin-left: 8px;
         }
-        svg{
+
+        svg {
           position: relative;
           top: -4px;
         }
       }
-      .add{
+
+      .add {
         margin-right: 16px;
         background-color: #D3D3D3;
         border-radius: 15px;
