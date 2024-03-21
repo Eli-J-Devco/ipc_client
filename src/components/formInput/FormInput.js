@@ -5,6 +5,8 @@ import { createContext, forwardRef, useContext, useEffect, useRef, useState } fr
 import styles from "./FormInput.module.scss";
 import { ReactComponent as LockIcon } from "../../assets/images/lock.svg";
 import { ReactComponent as UnlockIcon } from "../../assets/images/unlock.svg";
+import { ReactComponent as RandomIcon } from '../../assets/images/random.svg';
+import { generateRandomPassword } from '../../utils/Utils';
 
 const FormInputContext = createContext();
 
@@ -27,7 +29,7 @@ function FormInput({ children, className, id, onSubmit, initialValues, validatio
     );
 }
 
-function Text({ className, label, placeholder, name, value, type = "text", disabled, readOnly, autoComplete = "off", textarea, horizontal, onChange, onBlur, onClick, unit }) {
+function Text({ className, label, placeholder, name, value, required, isRandom, type = "text", disabled, readOnly, autoComplete = "off", textarea, horizontal, onChange, onBlur, onClick, unit }) {
     const validate = useContext(FormInputContext);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -36,7 +38,14 @@ function Text({ className, label, placeholder, name, value, type = "text", disab
             controlId={name}
             className={`${styles["form-text-wrapper"]} ${className ? className : ""} ${horizontal ? styles.horizontal : ""}`}
         >
-            {label && <Form.Label>{label}</Form.Label>}
+            {label &&
+                <Form.Label>
+                    {label}
+                    {
+                        required ? <span className="required">*</span> : ""
+                    }
+                </Form.Label>
+            }
             <div style={{ position: "relative" }}>
                 <div>
                     <Form.Control
@@ -60,16 +69,27 @@ function Text({ className, label, placeholder, name, value, type = "text", disab
                 </div>
                 {
                     type === "password" ?
-                        <span style={{ position: "absolute", top: '10%', right: 0 }} onClick={() => setShowPassword(!showPassword)}>
-                            {!showPassword ?
-                                (
-                                    <LockIcon style={{ padding: 4 }} />
-                                ) :
-                                (
-                                    <UnlockIcon style={{ padding: 4 }} />
-                                )
+                        <div style={{ display: "inline-block", position: "absolute", top: '10%', right: 0, cursor: "pointer" }}>
+                            {
+                                isRandom &&
+                                <span onClick={() => {
+                                    validate.setFieldValue(name, generateRandomPassword());
+                                    setShowPassword(true);
+                                }}>
+                                    <RandomIcon style={{ padding: 4 }} />
+                                </span>
                             }
-                        </span>
+                            <span onClick={() => setShowPassword(!showPassword)}>
+                                {!showPassword ?
+                                    (
+                                        <LockIcon style={{ padding: 4 }} />
+                                    ) :
+                                    (
+                                        <UnlockIcon style={{ padding: 4 }} />
+                                    )
+                                }
+                            </span>
+                        </div>
                         : ""
                 }
             </div>
@@ -103,7 +123,7 @@ const Check = forwardRef(({ className, label, name, checked, disabled, inline, t
 });
 FormInput.Check = Check;
 
-function Select({ className, label, name, option, horizontal, closeMenuOnSelect, hideSelectedOptions, isClearable, isDisabled, isMulti, isSearchable, onChange, onBlur, value, placeholder }) {
+function Select({ className, label, name, required, groupOption, option, horizontal, closeMenuOnSelect, hideSelectedOptions, isClearable, isDisabled, isMulti, isSearchable, onChange, onBlur, value, placeholder }) {
     const validate = useContext(FormInputContext);
     const customStyles = {
         indicatorSeparator: (baseStyles, state) => ({
@@ -131,12 +151,42 @@ function Select({ className, label, name, option, horizontal, closeMenuOnSelect,
                 borderColor: state.isFocused ? "var(--bg-color-dark)" : validate && validate.touched[name] && validate.errors[name] ? "var(--bs-form-invalid-border-color)" : "hsl(0, 0%, 70%)"
             },
             minHeight: 31
-        })
+        }),
+        groupStyles: (baseStyles, state) => ({
+            ...baseStyles,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+        }),
+        groupBadgeStyles: (baseStyles, state) => ({
+            ...baseStyles,
+            backgroundColor: 'var(--bs-primary)',
+            borderRadius: '2em',
+            color: 'white',
+            display: 'flex',
+            justifyContent: 'center',
+            padding: '0 8px',
+            fontSize: '0.8em',
+            marginRight: 5,
+        }),
     };
 
+    const formatGroupLabel = (data) => (
+        <div style={customStyles.groupStyles}>
+            <span>{data.label}</span>
+            <span style={customStyles.groupBadgeStyles}>{data.options.length}</span>
+        </div>
+    );
     return (
         <div className={`${styles["form-select"]} ${className ? className : ""} ${horizontal ? styles.horizontal : ""}`}>
-            {label && <label>{label}</label>}
+            {label &&
+                <label>
+                    {label}
+                    {
+                        required ? <span className="required">*</span> : ""
+                    }
+                </label>
+            }
 
             <ReactSelect
                 name={name}
@@ -156,6 +206,7 @@ function Select({ className, label, name, option, horizontal, closeMenuOnSelect,
                 onChange={validate && onChange === undefined ? selected => validate.setFieldValue(name, selected) : onChange}
                 onBlur={validate && onBlur === undefined ? e => validate.setFieldTouched(name, true) : onBlur}
                 placeholder={placeholder}
+                formatGroupLabel={groupOption ? formatGroupLabel : undefined}
             />
 
             {validate && validate.touched[name] && validate.errors[name] ? <div className={styles.errors}>{validate.errors[name]}</div> : ""}
