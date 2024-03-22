@@ -202,7 +202,6 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
                             name="status"
                             option={statusOption}
                             className="mb-3"
-                            required={true}
                         />
                     </div>
                 </div>
