@@ -1,5 +1,6 @@
 import {
     getCoreRowModel,
+    getExpandedRowModel,
     useReactTable,
 } from '@tanstack/react-table'
 import isArray from 'lodash/isArray';
@@ -35,6 +36,7 @@ function useTable({ columns, data, statusFilter, total, offset, setLimit, setOff
         data,
         columns: columnDef,
         getCoreRowModel: getCoreRowModel(),
+        getExpandedRowModel: getExpandedRowModel(),
         state: {
             columnVisibility,
             columnSizing,
