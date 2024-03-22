@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 import Constants from '../../utils/Constants';
 
-function useTable({ columns, data, total, offset, setLimit, setOffset, slugProps }) {
+function useTable({ columns, data, statusFilter, total, offset, setLimit, setOffset, slugProps }) {
     const [columnVisibility, setColumnVisibility] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: true }), {}));
     const [columnSizing, setColumnSizing] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: cur.width ? cur.width : 100 }), {}));
     const [columnOrder, setColumnOrder] = useState(columns.map(column => column.id.toString()));
@@ -76,6 +76,13 @@ function useTable({ columns, data, total, offset, setLimit, setOffset, slugProps
     useEffect(() => {
         if (setOffset) setOffset(pageIndex * pageSize);
     }, [pageIndex, pageSize]);
+
+    useEffect(() => {
+        if (statusFilter !== undefined) {
+            table.setPageIndex(0);
+            if (setOffset) setOffset(0);
+        }
+    }, [statusFilter]);
 
     const handleOnChangePageSize = e => {
         const pageSize = Number(e.target.value);

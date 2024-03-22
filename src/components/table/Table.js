@@ -32,7 +32,7 @@ import { useState } from 'react';
  * @param {component} slugProps               - component that wrapping cell's value. when pass component in, prop's name is column's slug value
  */
 function Table({ control, variant, className, maxHeight, columns, data, visible, resizable, draggable, pagination, selectRow, ...slugProps }) {
-    const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef, handleOnChangePageSize } = useTable({ columns, data, total: pagination?.total, offset: pagination?.offset, setLimit: pagination?.setLimit, setOffset: pagination?.setOffset, slugProps });
+    const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef, handleOnChangePageSize } = useTable({ columns, data, statusFilter: pagination?.statusFilter, total: pagination?.total, offset: pagination?.offset, setLimit: pagination?.setLimit, setOffset: pagination?.setOffset, slugProps });
     return (
         <div>
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>

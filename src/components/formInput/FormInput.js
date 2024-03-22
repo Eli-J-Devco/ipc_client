@@ -50,6 +50,7 @@ function Text({ className, label, placeholder, name, value, required, isRandom, 
                 <div>
                     <Form.Control
                         className={styles["form-text"]}
+                        style={type === "password" ? { backgroundImage: "none" } : {}}
                         placeholder={placeholder}
                         size="sm"
                         name={name}
@@ -69,7 +70,7 @@ function Text({ className, label, placeholder, name, value, required, isRandom, 
                 </div>
                 {
                     type === "password" ?
-                        <div style={{ display: "inline-block", position: "absolute", top: '10%', right: 0, cursor: "pointer" }}>
+                        <div style={{ display: "inline-block", position: "absolute", top: "10%", right: 0, cursor: "pointer" }}>
                             {
                                 isRandom &&
                                 <span onClick={() => {

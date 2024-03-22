@@ -169,6 +169,7 @@ export default function Users() {
           )}
 
           pagination={{
+            statusFilter: statusFilter,
             enable: true,
             total: total,
             offset: offset,

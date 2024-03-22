@@ -3,31 +3,29 @@
 * All rights reserved.
 * 
 *********************************************************/
-import React, { useEffect, useState } from 'react'
-import { Tooltip } from 'react-tooltip';
-import { FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import React, { } from 'react'
 
-import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
-import { loginService } from '../../../../../services/loginService';
-
-import Modal from '../../../../../components/modal/Modal';
-import { RTextForm } from '../../../../../components/Controls'
-import Button from '../../../../../components/button/Button';
-import FormInput from '../../../../../components/formInput/FormInput';
-import Constants from '../../../../../utils/Constants';
-import LibToast from '../../../../../utils/LibToast';
-import * as yup from 'yup';
-import _ from 'lodash';
 import useUserModal from '../useUserModal';
 
 export default function UserModal(props) {
     const { isOpenModal, closeModal, setNeedRefresh } = props;
     const { actionOption } = useUserModal();
+    const initialValues = {
+        id: isOpenModal?.user?.id,
+        first_name: isOpenModal?.user?.first_name ? isOpenModal?.user?.first_name : "",
+        last_name: isOpenModal?.user?.last_name ? isOpenModal?.user?.last_name : "",
+        phone: isOpenModal?.user?.phone ? isOpenModal?.user?.phone : "",
+        roles_id: isOpenModal?.user?.roles_id || [],
+        status: isOpenModal?.user?.status || isOpenModal?.action === actionOption.Add.action ? { value: 1, label: "Active" } : { value: 0, label: "Inactive" },
+        email: isOpenModal?.user?.email ? isOpenModal?.user?.email : "",
+        ...(isOpenModal?.action === actionOption.Add.action && {
+            password: "",
+            confirmPassword: ""
+        }),
+    };
 
     const Modal = (props) => actionOption[isOpenModal?.action].modal(props);
     return (
-        <Modal isOpenModal={isOpenModal} closeModal={closeModal} setNeedRefresh={setNeedRefresh} />
+        <Modal isOpenModal={{ ...isOpenModal, user: initialValues }} closeModal={closeModal} setNeedRefresh={setNeedRefresh} />
     )
 }

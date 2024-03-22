@@ -16,7 +16,7 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
     const { t } = useTranslation();
     const { actionOption } = useUserModal();
     const [allRoles, setAllRoles] = useState([]);
-    const statusOption = [{ value: 0, label: "Inactive" }, { value: 1, label: "Active" }]
+    const statusOption = [{ value: 1, label: "Active" }, { value: 0, label: "Inactive" }]
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
 
@@ -116,10 +116,10 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
                 close={closeModal}
                 title={`${isOpenModal?.action} User`}
                 footer={footer}
-                size="xl"
+                size="lg"
             >
-                <div className='row d-flex justify-content-center'>
-                    <div className='col-5 m-3'>
+                <div className='row justify-content-center m-3'>
+                    <div className='col-6'>
                         <FormInput.Text
                             label="First Name"
                             name="first_name"
@@ -127,6 +127,17 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
                             className="mb-3"
                             required={true}
                         />
+                    </div>
+                    <div className='col-6'>
+                        <FormInput.Text
+                            label="Last Name"
+                            name="last_name"
+                            placeholder="Last Name"
+                            className="mb-3"
+                            required={true}
+                        />
+                    </div>
+                    <div className='ms-3 me-3'>
                         <FormInput.Text
                             label="Email"
                             name="email"
@@ -135,17 +146,33 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
                             disabled={isOpenModal?.action === actionOption.Edit.action}
                             required={isOpenModal?.action === actionOption.Add.action}
                         />
+                        <FormInput.Text
+                            label="Phone Number"
+                            name="phone"
+                            placeholder="Phone Number"
+                            className="mb-3"
+                        />
                         {
                             isOpenModal?.action === actionOption.Add.action &&
-                            <FormInput.Text
-                                label="Password"
-                                name="password"
-                                type='password'
-                                placeholder="Password"
-                                className="mb-3"
-                                required={true}
-                                isRandom={true}
-                            />
+                            <>
+                                <FormInput.Text
+                                    label="Password"
+                                    name="password"
+                                    type='password'
+                                    placeholder="Password"
+                                    className="mb-3"
+                                    required={true}
+                                    isRandom={true}
+                                />
+                                <FormInput.Text
+                                    label="Confirm password"
+                                    name="confirmPassword"
+                                    type='password'
+                                    placeholder="Confirm password"
+                                    className="mb-3"
+                                    required={true}
+                                />
+                            </>
                         }
                         <FormInput.Select
                             label="Role"
@@ -157,32 +184,6 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
                             className="mb-3"
                             required={true}
                         />
-                    </div>
-                    <div className='col-5 m-3'>
-                        <FormInput.Text
-                            label="Last Name"
-                            name="last_name"
-                            placeholder="Last Name"
-                            className="mb-3"
-                            required={true}
-                        />
-                        <FormInput.Text
-                            label="Phone Number"
-                            name="phone"
-                            placeholder="Phone Number"
-                            className="mb-3"
-                        />
-                        {
-                            isOpenModal?.action === actionOption.Add.action &&
-                            <FormInput.Text
-                                label="Confirm password"
-                                name="confirmPassword"
-                                type='password'
-                                placeholder="Confirm password"
-                                className="mb-3"
-                                required={true}
-                            />
-                        }
                         <FormInput.Select
                             label="Status"
                             name="status"
