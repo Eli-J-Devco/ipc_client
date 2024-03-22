@@ -88,6 +88,7 @@ function useTable({ columns, data, statusFilter, total, offset, setLimit, setOff
         const pageSize = Number(e.target.value);
         table.setPageSize(pageSize);
         table.setPageIndex(0);
+        setOffset(0);
         if (setLimit) setLimit(pageSize);
         if (total) setPageCount(Math.ceil(total / pageSize));
     }

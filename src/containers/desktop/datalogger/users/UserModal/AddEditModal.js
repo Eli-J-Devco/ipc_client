@@ -1,16 +1,24 @@
+/********************************************************
+* Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+* All rights reserved.
+* 
+*********************************************************/
 import { useEffect, useState } from 'react';
-import * as yup from 'yup';
-import Button from '../../../../../components/button/Button';
-import LibToast from '../../../../../utils/LibToast';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import _ from 'lodash';
+import * as yup from 'yup';
+
 import useUserModal from '../useUserModal';
 import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
-import { useNavigate } from 'react-router-dom';
-import Constants from '../../../../../utils/Constants';
 import { loginService } from '../../../../../services/loginService';
+
 import FormInput from '../../../../../components/formInput/FormInput';
+import Button from '../../../../../components/button/Button';
 import Modal from '../../../../../components/modal/Modal';
-import _ from 'lodash';
+
+import LibToast from '../../../../../utils/LibToast';
+import Constants from '../../../../../utils/Constants';
 
 export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }) {
     const { t } = useTranslation();
@@ -31,6 +39,11 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
         }),
     });
 
+    /**
+     * Handle add or edit user
+     * @author nhan.tran 2024-03-22
+     * @param {Object} data 
+     */
     const handleSave = (data) => {
         if (_.isEqual(data, isOpenModal?.user)) {
             LibToast.toast(t('toastMessage.info.noChange'), "info");

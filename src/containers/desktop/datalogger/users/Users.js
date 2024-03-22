@@ -3,27 +3,30 @@
 * All rights reserved.
 * 
 *********************************************************/
-import React, { createContext, useEffect, useState } from 'react';
-import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styles from './Users.module.scss';
+
+import useAxiosPrivate from '../../../../hooks/useAxiosPrivate';
+import useUserModal from './useUserModal';
+import UserModal from './UserModal/UserModal';
+import useUsers from './useUsers';
+
+import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
 import Table from '../../../../components/table/Table';
+import Button from '../../../../components/button/Button';
+import FormInput from "../../../../components/formInput/FormInput";
+
 import { ReactComponent as EditIcon } from "../../../../assets/images/edit.svg";
 import { ReactComponent as DeleteIcon } from "../../../../assets/images/delete.svg";
 import { ReactComponent as StatusIcon } from "../../../../assets/images/status-circle.svg";
 import { ReactComponent as ResetPassword } from "../../../../assets/images/reset-password.svg";
 import { ReactComponent as AddIcon } from "../../../../assets/images/add.svg";
-import Button from '../../../../components/button/Button';
-import FormInput from "../../../../components/formInput/FormInput";
-import useUsers from './useUsers';
-import useAxiosPrivate from '../../../../hooks/useAxiosPrivate';
+
 import Constants from '../../../../utils/Constants';
-import _ from 'lodash';
 import { loginService } from '../../../../services/loginService';
 import LibToast from '../../../../utils/LibToast';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import useUserModal from './useUserModal';
-import UserModal from './UserModal/UserModal';
 
 export default function Users() {
   const { t } = useTranslation();

@@ -1,12 +1,20 @@
+/********************************************************
+* Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+* All rights reserved.
+* 
+*********************************************************/
+import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+
+import { loginService } from "../../../../../services/loginService";
+
 import Button from "../../../../../components/button/Button";
 import FormInput from "../../../../../components/formInput/FormInput";
 import Modal from "../../../../../components/modal/Modal";
-import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
-import { useTranslation } from "react-i18next";
+
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
-import { loginService } from "../../../../../services/loginService";
 
 export default function ConfirmDeleteModal({ isOpenModal, closeModal, setNeedRefresh }) {
     const { t } = useTranslation();
@@ -22,6 +30,11 @@ export default function ConfirmDeleteModal({ isOpenModal, closeModal, setNeedRef
         </Button>
     </div>
 
+    /**
+     * Handle delete user
+     * @author nhan.tran 2024-03-22
+     * @param {Object} data
+     */
     const handleDelete = () => {
         const output = document.getElementById("progress");
         output.innerHTML = "<div><img src='/loading.gif' /></div>";

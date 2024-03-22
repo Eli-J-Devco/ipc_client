@@ -1,3 +1,8 @@
+/********************************************************
+* Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+* All rights reserved.
+* 
+*********************************************************/
 import { useState } from "react";
 import ResetPasswordModal from "./UserModal/ResetPasswordModal";
 import AddEditModal from "./UserModal/AddEditModal";
