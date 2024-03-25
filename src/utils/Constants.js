@@ -67,6 +67,14 @@ const Constants = {
       CONFIG: "/device_list/config/",
       CREATE: "/device_list/create_multiple/",
     },
+    TEMPLATE: {
+      LIST: "/template/all/",
+      GET_ONE: "/template/?id=",
+      CREATE: "/template/create/",
+      UPDATE: "/template/update/",
+      DELETE: "/template/delete/",
+      GET_MPTT: "/template/get_mppt_template/",
+    },
     UPLOAD_CHANNEL: {
       ALL_CHANNELS: "/upload_channel/all_channel/",
       UPDATE_CHANNEL: "/upload_channel/update/",

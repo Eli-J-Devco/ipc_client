@@ -4,7 +4,6 @@
 * 
 *********************************************************/
 import React, { useEffect } from 'react'
-import { Tooltip } from 'react-tooltip';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

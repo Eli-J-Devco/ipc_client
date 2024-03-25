@@ -22,6 +22,7 @@ import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import _ from "lodash";
 import { loginService } from "../../../../services/loginService";
 import LibToast from "../../../../utils/LibToast";
+import { TreeProvider } from "../../../../components/treeView/useTree";
 
 export default function Devices() {
   const { t } = useTranslation();
@@ -34,7 +35,7 @@ export default function Devices() {
   const [device, setDevice] = useState([]);
 
   useEffect(() => {
-    if (isAddDevice) return;
+    // if (!isAddDevice) return;
 
     var output = document.getElementById("progress");
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
@@ -60,7 +61,7 @@ export default function Devices() {
       }
     }, 1000);
 
-  }, [isAddDevice, navigate, t, axiosPrivate]);
+  }, [navigate, t, axiosPrivate]);
 
   const columns = [
     { id: 1, slug: "id", name: "Serial Number", width: 100 },
@@ -80,7 +81,11 @@ export default function Devices() {
 
   return (
     <div className={`main ${styles.main_devices}`}>
-      {isAddDevice && <AddDevice closeAddDevice={closeAddDevice} deviceConfig={deviceConfig} />}
+      {isAddDevice &&
+        <TreeProvider>
+          <AddDevice closeAddDevice={closeAddDevice} deviceConfig={deviceConfig} />
+        </TreeProvider>
+      }
       <div className={styles.header_devices}>
         <div className='row'>
           <div className='col-xl-6 col-lg-6 col-md-6 col-6'>

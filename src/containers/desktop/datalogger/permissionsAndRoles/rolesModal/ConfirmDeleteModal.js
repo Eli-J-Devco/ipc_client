@@ -3,9 +3,7 @@
 * All rights reserved.
 * 
 *********************************************************/
-import React, { useEffect } from 'react'
-import { Tooltip } from 'react-tooltip';
-import { FormProvider, useForm } from 'react-hook-form';
+import React from 'react'
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,7 +11,6 @@ import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
 import { loginService } from '../../../../../services/loginService';
 
 import Modal from '../../../../../components/modal/Modal';
-import { RTextForm } from '../../../../../components/Controls'
 import Button from '../../../../../components/button/Button';
 import Constants from '../../../../../utils/Constants';
 import LibToast from '../../../../../utils/LibToast';
@@ -25,6 +22,11 @@ export default function ConfirmDeleteModal(props) {
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
 
+  /**
+   * Handle delete role
+   * @author nhan.tran 2024-03-22
+   * @param {Object} data
+   */
   const handleDelete = () => {
     var output = document.getElementById("progress");
     output.innerHTML = "<div><img src='/loading.gif' /></div>";

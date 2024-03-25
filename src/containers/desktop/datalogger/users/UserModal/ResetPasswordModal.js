@@ -1,13 +1,20 @@
+/********************************************************
+* Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+* All rights reserved.
+* 
+*********************************************************/
 import { useTranslation } from "react-i18next";
-import FormInput from "../../../../../components/formInput/FormInput";
-import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
-import Constants from "../../../../../utils/Constants";
-import LibToast from "../../../../../utils/LibToast";
-import { loginService } from "../../../../../services/loginService";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+
+import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
+import { loginService } from "../../../../../services/loginService";
+
 import Modal from "../../../../../components/modal/Modal";
 import Button from "../../../../../components/button/Button";
+import FormInput from "../../../../../components/formInput/FormInput";
+import Constants from "../../../../../utils/Constants";
+import LibToast from "../../../../../utils/LibToast";
 
 export default function ResetPasswordModal({ isOpenModal, closeModal }) {
     const { t } = useTranslation();
@@ -16,6 +23,11 @@ export default function ResetPasswordModal({ isOpenModal, closeModal }) {
 
     const [newPassword, setNewPassword] = useState("");
 
+    /**
+     * Handle reset password of user
+     * @author nhan.tran 2024-03-22
+     * @param {Object} data
+     */
     const handleResetPassword = () => {
         setTimeout(async () => {
             try {
