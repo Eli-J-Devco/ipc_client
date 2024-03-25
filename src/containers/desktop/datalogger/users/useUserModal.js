@@ -28,8 +28,8 @@ export default function useUserModal(props) {
                 )
             }
         },
-        Edit: {
-            action: "Edit",
+        Update: {
+            action: "Update",
             modal: (props) => {
                 return (
                     <AddEditModal isOpenModal={props.isOpenModal} closeModal={props.closeModal} setNeedRefresh={props.setNeedRefresh} />
