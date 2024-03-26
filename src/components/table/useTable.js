@@ -4,14 +4,15 @@ import {
     useReactTable,
 } from '@tanstack/react-table'
 import isArray from 'lodash/isArray';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 import Constants from '../../utils/Constants';
 
 function useTable({ columns, data, statusFilter, total, offset, setLimit, setOffset, slugProps }) {
-    const [columnVisibility, setColumnVisibility] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: true }), {}));
-    const [columnSizing, setColumnSizing] = useState(columns.reduce((acc, cur) => ({ ...acc, [cur.id]: cur.width ? cur.width : 100 }), {}));
-    const [columnOrder, setColumnOrder] = useState(columns.map(column => column.id.toString()));
+    // const columnsDefault = isArray(columns) ? columns : columns?.columnDefs || columns || [];
+    // const [columnVisibility, setColumnVisibility] = useState(columnsDefault.reduce((acc, cur) => ({ ...acc, [cur.id]: true }), {}));
+    // const [columnSizing, setColumnSizing] = useState(columnsDefault.reduce((acc, cur) => ({ ...acc, [cur.id]: cur.width ? cur.width : 100 }), {}));
+    // const [columnOrder, setColumnOrder] = useState(columnsDefault.map(column => column.id.toString()));
     const [isDropDownsShow, setIsDropDownsShow] = useState(false);
     const dropDownsRef = useClickAway(() => setIsDropDownsShow(false));
     const [pageCount, setPageCount] = useState(-1);
@@ -28,7 +29,7 @@ function useTable({ columns, data, statusFilter, total, offset, setLimit, setOff
                     return (typeof slugProps[slug] === "function") ? slugProps[slug](row.original, row.index) : value
                 }
             }))
-            : []
+            : columns?.columnDefs || columns || []
         , []
     );
 
@@ -38,14 +39,16 @@ function useTable({ columns, data, statusFilter, total, offset, setLimit, setOff
         getCoreRowModel: getCoreRowModel(),
         getExpandedRowModel: getExpandedRowModel(),
         state: {
-            columnVisibility,
-            columnSizing,
-            columnOrder,
+            // columnVisibility,
+            // columnSizing,
+            // columnOrder,
         },
-        onColumnVisibilityChange: setColumnVisibility,
-        columnResizeMode: "onChange",
-        onColumnSizingChange: setColumnSizing,
-        onColumnOrderChange: setColumnOrder,
+        getSubRows: (row) => row.subRows,
+        // onColumnVisibilityChange: setColumnVisibility,
+        // columnResizeMode: "onChange",
+        // onColumnSizingChange: setColumnSizing,
+        // onColumnOrderChange: setColumnOrder,
+        enableColumnResizing: true,
         enableRowSelection: true,
         enableMultiRowSelection: false,
         manualPagination: true,

@@ -38,20 +38,26 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
                 <table className={`${styles.table} ${variant ? styles[variant] : ""}`} style={{ minWidth: table.getTotalSize() ? table.getTotalSize() : 0 }}>
                     <thead>
-                        <tr className={styles["header-row"]}>
-                            {
-                                table.getFlatHeaders().map(header => (
-                                    <Header
-                                        key={header.id}
-                                        variant={variant}
-                                        item={header}
-                                        table={table}
-                                        resizable={resizable}
-                                        draggable={draggable}
-                                    />
-                                ))
-                            }
-                        </tr>
+                        {
+                            table.getHeaderGroups().map(headerGroup => (
+                                <tr key={headerGroup?.id} className={styles["header-row"]}>
+                                    {
+                                        headerGroup.headers.map(header => {
+                                            return (
+                                                <Header
+                                                    key={header.id}
+                                                    variant={variant}
+                                                    item={header}
+                                                    table={table}
+                                                    resizable={resizable}
+                                                    draggable={draggable}
+                                                />
+                                            )
+                                        })
+                                    }
+                                </tr>
+                            ))
+                        }
                     </thead>
 
                     <tbody>

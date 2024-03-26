@@ -54,7 +54,7 @@ function Text({ className, label, placeholder, name, value, required, isRandom, 
                         placeholder={placeholder}
                         size="sm"
                         name={name}
-                        type={type === "password" && !showPassword ? "password" : "text"}
+                        type={type === "password" ? !showPassword ? "password" : "text" : type}
                         disabled={disabled}
                         readOnly={readOnly}
                         autoComplete={autoComplete}

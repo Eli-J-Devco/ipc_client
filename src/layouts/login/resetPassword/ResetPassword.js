@@ -7,21 +7,8 @@ import { Component } from 'react';
 import { withTranslation } from 'react-i18next';
 import ResetPasswordJsx from './ResetPassword.jsx';
 
-class ResetPassword extends Component {
-
-    constructor(props, context) {
-        super(props, context);
-        this.jsxTemplate = ResetPasswordJsx;
-        this.state = {
-            permissions: []
-        };
-    }
-    
-    render() {
-        return this.jsxTemplate.call(this)
-    }
+export default function ResetPassword() {
+    return (
+        <ResetPasswordJsx />
+    )
 }
-
-
-const HighOrderComponentTranslated = withTranslation('common')(ResetPassword)
-export default HighOrderComponentTranslated;

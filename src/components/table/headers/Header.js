@@ -1,5 +1,6 @@
 import useHeader from "./useHeader";
 import styles from './Header.module.scss';
+import { flexRender } from "@tanstack/react-table";
 
 function Header({ variant, item, table, resizable, draggable }) {
     const { dropRef, dragRef } = useHeader({ draggable, table, item });
@@ -14,7 +15,9 @@ function Header({ variant, item, table, resizable, draggable }) {
                 ref={dragRef}
                 className={draggable ? styles.draggable : ""}
             >
-                {item.column.columnDef.header}
+                {
+                    flexRender(item.column.columnDef.header, item.getContext())
+                }
             </div>
 
             {
