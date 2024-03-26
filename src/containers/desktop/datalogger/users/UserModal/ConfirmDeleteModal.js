@@ -74,8 +74,8 @@ export default function ConfirmDeleteModal({ isOpenModal, closeModal, setNeedRef
                 size="lg"
             >
                 <div className='d-flex justify-content-center mb-3'>
-                    <h4>
-                        Are you sure to delete user with id: {isOpenModal?.user?.id}?
+                    <h4 className="text-center">
+                        Are you sure to delete user with email: <strong>{isOpenModal?.user?.email}</strong>?
                     </h4>
                 </div>
                 <div className='d-flex justify-content-center'>

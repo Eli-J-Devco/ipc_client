@@ -154,19 +154,19 @@ export default function Users() {
                 image={<EditIcon />}
                 className="mx-2"
                 title="Edit"
-                onClick={() => openModal(actionOption.Edit.action, { ...item, first_name: item?.full_name.split(" ")[0], last_name: item?.full_name.split(" ")[1] })}
+                onClick={() => openModal(actionOption.Update.action, { ...item, first_name: item?.full_name.split(" ")[0], last_name: item?.full_name.split(" ")[1] })}
               />
               <Button.Image
                 image={<DeleteIcon />}
                 className="mx-2"
                 title="Delete"
-                onClick={() => openModal(actionOption.ConfirmDelete.action, { id: item?.id })}
+                onClick={() => openModal(actionOption.ConfirmDelete.action, { email: item?.email, id: item?.id })}
               />
               <Button.Image
                 image={<ResetPassword />}
                 className="mx-2"
                 title="Reset Password"
-                onClick={() => openModal(actionOption.ResetPassword.action, { ...item })}
+                onClick={() => openModal(actionOption.ResetPassword.action, { email: item?.email, id: item?.id })}
               />
             </div>
           )}

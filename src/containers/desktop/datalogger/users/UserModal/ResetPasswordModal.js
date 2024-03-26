@@ -72,7 +72,7 @@ export default function ResetPasswordModal({ isOpenModal, closeModal }) {
                     !newPassword ?
                         <div>
                             <h4 className="text-center m-5">
-                                Are you sure to reset password of user with id: <strong>{isOpenModal?.user?.id}</strong>?
+                                Are you sure to reset password of user with email: <strong>{isOpenModal?.user?.email}</strong>?
                             </h4>
                             <div className="d-flex justify-content-center">
                                 {footer}
@@ -81,7 +81,7 @@ export default function ResetPasswordModal({ isOpenModal, closeModal }) {
                         :
                         <div>
                             <h4 className="text-center">
-                                Password of user with id: <strong>{isOpenModal?.user?.id}</strong> has been reset successfully
+                                Password of user with email: <strong>{isOpenModal?.user?.email}</strong> has been reset successfully
                             </h4>
                             <div>
                                 <FormInput.Text label="New password" name="new_password" value={newPassword} type="password" onClick={() => {

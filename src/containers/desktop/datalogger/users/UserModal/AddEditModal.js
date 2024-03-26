@@ -70,7 +70,7 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
             try {
                 const response = await axiosPrivate.post(url, dataPost);
                 if (response?.status === 200 || response?.status === 201) {
-                    LibToast.toast(`User ${data?.full_name} ${isOpenModal?.action === actionOption.Edit ? t('toastMessage.info.update') : t('toastMessage.info.add')}`, "info");
+                    LibToast.toast(`User ${data?.full_name} ${isOpenModal?.action === actionOption.Update ? t('toastMessage.info.update') : t('toastMessage.info.add')}`, "info");
                     setNeedRefresh(true);
                     closeModal();
                 }
@@ -156,7 +156,7 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
                             name="email"
                             placeholder="Email"
                             className="mb-3"
-                            disabled={isOpenModal?.action === actionOption.Edit.action}
+                            disabled={isOpenModal?.action === actionOption.Update.action}
                             required={isOpenModal?.action === actionOption.Add.action}
                         />
                         <FormInput.Text
