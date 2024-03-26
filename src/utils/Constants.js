@@ -67,6 +67,14 @@ const Constants = {
       CONFIG: "/device_list/config/",
       CREATE: "/device_list/create_multiple/",
     },
+    DEVICE_GROUP: {
+      LIST: "/device_group/get_all/",
+      GET_ONE: "/device_group/get_each/",
+      CREATE: "/device_group/create/",
+      UPDATE: "/device_group/edit_each/",
+      DELETE: "/device_group/delete_group/",
+      GET_TYPE: "/device_group/get_type/",
+    },
     TEMPLATE: {
       LIST: "/template/get_all/",
       LIST_BY_TYPE: "/template/get_all_by_type/",

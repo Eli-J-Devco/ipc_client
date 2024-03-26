@@ -1,24 +1,27 @@
 import { Outlet } from "react-router-dom";
 import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
+import TemplatesProvider from "./useTemplates";
 
 function Templates() {
     return (
-        <div className="main">
-            <Breadcrumb
-                routes={[
-                    {
-                        path: "/datalogger",
-                        name: "Dashboard"
-                    },
-                    {
-                        path: "/datalogger/templates",
-                        name: "Templates"
-                    }
-                ]}
-            />
+        <TemplatesProvider>
+            <div className="main">
+                <Breadcrumb
+                    routes={[
+                        {
+                            path: "/datalogger",
+                            name: "Dashboard"
+                        },
+                        {
+                            path: "/datalogger/templates",
+                            name: "Templates"
+                        }
+                    ]}
+                />
 
-            <Outlet />
-        </div>
+                <Outlet />
+            </div>
+        </TemplatesProvider>
     );
 }
 

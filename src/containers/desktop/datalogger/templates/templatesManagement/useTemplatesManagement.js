@@ -5,33 +5,22 @@ function useTemplatesManagement() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [template, setTemplate] = useState("Modbus Template");
     const [fileUpload, setFileUpload] = useState(null);
-    const [columns, ] = useState([
+    const [columns,] = useState([
         {
             id: 1,
             slug: "id",
             name: "No."
         }, {
             id: 2,
-            slug: "file_name",
+            slug: "name",
             name: "File Name"
         }, {
             id: 3,
             slug: "action",
-            name: "Actions"
+            name: <div className="d-flex flex-wrap justify-content-center">Action</div>
         }
     ]);
-    const [templateList, ] = useState([
-        {
-            id: "1",
-            file_name: "invt"
-        }, {
-            id: "2",
-            file_name: "invt2"
-        }, {
-            id: "3",
-            file_name: "invt3"
-        }
-    ]);
+    const [templateList, setTemplateList] = useState([]);
     const navigate = useNavigate();
 
     const openModal = value => {
@@ -40,7 +29,7 @@ function useTemplatesManagement() {
     };
     const closeModal = () => setIsModalOpen(false);
     const handleOnItemEdit = item => {
-        navigate(`/datalogger/templates/${item.file_name}/points`);
+        navigate(`/datalogger/templates/${item.id}/points`);
     };
     const handleFileUploadChange = (e) => {
         setFileUpload(e.target.files ? e.target.files[0] : undefined)
@@ -53,6 +42,7 @@ function useTemplatesManagement() {
         template,
         columns,
         templateList,
+        setTemplateList,
         handleOnItemEdit,
         fileUpload,
         handleFileUploadChange
