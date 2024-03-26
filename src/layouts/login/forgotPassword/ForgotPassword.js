@@ -44,10 +44,7 @@ export default function ForgotPassword() {
                     LibToast.toast(msg, "error");
                 }
                 else {
-                    if (msg)
-                        LibToast.toast(t('toastMessage.error.fetch'), "error");
-                    else
-                        navigate("/")
+                    LibToast.toast(t('toastMessage.error.fetch'), "error");
                 }
             } finally {
                 output.innerHTML = "";
