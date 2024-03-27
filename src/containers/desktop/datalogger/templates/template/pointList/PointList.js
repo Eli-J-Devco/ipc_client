@@ -1,11 +1,13 @@
 import Button from "../../../../../../components/button/Button";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import Table from "../../../../../../components/table/Table";
+import { useTemplate } from "../useTemplate";
 import EditPointModal from "./editPointModal/EditPointModal";
 import usePointList from "./usePointList";
 
 function PointList() {
     const { columns, pointList, isModalOpen, closeModal, handlePointEdit, point } = usePointList();
+    const { templateId } = useTemplate();
 
     return (
         <div>
@@ -18,7 +20,7 @@ function PointList() {
                 />
 
                 <Button className="mx-3">
-                    <Button.Text text="Change Number of Points"/>
+                    <Button.Text text="Change Number of Points" />
                 </Button>
             </div>
 
@@ -50,7 +52,7 @@ function PointList() {
                 close={closeModal}
                 data={point}
             />
-            
+
             <Button className="mt-3">
                 <Button.Text text="Delete Selected Points" />
             </Button>

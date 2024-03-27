@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTemplate } from "../useTemplate";
 
 function usePointList() {
+    const { defaultPointList } = useTemplate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [point, setPoint] = useState({});
-    const [columns, ] = useState([
+    const [columns,] = useState([
         {
             id: 1,
             slug: "id_checkbox",
@@ -23,7 +25,7 @@ function usePointList() {
             name: "Class"
         }, {
             id: 5,
-            slug: "reg",
+            slug: "register",
             name: "Reg"
         }, {
             id: 6,
@@ -43,11 +45,11 @@ function usePointList() {
             name: "Offset"
         }, {
             id: 10,
-            slug: "mult_reg",
+            slug: "multreg",
             name: "Mult Reg"
         }, {
             id: 11,
-            slug: "invalid",
+            slug: "invalidvalue",
             name: "Invalid Bit Pattern"
         }, {
             id: 12,
@@ -55,57 +57,11 @@ function usePointList() {
             name: <div className="text-center">Actions</div>
         }
     ]);
-    const [pointList, ] = useState([
-        {
-            id: 1,
-            name: "C_DeviceAddress",
-            unit: "",
-            class: "Input",
-            reg: 40069,
-            data_type: "UNIT16",
-            byte_order: "normal",
-            slope: "",
-            offset: "",
-            mult_reg: "",
-            invalid: ""
-        },{
-            id: 2,
-            name: "C_SunSpec_DID",
-            unit: "",
-            class: "Input",
-            reg: "40070",
-            data_type: "UNIT16",
-            byte_order: "normal",
-            slope: "",
-            offset: "",
-            mult_reg: "",
-            invalid: ""
-        },{
-            id: 3,
-            name: "C_SunSpec_Length",
-            unit: "",
-            class: "Input",
-            reg: 40071,
-            data_type: "UNIT16",
-            byte_order: "normal",
-            slope: "",
-            offset: "",
-            mult_reg: "",
-            invalid: ""
-        },{
-            id: 4,
-            name: "I_AC_Current",
-            unit: "Amps",
-            class: "Input",
-            reg: 40072,
-            data_type: "UNIT16",
-            byte_order: "normal",
-            slope: "",
-            offset: "",
-            mult_reg: "",
-            invalid: ""
-        }
-    ]);
+    const [pointList, setPointList] = useState();
+
+    useEffect(() => {
+        setPointList(defaultPointList.map((item, index) => ({ ...item, id: index, unit: item?.type_units?.Units, class: item?.type_class?.TypeClass, data_type: item?.type_datatype?.["Data Type"], byte_order: item?.type_byteorder?.["Byte Order"] })));
+    }, [defaultPointList]);
 
     const closeModal = () => setIsModalOpen(false);
     const handlePointEdit = item => {

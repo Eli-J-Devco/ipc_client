@@ -29,7 +29,7 @@ function useTemplatesManagement() {
     };
     const closeModal = () => setIsModalOpen(false);
     const handleOnItemEdit = item => {
-        navigate(`/datalogger/templates/${item.id}/points`);
+        navigate(`/datalogger/templates/${item.id}/points`, { state: { template: item } });
     };
     const handleFileUploadChange = (e) => {
         setFileUpload(e.target.files ? e.target.files[0] : undefined)

@@ -92,6 +92,7 @@ import SetupControl from "./containers/desktop/scada/setupControl/SetupControl";
 import Basic from "./containers/desktop/scada/setupControl/basic/Basic";
 import ExportLimitationControl from "./containers/desktop/scada/setupControl/exportLimitationControl/ExportLimitationControl";
 import ScheduleControl from "./containers/desktop/scada/setupControl/scheduleControl/ScheduleControl";
+import TemplateConfigContext from "./containers/desktop/datalogger/templates/template/TemplateConfigContext";
 
 export default class App extends Component {
   render() {
@@ -160,7 +161,7 @@ export default class App extends Component {
 
                   <Route path="templates" element={<Templates />}>
                     <Route index element={<TemplatesManagement />} />
-                    <Route path=":name" element={<Template />}>
+                    <Route path=":id" element={<TemplateConfigContext />}>
                       <Route path="points" element={<PointList />} />
                       <Route path="registers" element={<RegisterBlocks />} />
                       <Route path="advanced" element={<Advanced />} />
