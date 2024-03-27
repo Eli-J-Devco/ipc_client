@@ -2,11 +2,11 @@ import Button from "../../../../../../components/button/Button";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import Table from "../../../../../../components/table/Table";
 import { useTemplate } from "../useTemplate";
-import EditPointModal from "./editPointModal/EditPointModal";
-import usePointList from "./usePointList";
+import EditMPPTModal from "./editMPPTModal/EditMPPTModal";
+import useMPPTList from "./useMPPTList";
 
-function PointList() {
-    const { columns, pointList, isModalOpen, closeModal, handlePointEdit, point } = usePointList();
+function MPPTList() {
+    const { columns, pointList, isModalOpen, closeModal, handlePointEdit, point } = useMPPTList();
 
     return (
         <div>
@@ -32,7 +32,7 @@ function PointList() {
                 data={pointList}
             />
 
-            <EditPointModal
+            <EditMPPTModal
                 isOpen={isModalOpen}
                 close={closeModal}
                 data={point}
@@ -45,4 +45,4 @@ function PointList() {
     );
 }
 
-export default PointList;
+export default MPPTList;

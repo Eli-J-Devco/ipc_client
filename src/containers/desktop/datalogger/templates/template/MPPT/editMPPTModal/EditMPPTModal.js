@@ -3,19 +3,17 @@ import Button from "../../../../../../../components/button/Button";
 import FormInput from "../../../../../../../components/formInput/FormInput";
 import Modal from "../../../../../../../components/modal/Modal";
 import { useTemplate } from "../../useTemplate";
-import styles from "./EditPointModal.module.scss";
-import useEditPointModal from "./useEditPointModal";
+import styles from "./EditMPPTModal.module.scss";
+import useEditMPPTModal from "./useEditPMPPTModal";
 
-function EditPointModal({ isOpen, close, data }) {
-    const { initialValues, modbusConfig, setModbusConfig, modbusRegisterType, setModbusRegisterType, validationSchema } = useEditPointModal(data);
+function EditMPPTModal({ isOpen, close, data }) {
+    const { initialValues, modbusConfig, setModbusConfig, modbusRegisterType, setModbusRegisterType, validationSchema } = useEditMPPTModal(data);
     const { config } = useTemplate();
     const { data_type, byte_order, point_unit, type_point, type_class } = config;
     useEffect(() => {
         if (type_point && type_point.length > 0 && type_class && type_class.length > 0) {
-            setTimeout(() => {
-                setModbusConfig(data?.type_point?.id);
-                setModbusRegisterType(data?.type_class?.id);
-            }, 100);
+            setModbusConfig(data?.type_point?.id);
+            setModbusRegisterType(data?.type_class?.id);
         }
     }, [type_point, setModbusConfig, type_class, setModbusRegisterType]);
     return (
@@ -82,7 +80,7 @@ function EditPointModal({ isOpen, close, data }) {
                     <div className="col-4">
                         <FormInput.Text
                             label="Point Unit:"
-                            name="unit_name"
+                            name="unit"
                         />
                     </div>
 
@@ -92,9 +90,8 @@ function EditPointModal({ isOpen, close, data }) {
 
                     <div className="col-3 align-self-end">
                         <FormInput.Select
-                            isSearchable={true}
-                            name="unit"
-                            option={point_unit.map(item => ({ value: item.id, label: item.unit }))}
+                            isSearchable={false}
+                            isClearable={true}
                         />
                     </div>
 
@@ -160,7 +157,6 @@ function EditPointModal({ isOpen, close, data }) {
                                     label="Data Format:"
                                     name="data_type"
                                     isSearchable={false}
-                                    option={data_type.map(item => ({ value: item.id, label: item.data_type }))}
                                 />
                             </div>
                         </div>
@@ -171,7 +167,6 @@ function EditPointModal({ isOpen, close, data }) {
                                     label="Byte Order:"
                                     name="byte_order"
                                     isSearchable={false}
-                                    option={byte_order.map(item => ({ value: item.id, label: item.byte_order }))}
                                 />
                             </div>
                         </div>
@@ -373,4 +368,4 @@ function EditPointModal({ isOpen, close, data }) {
     );
 }
 
-export default EditPointModal;
+export default EditMPPTModal;

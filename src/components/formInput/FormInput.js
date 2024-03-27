@@ -153,29 +153,27 @@ function Select({ className, label, name, required, groupOption, option, horizon
             },
             minHeight: 31
         }),
-        groupStyles: (baseStyles, state) => ({
-            ...baseStyles,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-        }),
-        groupBadgeStyles: (baseStyles, state) => ({
-            ...baseStyles,
-            backgroundColor: 'var(--bs-primary)',
-            borderRadius: '2em',
-            color: 'white',
-            display: 'flex',
-            justifyContent: 'center',
-            padding: '0 8px',
-            fontSize: '0.8em',
-            marginRight: 5,
-        }),
     };
 
     const formatGroupLabel = (data) => (
-        <div style={customStyles.groupStyles}>
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+        }}>
             <span>{data.label}</span>
-            <span style={customStyles.groupBadgeStyles}>{data.options.length}</span>
+            <span style={{
+                backgroundColor: 'var(--bs-primary)',
+                borderRadius: '2em',
+                color: 'white',
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '0 8px',
+                fontSize: '0.8em',
+                marginRight: 5,
+            }}>
+                {data.options.length}
+            </span>
         </div>
     );
     return (

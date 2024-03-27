@@ -4,7 +4,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import Button from "../../../../../../components/button/Button";
 
-function usePointList() {
+function useMPPTList() {
     const { defaultPointList } = useTemplate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [point, setPoint] = useState({});
@@ -99,4 +99,4 @@ function usePointList() {
     };
 }
 
-export default usePointList;
+export default useMPPTList;

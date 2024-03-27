@@ -83,6 +83,7 @@ const Constants = {
       UPDATE: "/template/edit_each/",
       DELETE: "/template/delete/",
       GET_MPTT: "/template/get_mppt_template/",
+      CONFIG: "/template/get_template_config/",
     },
     UPLOAD_CHANNEL: {
       ALL_CHANNELS: "/upload_channel/all_channel/",

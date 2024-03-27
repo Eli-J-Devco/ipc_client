@@ -1,7 +1,7 @@
 import { useState } from "react";
 import * as yup from 'yup';
 
-function useEditPointModal(data) {
+function useEditMPPTModal(data) {
     const [modbusConfig, setModbusConfig] = useState(1);
     const [modbusRegisterType, setModbusRegisterType] = useState(1);
 
@@ -14,8 +14,7 @@ function useEditPointModal(data) {
     const initialValues = {
         ...data,
         index: `pt${data?.index}`,
-        unit: { value: data?.type_units?.id, label: data?.type_units?.unit },
-        unit_name: data?.type_units?.unit,
+        unit: data?.type_units?.unit,
         class: data?.type_class?.type_class,
         data_type: { value: data?.type_datatype?.data_type, label: data?.type_datatype?.data_type },
         byte_order: { value: data?.type_byteorder?.byte_order, label: data?.type_byteorder?.byte_order },
@@ -40,4 +39,4 @@ function useEditPointModal(data) {
     };
 }
 
-export default useEditPointModal;
+export default useEditMPPTModal;

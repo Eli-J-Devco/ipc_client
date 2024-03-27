@@ -1,13 +1,13 @@
 import styles from './Template.module.scss';
 import NavTabs from "../../../../../components/navTabs/NavTabs";
-import { Outlet, useParams } from "react-router-dom";
-import TemplateProvider, { useTemplate } from "./useTemplate";
+import { Outlet } from "react-router-dom";
+import { useTemplate } from "./useTemplate";
 import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
 import { useEffect } from 'react';
 import Constants from '../../../../../utils/Constants';
 
 function Template() {
-    const { id, setDefaultPointList, setDefaultRegisterList } = useTemplate();
+    const { id, setDefaultPointList, setDefaultRegisterList, setConfig } = useTemplate();
     const axiosPrivate = useAxiosPrivate();
 
     useEffect(() => {
@@ -23,6 +23,20 @@ function Template() {
             }
         }, 300);
     }, [id]);
+
+    useEffect(() => {
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.CONFIG);
+                if (response?.status === 200) {
+                    setConfig(response?.data);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }, 300);
+    }, [setConfig]);
+
     return (
         <div className={styles.template} >
             <header className={styles.header} >
@@ -37,13 +51,17 @@ function Template() {
                             name: "Point List"
                         },
                         {
+                            path: `/datalogger/templates/${id}/mppt`,
+                            name: "MPPT"
+                        },
+                        {
                             path: `/datalogger/templates/${id}/registers`,
                             name: "Register Blocks"
                         },
                         {
                             path: `/datalogger/templates/${id}/advanced`,
                             name: "Advanced"
-                        }
+                        },
                     ]}
                 />
 
