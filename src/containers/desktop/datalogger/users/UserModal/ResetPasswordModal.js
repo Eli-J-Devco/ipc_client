@@ -84,9 +84,13 @@ export default function ResetPasswordModal({ isOpenModal, closeModal }) {
                                 Password of user with email: <strong>{isOpenModal?.user?.email}</strong> has been reset successfully
                             </h4>
                             <div>
-                                <FormInput.Text label="New password" name="new_password" value={newPassword} type="password" onClick={() => {
-                                    navigator.clipboard.writeText(newPassword);
-                                    LibToast.toast("Password copied to clipboard", "info");
+                                <FormInput.Text label="New password" name="new_password" isShow={true} value={newPassword} type="password" onClick={() => {
+                                    navigator.clipboard.readText().then(text => {
+                                        if (text !== newPassword) {
+                                            navigator.clipboard.writeText(newPassword);
+                                            LibToast.toast("Password copied to clipboard", "info");
+                                        }
+                                    })
                                 }} />
                             </div>
                             <Button variant="dark" className="mt-3" onClick={() => closeModal()}>

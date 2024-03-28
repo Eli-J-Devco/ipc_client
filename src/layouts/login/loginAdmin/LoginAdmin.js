@@ -8,6 +8,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import styles from "./LoginAdmin.module.scss";
+import * as yup from "yup";
 
 import Libs from "../../../utils/Libs";
 import Constants from "../../../utils/Constants";
@@ -20,6 +21,7 @@ import { loginService } from "../../../services/loginService";
 
 import { ReactComponent as LockIcon } from "../../../assets/images/lock.svg";
 import { ReactComponent as UnlockIcon } from "../../../assets/images/unlock.svg";
+import FormInput from "../../../components/formInput/FormInput";
 
 /**
  * Login Admin
@@ -36,15 +38,17 @@ const LoginAdmin = () => {
   const location = useLocation();
   const from = location.state?.from?.pathname || "/datalogger/quickstart";
 
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = useForm({
-    mode: "onChange",
-  });
-
   const [showPassword, setShowPassword] = useState(false);
+
+  const initialValues = {
+    email: "",
+    password: "",
+  };
+
+  const schema = yup.object().shape({
+    email: yup.string().matches(Constants.REGEX_PATTERN.EMAIL, t("requiredMessage.email_pattern")).required(t("requiredMessage.email")),
+    password: yup.string().matches(Constants.REGEX_PATTERN.PASSWORD, t("requiredMessage.password_pattern")).required(t("requiredMessage.password")),
+  });
 
   /**
    * Submit login form
@@ -126,78 +130,28 @@ const LoginAdmin = () => {
           </a>
         </div>
 
-        <div className={styles.body_login}>
-          <div className={styles.login_title}>Login</div>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className={styles.form_group}>
-              <input
-                placeholder="Email"
-                className={
-                  errors.email ? "form-control input-error" : "form-control"
-                }
-                id="email"
+        <FormInput id="loginForm" initialValues={initialValues} validationSchema={schema} onSubmit={onSubmit}>
+          <div className={styles.body_login}>
+            <div className={styles.login_title}>Login</div>
+            <div className="position-relative mb-3">
+              <FormInput.Text
                 name="email"
-                {...register("email", {
-                  required: "Email Address is required",
-                  pattern: {
-                    value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                    message: "Invalid email address",
-                  },
-                })}
+                placeholder="Email"
+                required={true}
+                isCustomIcon={true}
               />
-
-              {errors.email && (
-                <span className={styles.validate}>{errors.email.message}</span>
-              )}
-              <svg style={{ padding: 4 }} fill="none" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="m0 0h48v48h-48z" fill="#494c4e" fillOpacity=".01" /><g stroke="#494c4e" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4"><circle cx="24" cy="12" r="8" /><path d="m42 44c0-9.9411-8.0589-18-18-18s-18 8.0589-18 18" /></g></svg>
-            </div>
-
-            <div className={styles.form_group}>
-              <input
-                placeholder="Password"
-                className={
-                  errors.password ? "form-control input-error" : "form-control"
-                }
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                {...register("password", {
-                  required: "You must specify a password",
-                  pattern: {
-                    value:
-                      /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹])[a-zA-Z0-9~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]{7,}$/,
-                    message:
-                      "Password should include at least one uppercase, one numeric value and one special character",
-                  },
-                  minLength: {
-                    value: 8,
-                    message: "Password must have at least 8 characters",
-                  },
-                })}
-              />
-              {errors.password && (
-                <span className={styles.validate}>
-                  {errors.password.message}
-                </span>
-              )}
-              <div
-                style={{ cursor: "pointer", position: "absolute", right: 0, top: 0 }}
-                onClick={() => {
-                  setTimeout(() => {
-                    setShowPassword(!showPassword);
-                  }, 100);
-                }}
-              >
-                {
-                  !showPassword ? (
-                    <LockIcon style={{ padding: 4 }} />
-                  ) : (
-                    <UnlockIcon style={{ padding: 4 }} />
-                  )
-                }
+              <div className="d-flex align-items-center position-absolute top-0 end-0 mt-1">
+                <svg style={{ padding: 6 }} fill="none" height="24" viewBox="0 0 48 48" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m0 0h48v48h-48z" fill="#494c4e" fillOpacity=".01" /><g stroke="#494c4e" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4"><circle cx="24" cy="12" r="8" /><path d="m42 44c0-9.9411-8.0589-18-18-18s-18 8.0589-18 18" /></g></svg>
               </div>
             </div>
-
+            <div>
+              <FormInput.Text
+                name="password"
+                placeholder="Password"
+                type="password"
+                required={true}
+              />
+            </div>
             <div className="row">
               <div className="col-xl-12 text-center">
                 <div className={styles.btn_login}>
@@ -217,11 +171,10 @@ const LoginAdmin = () => {
                 <a href="/forgot-password">Forgot email or password?</a>
               </div>
             </div>
-          </form>
-        </div>
+          </div>
+        </FormInput>
       </div>
     </div>
-    // <LoginAdminJSX onclick={handleSubmit(onSubmit)} />
   );
 };
 
