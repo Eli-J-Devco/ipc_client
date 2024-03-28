@@ -16,8 +16,8 @@ switch (url) {
     serverData = "";
     break;
   default:
-    serverAPI = "http://115.78.133.129:3001";
-    // serverAPI = "http://127.0.0.1:3001";
+    // serverAPI = "http://115.78.133.129:3001";
+    serverAPI = "http://127.0.0.1:3001";
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -67,11 +67,20 @@ const Constants = {
       CONFIG: "/device_list/config/",
       CREATE: "/device_list/create_multiple/",
     },
+    DEVICE_GROUP: {
+      LIST: "/device_group/get_all/",
+      GET_ONE: "/device_group/get_each/",
+      CREATE: "/device_group/create/",
+      UPDATE: "/device_group/edit_each/",
+      DELETE: "/device_group/delete_group/",
+      GET_TYPE: "/device_group/get_type/",
+    },
     TEMPLATE: {
-      LIST: "/template/all/",
-      GET_ONE: "/template/?id=",
+      LIST: "/template/get_all/",
+      LIST_BY_TYPE: "/template/get_all_by_type/",
+      GET_ONE: "/template/get_each_template/",
       CREATE: "/template/create/",
-      UPDATE: "/template/update/",
+      UPDATE: "/template/edit_each/",
       DELETE: "/template/delete/",
       GET_MPTT: "/template/get_mppt_template/",
     },
@@ -126,6 +135,10 @@ const Constants = {
     TRANSLATE: "translate",
     APPROVAL: "approval",
     FULL: "auths",
+  },
+  TEMPLATE_TYPE: {
+    BUILT_IN: 0,
+    CUSTOM: 1,
   },
   PAGE_SIZES: [5, 10, 20, 50, 100],
   DEFAULT_PAGE_SIZE: 5,

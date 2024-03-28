@@ -75,8 +75,14 @@ const LoginAdmin = () => {
 
         LibToast.toast(t("toastMessage.info.loginSuccess") + " " + userName, "info");
         navigate(from, { replace: true });
-      } catch (err) {
-        const msg = LoginErrors(err);
+      } catch (error) {
+        let msg = loginService.handleMissingInfo(error);
+        if (typeof msg === "string") {
+          LibToast.toast(msg, "error");
+        }
+        else {
+          LibToast.toast(t('toastMessage.error.fetch'), "error");
+        }
         setErrMsg(msg);
       }
       finally {

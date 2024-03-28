@@ -5,9 +5,8 @@
 *********************************************************/
 
 import React, { useEffect, useState } from 'react'
-import { Tooltip } from 'react-tooltip';
 import ModalDefault from 'react-bootstrap/Modal';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate'
@@ -16,17 +15,18 @@ import useAddDevice from './useAddDevice';
 import { AddModBusDevice } from './AddModBusDevice';
 
 import Modal from '../../../../../components/modal/Modal';
-import { RCheckbox, RTextForm } from '../../../../../components/Controls'
-import ReactSelectDropdown from '../../../../../components/ReactSelectDropdown';
 import Button from '../../../../../components/button/Button';
 import Constants from '../../../../../utils/Constants';
 import LibToast from '../../../../../utils/LibToast';
 import { loginService } from '../../../../../services/loginService';
 import AddMultipleDevice from './AddMultipleDevice';
 import FormInput from '../../../../../components/formInput/FormInput';
-import { useTreeState } from '../../../../../components/treeView/useTree';
-import TreeView from '../../../../../components/treeView/TreeView';
-
+import { createColumnHelper } from '@tanstack/react-table';
+import { ReactComponent as ExpandIcon } from "../../../../../assets/images/chevron-down.svg";
+import { ReactComponent as CollapseIcon } from "../../../../../assets/images/chevron-up.svg";
+import Table from '../../../../../components/table/Table';
+import _ from 'lodash';
+import MPTTConfigure from './mpttConfigure';
 
 export default function AddDevice(props) {
   const methods = useForm({ mode: "onChange" });
@@ -34,7 +34,7 @@ export default function AddDevice(props) {
   const axiosPrivate = useAxiosPrivate();
 
   const { closeAddDevice, deviceConfig } = props;
-  const { isAddMultipleDevice, schema, initialValues, setInitialValues, openAddMultipleDevice, closeAddMultipleDevice } = useAddDevice();
+  const { isAddMultipleDevice, schema, initialValues, setInitialValues, openAddMultipleDevice, closeAddMultipleDevice, setMaxMppt } = useAddDevice();
   const [protocol, setProtocol] = useState({
     Physical: 1,
     Virtual: 0
@@ -47,28 +47,28 @@ export default function AddDevice(props) {
         const { device_type, device_group, template, communication } = deviceConfig;
         setDeviceConfigDropdown(() => {
           return {
-            deviceType: device_type.map(item => ({ value: item.id, label: item.name })),
+            deviceType: device_type && device_type.map(item => ({ value: item.id, label: item.name })),
             deviceGroup: [
               {
                 label: "Custom",
-                options: device_group.filter(item => item.type === 1)?.map(item => { return { value: item.id, label: item.name, id_device_type: item.id_device_type } })
+                options: device_group && device_group.filter(item => item.type === 1)?.map(item => { return { value: item.id, label: item.name, id_device_type: item.id_device_type } })
               },
               {
                 label: "Built-in",
-                options: device_group.filter(item => item.type === 0)?.map(item => { return { value: item.id, label: item.name, id_device_type: item.id_device_type } })
+                options: device_group && device_group.filter(item => item.type === 0)?.map(item => { return { value: item.id, label: item.name, id_device_type: item.id_device_type } })
               }
             ],
             template: [
               {
                 label: "Custom",
-                options: template.filter(item => item.type === 1)?.map(item => { return { value: { id_template: item.id, id_device_group: item.id_device_group }, label: item.name } })
+                options: template && template.filter(item => item.type === 1)?.map(item => { return { value: { id_template: item.id, id_device_group: item.id_device_group }, label: item.name } })
               },
               {
                 label: "Built-in",
-                options: template.filter(item => item.type === 0)?.map(item => { return { value: { id_template: item.id, id_device_group: item.id_device_group }, label: item.name } })
+                options: template && template.filter(item => item.type === 0)?.map(item => { return { value: { id_template: item.id, id_device_group: item.id_device_group }, label: item.name } })
               },
             ].flat(),
-            communicationProtocol: communication.map(item => ({ value: item.id, label: item.name }))
+            communicationProtocol: communication && communication.map(item => ({ value: item.id, label: item.name }))
           }
         })
       }, 100);
@@ -91,12 +91,38 @@ export default function AddDevice(props) {
     }, 100);
   }, [deviceConfigDropdown]);
 
-  const handleSave = methods.handleSubmit((data) => {
+  const handleSave = (data) => {
+    let body = {
+      ...data,
+      id_communication: data.id_communication?.value,
+      id_device_type: data.id_device_type?.value,
+      id_template: data.id_template?.value.id_template,
+      mppt: data.mppt.map(item => {
+        return {
+          id: item.id,
+          id_pointkey: item.id_pointkey,
+          string: item.subRows.map(item => {
+            return {
+              id: item.id,
+              id_pointkey: item.id_pointkey,
+              panel: item.subRows.map(item => {
+                return {
+                  id: item.id,
+                  id_pointkey: item.id_pointkey
+                }
+              })
+            }
+          }).flat()
+        }
+      })
+    }
+    delete body.device_group;
+    delete body.mptt_count;
     const output = document.getElementById("progress");
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        const response = await axiosPrivate.post(Constants.API_URL.DEVICES.CREATE, data, {
+        const response = await axiosPrivate.post(Constants.API_URL.DEVICES.CREATE, body, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -124,10 +150,10 @@ export default function AddDevice(props) {
         closeAddDevice();
       }
     }, 500);
-  });
+  };
 
   const footer = <div>
-    <Button variant="dark" onClick={() => handleSave()} >
+    <Button variant="dark" type="submit" formId="addDeviceForm" >
       <Button.Text text="Add" />
     </Button>
     <Button
@@ -168,36 +194,49 @@ export default function AddDevice(props) {
       <Button.Text text="Create template" />
     </Button>
 
-  const { state, dispatch } = useTreeState();
+  const [mpttTemplate, setMpttTemplate] = useState();
   useEffect(() => {
     initialValues?.id_template ? setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.GET_MPTT, { id_template: initialValues?.id_template?.value?.id_template });
         if (response.data.length === 0) return;
-        let data = response.data?.mppt.map(item => {
+        setMaxMppt(response.data.mppt.length);
+        setInitialValues({ ...initialValues, mptt_count: response.data.mppt.length })
+        let data = response.data.mppt.map(item => {
           return {
             ...item,
-            children: item.string
+            status: 1,
+            subRows: item.string,
+            name: item.name + " (" + item.string.length + " strings)",
           }
         });
         data = data.map(item => {
           return {
             ...item,
-            children: item.children.map(item => {
+            subRows: item.subRows.map(item => {
               return {
                 ...item,
-                children: item.panel
+                status: 1,
+                subRows: item.panel.map(item => {
+                  return {
+                    ...item,
+                    status: 1,
+                  }
+                }),
+                name: item.name + " (" + item.panel.length + " panels)",
               }
             })
           }
-        })
-        dispatch({ type: "INIT_DATA", data });
+        });
+
+        setMpttTemplate(data);
       } catch (error) {
         console.log(error);
       }
     }, 100)
-      :
-      dispatch({ type: "INIT_DATA", data: [] });
+      : setTimeout(() => {
+        setMpttTemplate([]);
+      }, 100);
   }, [initialValues?.id_template]);
 
   return (
@@ -210,20 +249,22 @@ export default function AddDevice(props) {
         footer={footer}
       >
         <div>
-          <ModalDefault show={isAddMultipleDevice} style={{ top: '100px' }} onHide={() => closeAddMultipleDevice()}>
+          {/* <ModalDefault show={isAddMultipleDevice} style={{ top: '100px' }} onHide={() => closeAddMultipleDevice()}>
             <ModalDefault.Header style={{ backgroundColor: "#383434", color: "#fff" }}>Add Multiple Device</ModalDefault.Header>
             <ModalDefault.Body >
               <AddMultipleDevice handleSave={handleSave} closeAddMultipleDevice={closeAddMultipleDevice} />
             </ModalDefault.Body>
-          </ModalDefault>
+          </ModalDefault> */}
 
           <div className='col-xl-6 col-md-12'>
             <FormInput.Text
               label="Device ID"
-              name="id"
+              name="name"
               placeholder="Device name"
               className="mb-3"
               required={true}
+              value={initialValues?.name}
+              onChange={(e) => setInitialValues({ ...initialValues, name: e.target.value })}
             />
           </div>
 
@@ -326,10 +367,10 @@ export default function AddDevice(props) {
               createTemplateBTN
             }
           </div>
-          <div>
-            MPTT
-            <TreeView data={state} />
-          </div>
+          {
+            mpttTemplate && mpttTemplate.length > 0 &&
+            <MPTTConfigure initialValues={initialValues} dataTemplate={mpttTemplate} setDataTemplate={setMpttTemplate} setInitialValues={setInitialValues} />
+          }
         </div>
       </Modal>
     </FormInput>

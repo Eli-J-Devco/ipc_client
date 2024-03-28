@@ -25,7 +25,10 @@ export const AddModBusDevice = ({ communication, initialValues, setInitialValues
                     <FormInput.Text
                         label="RTU Bus-Address"
                         name="rtu_bus_address"
+                        type="number"
                         required={true}
+                        value={initialValues?.rtu_bus_address}
+                        onChange={(e) => setInitialValues({ ...initialValues, rtu_bus_address: e.target.value })}
                     />
                 </div>
                 {initialValues?.id_communication?.label && initialValues?.id_communication?.label.search(/RS485/g) === -1 ?
@@ -34,7 +37,10 @@ export const AddModBusDevice = ({ communication, initialValues, setInitialValues
                             <FormInput.Text
                                 label="MB/TCP Gateway Port"
                                 name="tcp_gateway_port"
+                                type="number"
                                 required={true}
+                                value={initialValues?.tcp_gateway_port}
+                                onChange={(e) => setInitialValues({ ...initialValues, tcp_gateway_port: e.target.value })}
                             />
                         </div>
                         <div className='col-xl-12 col-md-12'>
@@ -42,6 +48,8 @@ export const AddModBusDevice = ({ communication, initialValues, setInitialValues
                                 label="MB/TCP Gateway IP-Address"
                                 name="tcp_gateway_ip"
                                 required={true}
+                                value={initialValues?.tcp_gateway_ip}
+                                onChange={(e) => setInitialValues({ ...initialValues, tcp_gateway_ip: e.target.value })}
                             />
                         </div>
                     </>

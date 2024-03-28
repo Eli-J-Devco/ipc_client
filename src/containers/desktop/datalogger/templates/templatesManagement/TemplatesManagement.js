@@ -6,9 +6,40 @@ import useTemplatesManagement from "./useTemplatesManagement";
 import { ReactComponent as EditIcon } from "../../../../../assets/images/edit.svg";
 import { ReactComponent as DeleteIcon } from "../../../../../assets/images/delete.svg";
 import FormInput from "../../../../../components/formInput/FormInput";
+import { useEffect } from "react";
+import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
+import Constants from "../../../../../utils/Constants";
+import { loginService } from "../../../../../services/loginService";
+import LibToast from "../../../../../utils/LibToast";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 function TemplatesManagement() {
-    const { isModalOpen, openModal, closeModal, template, columns, templateList, handleOnItemEdit, fileUpload, handleFileUploadChange } = useTemplatesManagement();
+    const { isModalOpen, openModal, closeModal, template, columns, templateList, setTemplateList, handleOnItemEdit, fileUpload, handleFileUploadChange } = useTemplatesManagement();
+    const axiosPrivate = useAxiosPrivate();
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    useEffect(() => {
+        templateList.length === 0 && setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(`${Constants.API_URL.TEMPLATE.LIST_BY_TYPE}?type=${Constants.TEMPLATE_TYPE.CUSTOM}`);
+                if (response?.status === 200) {
+                    setTemplateList(response?.data);
+                }
+            } catch (error) {
+                let msg = loginService.handleMissingInfo(error);
+                if (typeof msg === "string") {
+                    LibToast.toast(msg, "error");
+                }
+                else {
+                    if (msg)
+                        LibToast.toast(t('toastMessage.error.fetch'), "error");
+                    else
+                        navigate("/")
+                }
+            }
+        }, 300);
+    }, [templateList]);
 
     return (
         <div className={styles["template-management"]} >
@@ -19,7 +50,7 @@ function TemplatesManagement() {
                             Edit Or Manage Your Templates
                         </div>
 
-                        <div className={styles.body}> 
+                        <div className={styles.body}>
                             <Table
                                 columns={columns}
                                 data={templateList}

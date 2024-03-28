@@ -33,7 +33,7 @@ export default function ResetPasswordModal({ isOpenModal, closeModal }) {
             try {
                 const response = await axiosPrivate.post(Constants.API_URL.USERS.RESET_PASSWORD, { username: isOpenModal?.user?.email });
                 if (response?.status === 200) {
-                    LibToast.toast(`Password of user with id: ${isOpenModal?.user?.id} has been reset successfully`, 'info');
+                    LibToast.toast(`Password of user with id: ${isOpenModal?.user?.email} has been reset successfully`, 'info');
                     setNewPassword(response?.data?.password);
                 }
             } catch (error) {
