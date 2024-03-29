@@ -29,9 +29,28 @@ function FormInput({ children, className, id, onSubmit, initialValues, validatio
     );
 }
 
-function Text({ className, label, placeholder, name, value, required, isRandom, type = "text", disabled, readOnly, autoComplete = "off", textarea, horizontal, onChange, onBlur, onClick, unit }) {
+function Text({
+    className, label,
+    placeholder,
+    name,
+    value,
+    required,
+    isRandom,
+    isShow = false,
+    isCustomIcon = false,
+    type = "text",
+    disabled,
+    readOnly,
+    autoComplete = "off",
+    textarea,
+    horizontal,
+    onChange,
+    onBlur,
+    onClick,
+    unit
+}) {
     const validate = useContext(FormInputContext);
-    const [showPassword, setShowPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(isShow);
 
     return (
         <Form.Group
@@ -50,7 +69,7 @@ function Text({ className, label, placeholder, name, value, required, isRandom, 
                 <div>
                     <Form.Control
                         className={styles["form-text"]}
-                        style={type === "password" ? { backgroundImage: "none" } : {}}
+                        style={type === "password" || isCustomIcon ? { backgroundImage: "none" } : {}}
                         placeholder={placeholder}
                         size="sm"
                         name={name}
@@ -70,7 +89,7 @@ function Text({ className, label, placeholder, name, value, required, isRandom, 
                 </div>
                 {
                     type === "password" ?
-                        <div style={{ display: "inline-block", position: "absolute", top: "10%", right: 0, cursor: "pointer" }}>
+                        <div className='d-flex align-items-center position-absolute top-0 end-0 mt-1' style={{ cursor: "pointer" }}>
                             {
                                 isRandom &&
                                 <span onClick={() => {
@@ -83,10 +102,10 @@ function Text({ className, label, placeholder, name, value, required, isRandom, 
                             <span onClick={() => setShowPassword(!showPassword)}>
                                 {!showPassword ?
                                     (
-                                        <LockIcon style={{ padding: 4 }} />
+                                        <LockIcon style={{ padding: 6 }} />
                                     ) :
                                     (
-                                        <UnlockIcon style={{ padding: 4 }} />
+                                        <UnlockIcon style={{ padding: 6 }} />
                                     )
                                 }
                             </span>
@@ -153,29 +172,27 @@ function Select({ className, label, name, required, groupOption, option, horizon
             },
             minHeight: 31
         }),
-        groupStyles: (baseStyles, state) => ({
-            ...baseStyles,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-        }),
-        groupBadgeStyles: (baseStyles, state) => ({
-            ...baseStyles,
-            backgroundColor: 'var(--bs-primary)',
-            borderRadius: '2em',
-            color: 'white',
-            display: 'flex',
-            justifyContent: 'center',
-            padding: '0 8px',
-            fontSize: '0.8em',
-            marginRight: 5,
-        }),
     };
 
     const formatGroupLabel = (data) => (
-        <div style={customStyles.groupStyles}>
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+        }}>
             <span>{data.label}</span>
-            <span style={customStyles.groupBadgeStyles}>{data.options.length}</span>
+            <span style={{
+                backgroundColor: 'var(--bs-primary)',
+                borderRadius: '2em',
+                color: 'white',
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '0 8px',
+                fontSize: '0.8em',
+                marginRight: 5,
+            }}>
+                {data.options.length}
+            </span>
         </div>
     );
     return (

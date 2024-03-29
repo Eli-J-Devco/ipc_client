@@ -3,7 +3,7 @@
 * All rights reserved.
 * 
 *********************************************************/
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styles from './PermissionsAndRoles.module.scss';
@@ -31,7 +31,15 @@ import ConfirmDeleteModal from './rolesModal/ConfirmDeleteModal';
 export default function PermissionsAndRoles() {
   const { t } = useTranslation();
   const axiosPrivate = useAxiosPrivate();
-  const { isOpenRolesModal, openAddRoles, closeAddRoles, openEditRoles, closeEditRoles, openConfirmDeleteRoles, closeConfirmDeleteRoles } = usePermissionsAndRoles();
+  const {
+    isOpenRolesModal,
+    openAddRoles,
+    closeAddRoles,
+    openEditRoles,
+    closeEditRoles,
+    openConfirmDeleteRoles,
+    closeConfirmDeleteRoles
+  } = usePermissionsAndRoles();
   const [needRefresh, setNeedRefresh] = useState(true);
 
   const [roles, setRoles] = useState([]);

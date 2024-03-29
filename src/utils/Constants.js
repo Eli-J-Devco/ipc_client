@@ -83,6 +83,7 @@ const Constants = {
       UPDATE: "/template/edit_each/",
       DELETE: "/template/delete/",
       GET_MPTT: "/template/get_mppt_template/",
+      CONFIG: "/template/get_template_config/",
     },
     UPLOAD_CHANNEL: {
       ALL_CHANNELS: "/upload_channel/all_channel/",
@@ -104,6 +105,11 @@ const Constants = {
       ADD_ROLE: "/users/create/role/",
       UPDATE_ROLE_SCREEN: "/users/update/role_screen/",
     },
+  },
+
+  REGEX_PATTERN: {
+    EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+    PASSWORD: /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹])[a-zA-Z0-9~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]{7,}$/,
   },
 
   SCREEN_MODE: {

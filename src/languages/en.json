@@ -94,6 +94,12 @@
         "how_many_to_add": "How many to add?",
         "when_adding": "When adding, increment"
     },
+    "requiredMessage": {
+        "email": "Please enter a valid email address.",
+        "email_pattern": "Invalid email address.",
+        "password": "Please enter a valid password.",
+        "password_pattern": "Password must be at least 8 characters long and contain at least one number, one uppercase letter, one lowercase letter, and one special character."
+    },
     "toastMessage": {
         "error": {
             "fetch": "Server error. Please try again later.",

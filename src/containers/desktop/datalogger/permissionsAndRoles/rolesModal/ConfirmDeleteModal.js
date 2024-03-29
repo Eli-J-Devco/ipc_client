@@ -35,8 +35,9 @@ export default function ConfirmDeleteModal(props) {
         const response = await axiosPrivate.post(Constants.API_URL.USERS.DELETE_ROLE, { id: role?.id });
         if (response.status === 200) {
           LibToast.toast(`Role ${t('toastMessage.info.delete')}`, 'info');
+          closeRolesModal(true);
+          setNeedRefresh(true);
         }
-        setNeedRefresh(true);
       }
       catch (error) {
         setNeedRefresh(false);
@@ -55,7 +56,6 @@ export default function ConfirmDeleteModal(props) {
       }
       finally {
         output.innerHTML = "";
-        closeRolesModal(true);
       }
     }, 100);
   }
