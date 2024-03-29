@@ -1,18 +1,20 @@
-.main_login{
-    .validate{
+.main_login {
+    .validate {
         color: red;
         display: inline-block;
         width: 100%;
         margin-top: 3px;
     }
-    .box_login{
+
+    .box_login {
         width: 360px;
         margin: 7% auto 0 auto;
         border-radius: (6px);
         box-shadow: (0 0 8px 0 rgba(0, 0, 0, 0.2));
         overflow: hidden;
         font-size: 14px;
-        .title{
+
+        .title {
             background-color: #383434;
             text-transform: uppercase;
             border-bottom: 1px solid #d3d3d3;
@@ -21,22 +23,27 @@
             color: #FFF;
             text-align: center;
             position: relative;
-            img{
+
+            img {
                 height: 50px;
             }
         }
-        .body_login{
+
+        .body_login {
             padding: 30px;
-            .login_title{
+
+            .login_title {
                 font-weight: 500;
                 text-align: center;
                 padding-bottom: 20px;
                 font-size: 24px;
             }
-            .form_group{
+
+            .form_group {
                 margin-bottom: 20px;
                 position: relative;
-                input{
+
+                input {
                     height: 34px;
                     background: #E7F0FE;
                     border-radius: (20px);
@@ -44,21 +51,34 @@
                     font-size: 14px;
                     border-color: transparent;
                 }
-                label{
+
+                label {
                     margin-bottom: 0;
-                }
-                svg{
-                    width: 28px;
-                    height: 28px;
-                    position: absolute;
-                    top: 3px;
-                    right: 6px;
                 }
             }
 
-            .btn_login{
+            .form_validate {
+                margin-bottom: 20px;
+                position: relative;
+
+                input {
+                    height: 34px;
+                    background: #E7F0FE;
+                    border-radius: (20px);
+                    outline: none;
+                    font-size: 14px;
+                    border-color: red;
+                }
+
+                label {
+                    margin-bottom: 0;
+                }
+            }
+
+            .btn_login {
                 margin-top: 30px;
-                button{
+
+                button {
                     background-color: #383434;
                     color: #fff;
                     display: inline-block;
@@ -74,10 +94,11 @@
                     display: inline-block;
                 }
             }
-            .email_password{
+
+            .email_password {
                 margin: 20px 0;
             }
         }
     }
-    
+
 }

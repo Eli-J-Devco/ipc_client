@@ -30,7 +30,10 @@ function FormInput({ children, className, id, onSubmit, initialValues, validatio
 }
 
 function Text({
-    className, label,
+    className,
+    inputClassName,
+    invalidClassName,
+    label,
     placeholder,
     name,
     value,
@@ -55,7 +58,7 @@ function Text({
     return (
         <Form.Group
             controlId={name}
-            className={`${styles["form-text-wrapper"]} ${className ? className : ""} ${horizontal ? styles.horizontal : ""}`}
+            className={`${styles["form-text-wrapper"]} ${validate ? validate.touched[name] && validate.errors[name] ? invalidClassName : "" : ""} ${className ? className : ""} ${horizontal ? styles.horizontal : ""}`}
         >
             {label &&
                 <Form.Label>
@@ -68,7 +71,7 @@ function Text({
             <div style={{ position: "relative" }}>
                 <div>
                     <Form.Control
-                        className={styles["form-text"]}
+                        className={`${styles["form-text"]} ${inputClassName ? inputClassName : ""}`}
                         style={type === "password" || isCustomIcon ? { backgroundImage: "none" } : {}}
                         placeholder={placeholder}
                         size="sm"
@@ -88,7 +91,7 @@ function Text({
                     <Form.Control.Feedback type="invalid" >{validate ? validate.errors[name] : ""}</Form.Control.Feedback>
                 </div>
                 {
-                    type === "password" ?
+                    type === "password" && !isCustomIcon ?
                         <div className='d-flex align-items-center position-absolute top-0 end-0 mt-1' style={{ cursor: "pointer" }}>
                             {
                                 isRandom &&
