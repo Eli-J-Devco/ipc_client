@@ -4,6 +4,7 @@ import * as yup from 'yup';
 function useEditPointModal(data) {
     const [modbusConfig, setModbusConfig] = useState(1);
     const [modbusRegisterType, setModbusRegisterType] = useState(1);
+    const [selectedUnit, setSelectedUnit] = useState({ value: data?.type_units?.id, label: data?.type_units?.unit });
 
     const validationSchema = yup.object({
         id: yup.string().required('Required'),
@@ -32,11 +33,13 @@ function useEditPointModal(data) {
 
     return {
         initialValues,
+        validationSchema,
         modbusConfig,
         setModbusConfig,
         modbusRegisterType,
         setModbusRegisterType,
-        validationSchema
+        selectedUnit,
+        setSelectedUnit
     };
 }
 

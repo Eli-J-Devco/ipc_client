@@ -31,8 +31,8 @@ function FormInput({ children, className, id, onSubmit, initialValues, validatio
 
 function Text({
     className,
-    inputClassName,
-    invalidClassName,
+    inputClassName = "",
+    invalidClassName = "",
     label,
     placeholder,
     name,

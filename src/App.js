@@ -166,7 +166,6 @@ export default class App extends Component {
                       <Route path="points" element={<PointList />} />
                       <Route path="mppt" element={<MPPTList />} />
                       <Route path="registers" element={<RegisterBlocks />} />
-                      <Route path="advanced" element={<Advanced />} />
                     </Route>
                   </Route>
 

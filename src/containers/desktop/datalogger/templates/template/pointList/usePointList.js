@@ -9,7 +9,7 @@ function usePointList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [point, setPoint] = useState({});
 
-    const [pointList, setPointList] = useState();
+    const [pointList, setPointList] = useState([]);
 
     useEffect(() => {
         setPointList(defaultPointList.map((item, index) => ({ ...item, index: index, unit: item?.type_units?.unit, class: item?.type_class?.type_class, data_type: item?.type_datatype?.data_type, byte_order: item?.type_byteorder?.byte_order })));
@@ -25,13 +25,22 @@ function usePointList() {
     const columns = [
         columnsHelper.accessor("id_checkbox", {
             id: "id_checkbox",
-            header: "Point#",
+            header: ({ table }) => (
+                <FormInput.Check
+                    inline
+                    name="all"
+                    label="Point#"
+                    checked={table.getIsAllRowsSelected()}
+                    onChange={(e) => table.toggleAllRowsSelected(e.target.checked)}
+                />
+            ),
             cell: ({ row }) => (
                 <FormInput.Check
                     inline
                     name={row.original.name}
                     label={`pt${row.original.index}`}
-                    onChange={(e) => e?.target?.checked && console.log(row.original)}
+                    checked={row.getIsSelected()}
+                    onChange={(e) => row.toggleSelected(e.target.checked)}
                 />
             )
         }),

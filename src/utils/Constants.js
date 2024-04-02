@@ -84,6 +84,10 @@ const Constants = {
       DELETE: "/template/delete/",
       GET_MPTT: "/template/get_mppt_template/",
       CONFIG: "/template/get_template_config/",
+      POINT: {
+        DELETE: "/template/delete_point_list/",
+        DELETE_MPPT: "/template/delete_point_list/mppt/",
+      }
     },
     UPLOAD_CHANNEL: {
       ALL_CHANNELS: "/upload_channel/all_channel/",

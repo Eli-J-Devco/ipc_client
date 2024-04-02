@@ -8,7 +8,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 import Constants from '../../utils/Constants';
 
-function useTable({ columns, data, statusFilter, total, offset, setLimit, setOffset, slugProps }) {
+function useTable({
+    columns,
+    data,
+    statusFilter,
+    total,
+    offset,
+    setLimit,
+    setOffset,
+    rowSelection,
+    setRowSelection,
+    slugProps
+}) {
     // const columnsDefault = isArray(columns) ? columns : columns?.columnDefs || columns || [];
     // const [columnVisibility, setColumnVisibility] = useState(columnsDefault.reduce((acc, cur) => ({ ...acc, [cur.id]: true }), {}));
     // const [columnSizing, setColumnSizing] = useState(columnsDefault.reduce((acc, cur) => ({ ...acc, [cur.id]: cur.width ? cur.width : 100 }), {}));
@@ -42,15 +53,18 @@ function useTable({ columns, data, statusFilter, total, offset, setLimit, setOff
             // columnVisibility,
             // columnSizing,
             // columnOrder,
+            rowSelection: rowSelection || {}
         },
         getSubRows: (row) => row.subRows,
         // onColumnVisibilityChange: setColumnVisibility,
         // columnResizeMode: "onChange",
         // onColumnSizingChange: setColumnSizing,
         // onColumnOrderChange: setColumnOrder,
+        onRowSelectionChange: setRowSelection || (() => { }),
         enableColumnResizing: true,
         enableRowSelection: true,
-        enableMultiRowSelection: false,
+        enableMultiRowSelection: true,
+        enableSubRowSelection: true,
         manualPagination: true,
         pageCount
     });

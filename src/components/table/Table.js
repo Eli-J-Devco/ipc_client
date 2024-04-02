@@ -29,10 +29,31 @@ import { useState } from 'react';
  * @param {string}    pagination.total        - total records without limit and offset
  * @param {string}    pagination.setLimit     - get limit from table component
  * @param {string}    pagination.setOffset    - get offset from table component
+ * @param {object}    selectRow               - select row
+ * @param {boolean}   selectRow.enable        - enable select row on click  
+ * @param {object}    selectRow.rowSelection   - selected row
+ * @param {function}  selectRow.setRowSelection  - set selected row
  * @param {component} slugProps               - component that wrapping cell's value. when pass component in, prop's name is column's slug value
  */
 function Table({ control, variant, className, maxHeight, columns, data, visible, resizable, draggable, pagination, selectRow, ...slugProps }) {
-    const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef, handleOnChangePageSize } = useTable({ columns, data, statusFilter: pagination?.statusFilter, total: pagination?.total, offset: pagination?.offset, setLimit: pagination?.setLimit, setOffset: pagination?.setOffset, slugProps });
+    const {
+        table,
+        isDropDownsShow,
+        handleOpenDropDowns,
+        dropDownsRef,
+        handleOnChangePageSize
+    } = useTable({
+        columns,
+        data,
+        statusFilter: pagination?.statusFilter,
+        total: pagination?.total,
+        offset: pagination?.offset,
+        setLimit: pagination?.setLimit,
+        setOffset: pagination?.setOffset,
+        rowSelection: selectRow?.rowSelection,
+        setRowSelection: selectRow?.setRowSelection,
+        slugProps
+    });
     return (
         <div>
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
@@ -64,7 +85,7 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
                         {
                             data?.length > 0 ? table.getRowModel().rows.map(row => {
                                 let isSelected = false;
-                                if (selectRow && row?.original?.id === selectRow?.selectedRow?.id) {
+                                if (selectRow?.enable && row?.original?.id === selectRow?.rowSelection?.id) {
                                     isSelected = true;
                                 }
                                 return (
@@ -74,7 +95,7 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
                                             if (selectRow?.enable) {
                                                 row.toggleSelected(true);
                                                 setTimeout(() => {
-                                                    selectRow?.onSelect(row.original);
+                                                    selectRow?.setRowSelection(row.original);
                                                 }, 100);
                                             }
                                         }}

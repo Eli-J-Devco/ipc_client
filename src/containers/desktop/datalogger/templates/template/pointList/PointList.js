@@ -1,7 +1,6 @@
 import Button from "../../../../../../components/button/Button";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import Table from "../../../../../../components/table/Table";
-import { useTemplate } from "../useTemplate";
 import EditPointModal from "./editPointModal/EditPointModal";
 import usePointList from "./usePointList";
 import * as yup from 'yup';
@@ -13,10 +12,10 @@ function PointList() {
     const schema = yup.object().shape({
         num_of_point: yup.number().required()
     });
-    return (
+    return pointList.length > 0 && (
         <FormInput id="pointListForm" initialValues={initialValues} validationSchema={schema}>
             <div>
-                <div className="d-flex">
+                <div className="d-flex mb-3">
                     <FormInput.Text
                         label="Number of Points:"
                         name="num_of_point"
@@ -39,11 +38,14 @@ function PointList() {
                     data={pointList}
                 />
 
-                <EditPointModal
-                    isOpen={isModalOpen}
-                    close={closeModal}
-                    data={point}
-                />
+                {
+                    isModalOpen &&
+                    <EditPointModal
+                        isOpen={isModalOpen}
+                        close={closeModal}
+                        data={point}
+                    />
+                }
 
                 <Button className="mt-3" type="submit" formId="pointListForm">
                     <Button.Text text="Delete Selected Points" />

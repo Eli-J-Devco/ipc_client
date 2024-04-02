@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Button from "../../../../../../../components/button/Button";
 import FormInput from "../../../../../../../components/formInput/FormInput";
 import Modal from "../../../../../../../components/modal/Modal";
@@ -7,18 +7,42 @@ import styles from "./EditPointModal.module.scss";
 import useEditPointModal from "./useEditPointModal";
 
 function EditPointModal({ isOpen, close, data }) {
-    const { initialValues, modbusConfig, setModbusConfig, modbusRegisterType, setModbusRegisterType, validationSchema } = useEditPointModal(data);
+    const {
+        initialValues,
+        validationSchema,
+        modbusConfig,
+        setModbusConfig,
+        modbusRegisterType,
+        setModbusRegisterType,
+        selectedUnit,
+        setSelectedUnit
+    } = useEditPointModal(data);
     const { config } = useTemplate();
+    const [pointUnits, setPointUnits] = useState([]);
+
     const { data_type, byte_order, point_unit, type_point, type_class } = config;
     useEffect(() => {
-        if (type_point && type_point.length > 0 && type_class && type_class.length > 0) {
+        if (data_type?.length > 0 && byte_order?.length > 0 && point_unit?.length > 0 && type_point?.length > 0 && type_class?.length > 0) {
             setTimeout(() => {
                 setModbusConfig(data?.type_point?.id);
                 setModbusRegisterType(data?.type_class?.id);
+
+                let unitGroup = point_unit.filter(item => item?.unit.match(/---/i));
+                let units = [];
+                unitGroup.forEach(group => {
+                    let firstItemIndex = point_unit.indexOf(group) + 1;
+                    let lastItemIndex = point_unit.indexOf(point_unit.find((item, index) => index > firstItemIndex && item?.unit.match(/---/i)));
+                    units.push({
+                        label: group?.unit.replaceAll("-", "").trim(),
+                        options: point_unit.slice(firstItemIndex, lastItemIndex).map(item => ({ value: item?.id, label: item?.unit }))
+                    });
+                });
+                setPointUnits(units);
             }, 100);
         }
-    }, [type_point, setModbusConfig, type_class, setModbusRegisterType]);
-    return (
+    }, [data_type?.length, byte_order?.length, point_unit?.length, type_point?.length, type_class?.length, data]);
+
+    return data_type?.length > 0 && byte_order?.length > 0 && point_unit?.length > 0 && type_point?.length > 0 && type_class?.length > 0 && (
         <Modal
             isOpen={isOpen}
             close={close}
@@ -83,6 +107,8 @@ function EditPointModal({ isOpen, close, data }) {
                         <FormInput.Text
                             label="Point Unit:"
                             name="unit_name"
+                            value={selectedUnit?.label}
+                            disabled={true}
                         />
                     </div>
 
@@ -94,7 +120,10 @@ function EditPointModal({ isOpen, close, data }) {
                         <FormInput.Select
                             isSearchable={true}
                             name="unit"
-                            option={point_unit.map(item => ({ value: item.id, label: item.unit }))}
+                            option={pointUnits}
+                            groupOption={true}
+                            value={selectedUnit}
+                            onChange={(value) => setSelectedUnit(value)}
                         />
                     </div>
 
@@ -107,8 +136,9 @@ function EditPointModal({ isOpen, close, data }) {
                 </div>
                 <div className={`my-2 p-2 ${styles.title}`}>
                     {
-                        type_point && type_point.length > 0 && type_point.filter(item => item.type === 1).map((item) => (
+                        type_point.map((item) => (
                             <FormInput.Check
+                                key={item?.id}
                                 type="radio"
                                 name={item?.type_point}
                                 label={item?.type_point}
@@ -121,11 +151,12 @@ function EditPointModal({ isOpen, close, data }) {
                 </div>
 
                 {
-                    type_point && type_point.length > 0 && modbusConfig === type_point[0]?.id &&
+                    modbusConfig === type_point[0]?.id &&
                     <div className={`my-2 p-2 ${styles.title}`}>
                         {
-                            type_class && type_class.length > 0 && type_class.map((item) => (
+                            type_class.map((item) => (
                                 <FormInput.Check
+                                    key={item?.id}
                                     type="radio"
                                     name={item?.type_class}
                                     label={item?.type_class}
@@ -139,7 +170,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 {
-                    type_point && type_point.length > 0 && modbusConfig === type_point[0]?.id &&
+                    modbusConfig === type_point[0]?.id &&
                     <>
                         <div className="row my-2">
                             <div className="col-4">
@@ -198,14 +229,14 @@ function EditPointModal({ isOpen, close, data }) {
                     </>
                 }
                 {
-                    type_point && type_point.length > 0 && modbusConfig !== type_point[2]?.id &&
+                    modbusConfig !== type_point[2]?.id &&
                     <div className={`my-2 p-2 text-center fw-bold ${styles.title} ${styles.light}`}>
                         Scale & Offset
                     </div>
                 }
 
                 {
-                    type_point && type_point.length > 0 && modbusConfig === type_point[0]?.id &&
+                    modbusConfig === type_point[0]?.id &&
                     <>
                         <div className="row my-2">
                             <div className="col-4">
@@ -250,7 +281,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 {
-                    type_point && type_point.length > 0 && type_class && type_class.length > 0 && modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[0]?.id &&
+                    modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[0]?.id &&
                     <div className="row my-2">
                         <div className="col-4">
                             <FormInput.Text
@@ -273,7 +304,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 {
-                    type_point && type_point.length > 0 && type_class && type_class.length > 0 && modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[1]?.id &&
+                    modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[1]?.id &&
                     <div className="row my-2">
                         <div className="col-4">
                             <FormInput.Text
@@ -300,7 +331,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 {
-                    type_point && type_point.length > 0 && type_class && type_class.length > 0 && modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[2]?.id &&
+                    modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[2]?.id &&
                     <>
                         <div className="row my-2">
                             <div className="col-4">
@@ -346,7 +377,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 {
-                    type_point && type_point.length > 0 && modbusConfig === type_point[1]?.id &&
+                    modbusConfig === type_point[1]?.id &&
                     <div className="row my-2">
                         <div className="col-4">
                             <FormInput.Text

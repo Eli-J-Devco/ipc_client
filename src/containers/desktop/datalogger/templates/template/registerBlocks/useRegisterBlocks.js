@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTemplate } from "../useTemplate";
 
 function useRegisterBlocks() {
-    const [columns, ] = useState([
+    const [columns, setColumns] = useState([
         {
             id: 1,
             slug: "id_checkbox",
@@ -9,19 +10,11 @@ function useRegisterBlocks() {
             width: 150
         }, {
             id: 2,
-            slug: "address_input",
+            slug: "addr",
             name: "Modbus Register Address"
         }, {
-            id: 3,
-            slug: "offset",
-            name: "Offset"
-        }, {
-            id: 4,
-            slug: "hex",
-            name: "(hex)"
-        }, {
             id: 5,
-            slug: "count_input",
+            slug: "count",
             name: "Count",
             width: 200
         }, {
@@ -31,55 +24,37 @@ function useRegisterBlocks() {
             width: 200
         }
     ]);
-    const [registerList, ] = useState([
-        {
-            id: 1,
-            address: 40069,
-            offset: 68,
-            hex: "0x0044",
-            count: 34,
-            fuction: "read"
-        },{
-            id: 2,
-            address: 40104,
-            offset: 68,
-            hex: "0x0067",
-            count: 1,
-            fuction: "read"
-        },{
-            id: 3,
-            address: 40107,
-            offset: 68,
-            hex: "0x006A",
-            count: 3,
-            fuction: "read"
-        },{
-            id: 4,
-            address: 0,
-            offset: -1,
-            hex: "0xFFFF",
-            count: 0,
-            fuction: "not used"
-        },{
-            id: 5,
-            address: 0,
-            offset: -1,
-            hex: "0xFFFF",
-            count: 0,
-            fuction: "not used"
-        },{
-            id: 6,
-            address: 0,
-            offset: -1,
-            hex: "0xFFFF",
-            count: 0,
-            fuction: "not used"
-        }
-    ]);
+    const { defaultRegisterList, config } = useTemplate();
+
+    const [registerList, setRegisterList] = useState([]);
+
+    const [functionList, setFunctionList] = useState([]);
+
+    useEffect(() => {
+        var output = document.getElementById("progress");
+        output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
+        if (!defaultRegisterList || !config?.type_function) return;
+
+        setTimeout(() => {
+            setRegisterList(defaultRegisterList.map((item, index) => ({
+                index: index,
+                id: item.id,
+                id_checkbox: item.id,
+                addr: item.addr,
+                count: item.count,
+                function_select: { value: item.type_function.id, label: item.type_function.Function }
+            })));
+            setFunctionList(config?.type_function.map(
+                item => ({ value: item.id, label: item.Function })
+            ));
+            output.innerHTML = "";
+        }, 100);
+    }, [defaultRegisterList, config?.type_function]);
 
     return {
         columns,
-        registerList
+        registerList,
+        functionList
     };
 }
 

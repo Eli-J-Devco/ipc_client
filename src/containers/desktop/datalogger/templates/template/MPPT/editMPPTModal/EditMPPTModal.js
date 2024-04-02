@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Button from "../../../../../../../components/button/Button";
 import FormInput from "../../../../../../../components/formInput/FormInput";
 import Modal from "../../../../../../../components/modal/Modal";
@@ -6,17 +6,44 @@ import { useTemplate } from "../../useTemplate";
 import styles from "./EditMPPTModal.module.scss";
 import useEditMPPTModal from "./useEditPMPPTModal";
 
-function EditMPPTModal({ isOpen, close, data }) {
-    const { initialValues, modbusConfig, setModbusConfig, modbusRegisterType, setModbusRegisterType, validationSchema } = useEditMPPTModal(data);
+function EditMPPTModal({ isOpen, close, data, setPoint }) {
+    const {
+        initialValues,
+        validationSchema,
+        modbusConfig,
+        setModbusConfig,
+        modbusRegisterType,
+        setModbusRegisterType,
+        selectedUnit,
+        setSelectedUnit,
+        onSubmit
+    } = useEditMPPTModal(data, close, setPoint);
     const { config } = useTemplate();
+    const [pointUnits, setPointUnits] = useState([]);
+
     const { data_type, byte_order, point_unit, type_point, type_class } = config;
     useEffect(() => {
-        if (type_point && type_point.length > 0 && type_class && type_class.length > 0) {
-            setModbusConfig(data?.type_point?.id);
-            setModbusRegisterType(data?.type_class?.id);
+        if (data_type?.length > 0 && byte_order?.length > 0 && point_unit?.length > 0 && type_point?.length > 0 && type_class?.length > 0) {
+            setTimeout(() => {
+                setModbusConfig(data?.type_point?.id);
+                setModbusRegisterType(data?.type_class?.id);
+
+                let unitGroup = point_unit.filter(item => item?.unit.match(/---/i));
+                let units = [];
+                unitGroup.forEach(group => {
+                    let firstItemIndex = point_unit.indexOf(group) + 1;
+                    let lastItemIndex = point_unit.indexOf(point_unit.find((item, index) => index > firstItemIndex && item?.unit.match(/---/i)));
+                    units.push({
+                        label: group?.unit.replaceAll("-", "").trim(),
+                        options: point_unit.slice(firstItemIndex, lastItemIndex).map(item => ({ value: item?.id, label: item?.unit }))
+                    });
+                });
+                setPointUnits(units);
+            }, 100);
         }
-    }, [type_point, setModbusConfig, type_class, setModbusRegisterType]);
-    return (
+    }, [data_type?.length, byte_order?.length, point_unit?.length, type_point?.length, type_class?.length, data]);
+
+    return data && data_type?.length > 0 && byte_order?.length > 0 && point_unit?.length > 0 && type_point?.length > 0 && type_class?.length > 0 && (
         <Modal
             isOpen={isOpen}
             close={close}
@@ -35,6 +62,7 @@ function EditMPPTModal({ isOpen, close, data }) {
                     <Button
                         variant="white"
                         className="m-0 ms-3"
+                        onClick={close}
                     >
                         <Button.Text text="Cancel" />
                     </Button>
@@ -43,7 +71,7 @@ function EditMPPTModal({ isOpen, close, data }) {
         >
             <FormInput
                 id="point-configuration-form"
-                onSubmit={values => console.log(values)}
+                onSubmit={onSubmit}
                 initialValues={initialValues}
                 validationSchema={validationSchema}
             >
@@ -80,7 +108,9 @@ function EditMPPTModal({ isOpen, close, data }) {
                     <div className="col-4">
                         <FormInput.Text
                             label="Point Unit:"
-                            name="unit"
+                            name="unit_name"
+                            value={selectedUnit?.label}
+                            disabled={true}
                         />
                     </div>
 
@@ -90,39 +120,50 @@ function EditMPPTModal({ isOpen, close, data }) {
 
                     <div className="col-3 align-self-end">
                         <FormInput.Select
-                            isSearchable={false}
-                            isClearable={true}
+                            isSearchable={true}
+                            name="unit"
+                            option={pointUnits}
+                            groupOption={true}
+                            value={selectedUnit}
+                            onChange={(value) => setSelectedUnit(value)}
+                            isDisabled={modbusConfig === type_point[2]?.id}
                         />
                     </div>
 
                     <div className="col-4 align-self-end">
-                        <FormInput.Check
-                            name="check_unit"
-                            label="allow per-meter edit"
-                        />
+                        {
+                            modbusConfig !== type_point[2]?.id &&
+                            <FormInput.Check
+                                name="check_unit"
+                                label="allow per-meter edit"
+                            />
+                        }
                     </div>
                 </div>
                 <div className={`my-2 p-2 ${styles.title}`}>
                     {
-                        type_point && type_point.length > 0 && type_point.filter(item => item.type === 1).map((item) => (
+                        type_point.map((item) => (
                             <FormInput.Check
+                                key={item?.id}
                                 type="radio"
                                 name={item?.type_point}
                                 label={item?.type_point}
                                 inline
                                 checked={modbusConfig === item?.id}
                                 onChange={() => setModbusConfig(item?.id)}
+                                disabled={modbusConfig === type_point[2]?.id}
                             />
                         ))
                     }
                 </div>
 
                 {
-                    type_point && type_point.length > 0 && modbusConfig === type_point[0]?.id &&
+                    modbusConfig === type_point[0]?.id &&
                     <div className={`my-2 p-2 ${styles.title}`}>
                         {
-                            type_class && type_class.length > 0 && type_class.map((item) => (
+                            type_class.map((item) => (
                                 <FormInput.Check
+                                    key={item?.id}
                                     type="radio"
                                     name={item?.type_class}
                                     label={item?.type_class}
@@ -136,7 +177,7 @@ function EditMPPTModal({ isOpen, close, data }) {
                 }
 
                 {
-                    type_point && type_point.length > 0 && modbusConfig === type_point[0]?.id &&
+                    modbusConfig === type_point[0]?.id &&
                     <>
                         <div className="row my-2">
                             <div className="col-4">
@@ -157,6 +198,7 @@ function EditMPPTModal({ isOpen, close, data }) {
                                     label="Data Format:"
                                     name="data_type"
                                     isSearchable={false}
+                                    option={data_type.map(item => ({ value: item.id, label: item.data_type }))}
                                 />
                             </div>
                         </div>
@@ -167,6 +209,7 @@ function EditMPPTModal({ isOpen, close, data }) {
                                     label="Byte Order:"
                                     name="byte_order"
                                     isSearchable={false}
+                                    option={byte_order.map(item => ({ value: item.id, label: item.byte_order }))}
                                 />
                             </div>
                         </div>
@@ -193,14 +236,14 @@ function EditMPPTModal({ isOpen, close, data }) {
                     </>
                 }
                 {
-                    type_point && type_point.length > 0 && modbusConfig !== type_point[2]?.id &&
+                    modbusConfig !== type_point[2]?.id &&
                     <div className={`my-2 p-2 text-center fw-bold ${styles.title} ${styles.light}`}>
                         Scale & Offset
                     </div>
                 }
 
                 {
-                    type_point && type_point.length > 0 && modbusConfig === type_point[0]?.id &&
+                    modbusConfig === type_point[0]?.id &&
                     <>
                         <div className="row my-2">
                             <div className="col-4">
@@ -245,7 +288,7 @@ function EditMPPTModal({ isOpen, close, data }) {
                 }
 
                 {
-                    type_point && type_point.length > 0 && type_class && type_class.length > 0 && modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[0]?.id &&
+                    modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[0]?.id &&
                     <div className="row my-2">
                         <div className="col-4">
                             <FormInput.Text
@@ -268,7 +311,7 @@ function EditMPPTModal({ isOpen, close, data }) {
                 }
 
                 {
-                    type_point && type_point.length > 0 && type_class && type_class.length > 0 && modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[1]?.id &&
+                    modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[1]?.id &&
                     <div className="row my-2">
                         <div className="col-4">
                             <FormInput.Text
@@ -295,7 +338,7 @@ function EditMPPTModal({ isOpen, close, data }) {
                 }
 
                 {
-                    type_point && type_point.length > 0 && type_class && type_class.length > 0 && modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[2]?.id &&
+                    modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[2]?.id &&
                     <>
                         <div className="row my-2">
                             <div className="col-4">
@@ -341,7 +384,7 @@ function EditMPPTModal({ isOpen, close, data }) {
                 }
 
                 {
-                    type_point && type_point.length > 0 && modbusConfig === type_point[1]?.id &&
+                    modbusConfig === type_point[1]?.id &&
                     <div className="row my-2">
                         <div className="col-4">
                             <FormInput.Text

@@ -1,27 +1,28 @@
 import Button from "../../../../../../components/button/Button";
-import FormInput from "../../../../../../components/formInput/FormInput";
 import Table from "../../../../../../components/table/Table";
-import { useTemplate } from "../useTemplate";
 import EditMPPTModal from "./editMPPTModal/EditMPPTModal";
 import useMPPTList from "./useMPPTList";
 
 function MPPTList() {
-    const { columns, pointList, isModalOpen, closeModal, handlePointEdit, point } = useMPPTList();
+    const {
+        columns,
+        pointList,
+        isModalOpen,
+        closeModal,
+        updatePoint,
+        point,
+        rowSelection,
+        setRowSelection,
+        addNewMPPT,
+        removePoint,
+        resetTemp
+    } = useMPPTList();
 
-    return (
+    return pointList.length > 0 && (
         <div>
-            <div className="d-flex">
-                <FormInput.Text
-                    label="Number of Points:"
-                    name="num_of_point"
-                    className="mx-3"
-                    horizontal
-                />
-
-                <Button className="mx-3">
-                    <Button.Text text="Change Number of Points" />
-                </Button>
-            </div>
+            <Button className="m-3" onClick={() => addNewMPPT()}>
+                <Button.Text text="Add New MPPT" />
+            </Button>
 
             <Table
                 visible
@@ -30,16 +31,30 @@ function MPPTList() {
                 maxHeight="calc(100vh - 400px)"
                 columns={{ columnDefs: columns }}
                 data={pointList}
+                selectRow={{
+                    enable: false,
+                    rowSelection: rowSelection,
+                    setRowSelection: setRowSelection
+                }}
             />
 
-            <EditMPPTModal
-                isOpen={isModalOpen}
-                close={closeModal}
-                data={point}
-            />
+            {
+                isModalOpen &&
+                <EditMPPTModal
+                    isOpen={isModalOpen}
+                    close={closeModal}
+                    data={point}
+                    setPoint={(newPoint) => {
+                        updatePoint(newPoint);
+                    }}
+                />
+            }
 
-            <Button className="mt-3">
+            <Button className="mt-3" onClick={() => removePoint()}>
                 <Button.Text text="Delete Selected Points" />
+            </Button>
+            <Button className="ms-3 mt-3" onClick={() => resetTemp()}>
+                <Button.Text text="Reset" />
             </Button>
         </div>
     );
