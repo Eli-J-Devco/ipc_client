@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
 import TemplatesProvider from "./useTemplates";
-
 function Templates() {
     return (
         <TemplatesProvider>

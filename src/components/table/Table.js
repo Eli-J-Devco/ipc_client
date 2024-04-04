@@ -7,7 +7,6 @@ import DropDowns from './dropDowns/DropDowns';
 import Header from './headers/Header';
 import Pagination from './pagination/Pagination';
 import Constants from '../../utils/Constants';
-import { useState } from 'react';
 
 /**
  * Table component
@@ -15,11 +14,16 @@ import { useState } from 'react';
  * @param {string}    variant                 - style base on specific variant
  * @param {string}    className               - custom class
  * @param {string}    maxHeight               - set maxHeight inline style for table (exclude control bar) for each specific case
+ * ===============================================
  * @param {object[]}  columns                 - table columns definition
  * @param {number}    columns[].id            - column id
  * @param {string}    columns[].slug          - column slug
  * @param {string}    columns[].name          - oclumn name
  * @param {string}    columns[].width         - column width: optional, default value: 100px
+ * Or
+ * @param {object}    columns                 - table columns definition
+ * @param {object[]}  columns.columnDefs      - table columns definition, define by user with createColumnHelper
+ * ===============================================
  * @param {array}     data                    - fetching data
  * @param {boolean}   visible                 - enable hide/unhide columns
  * @param {boolean}   resizable               - enable resize columns

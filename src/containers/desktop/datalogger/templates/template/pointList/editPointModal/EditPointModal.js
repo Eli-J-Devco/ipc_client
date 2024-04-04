@@ -5,8 +5,9 @@ import Modal from "../../../../../../../components/modal/Modal";
 import { useTemplate } from "../../useTemplate";
 import styles from "./EditPointModal.module.scss";
 import useEditPointModal from "./useEditPointModal";
+import _ from "lodash";
 
-function EditPointModal({ isOpen, close, data }) {
+function EditPointModal({ isOpen, close, data, setPoint }) {
     const {
         initialValues,
         validationSchema,
@@ -15,8 +16,13 @@ function EditPointModal({ isOpen, close, data }) {
         modbusRegisterType,
         setModbusRegisterType,
         selectedUnit,
-        setSelectedUnit
-    } = useEditPointModal(data);
+        setSelectedUnit,
+        selectedDataType,
+        setSelectedDataType,
+        selectedByteOrder,
+        setSelectedByteOrder,
+        onSubmit
+    } = useEditPointModal(data, close, setPoint);
     const { config } = useTemplate();
     const [pointUnits, setPointUnits] = useState([]);
 
@@ -24,8 +30,8 @@ function EditPointModal({ isOpen, close, data }) {
     useEffect(() => {
         if (data_type?.length > 0 && byte_order?.length > 0 && point_unit?.length > 0 && type_point?.length > 0 && type_class?.length > 0) {
             setTimeout(() => {
-                setModbusConfig(data?.type_point?.id);
-                setModbusRegisterType(data?.type_class?.id);
+                setModbusConfig(data?.type_point);
+                setModbusRegisterType(data?.type_class);
 
                 let unitGroup = point_unit.filter(item => item?.unit.match(/---/i));
                 let units = [];
@@ -42,7 +48,7 @@ function EditPointModal({ isOpen, close, data }) {
         }
     }, [data_type?.length, byte_order?.length, point_unit?.length, type_point?.length, type_class?.length, data]);
 
-    return data_type?.length > 0 && byte_order?.length > 0 && point_unit?.length > 0 && type_point?.length > 0 && type_class?.length > 0 && (
+    return data && data_type?.length > 0 && byte_order?.length > 0 && point_unit?.length > 0 && type_point?.length > 0 && type_class?.length > 0 && (
         <Modal
             isOpen={isOpen}
             close={close}
@@ -61,6 +67,7 @@ function EditPointModal({ isOpen, close, data }) {
                     <Button
                         variant="white"
                         className="m-0 ms-3"
+                        onClick={close}
                     >
                         <Button.Text text="Cancel" />
                     </Button>
@@ -69,7 +76,7 @@ function EditPointModal({ isOpen, close, data }) {
         >
             <FormInput
                 id="point-configuration-form"
-                onSubmit={values => console.log(values)}
+                onSubmit={onSubmit}
                 initialValues={initialValues}
                 validationSchema={validationSchema}
             >
@@ -124,14 +131,18 @@ function EditPointModal({ isOpen, close, data }) {
                             groupOption={true}
                             value={selectedUnit}
                             onChange={(value) => setSelectedUnit(value)}
+                            isDisabled={_.isEqual(data?.type_point, type_point[2])}
                         />
                     </div>
 
                     <div className="col-4 align-self-end">
-                        <FormInput.Check
-                            name="check_unit"
-                            label="allow per-meter edit"
-                        />
+                        {
+                            !_.isEqual(data?.type_point, type_point[2]) &&
+                            <FormInput.Check
+                                name="check_unit"
+                                label="allow per-meter edit"
+                            />
+                        }
                     </div>
                 </div>
                 <div className={`my-2 p-2 ${styles.title}`}>
@@ -143,15 +154,16 @@ function EditPointModal({ isOpen, close, data }) {
                                 name={item?.type_point}
                                 label={item?.type_point}
                                 inline
-                                checked={modbusConfig === item?.id}
-                                onChange={() => setModbusConfig(item?.id)}
+                                checked={_.isEqual(modbusConfig, item)}
+                                onChange={() => setModbusConfig(item)}
+                                disabled={_.isEqual(data?.type_point, type_point[2])}
                             />
                         ))
                     }
                 </div>
 
                 {
-                    modbusConfig === type_point[0]?.id &&
+                    _.isEqual(modbusConfig, type_point[0]) &&
                     <div className={`my-2 p-2 ${styles.title}`}>
                         {
                             type_class.map((item) => (
@@ -161,8 +173,8 @@ function EditPointModal({ isOpen, close, data }) {
                                     name={item?.type_class}
                                     label={item?.type_class}
                                     inline
-                                    checked={modbusRegisterType === item?.id}
-                                    onChange={() => setModbusRegisterType(item?.id)}
+                                    checked={_.isEqual(modbusRegisterType, item)}
+                                    onChange={() => setModbusRegisterType(item)}
                                 />
                             ))
                         }
@@ -170,7 +182,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 {
-                    modbusConfig === type_point[0]?.id &&
+                    _.isEqual(modbusConfig, type_point[0]) &&
                     <>
                         <div className="row my-2">
                             <div className="col-4">
@@ -191,7 +203,9 @@ function EditPointModal({ isOpen, close, data }) {
                                     label="Data Format:"
                                     name="data_type"
                                     isSearchable={false}
+                                    value={selectedDataType}
                                     option={data_type.map(item => ({ value: item.id, label: item.data_type }))}
+                                    onChange={(value) => setSelectedDataType(value)}
                                 />
                             </div>
                         </div>
@@ -202,7 +216,9 @@ function EditPointModal({ isOpen, close, data }) {
                                     label="Byte Order:"
                                     name="byte_order"
                                     isSearchable={false}
+                                    value={selectedByteOrder}
                                     option={byte_order.map(item => ({ value: item.id, label: item.byte_order }))}
+                                    onChange={(value) => setSelectedByteOrder(value)}
                                 />
                             </div>
                         </div>
@@ -229,14 +245,14 @@ function EditPointModal({ isOpen, close, data }) {
                     </>
                 }
                 {
-                    modbusConfig !== type_point[2]?.id &&
+                    _.isEqual(modbusConfig, type_point[2]) &&
                     <div className={`my-2 p-2 text-center fw-bold ${styles.title} ${styles.light}`}>
                         Scale & Offset
                     </div>
                 }
 
                 {
-                    modbusConfig === type_point[0]?.id &&
+                    _.isEqual(modbusConfig, type_point[0]) &&
                     <>
                         <div className="row my-2">
                             <div className="col-4">
@@ -281,7 +297,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 {
-                    modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[0]?.id &&
+                    _.isEqual(modbusConfig, type_point[0]) && _.isEqual(modbusRegisterType, type_class[0]) &&
                     <div className="row my-2">
                         <div className="col-4">
                             <FormInput.Text
@@ -304,7 +320,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 {
-                    modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[1]?.id &&
+                    _.isEqual(modbusConfig, type_point[0]) && _.isEqual(modbusRegisterType, type_class[1]) &&
                     <div className="row my-2">
                         <div className="col-4">
                             <FormInput.Text
@@ -331,7 +347,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 {
-                    modbusConfig === type_point[0]?.id && modbusRegisterType === type_class[2]?.id &&
+                    _.isEqual(modbusConfig, type_point[0]) && _.isEqual(modbusRegisterType, type_class[2]) &&
                     <>
                         <div className="row my-2">
                             <div className="col-4">
@@ -377,7 +393,7 @@ function EditPointModal({ isOpen, close, data }) {
                 }
 
                 {
-                    modbusConfig === type_point[1]?.id &&
+                    _.isEqual(modbusConfig, type_point[1]) &&
                     <div className="row my-2">
                         <div className="col-4">
                             <FormInput.Text

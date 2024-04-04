@@ -5,9 +5,11 @@ function useEditMPPTModal(data, close, setPoint) {
     const [modbusConfig, setModbusConfig] = useState(1);
     const [modbusRegisterType, setModbusRegisterType] = useState(1);
     const [selectedUnit, setSelectedUnit] = useState({ value: data?.type_units?.id, label: data?.type_units?.unit });
+    const [selectedDataType, setSelectedDataType] = useState({ value: data?.type_datatype?.data_type, label: data?.type_datatype?.data_type });
+    const [selectedByteOrder, setSelectedByteOrder] = useState({ value: data?.type_byteorder?.byte_order, label: data?.type_byteorder?.byte_order });
 
     const validationSchema = yup.object({
-        id: yup.string().required('Required'),
+        // index: yup.string().required('Required'),
         name: yup.string().required('Required'),
         unit: yup.object().required('Required')
     });
@@ -33,10 +35,16 @@ function useEditMPPTModal(data, close, setPoint) {
     const onSubmit = (values) => {
         setPoint({
             ...values,
-            index: values.index.replace('pt', ''),
-            byte_order: values.byte_order.label,
-            data_type: values.data_type.label,
-            unit: values.unit.label,
+            index: parseInt(values.index.replace('pt', '')),
+            unit: selectedUnit.label,
+            data_type: selectedDataType.label,
+            byte_order: selectedByteOrder.label,
+            class: modbusRegisterType?.type_class,
+            type_point: modbusConfig,
+            type_class: modbusRegisterType,
+            type_units: { id: selectedUnit.value, unit: selectedUnit.label },
+            type_datatype: { id: selectedDataType.value, data_type: selectedDataType.label },
+            type_byteorder: { id: selectedByteOrder.value, byte_order: selectedByteOrder.label },
         })
         close();
     };
@@ -50,6 +58,10 @@ function useEditMPPTModal(data, close, setPoint) {
         validationSchema,
         selectedUnit,
         setSelectedUnit,
+        selectedDataType,
+        setSelectedDataType,
+        selectedByteOrder,
+        setSelectedByteOrder,
         onSubmit
     };
 }

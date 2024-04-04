@@ -76,18 +76,18 @@ const Constants = {
       GET_TYPE: "/device_group/get_type/",
     },
     TEMPLATE: {
-      LIST: "/template/get_all/",
-      LIST_BY_TYPE: "/template/get_all_by_type/",
-      GET_ONE: "/template/get_each_template/",
       CREATE: "/template/create/",
-      UPDATE: "/template/edit_each/",
       DELETE: "/template/delete/",
-      GET_MPTT: "/template/get_mppt_template/",
-      CONFIG: "/template/get_template_config/",
-      POINT: {
-        DELETE: "/template/delete_point_list/",
-        DELETE_MPPT: "/template/delete_point_list/mppt/",
-      }
+      UPDATE: "/template/edit/",
+      LIST: "/template/get/all/",
+      LIST_BY_TYPE: "/template/get/all/type/",
+      GET_ONE: "/template/get/",
+      CONFIG: "/template/config/",
+      GET_MPTT: "/template/mppt/get/template/",
+      // POINT: {
+      //   DELETE: "/template/delete_point_list/",
+      //   DELETE_MPPT: "/template/delete_point_list/mppt/",
+      // }
     },
     UPLOAD_CHANNEL: {
       ALL_CHANNELS: "/upload_channel/all_channel/",
