@@ -16,71 +16,90 @@ export const POINT_CONFIG = {
     MPPT_CONFIG: {
         values: [274, 275],
         names: ["MPPT Voltage", "MPPT Current"]
+    },
+    NORMAL: {
+        value: 266,
+        name: "Normal"
     }
 }
 
 export class RowAdapter {
-    constructor(item = {
-        id: 0,
-        name: "",
-        id_config_information: 0,
-        config: "",
-        type_units: {
-            unit: ""
+    constructor({
+        id = 0,
+        index = 0,
+        name = "",
+        namekey = "",
+        id_config_information = 0,
+        config = "",
+        type_units = {
+            namekey: ""
         },
-        type_class: {
-            type_class: ""
+        type_class = {
+            namekey: ""
         },
-        register: "",
-        type_datatype: {
-            data_type: ""
+        register = "",
+        type_datatype = {
+            namekey: ""
         },
-        type_byteorder: {
-            byte_order: ""
+        type_byteorder = {
+            namekey: ""
         },
-        slope: 0,
-        offset: 0,
-        multreg: 0,
-        invalidvalue: 0,
-        type_point: 0,
-        is_check: false,
-        check_invalid: true,
-        check_slope: true,
-        check_offset: true,
-        check_multreg: true,
-        check_name: true,
-        check_unit: true,
-        parent: 0,
-        subRows: []
-    }, index) {
+        type_point_list = {
+            namekey: ""
+        },
+        type_control = {
+            namekey: ""
+        },
+        slope = 0,
+        offset = 0,
+        multreg = 0,
+        invalidvalue = 0,
+        type_point = 0,
+        is_check = false,
+        invalidvalueenabled = true,
+        slopeenabled = true,
+        offsetenabled = true,
+        multregenabled = true,
+        nameedit = true,
+        unitsedit = true,
+        control_enabled = true,
+        parent = 0,
+        subRows = [],
+        ...rest
+    }) {
         this.index = index
-        this.id = item.id
-        this.name = item.name
-        this.id_config_information = item.id_config_information
-        this.config = item.config
-        this.unit = item?.type_units?.unit
-        this.class = item?.type_class?.type_class
-        this.register = item.register
-        this.data_type = item?.type_datatype?.data_type
-        this.byte_order = item?.type_byteorder?.byte_order
-        this.slope = item.slope
-        this.offset = item.offset
-        this.multreg = item.multreg
-        this.invalidvalue = item.invalidvalue
-        this.type_point = item?.type_point
-        this.is_check = item.is_check
-        this.type_byteorder = item?.type_byteorder
-        this.type_class = item?.type_class
-        this.type_datatype = item?.type_datatype
-        this.type_units = item?.type_units
-        this.check_invalid = item?.invalidvalueenabled
-        this.check_slope = item?.slopeenabled
-        this.check_offset = item?.offsetenabled
-        this.check_multreg = item?.multregenabled
-        this.check_name = item?.nameedit
-        this.check_unit = item?.unitsedit
-        this.parent = item.parent
-        this.subRows = item.subRows
+        this.id = id
+        this.name = name
+        this.namekey = namekey
+        this.id_config_information = id_config_information
+        this.config = config
+        this.unit = type_units?.namekey
+        this.class = type_class?.namekey
+        this.register = register
+        this.data_type = type_datatype?.namekey
+        this.byte_order = type_byteorder?.namekey
+        this.slope = slope
+        this.offset = offset
+        this.multreg = multreg
+        this.invalidvalue = invalidvalue
+        this.type_point = type_point
+        this.is_check = is_check
+        this.type_byteorder = type_byteorder
+        this.type_class = type_class
+        this.type_datatype = type_datatype
+        this.type_point_list = type_point_list
+        this.type_units = type_units
+        this.type_control = type_control
+        this.invalidvalueenabled = invalidvalueenabled
+        this.slopeenabled = slopeenabled
+        this.offsetenabled = offsetenabled
+        this.multregenabled = multregenabled
+        this.nameedit = nameedit
+        this.unitsedit = unitsedit
+        this.control_enabled = control_enabled
+        this.parent = parent
+        this.subRows = subRows
+        this.rest = rest
     }
 
     getRow() {
@@ -88,6 +107,7 @@ export class RowAdapter {
             index: this.index,
             id: this.id,
             name: this.name,
+            namekey: this.namekey,
             config: this.config,
             id_config_information: this.id_config_information,
             unit: this.unit,
@@ -95,6 +115,7 @@ export class RowAdapter {
             register: this.register,
             data_type: this.data_type,
             byte_order: this.byte_order,
+            type_point_list: this.type_point_list,
             slope: this.slope,
             offset: this.offset,
             multreg: this.multreg,
@@ -105,21 +126,24 @@ export class RowAdapter {
             type_class: this.type_class,
             type_datatype: this.type_datatype,
             type_units: this.type_units,
-            check_invalid: this.check_invalid,
-            check_slope: this.check_slope,
-            check_offset: this.check_offset,
-            check_multreg: this.check_multreg,
-            check_name: this.check_name,
-            check_unit: this.check_unit,
+            type_control: this.type_control,
+            invalidvalueenabled: this.invalidvalueenabled,
+            slopeenabled: this.slopeenabled,
+            offsetenabled: this.offsetenabled,
+            multregenabled: this.multregenabled,
+            nameedit: this.nameedit,
+            unitsedit: this.unitsedit,
+            control_enabled: this.control_enabled,
             parent: this.parent,
-            subRows: this.subRows
+            subRows: this.subRows,
+            ...this.rest
         }
     }
 }
 
 export const resortIndex = (rows, type = POINT_CONFIG.MPPT) => {
     let index = 0;
-    let updateSelectedPoints = rows.map((point) => {
+    let updateSelectedPoints = rows?.map((point) => {
         point.index = index++;
 
         if (!_.isEqual(type, POINT_CONFIG.MPPT)) {

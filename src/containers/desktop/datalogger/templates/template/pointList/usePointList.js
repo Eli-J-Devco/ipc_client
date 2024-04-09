@@ -3,7 +3,7 @@ import { useTemplate } from "../useTemplate";
 import { createColumnHelper } from "@tanstack/react-table";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import Button from "../../../../../../components/button/Button";
-import { RowAdapter, resortIndex } from "../../../../../../utils/TemplateHelper";
+import { POINT_CONFIG, RowAdapter } from "../../../../../../utils/TemplateHelper";
 import _ from "lodash";
 import LibToast from "../../../../../../utils/LibToast";
 import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate";
@@ -20,8 +20,7 @@ function usePointList() {
         defaultPointList,
         editedPoint,
         setEditedPoint,
-        isChanged,
-        setIsChanged
+        setDefaultPointList
     } = useTemplate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [point, setPoint] = useState({});
@@ -30,10 +29,11 @@ function usePointList() {
     const [isReset, setIsReset] = useState(false);
     const [isForceUpdate, setIsForceUpdate] = useState(false);
     const [isSetUp, setIsSetUp] = useState(true);
+    const [isChanged, setIsChanged] = useState(false);
+    const [temporaryPointList, setTemporaryPointList] = useState([]);
     const output = document.getElementById("progress");
 
     useEffect(() => {
-        if (defaultPointList.length === 0) return;
 
         if (!isSetUp) return;
 
@@ -41,20 +41,28 @@ function usePointList() {
         if (!isReset && !editedPoint.state) {
             setPointList(editedPoint.data);
 
-            let selectedPoints = editedPoint?.data.filter((item) => item.is_checked === true);
+            let selectedPoints = editedPoint?.data.filter((item) => item.is_check === true);
             setRowSelection(selectedPoints.reduce((acc, item, index) => {
                 acc[item.index] = true;
                 return acc;
             }, {}));
+
+            if (editedPoint.data.length !== defaultPointList.length) {
+                setIsChanged(true);
+            }
         } else {
+            // if (defaultPointList.length === 0) return;
+
             setTimeout(() => {
-                let data = defaultPointList.map((item, index) => new RowAdapter({
-                    ...item,
-                    is_checked: false,
-                }, index).getRow());
+                let data = defaultPointList.map((item) => ({
+                    ...new RowAdapter({
+                        ...item,
+                        is_check: false,
+                    }).getRow()
+                }));
                 setPointList(_.cloneDeep(data));
                 setRowSelection({});
-                setIsChanged({ ...isChanged, point: false });
+                setIsChanged(false);
                 setIsReset(false);
             }, 100);
         }
@@ -75,7 +83,6 @@ function usePointList() {
                     state: false,
                     data: _.cloneDeep(pointList)
                 });
-                setIsChanged({ ...isChanged, point: true });
                 setIsForceUpdate(false);
             }, 100);
     }, [pointList, isForceUpdate]);
@@ -86,7 +93,7 @@ function usePointList() {
         setTimeout(() => {
 
             Object.keys(rowSelection).forEach(key => {
-                pointList[parseInt(key)].is_checked = true;
+                pointList[parseInt(key)].is_check = true;
             });
             setPointList([...pointList]);
         }, 100);
@@ -97,6 +104,17 @@ function usePointList() {
         setIsModalOpen(true);
         setPoint(item);
     }
+
+    useEffect(() => {
+        if (!point.id) return;
+        console.log(temporaryPointList)
+        console.log(point.index)
+        console.log(temporaryPointList.filter((item) => item.index !== point.index))
+        if (!defaultPointList.find((item) => item.id === point.id)) {
+            setDefaultPointList([...defaultPointList, point]);
+            setTemporaryPointList([...temporaryPointList.filter((item) => item.index !== point.index)]);
+        }
+    }, [point]);
 
     const columnsHelper = createColumnHelper();
     const columns = [
@@ -203,69 +221,90 @@ function usePointList() {
             });
 
             setPointList(_.cloneDeep(updatePointList));
+            setPoint(updatedPoint);
         }, 100);
     };
 
     const removePoint = () => {
-        setTimeout(() => {
-            let newPoints = pointList.filter((item) => !rowSelection[item.index]);
-            setPointList(resortIndex([...newPoints]));
-            setIsForceUpdate(newPoints.length === 0);
-            setIsChanged({ ...isChanged, point: true });
-            setRowSelection({});
-        }, 100);
-        // if (Object.keys(rowSelection).length === 0) {
-        //     LibToast.toast("No point selected", "error");
-        //     return;
-        // }
+        // setTimeout(() => {
+        //     let newPoints = pointList.filter((item) => !rowSelection[item.index]);
+        //     setPointList(resortIndex([...newPoints]));
+        //     setIsForceUpdate(newPoints.length === 0);
+        //     setIsChanged(true);
+        //     setRowSelection({});
+        // }, 100);
+        if (Object.keys(rowSelection).length === 0) {
+            LibToast.toast("No point selected", "error");
+            return;
+        }
 
-        // let deletePoint = [];
-        // rowSelection && Object.keys(rowSelection).forEach(key => {
-        //     deletePoint.push(pointList[parseInt(key)]);
-        // });
+        let deletePoint = [];
+        rowSelection && Object.keys(rowSelection).forEach(key => {
+            deletePoint.push(pointList[parseInt(key)]);
+        });
 
-        // let data = deletePoint.map(point => {
-        //     return {
-        //         id_point: point?.id,
-        //         id_pointkey: point?.name
-        //     }
-        // });
+        let data = deletePoint.map(point => {
+            return {
+                id_point: point?.id,
+                id_pointkey: point?.id_pointkey
+            }
+        });
 
-        // var output = document.getElementById("progress");
-        // output.innerHTML = "<div><img src='/loading.gif' /></div>";
-        // setTimeout(async () => {
-        //     try {
-        //         const response = await axiosPrivate.post(
-        //             Constants.API_URL.TEMPLATE.POINT.DELETE,
-        //             {
-        //                 id_template: id,
-        //                 points: data
-        //             },
-        //             {
-        //                 headers: {
-        //                     "Content-Type": "application/json"
-        //                 }
-        //             }
-        //         );
-        //         if (response?.status === 200) {
-        //             LibToast.toast("Delete points success", "info");
-        //             setDefaultPointList(response?.data?.point_list);
-        //             setConvertedPointList([]);
-        //             setEditedPoint({});
-        //         }
-        //     } catch (error) {
-        //         let msg = loginService.handleMissingInfo(error);
-        //         if (typeof msg === "string") {
-        //             LibToast.toast(msg, "error");
-        //         } else if (!msg) {
-        //             LibToast.toast("Delete point failed", "error");
-        //         } else {
-        //             navigate("/", { replace: true })
-        //         }
-        //     } finally {
-        //         output.innerHTML = "";
-        //     }
-        // }, 300)
+        var output = document.getElementById("progress");
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(
+                    Constants.API_URL.TEMPLATE.POINT.DELETE,
+                    {
+                        id_template: id,
+                        points: data
+                    },
+                    {
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }
+                );
+                if (response?.status === 200) {
+                    LibToast.toast("Delete points success", "info");
+                    setDefaultPointList(response?.data?.point_list);
+                    setIsReset(true);
+                    setIsSetUp(true);
+                    setIsChanged(false);
+                    setEditedPoint({});
+                }
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    setTimeout(() => {
+                        let newPoints = defaultPointList.filter((item) => !rowSelection[item.index]);
+                        setDefaultPointList([...newPoints]);
+                        setIsForceUpdate(newPoints.length === 0);
+                        setRowSelection({});
+                        setIsSetUp(true);
+                        setIsReset(true);
+                        setIsChanged(false);
+                        LibToast.toast("Delete points success", "info");
+                    }, 100);
+                    return;
+                }
+
+                let msg = loginService.handleMissingInfo(error);
+                if (typeof msg === "string") {
+                    LibToast.toast(msg, "error");
+                    return;
+                }
+
+                if (!msg) {
+                    LibToast.toast("Delete point failed", "error");
+                    return;
+                }
+
+                navigate("/", { replace: true })
+            } finally {
+                output.innerHTML = "";
+            }
+        }, 300)
     }
 
     const reset = () => {
@@ -280,25 +319,63 @@ function usePointList() {
             let currentLenght = pointList.length;
             let newPointList = _.cloneDeep(pointList);
 
-            if (currentLenght === count) return;
-
             if (currentLenght === 0) {
                 for (let i = 0; i < count; i++) {
-                    newPointList.push({ id: null });
+                    newPointList.push({
+                        ...new RowAdapter({ id: null, index: i, id_config_information: POINT_CONFIG.NORMAL.value }).getRow()
+                    });
                 }
-            } else if (currentLenght < count) {
-                for (let i = currentLenght; i < count; i++) {
-                    newPointList.push({ ...pointList[currentLenght - 1], id: null });
-                }
-            } else {
-                newPointList = newPointList.slice(0, count);
+                setPointList(newPointList);
+                setIsChanged(true);
+                setIsForceUpdate(newPointList.length === 0);
+                setTemporaryPointList(newPointList);
+                return;
             }
 
-            setPointList(resortIndex(newPointList));
-            setIsChanged({ ...isChanged, point: true });
+            for (let i = currentLenght; i < currentLenght + count; i++) {
+                newPointList.push({ ...pointList[currentLenght - 1], id: null, index: pointList[currentLenght - 1].index + 1 });
+            }
+
+            setPointList(newPointList);
+            setIsChanged(true);
             setIsForceUpdate(newPointList.length === 0);
+            setTemporaryPointList([...temporaryPointList, ...newPointList.slice(currentLenght, currentLenght + count)]);
+            LibToast.toast("Add new points success", "info");
         }, 100);
     }
+
+    const saveAllChanges = () => {
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.POINT.UPDATE_ALL, {
+                    id_template: id,
+                    points: pointList
+                }, {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response?.status === 200) {
+                    setDefaultPointList(response?.data);
+                    setIsReset(true);
+                    setIsSetUp(true);
+                    setIsChanged(false);
+                    setEditedPoint({});
+                    LibToast.toast("Save all changes success", "info");
+                }
+            } catch (error) {
+                let msg = loginService.handleMissingInfo(error);
+                if (typeof msg === "string") {
+                    LibToast.toast(msg, "error");
+                } else if (!msg) {
+                    LibToast.toast("Save all changes failed", "error");
+                } else {
+                    navigate("/", { replace: true })
+                }
+            }
+        }, 100);
+    };
     return {
         isModalOpen,
         closeModal,
@@ -311,7 +388,11 @@ function usePointList() {
         updatePoint,
         removePoint,
         changePointNumber,
-        point
+        point,
+        isChanged,
+        setIsChanged,
+        saveAllChanges,
+        temporaryPointList,
     };
 }
 

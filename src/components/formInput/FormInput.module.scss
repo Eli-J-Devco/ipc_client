@@ -20,24 +20,25 @@ $box-shadow-dark: 0 0 0 0.25rem rgba(56, 52, 52, 0.25);
     }
 }
 
-.form-check {    
+.form-check {
     input {
+
         &:checked,
         &[type=checkbox]:indeterminate {
             background-color: var(--bg-color-dark);
             border-color: var(--bg-color-dark);
         }
 
-        &[type=checkbox]:indeterminate + label::before {
+        &[type=checkbox]:indeterminate+label::before {
             content: none;
         }
 
-/*********************** overide index.scss ************************/
+        /*********************** overide index.scss ************************/
         &:checked {
             position: static;
             opacity: 1;
 
-            + label {
+            +label {
                 &::before {
                     border-top: unset;
                     border-left: unset;
@@ -55,7 +56,7 @@ $box-shadow-dark: 0 0 0 0.25rem rgba(56, 52, 52, 0.25);
             opacity: 1;
         }
 
-        + label {
+        +label {
             position: unset;
             padding: unset;
             cursor: unset;
@@ -71,7 +72,8 @@ $box-shadow-dark: 0 0 0 0.25rem rgba(56, 52, 52, 0.25);
                 transition: unset;
             }
         }
-/*******************************************************************/
+
+        /*******************************************************************/
 
         &:focus {
             border-color: var(--bg-color-dark);
@@ -124,24 +126,25 @@ $box-shadow-dark: 0 0 0 0.25rem rgba(56, 52, 52, 0.25);
         border-radius: 10px;
         width: fit-content;
         background-color: var(--bg-color-white);
-    
+
         .form-file {
             background-color: var(--bg-color-grey);
             padding: 3px 7px;
             border-radius: 4px;
             margin: 0 20px;
+
             &:hover {
                 opacity: 0.8;
                 cursor: pointer;
             }
         }
-    
+
         .description {
             margin: 0 20px;
             text-wrap: nowrap;
         }
-    
-        input { 
+
+        input {
             display: none;
         }
     }

@@ -25,6 +25,7 @@ function RegisterBlocks() {
     } = useTemplate();
 
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [confirmUpdate, setConfirmUpdate] = useState(false);
     const headerFormInit = {
         num_of_registers: registerList?.length || 0
     };
@@ -63,31 +64,31 @@ function RegisterBlocks() {
                     </div>
                 </Modal>
             }
-            <div>
-                <FormInput id="numOfRegistersForm" initialValues={headerFormInit} validationSchema={headerSchema} onSubmit={onChangeNumOfPoint}>
-                    <div className="d-flex mb-3">
-                        <FormInput.Text
-                            label="Number of Registers:"
-                            name="num_of_registers"
-                            className="mx-3"
-                            horizontal
-                            type="number"
-                        />
+            <FormInput className="m-2" id="numOfRegistersForm" initialValues={headerFormInit} validationSchema={headerSchema} onSubmit={onChangeNumOfPoint}>
+                <div className="d-inline-block">
+                    <FormInput.Text
+                        label="Number of Registers:"
+                        name="num_of_registers"
+                        horizontal
+                        type="number"
+                    />
+                </div>
 
-                        <Button className="mx-3" type="submit" formId="numOfRegistersForm">
-                            <Button.Text text="Change Number of Registers" />
-                        </Button>
-                        <Button
-                            className="mx-3"
-                            variant="white"
-                            onClick={() => resetRegisterList()}
-                            disabled={!isChanged.register}
-                        >
-                            <Button.Text text="Cancel" />
-                        </Button>
-                    </div>
-                </FormInput>
-            </div>
+                <Button className="mx-3 d-inline-block" type="submit" formId="numOfRegistersForm">
+                    <Button.Text text="Change Number of Registers" />
+                </Button>
+                <Button
+                    className="mx-3 d-inline-block"
+                    variant="white"
+                    onClick={() => resetRegisterList()}
+                    disabled={!isChanged.register}
+                >
+                    <Button.Text text="Cancel" />
+                </Button>
+                <Button className="d-inline-block float-end" onClick={() => setConfirmUpdate(true)}>
+                    <Button.Text text="Save all changes" />
+                </Button>
+            </FormInput>
             <div>
 
                 {

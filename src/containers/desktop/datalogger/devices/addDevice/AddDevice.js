@@ -118,6 +118,7 @@ export default function AddDevice(props) {
     }
     delete body.device_group;
     delete body.mptt_count;
+
     const output = document.getElementById("progress");
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {

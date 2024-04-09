@@ -156,7 +156,7 @@ function Select({ className, label, name, required, groupOption, option, horizon
         dropdownIndicator: (baseStyles, state) => ({
             ...baseStyles,
             paddingTop: "0px",
-            paddingBottom: "0px"
+            paddingBottom: "0px",
         }),
         clearIndicator: (baseStyles, state) => ({
             ...baseStyles,

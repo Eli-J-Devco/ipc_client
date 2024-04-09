@@ -192,7 +192,7 @@ function useRegisterBlocks() {
                     }
                 }
                 for (let i = 0; i < num; i++) {
-                    newRegisters.push({ ...newRegister, index: i });
+                    newRegisters.push({ ...newRegister, index: i, id: i, addr: { ...newRegister.addr, name: `addr${i}` }, count: { ...newRegister.count, name: `count${i}` }, function_select: { ...newRegister.function_select, name: `func${i}` } });
                 }
             }
             else {

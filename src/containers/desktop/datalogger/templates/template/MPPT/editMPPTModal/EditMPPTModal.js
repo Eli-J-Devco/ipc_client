@@ -8,6 +8,8 @@ import useEditMPPTModal from "./useEditPMPPTModal";
 import _ from "lodash";
 
 function EditMPPTModal({ isOpen, close, data, setPoint }) {
+    const [currentData, setCurrentData] = useState(data);
+
     const {
         initialValues,
         validationSchema,
@@ -21,34 +23,37 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
         setSelectedDataType,
         selectedByteOrder,
         setSelectedByteOrder,
+        selectedPointListType,
+        setSelectedPointListType,
         onSubmit
-    } = useEditMPPTModal(data, close, setPoint);
+    } = useEditMPPTModal(currentData, close, setPoint, setCurrentData);
+
     const { config } = useTemplate();
     const [pointUnits, setPointUnits] = useState([]);
 
-    const { data_type, byte_order, point_unit, type_point, type_class } = config;
+    const { data_type, byte_order, point_unit, type_point, type_class, type_point_list } = config;
     useEffect(() => {
-        if (data_type?.length > 0 && byte_order?.length > 0 && point_unit?.length > 0 && type_point?.length > 0 && type_class?.length > 0) {
+        if (Object.keys(config).length > 0) {
             setTimeout(() => {
-                setModbusConfig(data?.type_point);
-                setModbusRegisterType(data?.type_class);
+                setModbusConfig(currentData?.type_point);
+                setModbusRegisterType(currentData?.type_class);
 
-                let unitGroup = point_unit.filter(item => item?.unit.match(/---/i));
+                let unitGroup = point_unit.filter(item => item?.namekey.match(/---/i));
                 let units = [];
                 unitGroup.forEach(group => {
                     let firstItemIndex = point_unit.indexOf(group) + 1;
-                    let lastItemIndex = point_unit.indexOf(point_unit.find((item, index) => index > firstItemIndex && item?.unit.match(/---/i)));
+                    let lastItemIndex = point_unit.indexOf(point_unit.find((item, index) => index > firstItemIndex && item?.namekey.match(/---/i)));
                     units.push({
-                        label: group?.unit.replaceAll("-", "").trim(),
-                        options: point_unit.slice(firstItemIndex, lastItemIndex).map(item => ({ value: item?.id, label: item?.unit }))
+                        label: group?.namekey.replaceAll("-", "").trim(),
+                        options: point_unit.slice(firstItemIndex, lastItemIndex).map(item => ({ value: item?.id, label: item?.namekey }))
                     });
                 });
                 setPointUnits(units);
             }, 100);
         }
-    }, [data_type?.length, byte_order?.length, point_unit?.length, type_point?.length, type_class?.length, data]);
+    }, [config, currentData]);
 
-    return data && data_type?.length > 0 && byte_order?.length > 0 && point_unit?.length > 0 && type_point?.length > 0 && type_class?.length > 0 && (
+    return currentData && Object.keys(config).length > 0 && (
         <Modal
             isOpen={isOpen}
             close={close}
@@ -86,6 +91,17 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
                             label="Point Identifier:"
                             name="index"
                             disabled
+                        />
+                    </div>
+                    <div className="col-1"></div>
+                    <div className="col-5">
+                        <FormInput.Select
+                            label="Point list type:"
+                            isSearchable={true}
+                            name="type_point_list"
+                            option={type_point_list.map(item => ({ value: item.id, label: item.namekey })) || []}
+                            value={selectedPointListType}
+                            onChange={(value) => setSelectedPointListType(value)}
                         />
                     </div>
                 </div>
@@ -131,13 +147,13 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
                             groupOption={true}
                             value={selectedUnit}
                             onChange={(value) => setSelectedUnit(value)}
-                            isDisabled={_.isEqual(data?.type_point, type_point[2])}
+                            isDisabled={_.isEqual(currentData?.type_point, type_point[2])}
                         />
                     </div>
 
                     <div className="col-4 align-self-end">
                         {
-                            !_.isEqual(data?.type_point, type_point[2]) &&
+                            !_.isEqual(currentData?.type_point, type_point[2]) &&
                             <FormInput.Check
                                 name="check_unit"
                                 label="allow per-meter edit"
@@ -151,12 +167,12 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
                             <FormInput.Check
                                 key={item?.id}
                                 type="radio"
-                                name={item?.type_point}
-                                label={item?.type_point}
+                                name={item?.namekey}
+                                label={item?.namekey}
                                 inline
                                 checked={_.isEqual(modbusConfig, item)}
                                 onChange={() => setModbusConfig(item)}
-                                disabled={_.isEqual(data?.type_point, type_point[2])}
+                                disabled={_.isEqual(currentData?.type_point, type_point[2])}
                             />
                         ))
                     }
@@ -170,8 +186,8 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
                                 <FormInput.Check
                                     key={item?.id}
                                     type="radio"
-                                    name={item?.type_class}
-                                    label={item?.type_class}
+                                    name={item?.namekey}
+                                    label={item?.namekey}
                                     inline
                                     checked={_.isEqual(modbusRegisterType, item)}
                                     onChange={() => setModbusRegisterType(item)}

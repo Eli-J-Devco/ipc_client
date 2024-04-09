@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useNavigate } from "react-router-dom";
 import _ from "lodash";
+import * as yup from "yup";
 
 import { useTemplate } from "../useTemplate";
 import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate";
@@ -28,8 +29,6 @@ function useMPPTList() {
         setDefaultMPPTList,
         editedMPPT,
         setEditedMPPT,
-        isChanged,
-        setIsChanged
     } = useTemplate();
 
     const axiosPrivate = useAxiosPrivate();
@@ -43,7 +42,29 @@ function useMPPTList() {
     const [isReset, setIsReset] = useState(false);
     const [isForceUpdate, setIsForceUpdate] = useState(false);
     const [isSetUp, setIsSetUp] = useState(true);
+    const [isChangedMPPT, setIsChangedMPPT] = useState(false);
     const output = document.getElementById("progress");
+
+    const [isClone, setIsClone] = useState(false);
+    const addNewMPPTInit = {
+        num_of_mppt: 1,
+        is_clone_last_mppt: isClone,
+        num_of_string: 0,
+        num_of_panel: 0
+    };
+
+    const addNewMPPTSchema = yup.object().shape({
+        num_of_mppt: yup.number().required("Required").min(1, 'Minimum 1 point').max(10, 'Maximum 10 MPPT'),
+        ...(
+            !isClone ?
+                {
+
+                    num_of_string: yup.number().required("Required").min(0, 'Minimum 0 string').max(10, 'Maximum 10 strings per MPPT'),
+                    num_of_panel: yup.number().required("Required").min(0, 'Minimum 0 panel').max(10, 'Maximum 10 panels per string')
+                } : {}
+        )
+    });
+
     /**
      * This useEffect is used to set the initial state of the pointList
      * It is only called once when the convertedPointList is set
@@ -51,7 +72,6 @@ function useMPPTList() {
      * @author nhan.tran 2024-04-02
      */
     useEffect(() => {
-        if (defaultMPPTList?.length === 0) return;
         if (!isSetUp) return;
 
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
@@ -71,15 +91,29 @@ function useMPPTList() {
             }, 100);
         } else {
             setTimeout(() => {
-                let data = defaultMPPTList.map((mppt, index) => {
+                let data = defaultMPPTList?.map((mppt, index) => {
                     return {
-                        ...mppt,
+                        ...new RowAdapter({
+                            ...mppt,
+                            config: POINT_CONFIG.STRING
+                        }, index).getRow(),
                         subRows: mppt?.children?.map((string, sindex) => {
                             return {
-                                ...string,
+                                ...new RowAdapter({
+                                    ...string,
+                                    ...(
+                                        string?.id_config_information === POINT_CONFIG.STRING.value ?
+                                            {
+                                                config: POINT_CONFIG.PANEL
+                                            } :
+                                            {
+                                                config: "",
+                                            }
+                                    )
+                                }, sindex).getRow(),
                                 subRows: string?.children?.map((panel, pindex) => {
                                     return {
-                                        ...panel
+                                        ...new RowAdapter(panel, pindex).getRow()
                                     }
                                 }) || []
                             }
@@ -88,12 +122,11 @@ function useMPPTList() {
                 });
                 setPointList(resortIndex(data, POINT_CONFIG.MPPT));
                 setRowSelection({});
-                setIsChanged({ ...isChanged, mppt: false });
+                setIsChangedMPPT(false);
                 setIsReset(false);
             }, 100);
         }
         setTimeout(() => {
-            console.log("reset", isReset);
             setIsSetUp(false);
             output.innerHTML = "";
         }, 100);
@@ -106,17 +139,21 @@ function useMPPTList() {
      */
     useEffect(() => {
         if (pointList.length === 0 && !isForceUpdate) return;
-
+        console.log("pointList", _.isEqual(pointList, editedMPPT.data));
         !_.isEqual(pointList, editedMPPT.data) &&
             setTimeout(() => {
                 setEditedMPPT({
                     state: false,
                     data: _.cloneDeep(pointList)
                 });
-                setIsChanged({ ...isChanged, mppt: true });
+                setIsChangedMPPT(true);
                 setIsForceUpdate(false);
             }, 100);
     }, [pointList, isForceUpdate]);
+
+    useEffect(() => {
+        console.log("isChangedMPPT", isChangedMPPT);
+    }, [isChangedMPPT]);
 
     /**
      * Close the modal
@@ -399,45 +436,37 @@ function useMPPTList() {
      * Add a new MPPT to the pointList
      * @author nhan.tran 2024-04-02
      */
-    const addNewMPPT = () => {
-        setTimeout(() => {
-            let mpptLength = pointList.length;
-            if (mpptLength === 0) {
-                let newMPPT = _.cloneDeep(new RowAdapter({
-                    id: null,
-                    name: "New MPPT",
-                    config: POINT_CONFIG.STRING,
-                    subRows: POINT_CONFIG.MPPT_CONFIG.values.map((config, index) => {
-                        return new RowAdapter({
-                            id: null,
-                            name: POINT_CONFIG.MPPT_CONFIG.names[index],
-                            id_config_information: config,
-                            config: "",
-                        }, index).getRow();
-                    })
-                }, 0).getRow());
-                setPointList([newMPPT]);
-                return;
+    const addNewMPPT = (data) => {
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.POINT.ADD_MPPT, {
+                    ...data,
+                    id_template: id
+                }, {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (response?.status === 200) {
+                    setDefaultMPPTList(response?.data?.mppt_list);
+                    setRowSelection({});
+                    setIsChangedMPPT(false);
+                    setEditedMPPT({});
+                    setIsSetUp(true);
+                    setIsReset(true);
+                    LibToast.toast("Add new MPPT success", "info");
+                }
+            } catch (error) {
+                let msg = loginService.handleMissingInfo(error);
+                if (typeof msg === "string") {
+                    LibToast.toast(msg, "error");
+                } else if (!msg) {
+                    LibToast.toast("Add new MPPT failed", "error");
+                } else {
+                    navigate("/", { replace: true })
+                }
             }
-            let newMPPT = _.cloneDeep(new RowAdapter(
-                {
-                    ...pointList[mpptLength - 1],
-                    id: null,
-                    name: `New MPPT ${mpptLength + 1}`,
-                    config: pointList[mpptLength - 1]?.config,
-                    subRows: pointList[mpptLength - 1]?.subRows?.map((string, index) => ({
-                        ...new RowAdapter({ ...string }, index).getRow(),
-                        id: null,
-                        subRows: string?.subRows?.map((panel, pindex) => ({
-                            ...new RowAdapter({ ...panel }, index).getRow(),
-                            id: null
-                        })) || []
-                    })) || []
-                },
-                0)
-                .getRow());
-            setPointList(resortIndex([...pointList, newMPPT], POINT_CONFIG.MPPT));
-        }, 100);
+        }, 300);
     }
 
     /**
@@ -450,91 +479,107 @@ function useMPPTList() {
             return;
         }
 
-        let newPointList = pointList.filter((point, index) => {
-            if (rowSelection[index]) {
-                return false;
+        // let newPointList = pointList.filter((point, index) => {
+        //     if (rowSelection[index]) {
+        //         return false;
+        //     }
+
+        //     let newSubRows = point?.subRows?.filter((string, sindex) => {
+        //         if (rowSelection[`${index}.${sindex}`]) {
+        //             return false;
+        //         }
+
+        //         let newPanel = string?.subRows?.filter((panel, pindex) => {
+        //             return !rowSelection[`${index}.${sindex}.${pindex}`];
+        //         });
+
+        //         string.subRows = newPanel;
+        //         return true;
+        //     });
+
+        //     point.subRows = newSubRows;
+        //     return true;
+        // });
+
+        // setPointList(resortIndex(newPointList, POINT_CONFIG.MPPT));
+        // setRowSelection({});
+        // setIsForceUpdate(newPointList.length === 0);
+        // setIsChangedMPPT(true);
+        let deletePoint = [];
+        rowSelection && Object.keys(rowSelection).forEach(key => {
+            let keys = key.split(".");
+            if (keys.length === 1) {
+                deletePoint.push(pointList[keys[0]]);
             }
 
-            let newSubRows = point?.subRows?.filter((string, sindex) => {
-                if (rowSelection[`${index}.${sindex}`]) {
-                    return false;
-                }
+            if (keys.length === 2 && pointList[keys[0]]?.subRows) {
+                deletePoint.push(pointList[keys[0]].subRows[keys[1]]);
+            }
 
-                let newPanel = string?.subRows?.filter((panel, pindex) => {
-                    return !rowSelection[`${index}.${sindex}.${pindex}`];
-                });
-
-                string.subRows = newPanel;
-                return true;
-            });
-
-            point.subRows = newSubRows;
-            return true;
+            if (keys.length === 3 && pointList[keys[0]]?.subRows[keys[1]]?.subRows) {
+                deletePoint.push(pointList[keys[0]].subRows[keys[1]].subRows[keys[2]]);
+            }
+        });
+        let data = deletePoint.map(point => {
+            return {
+                id_point: point?.id,
+                id_pointkey: point?.name,
+                id_config_information: point?.id_config_information,
+                parent: point?.parent
+            }
         });
 
-        setPointList(resortIndex(newPointList, POINT_CONFIG.MPPT));
-        setRowSelection({});
-        setIsForceUpdate(newPointList.length === 0);
-        setIsChanged({ ...isChanged, mppt: true });
-        // let deletePoint = [];
-        // rowSelection && Object.keys(rowSelection).forEach(key => {
-        //     let keys = key.split(".");
-        //     if (keys.length === 1) {
-        //         deletePoint.push(pointList[keys[0]]);
-        //     }
+        var output = document.getElementById("progress");
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(
+                    Constants.API_URL.TEMPLATE.POINT.DELETE_MPPT,
+                    {
+                        id_template: id,
+                        points: data
+                    },
+                    {
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }
+                );
+                if (response?.status === 200) {
+                    LibToast.toast("Delete points success", "info");
+                    setDefaultMPPTList(response?.data?.mppt_list);
+                    setIsSetUp(true);
+                    setIsReset(true);
+                    setIsChangedMPPT(false);
+                    setEditedMPPT({});
+                }
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    setTimeout(() => {
+                        let newPoints = defaultMPPTList.filter((item) => !rowSelection[item.index]);
+                        setDefaultMPPTList(resortIndex([...newPoints]));
+                        setIsForceUpdate(newPoints.length === 0);
+                        setRowSelection({});
+                        setIsSetUp(true);
+                        setIsReset(true);
+                        setIsChangedMPPT(false);
+                        LibToast.toast("Delete points success", "info");
+                    }, 100);
+                    return;
+                }
 
-        //     if (keys.length === 2 && pointList[keys[0]]?.subRows) {
-        //         deletePoint.push(pointList[keys[0]].subRows[keys[1]]);
-        //     }
-
-        //     if (keys.length === 3 && pointList[keys[0]]?.subRows[keys[1]]?.subRows) {
-        //         deletePoint.push(pointList[keys[0]].subRows[keys[1]].subRows[keys[2]]);
-        //     }
-        // });
-        // let data = deletePoint.map(point => {
-        //     return {
-        //         id_point: point?.id,
-        //         id_pointkey: point?.name,
-        //         id_config_information: point?.id_config_information,
-        //         parent: point?.parent
-        //     }
-        // });
-
-        // var output = document.getElementById("progress");
-        // output.innerHTML = "<div><img src='/loading.gif' /></div>";
-        // setTimeout(async () => {
-        //     try {
-        //         const response = await axiosPrivate.post(
-        //             Constants.API_URL.TEMPLATE.POINT.DELETE_MPPT,
-        //             {
-        //                 id_template: id,
-        //                 points: data
-        //             },
-        //             {
-        //                 headers: {
-        //                     "Content-Type": "application/json"
-        //                 }
-        //             }
-        //         );
-        //         if (response?.status === 200) {
-        //             LibToast.toast("Delete points success", "info");
-        //             setDefaultMPPTList(response?.data?.mppt_list);
-        //             setIsReset(true);
-        //             setEditedMPPT({});
-        //         }
-        //     } catch (error) {
-        //         let msg = loginService.handleMissingInfo(error);
-        //         if (typeof msg === "string") {
-        //             LibToast.toast(msg, "error");
-        //         } else if (!msg) {
-        //             LibToast.toast("Delete point failed", "error");
-        //         } else {
-        //             navigate("/", { replace: true })
-        //         }
-        //     } finally {
-        //         output.innerHTML = "";
-        //     }
-        // }, 300)
+                let msg = loginService.handleMissingInfo(error);
+                if (typeof msg === "string") {
+                    LibToast.toast(msg, "error");
+                } else if (!msg) {
+                    LibToast.toast("Delete point failed", "error");
+                } else {
+                    navigate("/", { replace: true })
+                }
+            } finally {
+                output.innerHTML = "";
+            }
+        }, 300)
     }
 
     /**
@@ -560,7 +605,12 @@ function useMPPTList() {
         setRowSelection,
         addNewMPPT,
         removePoint,
-        resetTemp
+        resetTemp,
+        isChangedMPPT,
+        addNewMPPTInit,
+        addNewMPPTSchema,
+        isClone,
+        setIsClone
     };
 }
 
