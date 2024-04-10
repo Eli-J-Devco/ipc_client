@@ -27,8 +27,6 @@ function useMPPTList() {
         id,
         defaultMPPTList,
         setDefaultMPPTList,
-        editedMPPT,
-        setEditedMPPT,
     } = useTemplate();
 
     const axiosPrivate = useAxiosPrivate();
@@ -39,16 +37,86 @@ function useMPPTList() {
     const [pointList, setPointList] = useState([]);
 
     const [rowSelection, setRowSelection] = useState({});
-    const [isReset, setIsReset] = useState(false);
-    const [isForceUpdate, setIsForceUpdate] = useState(false);
     const [isSetUp, setIsSetUp] = useState(true);
-    const [isChangedMPPT, setIsChangedMPPT] = useState(false);
+    const [isClone, setIsClone] = useState(false);
+    const [addChildrenModal, setAddChildrenModal] = useState({
+        [POINT_CONFIG.STRING.name]: {
+            isOpen: false,
+            initialValues: {
+                num_of_string: 1,
+                num_of_panel: 0,
+                is_clone_from_last: false
+            },
+            validationSchema: yup.object().shape({
+                num_of_string: yup.number().required("Required").min(1, 'Minimum 1 string').max(10, 'Maximum 10 strings per MPPT'),
+                ...(
+                    isClone ? {} :
+                        {
+                            num_of_panel: yup.number().required("Required").min(0, 'Minimum 0 panel').max(10, 'Maximum 10 panels per string')
+                        }
+                )
+            }),
+            fields: [
+                {
+                    name: "num_of_string",
+                    type: "number",
+                    label: "Number of String",
+                    placeholder: "Number of String",
+                    required: true
+                },
+                {
+                    name: "is_clone_from_last",
+                    type: "checkbox",
+                    label: "Clone from last",
+                    placeholder: "Clone from last String",
+                    required: false,
+                    onChange: (e) => setIsClone(e.target.checked)
+                },
+                {
+                    name: "num_of_panel",
+                    type: "number",
+                    label: "Number of Panel",
+                    placeholder: "Number of Panel",
+                    required: true,
+                    isHidden: isClone
+                },
+            ],
+            onSubmit: (data) => addNewChildren(data),
+        },
+        [POINT_CONFIG.PANEL.name]: {
+            isOpen: false,
+            initialValues: {
+                num_of_panel: 1,
+                is_clone_from_last: false
+            },
+            validationSchema: yup.object().shape({
+                num_of_panel: yup.number().required("Required").min(1, 'Minimum 1 panel').max(10, 'Maximum 10 panels per string')
+            }),
+            fields: [
+                {
+                    name: "num_of_panel",
+                    type: "number",
+                    label: "Number of Panel",
+                    placeholder: "Number of Panel",
+                    required: true
+                },
+                {
+                    name: "is_clone_from_last",
+                    type: "checkbox",
+                    label: "Clone from last",
+                    placeholder: "Clone from last Panel",
+                    required: false,
+                    onChange: (e) => setIsClone(e.target.checked)
+                }
+            ],
+            onSubmit: (data) => addNewChildren(data),
+        }
+    });
     const output = document.getElementById("progress");
 
-    const [isClone, setIsClone] = useState(false);
     const addNewMPPTInit = {
         num_of_mppt: 1,
-        is_clone_last_mppt: isClone,
+        is_clone_from_last: isClone,
         num_of_string: 0,
         num_of_panel: 0
     };
@@ -74,86 +142,49 @@ function useMPPTList() {
     useEffect(() => {
         if (!isSetUp) return;
 
-        output.innerHTML = "<div><img src='/loading.gif' /></div>";
-        if (!isReset && !editedMPPT.state) {
-            setTimeout(() => {
-                setPointList(_.cloneDeep(editedMPPT.data));
-
-                editedMPPT?.data?.forEach((mppt, index) => {
-                    mppt?.is_check && (rowSelection[index] = true);
-                    mppt?.subRows?.forEach((string, sindex) => {
-                        string?.is_check && (rowSelection[`${index}.${sindex}`] = true);
-                        string?.subRows?.forEach((panel, pindex) => {
-                            panel?.is_check && (rowSelection[`${index}.${sindex}.${pindex}`] = true);
-                        });
-                    });
-                });
-            }, 100);
-        } else {
-            setTimeout(() => {
-                let data = defaultMPPTList?.map((mppt, index) => {
-                    return {
-                        ...new RowAdapter({
-                            ...mppt,
-                            config: POINT_CONFIG.STRING
-                        }, index).getRow(),
-                        subRows: mppt?.children?.map((string, sindex) => {
-                            return {
-                                ...new RowAdapter({
-                                    ...string,
-                                    ...(
-                                        string?.id_config_information === POINT_CONFIG.STRING.value ?
-                                            {
-                                                config: POINT_CONFIG.PANEL
-                                            } :
-                                            {
-                                                config: "",
-                                            }
-                                    )
-                                }, sindex).getRow(),
-                                subRows: string?.children?.map((panel, pindex) => {
-                                    return {
-                                        ...new RowAdapter(panel, pindex).getRow()
-                                    }
-                                }) || []
-                            }
-                        }) || []
-                    }
-                });
-                setPointList(resortIndex(data, POINT_CONFIG.MPPT));
-                setRowSelection({});
-                setIsChangedMPPT(false);
-                setIsReset(false);
-            }, 100);
+        if (output.innerHTML === "") {
+            output.innerHTML = "<div><img src='/loading.gif' /></div>";
         }
+
+        setTimeout(() => {
+            let data = defaultMPPTList?.map((mppt, index) => {
+                return {
+                    ...new RowAdapter({
+                        ...mppt,
+                        config: POINT_CONFIG.STRING
+                    }, index).getRow(),
+                    subRows: mppt?.children?.map((string, sindex) => {
+                        return {
+                            ...new RowAdapter({
+                                ...string,
+                                ...(
+                                    string?.id_config_information === POINT_CONFIG.STRING.value ?
+                                        {
+                                            config: POINT_CONFIG.PANEL
+                                        } :
+                                        {
+                                            config: "",
+                                        }
+                                )
+                            }, sindex).getRow(),
+                            subRows: string?.children?.map((panel, pindex) => {
+                                return {
+                                    ...new RowAdapter(panel, pindex).getRow()
+                                }
+                            }) || []
+                        }
+                    }) || []
+                }
+            });
+            setPointList(resortIndex(data, POINT_CONFIG.MPPT));
+            setRowSelection({});
+        }, 100);
+
         setTimeout(() => {
             setIsSetUp(false);
             output.innerHTML = "";
         }, 100);
-    }, [defaultMPPTList, isReset]);
-
-    /**
-     * This useEffect is used to update the editedMPPT when the pointList is updated
-     * It is only called when the pointList is updated
-     * @author nhan.tran 2024-04-02
-     */
-    useEffect(() => {
-        if (pointList.length === 0 && !isForceUpdate) return;
-        console.log("pointList", _.isEqual(pointList, editedMPPT.data));
-        !_.isEqual(pointList, editedMPPT.data) &&
-            setTimeout(() => {
-                setEditedMPPT({
-                    state: false,
-                    data: _.cloneDeep(pointList)
-                });
-                setIsChangedMPPT(true);
-                setIsForceUpdate(false);
-            }, 100);
-    }, [pointList, isForceUpdate]);
-
-    useEffect(() => {
-        console.log("isChangedMPPT", isChangedMPPT);
-    }, [isChangedMPPT]);
+    }, [defaultMPPTList]);
 
     /**
      * Close the modal
@@ -167,8 +198,10 @@ function useMPPTList() {
      * @param {Object} item The point to be edited
      */
     const handlePointEdit = item => {
-        setIsModalOpen(true);
-        setPoint(item);
+        setTimeout(() => {
+            setIsModalOpen(true);
+            setPoint(item);
+        }, 100);
     }
 
     /**
@@ -177,103 +210,68 @@ function useMPPTList() {
      * @param {Object} newPoint The new point to be updated
      */
     const updatePoint = (newPoint) => {
+        let updatedPoint = { ...newPoint };
         setTimeout(() => {
-            let updatePointList = pointList.map((p) => {
-                if (p.index === newPoint.index) {
-                    return newPoint;
-                }
+            var isFound = false;
+            setDefaultMPPTList([
+                ...defaultMPPTList.map(mppt => {
+                    if (isFound) return mppt;
 
-                return {
-                    ...p,
-                    subRows: p.subRows.map((string) => {
-                        if (string.index === newPoint.index) {
-                            return newPoint;
+                    let children = mppt?.children || [];
+                    if (mppt.id === newPoint.id) {
+                        updatedPoint = {
+                            ...updatedPoint,
+                            children: children
                         }
+                        isFound = true;
+                        return updatedPoint;
+                    }
+
+                    let updatedString = children.map(string => {
+                        if (isFound) return string;
+
+                        let panels = string?.children || [];
+                        if (string.id === newPoint.id) {
+                            updatedPoint = {
+                                ...updatedPoint,
+                                children: panels
+                            }
+
+                            isFound = true;
+                            return updatedPoint;
+                        }
+
+                        let updatedPanel = panels.map(panel => {
+                            if (isFound) return panel;
+
+                            if (panel.id === newPoint.id) {
+                                updatedPoint = {
+                                    ...updatedPoint
+                                }
+
+                                isFound = true;
+                                return updatedPoint;
+                            }
+
+                            return panel;
+                        })
 
                         return {
                             ...string,
-                            subRows:
-                                string.subRows.map((panel) => {
-                                    if (panel.index === newPoint.index) {
-                                        return newPoint;
-                                    }
-
-                                    return panel;
-                                })
+                            children: updatedPanel
                         };
-
                     })
-                };
-            });
 
-            setPointList(_.cloneDeep(updatePointList));
+                    return {
+                        ...mppt,
+                        children: updatedString
+                    };
+                })]);
+
+            setIsSetUp(true);
+            setPoint({});
         }, 100);
     };
-
-    const [row, setRow] = useState({
-        row: {},
-        state: false
-    });
-
-    /**
-     * This useEffect is used to add a new string or panel to the pointList
-     * It is only called when the row is updated
-     * @author nhan.tran 2024-04-02
-     */
-    useEffect(() => {
-        row.state && setTimeout(() => {
-            let children = row.row.original?.subRows?.length || 0;
-            let newChild = null;
-            if (children) {
-                newChild = _.cloneDeep(new RowAdapter(
-                    {
-                        ...row.row.original?.subRows[children - 1],
-                        id: null,
-                        name: _.isEqual(row.row.original?.config, POINT_CONFIG.STRING) ? "New String" : "New Panel",
-                        ...(
-                            _.isEqual(row.row.original?.config, POINT_CONFIG.STRING) ?
-                                {
-                                    config: POINT_CONFIG.PANEL,
-                                    id_config_information: POINT_CONFIG.STRING.value
-                                } :
-                                {
-                                    config: "",
-                                    id_config_information: POINT_CONFIG.PANEL.value
-                                }
-                        ),
-                        subRows: row.row.original?.subRows[children - 1]?.subRows?.map((panel, index) => ({
-                            ...new RowAdapter({ ...panel, id: null, config: "" }, index).getRow()
-                        })) || [],
-                    }, 1).getRow());
-            } else {
-                row.row.original.subRows = [];
-                newChild = new RowAdapter(
-                    {
-                        id: null,
-                        name: _.isEqual(row.row.original?.config, POINT_CONFIG.STRING) ? "New String" : "New Panel",
-                        ...(
-                            _.isEqual(row.row.original?.config, POINT_CONFIG.STRING) ?
-                                {
-                                    name: "New String",
-                                    config: POINT_CONFIG.PANEL,
-                                } :
-                                {
-                                    name: "New Panel",
-                                    config: ""
-                                }
-                        ),
-                        subRows: []
-                    }, 1).getRow();
-            }
-            row.row.original?.subRows.push(newChild);
-            setPointList(resortIndex(pointList, POINT_CONFIG.MPPT));
-            !row.row.getIsExpanded() && row.row.toggleExpanded();
-            setRow({
-                row: {},
-                state: false
-            });
-        }, 100);
-    }, [row, pointList]);
 
     /**
      * This useEffect is used to update the selected points in the pointList
@@ -423,7 +421,15 @@ function useMPPTList() {
                     </Button>
                     {
                         row.original?.config &&
-                        <Button className="mx-2" onClick={() => setRow({ row: row, state: true })}>
+                        <Button className="mx-2" onClick={() => setAddChildrenModal({
+                            ...addChildrenModal,
+                            [row.original?.config.name]: {
+                                ...addChildrenModal[row.original?.config.name],
+                                isOpen: true,
+                                id: row.original.id,
+                                has_children: _.isEqual(row.original?.config, POINT_CONFIG.STRING) ? row.original?.subRows?.length - 2 : row.original?.subRows?.length,
+                            }
+                        })}>
                             <Button.Text text={`Add ${row.original?.config.name}`} />
                         </Button>
                     }
@@ -437,6 +443,7 @@ function useMPPTList() {
      * @author nhan.tran 2024-04-02
      */
     const addNewMPPT = (data) => {
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         setTimeout(async () => {
             try {
                 const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.POINT.ADD_MPPT, {
@@ -450,10 +457,7 @@ function useMPPTList() {
                 if (response?.status === 200) {
                     setDefaultMPPTList(response?.data?.mppt_list);
                     setRowSelection({});
-                    setIsChangedMPPT(false);
-                    setEditedMPPT({});
                     setIsSetUp(true);
-                    setIsReset(true);
                     LibToast.toast("Add new MPPT success", "info");
                 }
             } catch (error) {
@@ -479,32 +483,6 @@ function useMPPTList() {
             return;
         }
 
-        // let newPointList = pointList.filter((point, index) => {
-        //     if (rowSelection[index]) {
-        //         return false;
-        //     }
-
-        //     let newSubRows = point?.subRows?.filter((string, sindex) => {
-        //         if (rowSelection[`${index}.${sindex}`]) {
-        //             return false;
-        //         }
-
-        //         let newPanel = string?.subRows?.filter((panel, pindex) => {
-        //             return !rowSelection[`${index}.${sindex}.${pindex}`];
-        //         });
-
-        //         string.subRows = newPanel;
-        //         return true;
-        //     });
-
-        //     point.subRows = newSubRows;
-        //     return true;
-        // });
-
-        // setPointList(resortIndex(newPointList, POINT_CONFIG.MPPT));
-        // setRowSelection({});
-        // setIsForceUpdate(newPointList.length === 0);
-        // setIsChangedMPPT(true);
         let deletePoint = [];
         rowSelection && Object.keys(rowSelection).forEach(key => {
             let keys = key.split(".");
@@ -520,16 +498,16 @@ function useMPPTList() {
                 deletePoint.push(pointList[keys[0]].subRows[keys[1]].subRows[keys[2]]);
             }
         });
+
         let data = deletePoint.map(point => {
             return {
                 id_point: point?.id,
-                id_pointkey: point?.name,
+                id_pointkey: point?.id_pointkey,
                 id_config_information: point?.id_config_information,
                 parent: point?.parent
             }
         });
 
-        var output = document.getElementById("progress");
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
         setTimeout(async () => {
             try {
@@ -549,25 +527,8 @@ function useMPPTList() {
                     LibToast.toast("Delete points success", "info");
                     setDefaultMPPTList(response?.data?.mppt_list);
                     setIsSetUp(true);
-                    setIsReset(true);
-                    setIsChangedMPPT(false);
-                    setEditedMPPT({});
                 }
             } catch (error) {
-                if (error.response?.status === 404) {
-                    setTimeout(() => {
-                        let newPoints = defaultMPPTList.filter((item) => !rowSelection[item.index]);
-                        setDefaultMPPTList(resortIndex([...newPoints]));
-                        setIsForceUpdate(newPoints.length === 0);
-                        setRowSelection({});
-                        setIsSetUp(true);
-                        setIsReset(true);
-                        setIsChangedMPPT(false);
-                        LibToast.toast("Delete points success", "info");
-                    }, 100);
-                    return;
-                }
-
                 let msg = loginService.handleMissingInfo(error);
                 if (typeof msg === "string") {
                     LibToast.toast(msg, "error");
@@ -583,14 +544,57 @@ function useMPPTList() {
     }
 
     /**
-     * Reset the pointList to the defaultMPPTList when the reset button is clicked
-     * @author nhan.tran 2024-04-02
+     * Add new children to the pointList and update the pointList with the updated children
+     * @param {Object} data The data of the new children to be added
+     * @author nhan.tran 2024-04-10
      */
-    const resetTemp = () => {
-        setTimeout(() => {
-            setIsReset(true);
-            setIsSetUp(true);
-        }, 100);
+    const addNewChildren = (data) => {
+        let body = {
+            num_of_string: data.num_of_string,
+            num_of_panel: data.num_of_panel,
+            is_clone_from_last: data.is_clone_from_last,
+            id_template: id,
+            id: data.id
+        };
+
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
+
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.POINT.ADD_CHILDREN, body, {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (response?.status === 200) {
+                    setDefaultMPPTList(response?.data?.mppt_list);
+                    setRowSelection({});
+                    setIsSetUp(true);
+                    LibToast.toast("Add new children success", "info");
+                }
+            } catch (error) {
+                let msg = loginService.handleMissingInfo(error);
+                if (typeof msg === "string") {
+                    LibToast.toast(msg, "error");
+                } else if (!msg) {
+                    LibToast.toast("Add new children failed", "error");
+                } else {
+                    navigate("/", { replace: true })
+                }
+            } finally {
+                setAddChildrenModal({
+                    ...addChildrenModal,
+                    [POINT_CONFIG.STRING.name]: {
+                        ...addChildrenModal[POINT_CONFIG.STRING.name],
+                        isOpen: false
+                    },
+                    [POINT_CONFIG.PANEL.name]: {
+                        ...addChildrenModal[POINT_CONFIG.PANEL.name],
+                        isOpen: false
+                    }
+                });
+            }
+        }, 300);
     }
 
     return {
@@ -605,12 +609,12 @@ function useMPPTList() {
         setRowSelection,
         addNewMPPT,
         removePoint,
-        resetTemp,
-        isChangedMPPT,
         addNewMPPTInit,
         addNewMPPTSchema,
         isClone,
-        setIsClone
+        setIsClone,
+        addChildrenModal,
+        setAddChildrenModal,
     };
 }
 

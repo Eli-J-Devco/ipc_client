@@ -100,6 +100,7 @@ function useEditMPPTModal(data, close, setPoint, setCurrentData) {
                     setCurrentData({
                         ...new RowAdapter({ ...response.data }).getRow()
                     });
+
                     // close();
                     LibToast.toast("Point updated successfully", "info");
                 };
@@ -113,8 +114,6 @@ function useEditMPPTModal(data, close, setPoint, setCurrentData) {
                 } else {
                     navigate('/');
                 }
-            } finally {
-                output.innerHTML = "";
             }
         }, 500);
     };

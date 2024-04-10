@@ -90,6 +90,13 @@ const Constants = {
         DELETE: "/template/point/delete_multiple/",
         DELETE_MPPT: "/template/mppt/delete_multiple/",
         ADD_MPPT: "/template/mppt/create/",
+        ADD_POINT: "/template/point/create/",
+        ADD_CHILDREN: "/template/mppt/create/children/",
+      },
+      REGISTER: {
+        CREATE: "/template/register/create/",
+        DELETE: "/template/register/delete_multiple/",
+        UPDATE: "/template/register/edit_multiple/",
       }
     },
     UPLOAD_CHANNEL: {

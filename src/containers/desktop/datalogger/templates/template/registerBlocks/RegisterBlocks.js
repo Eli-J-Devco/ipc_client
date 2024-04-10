@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "../../../../../../components/button/Button";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import Modal from "../../../../../../components/modal/Modal";
 import Table from "../../../../../../components/table/Table";
 import useRegisterBlocks from "./useRegisterBlocks";
 import * as yup from 'yup';
-import { useTemplate } from "../useTemplate";
 
 function RegisterBlocks() {
     const {
@@ -15,27 +14,26 @@ function RegisterBlocks() {
         rowSelection,
         setRowSelection,
         changeRegisterNumber,
-        resetRegisterList,
         removeRegister,
-        temporarySave
+        applyUpdate
     } = useRegisterBlocks();
 
-    const {
-        isChanged,
-    } = useTemplate();
-
+    const [confirmAdd, setConfirmAdd] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
-    const [confirmUpdate, setConfirmUpdate] = useState(false);
     const headerFormInit = {
-        num_of_registers: registerList?.length || 0
+        num_of_registers: 1
     };
     const headerSchema = yup.object().shape({
-        num_of_registers: yup.number().required()
+        num_of_registers: yup.number().required("Required").min(1, "Minimum 1 register")
     });
-    const onChangeNumOfPoint = (values) => {
+    const onChangeNumOfPoint = (values, { resetForm }) => {
         changeRegisterNumber(values.num_of_registers);
-    };
 
+        setTimeout(() => {
+            resetForm();
+            setConfirmAdd(false);
+        }, 500);
+    };
 
     return (
         <>
@@ -64,6 +62,28 @@ function RegisterBlocks() {
                     </div>
                 </Modal>
             }
+            {
+                confirmAdd &&
+                <Modal
+                    isOpen={confirmAdd}
+                    close={() => setConfirmAdd(false)}
+                    title="Add Registers"
+                    footer={
+                        <div>
+                            <Button className="me-3" onClick={() => setConfirmAdd(false)}>
+                                <Button.Text text="No" />
+                            </Button>
+                            <Button className="ms-3" type="submit" formId="numOfRegistersForm">
+                                <Button.Text text="Yes" />
+                            </Button>
+                        </div>
+                    }
+                >
+                    <div>
+                        <p>Are you sure you want to add new registers?</p>
+                    </div>
+                </Modal>
+            }
             <FormInput className="m-2" id="numOfRegistersForm" initialValues={headerFormInit} validationSchema={headerSchema} onSubmit={onChangeNumOfPoint}>
                 <div className="d-inline-block">
                     <FormInput.Text
@@ -74,19 +94,8 @@ function RegisterBlocks() {
                     />
                 </div>
 
-                <Button className="mx-3 d-inline-block" type="submit" formId="numOfRegistersForm">
-                    <Button.Text text="Change Number of Registers" />
-                </Button>
-                <Button
-                    className="mx-3 d-inline-block"
-                    variant="white"
-                    onClick={() => resetRegisterList()}
-                    disabled={!isChanged.register}
-                >
-                    <Button.Text text="Cancel" />
-                </Button>
-                <Button className="d-inline-block float-end" onClick={() => setConfirmUpdate(true)}>
-                    <Button.Text text="Save all changes" />
+                <Button className="mx-3 d-inline-block" onClick={() => setConfirmAdd(true)} >
+                    <Button.Text text="Add Registers" />
                 </Button>
             </FormInput>
             <div>
@@ -108,7 +117,19 @@ function RegisterBlocks() {
                                     ...reg
                                 }
                             })}
-                        onSubmit={temporarySave}
+                        validationSchema={
+                            yup.object().shape({
+                                ...registerList.reduce((acc, reg) => {
+                                    return {
+                                        ...acc,
+                                        [reg?.addr?.name]: yup.number().required("Required").min(1, "Minimum address is 1").max(65535, "Maximum address is 65535"),
+                                        [reg?.count?.name]: yup.number().required("Required").min(0, "Minimum count is 0").max(125, "Maximum count is 125"),
+                                        [reg?.function_select?.name]: yup.object().required("Required")
+                                    }
+                                }, {})
+                            })
+                        }
+                        onSubmit={applyUpdate}
                     >
                         <Table
                             maxHeight="600px"
@@ -125,12 +146,15 @@ function RegisterBlocks() {
                         <Button className="mt-3" type="submit" formId="registerBlocksForm">
                             <Button.Text text="Apply" />
                         </Button>
-                        <Button
-                            className="mt-3 ms-3"
-                            onClick={() => setConfirmDelete(true)}
-                        >
-                            <Button.Text text="Delete selected Registers" />
-                        </Button>
+                        {
+                            Object.keys(rowSelection).length > 0 &&
+                            <Button
+                                className="mt-3 ms-3"
+                                onClick={() => setConfirmDelete(true)}
+                            >
+                                <Button.Text text="Delete selected Registers" />
+                            </Button>
+                        }
 
                     </FormInput>
                 }

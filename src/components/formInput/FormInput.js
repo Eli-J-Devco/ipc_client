@@ -41,6 +41,7 @@ function Text({
     isRandom,
     isShow = false,
     isCustomIcon = false,
+    isHidden = false,
     type = "text",
     disabled,
     readOnly,
@@ -59,6 +60,7 @@ function Text({
         <Form.Group
             controlId={name}
             className={`${styles["form-text-wrapper"]} ${validate ? validate.touched[name] && validate.errors[name] ? invalidClassName : "" : ""} ${className ? className : ""} ${horizontal ? styles.horizontal : ""}`}
+            hidden={isHidden}
         >
             {label &&
                 <Form.Label>

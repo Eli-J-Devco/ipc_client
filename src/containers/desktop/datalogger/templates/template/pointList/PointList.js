@@ -6,7 +6,6 @@ import EditPointModal from "./editPointModal/EditPointModal";
 import usePointList from "./usePointList";
 import * as yup from 'yup';
 import Modal from "../../../../../../components/modal/Modal";
-import ConfirmUpdateModal from "../ConfirmUpdateModal";
 function PointList() {
     const {
         columns,
@@ -19,9 +18,6 @@ function PointList() {
         setRowSelection,
         removePoint,
         changePointNumber,
-        reset,
-        isChanged,
-        temporaryPointList,
     } = usePointList();
     const initialValues = {
         num_of_point: 1
@@ -30,15 +26,32 @@ function PointList() {
         num_of_point: yup.number().required().min(1, 'Minimum 1 point')
     });
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [confirmAddPoints, setConfirmAddPoints] = useState({
+        values: {},
+        resetForm: () => { },
+        state: false
+    });
     const onChangeNumOfPoint = (values, { resetForm }) => {
         if (values.num_of_point <= 0) return;
 
+        setConfirmAddPoints({
+            values: values,
+            resetForm: resetForm,
+            state: true
+        });
+    };
+
+    const addPoints = (values, resetForm) => {
         changePointNumber(values.num_of_point);
         setTimeout(() => {
             resetForm();
-        }, 500);
-    };
-
+            setConfirmAddPoints({
+                values: {},
+                resetForm: () => { },
+                state: false
+            });
+        }, 300);
+    }
     return (
         <div>
             {
@@ -66,14 +79,40 @@ function PointList() {
                     </div>
                 </Modal>
             }
-            {/* {
-                confirmUpdate &&
-                <ConfirmUpdateModal
-                    confirmUpdate={confirmUpdate}
-                    setConfirmUpdate={setConfirmUpdate}
-                    updateTemplate={saveAllChanges}
-                />
-            } */}
+
+            {
+                confirmAddPoints &&
+                <Modal
+                    isOpen={confirmAddPoints.state}
+                    close={() => setConfirmAddPoints({
+                        values: {},
+                        resetForm: () => { },
+                        state: false
+                    })}
+                    title="Add New Points"
+                    footer={
+                        <div>
+                            <Button className="me-3" onClick={() => setConfirmAddPoints({
+                                values: {},
+                                resetForm: () => { },
+                                state: false
+                            })}>
+                                <Button.Text text="No" />
+                            </Button>
+                            <Button className="ms-3" onClick={() => {
+                                addPoints(confirmAddPoints.values, confirmAddPoints.resetForm)
+                            }}>
+                                <Button.Text text="Yes" />
+                            </Button>
+                        </div>
+                    }
+                >
+                    <div>
+                        <p>Are you sure you want to add new points?</p>
+                    </div>
+                </Modal>
+            }
+
             <div className="m-2">
                 <FormInput
                     className="d-inline-block"
@@ -130,13 +169,6 @@ function PointList() {
                         </Button>
                     }
                 </>
-            }
-
-            {
-                isChanged && temporaryPointList.length > 0 &&
-                <Button className="ms-3 mt-3" variant="white" onClick={() => reset()}>
-                    <Button.Text text="Cancel" />
-                </Button>
             }
         </div>
     );

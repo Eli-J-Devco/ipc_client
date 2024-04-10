@@ -5,6 +5,7 @@ import EditMPPTModal from "./editMPPTModal/EditMPPTModal";
 import useMPPTList from "./useMPPTList";
 import Modal from "../../../../../../components/modal/Modal";
 import FormInput from "../../../../../../components/formInput/FormInput";
+import { POINT_CONFIG } from "../../../../../../utils/TemplateHelper";
 
 function MPPTList() {
     const {
@@ -18,18 +19,16 @@ function MPPTList() {
         setRowSelection,
         addNewMPPT,
         removePoint,
-        resetTemp,
-        isChangedMPPT,
         addNewMPPTInit,
         addNewMPPTSchema,
         isClone,
         setIsClone,
+        addChildrenModal,
+        setAddChildrenModal
     } = useMPPTList();
 
     const [confirmDelete, setConfirmDelete] = useState(false);
-    const [confirmUpdate, setConfirmUpdate] = useState(false);
     const [addNewMPPTModal, setAddNewMPPTModal] = useState(false);
-
 
     return (
         <div>
@@ -73,7 +72,7 @@ function MPPTList() {
                                     <FormInput.Check
                                         className="d-inline-block ms-3"
                                         label="Clone from last MPPT"
-                                        name="is_clone_last_mppt"
+                                        name="is_clone_from_last"
                                         checked={isClone}
                                         onChange={() => setIsClone(!isClone)}
                                     />
@@ -125,23 +124,86 @@ function MPPTList() {
                     </div>
                 </Modal>
             }
+            {
+                Object.values(addChildrenModal).filter((item) => item.isOpen === true).length > 0 &&
+                <>
+                    {
+                        Object.keys(addChildrenModal).map((key, index) => {
+                            let item = addChildrenModal[key];
+                            return (
+                                item.isOpen &&
+                                <Modal
+                                    key={index}
+                                    isOpen={item.isOpen}
+                                    close={() => setAddChildrenModal({ ...addChildrenModal, [key]: { ...item, isOpen: false } })}
+                                    title={`Add ${key}`}
+                                    footer={
+                                        <div>
+                                            <Button className="me-3" onClick={() => setAddChildrenModal({ ...addChildrenModal, [key]: { ...item, isOpen: false } })}>
+                                                <Button.Text text="Cancel" />
+                                            </Button>
+                                            <Button className="ms-3" type="submit" formId={key}>
+                                                <Button.Text text="Save" />
+                                            </Button>
+                                        </div>
+                                    }
+                                >
+                                    <div>
+                                        <FormInput
+                                            id={key}
+                                            initialValues={item.initialValues}
+                                            validationSchema={item.validationSchema}
+                                            onSubmit={(values) => {
+                                                item.onSubmit({
+                                                    ...values,
+                                                    is_clone_from_last: isClone,
+                                                    id: item.id
+                                                })
+                                                setAddChildrenModal({ ...addChildrenModal, [key]: { ...item, isOpen: false } })
+                                            }}
+                                        >
+                                            <div>
+                                                {
+                                                    item.fields.map((field, index) => {
+                                                        return field.type !== "checkbox" ? (
+                                                            <FormInput.Text
+                                                                key={index}
+                                                                label={field.label}
+                                                                name={field.name}
+                                                                type={field.type}
+                                                                required={field.required}
+                                                                isHidden={isClone && key === POINT_CONFIG.STRING.name && field.name === "num_of_panel"}
+                                                            />
+                                                        ) :
+                                                            item.has_children > 0 && (
+                                                                <FormInput.Check
+                                                                    key={index}
+                                                                    label={field.label}
+                                                                    name={field.name}
+                                                                    checked={isClone}
+                                                                    onChange={field.onChange}
+                                                                />
+                                                            )
+                                                    })
+                                                }
+                                            </div>
+                                        </FormInput>
+                                    </div>
+                                </Modal>
+                            )
+                        })
+                    }
+                </>
+            }
             <div className="m-2">
                 <div className="d-inline-block">
                     <Button onClick={() => setAddNewMPPTModal(true)}>
                         <Button.Text text="Add New MPPT" />
                     </Button>
                 </div>
-                {
-                    isChangedMPPT &&
-                    <div className="d-inline-block float-end">
-                        <Button onClick={() => setConfirmUpdate(true)}>
-                            <Button.Text text="Save all changes" />
-                        </Button>
-                    </div>
-                }
             </div>
             {
-                pointList.length > 0 &&
+                pointList?.length > 0 &&
                 <>
                     <Table
                         visible
@@ -175,12 +237,6 @@ function MPPTList() {
                         </Button>
                     }
                 </>
-            }
-            {
-                isChangedMPPT &&
-                <Button className="ms-3 mt-3" variant="white" onClick={() => resetTemp()}>
-                    <Button.Text text="Cancel" />
-                </Button>
             }
         </div>
     );
