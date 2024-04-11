@@ -25,6 +25,8 @@ import PointList from "./containers/desktop/datalogger/templates/template/pointL
 import MPPTList from "./containers/desktop/datalogger/templates/template/MPPT/MPPTList";
 import RegisterBlocks from "./containers/desktop/datalogger/templates/template/registerBlocks/RegisterBlocks";
 import Advanced from "./containers/desktop/datalogger/templates/template/advanced/Advanced";
+import TemplateConfigContext from "./containers/desktop/datalogger/templates/template/TemplateConfigContext";
+import ControlGroups from "./containers/desktop/datalogger/templates/template/controlGroups/ControlGroups";
 
 import ProjectSetupInformation from "./containers/desktop/datalogger/ProjectSetup";
 import QuickStart from "./containers/desktop/datalogger/quickstart/QuickStart";
@@ -93,7 +95,6 @@ import SetupControl from "./containers/desktop/scada/setupControl/SetupControl";
 import Basic from "./containers/desktop/scada/setupControl/basic/Basic";
 import ExportLimitationControl from "./containers/desktop/scada/setupControl/exportLimitationControl/ExportLimitationControl";
 import ScheduleControl from "./containers/desktop/scada/setupControl/scheduleControl/ScheduleControl";
-import TemplateConfigContext from "./containers/desktop/datalogger/templates/template/TemplateConfigContext";
 
 export default class App extends Component {
   render() {
@@ -166,6 +167,7 @@ export default class App extends Component {
                       <Route path="points" element={<PointList />} />
                       <Route path="mppt" element={<MPPTList />} />
                       <Route path="registers" element={<RegisterBlocks />} />
+                      <Route path="control-groups" element={<ControlGroups />} />
                     </Route>
                   </Route>
 

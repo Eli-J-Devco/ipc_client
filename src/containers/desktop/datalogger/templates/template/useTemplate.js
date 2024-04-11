@@ -9,24 +9,8 @@ export default function TemplateProvider({ children }) {
     const [defaultPointList, setDefaultPointList] = useState([]);
     const [defaultMPPTList, setDefaultMPPTList] = useState([]);
     const [defaultRegisterList, setDefaultRegisterList] = useState([]);
-    const [editedPoint, setEditedPoint] = useState({
-        state: true,
-        data: []
-    });
-    const [editedMPPT, setEditedMPPT] = useState({
-        state: true,
-        data: []
-    });
-    const [editedRegister, setEditedRegister] = useState({
-        state: true,
-        data: []
-    });
+    const [defaultControlGroupList, setDefaultControlGroupList] = useState([]);
     const [config, setConfig] = useState({});
-    const [isChanged, setIsChanged] = useState({
-        point: false,
-        mppt: false,
-        register: false
-    });
     const { id } = useParams();
 
     return (
@@ -38,16 +22,10 @@ export default function TemplateProvider({ children }) {
             setDefaultMPPTList,
             defaultRegisterList,
             setDefaultRegisterList,
+            defaultControlGroupList,
+            setDefaultControlGroupList,
             config,
             setConfig,
-            editedPoint,
-            setEditedPoint,
-            editedMPPT,
-            setEditedMPPT,
-            editedRegister,
-            setEditedRegister,
-            isChanged,
-            setIsChanged
         }}>
             {children}
         </TemplateContext.Provider>

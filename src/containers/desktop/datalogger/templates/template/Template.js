@@ -19,6 +19,7 @@ function Template() {
         setDefaultPointList,
         setDefaultMPPTList,
         setDefaultRegisterList,
+        setDefaultControlGroupList,
         setConfig,
     } = useTemplate();
     const axiosPrivate = useAxiosPrivate();
@@ -37,6 +38,7 @@ function Template() {
                     setDefaultPointList(response?.data?.point_list);
                     setDefaultMPPTList(response?.data?.mppt_list);
                     setDefaultRegisterList(response?.data?.register_list);
+                    setDefaultControlGroupList(response?.data?.control_group_list);
                 }
             } catch (error) {
                 if (error?.response?.status === 404) {
@@ -84,6 +86,9 @@ function Template() {
                             {
                                 path: `/datalogger/templates/${id}/registers`,
                                 name: "Register Blocks"
+                            },                            {
+                                path: `/datalogger/templates/${id}/control-groups`,
+                                name: "Control Groups"
                             },
                         ]}
                     />
