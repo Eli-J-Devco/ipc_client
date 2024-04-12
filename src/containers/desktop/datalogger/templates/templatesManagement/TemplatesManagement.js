@@ -22,7 +22,11 @@ function TemplatesManagement() {
     const navigate = useNavigate();
     const [isConfirmDelete, setIsConfirmDelete] = useState({ state: false, item: {} });
     useEffect(() => {
-        templateList.length === 0 && setTimeout(async () => {
+        if (templateList.length > 0) return;
+
+        var output = document.getElementById("progress");
+        output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
+        setTimeout(async () => {
             try {
                 const response = await axiosPrivate.post(`${Constants.API_URL.TEMPLATE.LIST_BY_TYPE}?type=${Constants.TEMPLATE_TYPE.CUSTOM}`);
                 if (response?.status === 200) {
@@ -34,11 +38,13 @@ function TemplatesManagement() {
                     LibToast.toast(msg, "error");
                 }
                 else {
-                    if (msg)
+                    if (!msg)
                         LibToast.toast(t('toastMessage.error.fetch'), "error");
                     else
                         navigate("/")
                 }
+            } finally {
+                output.innerHTML = "";
             }
         }, 300);
     }, [templateList]);
@@ -60,7 +66,7 @@ function TemplatesManagement() {
                     LibToast.toast(msg, "error");
                 }
                 else {
-                    if (msg)
+                    if (!msg)
                         LibToast.toast(t('toastMessage.error.delete'), "error");
                     else
                         navigate("/")
