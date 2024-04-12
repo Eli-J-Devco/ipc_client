@@ -1,6 +1,6 @@
 import styles from "./Button.module.scss";
 
-function Button({ children, variant, className, title, type, formId, onClick }) {
+function Button({ children, variant, className, title, type, formId, onClick, disabled }) {
     return (
         <button
             type={type ? type : "button"}
@@ -8,6 +8,7 @@ function Button({ children, variant, className, title, type, formId, onClick }) 
             className={`${styles.btn} ${variant ? styles[variant] : ""} ${className ? className : ""}`}
             onClick={onClick}
             title={title}
+            disabled={disabled}
         >
             {children}
         </button>

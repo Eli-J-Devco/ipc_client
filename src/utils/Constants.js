@@ -76,14 +76,33 @@ const Constants = {
       GET_TYPE: "/device_group/get_type/",
     },
     TEMPLATE: {
-      LIST: "/template/get_all/",
-      LIST_BY_TYPE: "/template/get_all_by_type/",
-      GET_ONE: "/template/get_each_template/",
       CREATE: "/template/create/",
-      UPDATE: "/template/edit_each/",
       DELETE: "/template/delete/",
-      GET_MPTT: "/template/get_mppt_template/",
-      CONFIG: "/template/get_template_config/",
+      UPDATE: "/template/edit/",
+      LIST: "/template/get/all/",
+      LIST_BY_TYPE: "/template/get/all/type/",
+      GET_ONE: "/template/get/",
+      CONFIG: "/template/config/",
+      GET_MPTT: "/template/mppt/get/template/",
+      POINT: {
+        UPDATE: "/template/point/edit/",
+        UPDATE_ALL: "/template/point/edit/all/",
+        DELETE: "/template/point/delete_multiple/",
+        DELETE_MPPT: "/template/mppt/delete_multiple/",
+        ADD_MPPT: "/template/mppt/create/",
+        ADD_POINT: "/template/point/create/",
+        ADD_CHILDREN: "/template/mppt/create/children/",
+      },
+      REGISTER: {
+        CREATE: "/template/register/create/",
+        DELETE: "/template/register/delete_multiple/",
+        UPDATE: "/template/register/edit_multiple/",
+      },
+      CONTROL_GROUP: {
+        CREATE: "/template/control_group/create/",
+        UPDATE: "/template/control_group/edit/",
+        DELETE: "/template/control_group/delete/",
+      },
     },
     UPLOAD_CHANNEL: {
       ALL_CHANNELS: "/upload_channel/all_channel/",
@@ -109,7 +128,8 @@ const Constants = {
 
   REGEX_PATTERN: {
     EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-    PASSWORD: /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹])[a-zA-Z0-9~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]{7,}$/,
+    PASSWORD:
+      /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹])[a-zA-Z0-9~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]{7,}$/,
   },
 
   SCREEN_MODE: {
@@ -168,6 +188,6 @@ const Constants = {
       h: "hours",
       d: "days",
     },
-  }
+  },
 };
 export default Constants;

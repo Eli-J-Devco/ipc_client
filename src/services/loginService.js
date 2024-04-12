@@ -94,9 +94,10 @@ export const loginService = {
    * @return Boolean
    */
   handleMissingInfo(error) {
-    if (error?.response?.data) {
-      return error?.response?.data;
+    if (error?.response?.data?.message) {
+      return error?.response?.data?.message;
     }
+
     if (error?.config?.signal?.reason?.message)
       LibToast.toast(LoginErrors("", error?.config?.signal?.reason?.message), "error");
 

@@ -1,8 +1,3 @@
-/********************************************************
- * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
- * All rights reserved.
- *
- *********************************************************/
 import { useEffect, useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useNavigate } from "react-router-dom";
@@ -26,8 +21,9 @@ import {
 import { ReactComponent as ExpandIcon } from "../../../../../../assets/images/chevron-down.svg";
 import { ReactComponent as CollapseIcon } from "../../../../../../assets/images/chevron-up.svg";
 
-function useMPPTList() {
-  const { id, defaultMPPTList, setDefaultMPPTList } = useTemplate();
+export default function useControlGroups() {
+  const { id, defaultControlGroupList, setDefaultControlGroupList } =
+    useTemplate();
 
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
@@ -40,82 +36,32 @@ function useMPPTList() {
   const [isSetUp, setIsSetUp] = useState(true);
   const [isClone, setIsClone] = useState(false);
   const [addChildrenModal, setAddChildrenModal] = useState({
-    [POINT_CONFIG.STRING.name]: {
+    [POINT_CONFIG.CONTROL_GROUP.name]: {
       isOpen: false,
       initialValues: {
-        num_of_string: 1,
-        num_of_panel: 0,
+        num_of_point: 1,
         is_clone_from_last: false,
       },
       validationSchema: yup.object().shape({
-        num_of_string: yup
+        num_of_point: yup
           .number()
           .required("Required")
-          .min(1, "Minimum 1 string")
-          .max(10, "Maximum 10 strings per MPPT"),
-        ...(isClone
-          ? {}
-          : {
-              num_of_panel: yup
-                .number()
-                .required("Required")
-                .min(0, "Minimum 0 panel")
-                .max(10, "Maximum 10 panels per string"),
-            }),
+          .min(1, "Minimum 1")
+          .max(3, "Maximum 3"),
       }),
       fields: [
         {
-          name: "num_of_string",
+          name: "num_of_point",
           type: "number",
-          label: "Number of String",
-          placeholder: "Number of String",
+          label: "Number of Points",
+          placeholder: "Number of Points",
           required: true,
         },
         {
           name: "is_clone_from_last",
           type: "checkbox",
           label: "Clone from last",
-          placeholder: "Clone from last String",
-          required: false,
-          onChange: (e) => setIsClone(e.target.checked),
-        },
-        {
-          name: "num_of_panel",
-          type: "number",
-          label: "Number of Panel",
-          placeholder: "Number of Panel",
-          required: true,
-          isHidden: isClone,
-        },
-      ],
-      onSubmit: (data) => addNewChildren(data),
-    },
-    [POINT_CONFIG.PANEL.name]: {
-      isOpen: false,
-      initialValues: {
-        num_of_panel: 1,
-        is_clone_from_last: false,
-      },
-      validationSchema: yup.object().shape({
-        num_of_panel: yup
-          .number()
-          .required("Required")
-          .min(1, "Minimum 1 panel")
-          .max(10, "Maximum 10 panels per string"),
-      }),
-      fields: [
-        {
-          name: "num_of_panel",
-          type: "number",
-          label: "Number of Panel",
-          placeholder: "Number of Panel",
-          required: true,
-        },
-        {
-          name: "is_clone_from_last",
-          type: "checkbox",
-          label: "Clone from last",
-          placeholder: "Clone from last Panel",
+          placeholder: "Clone from last Point",
           required: false,
           onChange: (e) => setIsClone(e.target.checked),
         },
@@ -125,39 +71,24 @@ function useMPPTList() {
   });
   const output = document.getElementById("progress");
 
-  const addNewMPPTInit = {
-    num_of_mppt: 1,
-    is_clone_from_last: isClone,
-    num_of_string: 0,
-    num_of_panel: 0,
+  const addNewControlGroupInit = {
+    name: "",
+    description: "",
+    value: 0,
+    attributes: 0,
   };
 
-  const addNewMPPTSchema = yup.object().shape({
-    num_of_mppt: yup
+  const addNewCGSchema = yup.object().shape({
+    name: yup.string().required("Required"),
+    attributes: yup
       .number()
       .required("Required")
-      .min(1, "Minimum 1 point")
-      .max(10, "Maximum 10 MPPT"),
-    ...(!isClone
-      ? {
-          num_of_string: yup
-            .number()
-            .required("Required")
-            .min(0, "Minimum 0 string")
-            .max(10, "Maximum 10 strings per MPPT"),
-          num_of_panel: yup
-            .number()
-            .required("Required")
-            .min(0, "Minimum 0 panel")
-            .max(10, "Maximum 10 panels per string"),
-        }
-      : {}),
+      .min(0, "Minimum 0")
+      .max(2, "Maximum 2"),
   });
 
   /**
-   * This useEffect is used to set the initial state of the pointList
-   * It is only called once when the convertedPointList is set
-   * It is also used to set the initial state of the editedMPPT, defaultMPPTList, isReset and rowSelection
+   * Add a new control group to the pointList and update the pointList with the updated control group list
    * @author nhan.tran 2024-04-02
    */
   useEffect(() => {
@@ -168,43 +99,23 @@ function useMPPTList() {
     }
 
     setTimeout(() => {
-      let data = defaultMPPTList?.map((mppt, index) => {
+      let groupCount = 0;
+      let data = defaultControlGroupList?.map((group) => {
         return {
-          ...new RowAdapter(
-            {
-              ...mppt,
-              config: POINT_CONFIG.STRING,
-            },
-            index
-          ).getRow(),
+          ...new RowAdapter({
+            ...group,
+            index: groupCount++,
+            config: POINT_CONFIG.CONTROL_GROUP,
+          }).getRow(),
           subRows:
-            mppt?.children?.map((string, sindex) => {
+            group?.children?.map((point) => {
               return {
-                ...new RowAdapter(
-                  {
-                    ...string,
-                    ...(string?.id_config_information ===
-                    POINT_CONFIG.STRING.value
-                      ? {
-                          config: POINT_CONFIG.PANEL,
-                        }
-                      : {
-                          config: "",
-                        }),
-                  },
-                  sindex
-                ).getRow(),
-                subRows:
-                  string?.children?.map((panel, pindex) => {
-                    return {
-                      ...new RowAdapter(panel, pindex).getRow(),
-                    };
-                  }) || [],
+                ...new RowAdapter(point).getRow(),
               };
             }) || [],
         };
       });
-      setPointList(resortIndex(data, POINT_CONFIG.MPPT));
+      setPointList(resortIndex(data, POINT_CONFIG.CONTROL_GROUP));
       setRowSelection({});
     }, 100);
 
@@ -212,7 +123,7 @@ function useMPPTList() {
       setIsSetUp(false);
       output.innerHTML = "";
     }, 100);
-  }, [defaultMPPTList]);
+  }, [defaultControlGroupList]);
 
   /**
    * Close the modal
@@ -241,12 +152,12 @@ function useMPPTList() {
     let updatedPoint = { ...newPoint };
     setTimeout(() => {
       var isFound = false;
-      setDefaultMPPTList([
-        ...defaultMPPTList.map((mppt) => {
-          if (isFound) return mppt;
+      setDefaultControlGroupList([
+        ...defaultControlGroupList.map((group) => {
+          if (isFound) return group;
 
-          let children = mppt?.children || [];
-          if (mppt.id === newPoint.id) {
+          let children = group?.children || [];
+          if (group.id === newPoint.id) {
             updatedPoint = {
               ...updatedPoint,
               children: children,
@@ -255,44 +166,19 @@ function useMPPTList() {
             return updatedPoint;
           }
 
-          let updatedString = children.map((string) => {
-            if (isFound) return string;
+          let updatedPoints = children.map((p) => {
+            if (isFound) return p;
 
-            let panels = string?.children || [];
-            if (string.id === newPoint.id) {
-              updatedPoint = {
-                ...updatedPoint,
-                children: panels,
-              };
-
-              isFound = true;
-              return updatedPoint;
+            if (p.id === newPoint.id) {
+              return newPoint;
             }
 
-            let updatedPanel = panels.map((panel) => {
-              if (isFound) return panel;
-
-              if (panel.id === newPoint.id) {
-                updatedPoint = {
-                  ...updatedPoint,
-                };
-
-                isFound = true;
-                return updatedPoint;
-              }
-
-              return panel;
-            });
-
-            return {
-              ...string,
-              children: updatedPanel,
-            };
+            return p;
           });
 
           return {
-            ...mppt,
-            children: updatedString,
+            ...group,
+            children: updatedPoints,
           };
         }),
       ]);
@@ -396,7 +282,12 @@ function useMPPTList() {
             {...{
               inline: true,
               name: row.original.index,
-              label: `pt${row.original.index}`,
+              label: !_.isEqual(
+                row.original?.config,
+                POINT_CONFIG.CONTROL_GROUP
+              )
+                ? `pt${row.original.index}`
+                : `Group${row.original.index}`,
               checked: row.getIsSelected(),
               onChange: row.getToggleSelectedHandler(),
               disabled: POINT_CONFIG.MPPT_CONFIG.values.includes(
@@ -412,6 +303,11 @@ function useMPPTList() {
       id: "name",
       header: "Name",
       size: 200,
+      cell: ({ row }) => (
+        <div style={{ paddingLeft: `${row.depth * 2}rem` }}>
+          {row.original?.name}
+        </div>
+      ),
     }),
     columnsHelper.accessor("unit", {
       id: "unit",
@@ -474,14 +370,38 @@ function useMPPTList() {
                   ...addChildrenModal,
                   [row.original?.config.name]: {
                     ...addChildrenModal[row.original?.config.name],
+                    validationSchema: yup.object().shape({
+                      num_of_point: yup
+                        .number()
+                        .required("Required")
+                        .min(1, "Minimum is 1")
+                        .max(
+                          (row?.original?.attributes !== 0 &&
+                            row?.original?.attributes -
+                              row.original?.subRows?.length +
+                              1) ||
+                            10,
+                          `${
+                            row?.original?.attributes === 0
+                              ? "Maximum is 10"
+                              : `${
+                                  row?.original?.attributes -
+                                    row.original?.subRows?.length +
+                                    1 ===
+                                  0
+                                    ? "You reach the limit of this group"
+                                    : `Maximum is ${
+                                        row?.original?.attributes -
+                                        row.original?.subRows?.length +
+                                        1
+                                      }`
+                                }`
+                          }`
+                        ),
+                    }),
                     isOpen: true,
                     id: row.original.id,
-                    has_children: _.isEqual(
-                      row.original?.config,
-                      POINT_CONFIG.STRING
-                    )
-                      ? row.original?.subRows?.length - 2
-                      : row.original?.subRows?.length,
+                    has_children: row.original?.subRows?.length > 0,
                   },
                 })
               }
@@ -498,7 +418,7 @@ function useMPPTList() {
    * Add a new MPPT to the pointList
    * @author nhan.tran 2024-04-02
    */
-  const addNewMPPT = (data) => {
+  const addNewControlGroup = (data) => {
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
@@ -515,7 +435,7 @@ function useMPPTList() {
           }
         );
         if (response?.status === 200) {
-          setDefaultMPPTList(response?.data?.mppt_list);
+          setDefaultControlGroupList(response?.data?.mppt_list);
           setRowSelection({});
           setIsSetUp(true);
           LibToast.toast("Add new MPPT success", "info");
@@ -591,7 +511,7 @@ function useMPPTList() {
         );
         if (response?.status === 200) {
           LibToast.toast("Delete points success", "info");
-          setDefaultMPPTList(response?.data?.mppt_list);
+          setDefaultControlGroupList(response?.data?.mppt_list);
           setIsSetUp(true);
         }
       } catch (error) {
@@ -616,11 +536,9 @@ function useMPPTList() {
    */
   const addNewChildren = (data) => {
     let body = {
-      num_of_string: data.num_of_string,
-      num_of_panel: data.num_of_panel,
-      is_clone_from_last: data.is_clone_from_last,
+      number_of_point: data.num_of_point,
       id_template: id,
-      id: data.id,
+      id_control_group: data.id,
     };
 
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
@@ -628,7 +546,7 @@ function useMPPTList() {
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.POINT.ADD_CHILDREN,
+          Constants.API_URL.TEMPLATE.POINT.ADD_POINT,
           body,
           {
             headers: {
@@ -637,7 +555,7 @@ function useMPPTList() {
           }
         );
         if (response?.status === 200) {
-          setDefaultMPPTList(response?.data?.mppt_list);
+          setDefaultControlGroupList(response?.data?.control_group_list);
           setRowSelection({});
           setIsSetUp(true);
           LibToast.toast("Add new children success", "info");
@@ -652,6 +570,7 @@ function useMPPTList() {
           navigate("/", { replace: true });
         }
       } finally {
+        output.innerHTML = "";
         setAddChildrenModal({
           ...addChildrenModal,
           [POINT_CONFIG.STRING.name]: {
@@ -677,15 +596,14 @@ function useMPPTList() {
     updatePoint,
     rowSelection,
     setRowSelection,
-    addNewMPPT,
+    addNewControlGroup,
     removePoint,
-    addNewMPPTInit,
-    addNewMPPTSchema,
+    addNewControlGroupInit,
+    addNewCGSchema,
     isClone,
     setIsClone,
     addChildrenModal,
     setAddChildrenModal,
+    setIsSetUp,
   };
 }
-
-export default useMPPTList;

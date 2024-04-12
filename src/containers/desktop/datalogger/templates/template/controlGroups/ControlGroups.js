@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import Button from "../../../../../../components/button/Button";
-import Table from "../../../../../../components/table/Table";
-import EditMPPTModal from "./editMPPTModal/EditMPPTModal";
-import useMPPTList from "./useMPPTList";
+import { useState } from "react";
 import Modal from "../../../../../../components/modal/Modal";
+import Button from "../../../../../../components/button/Button";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import { POINT_CONFIG } from "../../../../../../utils/TemplateHelper";
+import Table from "../../../../../../components/table/Table";
+import useControlGroups from "./useControlGroups";
+import _ from "lodash";
+import EditPointModal from "./editPointModal/EditPointModal";
+import EditControlGroupModal from "./editControlGroupModal/EditControlGroupModal";
 
-function MPPTList() {
+export default function ControlGroups() {
   const {
     columns,
     pointList,
@@ -17,89 +19,27 @@ function MPPTList() {
     point,
     rowSelection,
     setRowSelection,
-    addNewMPPT,
+    addNewControlGroup,
     removePoint,
-    addNewMPPTInit,
-    addNewMPPTSchema,
+    addNewControlGroupInit,
     isClone,
-    setIsClone,
     addChildrenModal,
     setAddChildrenModal,
-  } = useMPPTList();
+    setIsSetUp,
+  } = useControlGroups();
 
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [addNewMPPTModal, setAddNewMPPTModal] = useState(false);
+  const [addNewControlGroupModal, setAddNewControlGroupModal] = useState(false);
 
   return (
     <div>
-      {addNewMPPTModal && (
-        <Modal
-          isOpen={addNewMPPTModal}
-          close={() => setAddNewMPPTModal(false)}
-          title="Add New MPPT"
-          footer={
-            <div>
-              <Button
-                className="me-3"
-                onClick={() => setAddNewMPPTModal(false)}
-              >
-                <Button.Text text="Cancel" />
-              </Button>
-              <Button className="ms-3" type="submit" formId="addNewMPPT">
-                <Button.Text text="Save" />
-              </Button>
-            </div>
-          }
-        >
-          <div>
-            <FormInput
-              id="addNewMPPT"
-              initialValues={addNewMPPTInit}
-              validationSchema={addNewMPPTSchema}
-              onSubmit={(values) => {
-                addNewMPPT(values);
-                setAddNewMPPTModal(false);
-              }}
-            >
-              <div>
-                <FormInput.Text
-                  className={`d-inline-block ${
-                    pointList.length <= 0 && "w-100"
-                  }`}
-                  label="Number of MPPT"
-                  name="num_of_mppt"
-                  type="number"
-                  required={true}
-                />
-                {pointList.length > 0 && (
-                  <FormInput.Check
-                    className="d-inline-block ms-3"
-                    label="Clone from last MPPT"
-                    name="is_clone_from_last"
-                    checked={isClone}
-                    onChange={() => setIsClone(!isClone)}
-                  />
-                )}
-              </div>
-              {(!isClone || pointList.length <= 0) && (
-                <>
-                  <FormInput.Text
-                    label="Number of String per MPPT"
-                    name="num_of_string"
-                    type="number"
-                    required={true}
-                  />
-                  <FormInput.Text
-                    label="Number of Panel per String"
-                    name="num_of_panel"
-                    type="number"
-                    required={true}
-                  />
-                </>
-              )}
-            </FormInput>
-          </div>
-        </Modal>
+      {addNewControlGroupModal && (
+        <EditControlGroupModal
+          isOpen={addNewControlGroupModal}
+          close={() => setAddNewControlGroupModal(false)}
+          data={addNewControlGroupInit}
+          setPoint={() => setIsSetUp(true)}
+        />
       )}
       {confirmDelete && (
         <Modal
@@ -219,8 +159,8 @@ function MPPTList() {
       )}
       <div className="m-2">
         <div className="d-inline-block">
-          <Button onClick={() => setAddNewMPPTModal(true)}>
-            <Button.Text text="Add New MPPT" />
+          <Button onClick={() => setAddNewControlGroupModal(true)}>
+            <Button.Text text="Add New Control Group" />
           </Button>
         </div>
       </div>
@@ -240,16 +180,28 @@ function MPPTList() {
             }}
           />
 
-          {isModalOpen && (
-            <EditMPPTModal
-              isOpen={isModalOpen}
-              close={closeModal}
-              data={point}
-              setPoint={(newPoint) => {
-                updatePoint(newPoint);
-              }}
-            />
-          )}
+          {isModalOpen ? (
+            !_.isEqual(point?.config, POINT_CONFIG.CONTROL_GROUP) ? (
+              <EditPointModal
+                isOpen={isModalOpen}
+                close={closeModal}
+                data={point}
+                setPoint={(newPoint) => {
+                  updatePoint(newPoint);
+                }}
+              />
+            ) : (
+              <EditControlGroupModal
+                isOpen={isModalOpen}
+                close={closeModal}
+                data={point}
+                setPoint={(newPoint) => {
+                  updatePoint(newPoint);
+                }}
+                isEdit={true}
+              />
+            )
+          ) : null}
           {Object.keys(rowSelection).length > 0 && (
             <Button className="mt-3" onClick={() => setConfirmDelete(true)}>
               <Button.Text text="Delete Selected Points" />
@@ -260,5 +212,3 @@ function MPPTList() {
     </div>
   );
 }
-
-export default MPPTList;

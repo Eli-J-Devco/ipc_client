@@ -7,7 +7,6 @@ import DropDowns from './dropDowns/DropDowns';
 import Header from './headers/Header';
 import Pagination from './pagination/Pagination';
 import Constants from '../../utils/Constants';
-import { useState } from 'react';
 
 /**
  * Table component
@@ -15,11 +14,16 @@ import { useState } from 'react';
  * @param {string}    variant                 - style base on specific variant
  * @param {string}    className               - custom class
  * @param {string}    maxHeight               - set maxHeight inline style for table (exclude control bar) for each specific case
+ * ===============================================
  * @param {object[]}  columns                 - table columns definition
  * @param {number}    columns[].id            - column id
  * @param {string}    columns[].slug          - column slug
  * @param {string}    columns[].name          - oclumn name
  * @param {string}    columns[].width         - column width: optional, default value: 100px
+ * Or
+ * @param {object}    columns                 - table columns definition
+ * @param {object[]}  columns.columnDefs      - table columns definition, define by user with createColumnHelper
+ * ===============================================
  * @param {array}     data                    - fetching data
  * @param {boolean}   visible                 - enable hide/unhide columns
  * @param {boolean}   resizable               - enable resize columns
@@ -29,10 +33,31 @@ import { useState } from 'react';
  * @param {string}    pagination.total        - total records without limit and offset
  * @param {string}    pagination.setLimit     - get limit from table component
  * @param {string}    pagination.setOffset    - get offset from table component
+ * @param {object}    selectRow               - select row
+ * @param {boolean}   selectRow.enable        - enable select row on click  
+ * @param {object}    selectRow.rowSelection   - selected row
+ * @param {function}  selectRow.setRowSelection  - set selected row
  * @param {component} slugProps               - component that wrapping cell's value. when pass component in, prop's name is column's slug value
  */
 function Table({ control, variant, className, maxHeight, columns, data, visible, resizable, draggable, pagination, selectRow, ...slugProps }) {
-    const { table, isDropDownsShow, handleOpenDropDowns, dropDownsRef, handleOnChangePageSize } = useTable({ columns, data, statusFilter: pagination?.statusFilter, total: pagination?.total, offset: pagination?.offset, setLimit: pagination?.setLimit, setOffset: pagination?.setOffset, slugProps });
+    const {
+        table,
+        isDropDownsShow,
+        handleOpenDropDowns,
+        dropDownsRef,
+        handleOnChangePageSize
+    } = useTable({
+        columns,
+        data,
+        statusFilter: pagination?.statusFilter,
+        total: pagination?.total,
+        offset: pagination?.offset,
+        setLimit: pagination?.setLimit,
+        setOffset: pagination?.setOffset,
+        rowSelection: selectRow?.rowSelection,
+        setRowSelection: selectRow?.setRowSelection,
+        slugProps
+    });
     return (
         <div>
             <div className={`${styles["table-wrapper"]} ${className ? className : ""}`} style={{ maxHeight }}>
@@ -64,7 +89,7 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
                         {
                             data?.length > 0 ? table.getRowModel().rows.map(row => {
                                 let isSelected = false;
-                                if (selectRow && row?.original?.id === selectRow?.selectedRow?.id) {
+                                if (selectRow?.enable && row?.original?.id === selectRow?.rowSelection?.id) {
                                     isSelected = true;
                                 }
                                 return (
@@ -74,7 +99,7 @@ function Table({ control, variant, className, maxHeight, columns, data, visible,
                                             if (selectRow?.enable) {
                                                 row.toggleSelected(true);
                                                 setTimeout(() => {
-                                                    selectRow?.onSelect(row.original);
+                                                    selectRow?.setRowSelection(row.original);
                                                 }, 100);
                                             }
                                         }}

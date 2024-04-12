@@ -189,8 +189,8 @@ export default function PermissionsAndRoles() {
                 selectRow={
                   {
                     enable: true,
-                    selectedRow: selectedRole,
-                    onSelect: setSelectedRole
+                    rowSelection: selectedRole,
+                    setRowSelection: setSelectedRole
                   }
                 }
                 status={item => (
