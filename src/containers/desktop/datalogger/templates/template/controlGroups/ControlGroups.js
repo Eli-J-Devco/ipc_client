@@ -1,13 +1,15 @@
 import { useState } from "react";
 import Modal from "../../../../../../components/modal/Modal";
 import Button from "../../../../../../components/button/Button";
-import FormInput from "../../../../../../components/formInput/FormInput";
+import FormInput, { FormInputEnum } from "../../../../../../components/formInput/FormInput";
 import { POINT_CONFIG } from "../../../../../../utils/TemplateHelper";
 import Table from "../../../../../../components/table/Table";
 import useControlGroups from "./useControlGroups";
 import _ from "lodash";
 import EditPointModal from "./editPointModal/EditPointModal";
 import EditControlGroupModal from "./editControlGroupModal/EditControlGroupModal";
+import LibToast from "../../../../../../utils/LibToast";
+import AddPointModal from "./addPointModal/AddPointModal";
 
 export default function ControlGroups() {
   const {
@@ -19,17 +21,176 @@ export default function ControlGroups() {
     point,
     rowSelection,
     setRowSelection,
-    addNewControlGroup,
     removePoint,
     addNewControlGroupInit,
-    isClone,
     addChildrenModal,
     setAddChildrenModal,
     setIsSetUp,
   } = useControlGroups();
 
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState({});
   const [addNewControlGroupModal, setAddNewControlGroupModal] = useState(false);
+  const footer = {
+    yes: (onclick) => (
+      <Button
+        className="ms-3 me-3"
+        onClick={() => {
+          if (onclick) {
+            onclick();
+            return;
+          };
+
+          removePoint({
+            isGroupSelected: true,
+          });
+          setConfirmDelete({});
+        }}
+      >
+        <Button.Text text="Yes" />
+      </Button>
+    ),
+    no: (
+      <Button
+        className="ms-3"
+        onClick={() => setConfirmDelete({})}
+      >
+        <Button.Text text="No" />
+      </Button>
+    ),
+  }
+
+  const unselectedPoints = () => {
+    setTimeout(() => {
+      setRowSelection(...Object.entries(rowSelection).filter(([key, value]) => {
+        if (key?.split('.').length > 1) {
+          return false;
+        }
+        return true;
+      }).map(([key, value]) => {
+        return { [key]: value };
+      }));
+      LibToast.toast("Points unselected successfully", "info");
+
+      setConfirmDelete({
+        title: "Delete Control Group",
+        message: "Are you sure you want to delete the selected control group?",
+        footer: (
+          <>
+            {footer.no}
+            {footer.yes()}
+          </>
+        ),
+      });
+    }, 100);
+  };
+
+  const checkDelete = () => {
+    let groupSelected = Object.keys(rowSelection).reduce((acc, key) => {
+      let splitedKey = key.split('.');
+      if (splitedKey.length > 1) {
+        return {
+          ...acc,
+          ...(
+            acc[splitedKey[0]] ?
+              {
+                [splitedKey[0]]: [...(acc[splitedKey[0]] || []), key]
+              }
+              : {
+                [key]: []
+              }
+          ),
+        }
+      }
+
+      return {
+        ...acc,
+        [key]: [],
+      };
+    }, {});
+
+    let isGroupSelected = Object.keys(groupSelected).some((key) => groupSelected[key].length > 0);
+    let isChildrenSelected = Object.keys(groupSelected).some((key) => key.split('.').length > 1);
+
+    var removePoints = {};
+    if (isChildrenSelected) {
+      removePoints = {
+        title: "Remove Points",
+        message: "No group are selected. Are you sure you want to remove the selected points out of group?",
+        footer: (
+          <>
+            <Button className="ms-3" onClick={() => {
+              removePoint({
+                isChildrenSelected: true,
+                isDeletePoints: true,
+              });
+              setConfirmDelete({});
+            }}>
+              <Button.Text text="Delete points" />
+            </Button>
+            <Button className="ms-3" onClick={() => {
+              removePoint({
+                isChildrenSelected: true,
+              });
+              setConfirmDelete({});
+            }}>
+              <Button.Text text="Remove points only" />
+            </Button>
+          </>
+        ),
+      };
+    }
+
+    if (isGroupSelected) {
+      setConfirmDelete({
+        title: "Delete Control Group with Points",
+        message: "You have selected the points within control group. Do you want to remove them too?",
+        footer: (
+          <>
+            {footer.no}
+            {footer.yes()}
+            <Button className="ms-3 me-3" onClick={unselectedPoints}>
+              <Button.Text text="Unselected points" />
+            </Button>
+            {removePoints.footer}
+          </>
+        ),
+        size: "lg",
+      });
+      return;
+    }
+
+    setConfirmDelete({
+      title: removePoints.title || "Delete Control Group",
+      message: removePoints.message || "Are you sure you want to delete the selected control group?",
+      footer: (
+        <>
+          {
+            removePoints.footer ?
+              (
+                <>
+                  {footer.no}
+                  {removePoints.footer}
+                </>
+              ) : (
+                <>
+                  {footer.no}
+                  {footer.yes(() => {
+                    removePoint(
+                      {
+                        isGroupSelected: true,
+                        isGroupOnly: true,
+                      }
+                    )
+                    setConfirmDelete({});
+                  })}
+                </>
+              )
+          }
+        </>
+      ),
+      size: "md",
+    });
+  };
 
   return (
     <div>
@@ -41,122 +202,30 @@ export default function ControlGroups() {
           setPoint={() => setIsSetUp(true)}
         />
       )}
-      {confirmDelete && (
+      {Object.keys(confirmDelete).length > 0 && (
         <Modal
-          isOpen={confirmDelete}
-          close={() => setConfirmDelete(false)}
-          title="Delete Selected Points"
+          isOpen={confirmDelete || false}
+          close={() => setConfirmDelete({})}
+          title={confirmDelete.title || ""}
           footer={
-            <div>
-              <Button className="me-3" onClick={() => setConfirmDelete(false)}>
-                <Button.Text text="No" />
-              </Button>
-              <Button
-                className="ms-3"
-                onClick={() => {
-                  removePoint();
-                  setConfirmDelete(false);
-                }}
-              >
-                <Button.Text text="Yes" />
-              </Button>
-            </div>
+            confirmDelete.footer || footer
           }
+          size={confirmDelete.size || "md"}
         >
           <div>
-            <p>Are you sure you want to delete the selected points?</p>
+            <p>
+              {
+                confirmDelete.message ||
+                "Are you sure you want to delete the selected control group?"
+              }
+            </p>
           </div>
         </Modal>
       )}
-      {Object.values(addChildrenModal).filter((item) => item.isOpen === true)
-        .length > 0 && (
-        <>
-          {Object.keys(addChildrenModal).map((key, index) => {
-            let item = addChildrenModal[key];
-            return (
-              item.isOpen && (
-                <Modal
-                  key={index}
-                  isOpen={item.isOpen}
-                  close={() =>
-                    setAddChildrenModal({
-                      ...addChildrenModal,
-                      [key]: { ...item, isOpen: false },
-                    })
-                  }
-                  title={`Add ${key}`}
-                  footer={
-                    <div>
-                      <Button
-                        className="me-3"
-                        onClick={() =>
-                          setAddChildrenModal({
-                            ...addChildrenModal,
-                            [key]: { ...item, isOpen: false },
-                          })
-                        }
-                      >
-                        <Button.Text text="Cancel" />
-                      </Button>
-                      <Button className="ms-3" type="submit" formId={key}>
-                        <Button.Text text="Save" />
-                      </Button>
-                    </div>
-                  }
-                >
-                  <div>
-                    <FormInput
-                      id={key}
-                      initialValues={item.initialValues}
-                      validationSchema={item.validationSchema}
-                      onSubmit={(values) => {
-                        item.onSubmit({
-                          ...values,
-                          is_clone_from_last: isClone,
-                          id: item.id,
-                        });
-                        setAddChildrenModal({
-                          ...addChildrenModal,
-                          [key]: { ...item, isOpen: false },
-                        });
-                      }}
-                    >
-                      <div>
-                        {item.fields.map((field, index) => {
-                          return field.type !== "checkbox" ? (
-                            <FormInput.Text
-                              key={index}
-                              label={field.label}
-                              name={field.name}
-                              type={field.type}
-                              required={field.required}
-                              isHidden={
-                                isClone &&
-                                key === POINT_CONFIG.STRING.name &&
-                                field.name === "num_of_panel"
-                              }
-                            />
-                          ) : (
-                            item.has_children > 0 && (
-                              <FormInput.Check
-                                key={index}
-                                label={field.label}
-                                name={field.name}
-                                checked={isClone}
-                                onChange={field.onChange}
-                              />
-                            )
-                          );
-                        })}
-                      </div>
-                    </FormInput>
-                  </div>
-                </Modal>
-              )
-            );
-          })}
-        </>
-      )}
+      <AddPointModal
+        addChildrenModal={addChildrenModal}
+        setAddChildrenModal={setAddChildrenModal}
+      />
       <div className="m-2">
         <div className="d-inline-block">
           <Button onClick={() => setAddNewControlGroupModal(true)}>
@@ -203,7 +272,7 @@ export default function ControlGroups() {
             )
           ) : null}
           {Object.keys(rowSelection).length > 0 && (
-            <Button className="mt-3" onClick={() => setConfirmDelete(true)}>
+            <Button className="mt-3" onClick={() => checkDelete()}>
               <Button.Text text="Delete Selected Points" />
             </Button>
           )}

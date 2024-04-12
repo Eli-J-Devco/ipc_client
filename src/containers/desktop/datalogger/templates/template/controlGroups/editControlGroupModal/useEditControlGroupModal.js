@@ -24,7 +24,11 @@ function useEditControlGroupModal(
   const axiosPrivate = useAxiosPrivate();
   const { id } = useTemplate();
   const navigate = useNavigate();
-  const { defaultPointList, setDefaultPointList, setDefaultControlGroupList } =
+  const {
+    defaultPointList,
+    setDefaultPointList,
+    setDefaultControlGroupList
+  } =
     useTemplate();
 
   const [pointList, setPointList] = useState([]);
@@ -39,6 +43,9 @@ function useEditControlGroupModal(
     { label: 1, value: 1 },
     { label: 2, value: 2 },
   ]);
+  const [isClone, setIsClone] = useState(false);
+  const [refreshTable, setRefreshTable] = useState(false);
+
   const validationSchema = yup.object({
     name: yup.string().required("Required"),
     attributes: yup.number().required("Required"),
@@ -62,6 +69,7 @@ function useEditControlGroupModal(
             label: "Point#",
             checked: table.getIsAllRowsSelected(),
             onChange: (e) => table.toggleAllRowsSelected(e.target.checked),
+            disabled: selectedAttributes.value !== 0 && Object.keys(rowSelection).length >= selectedAttributes.value + 1,
           }}
         />
       ),
@@ -75,6 +83,7 @@ function useEditControlGroupModal(
               checked: row.getIsSelected(),
               onChange: row.getToggleSelectedHandler(),
               indeterminate: row.getIsSomeSelected(),
+              disabled: selectedAttributes.value !== 0 && Object.keys(rowSelection).length >= selectedAttributes.value + 1 && !row.getIsSelected(),
             }}
           />
         );
@@ -114,17 +123,25 @@ function useEditControlGroupModal(
   }, [defaultPointList, isSetUp]);
 
   const onSubmit = (values) => {
+    if (isClone && Object.keys(rowSelection).length === 0) {
+      LibToast.toast("Please select at least one point", "error");
+      return;
+    }
+
     let group = {
       ...(isEdit
-        ? values
+        ? {
+          ...values,
+          attributes: selectedAttributes.value,
+        }
         : {
-            id_template: id,
-            control_group: {
-              ...values,
-              attributes: selectedAttributes.value,
-              children: Object.keys(rowSelection).map((key) => pointList[key]),
-            },
-          }),
+          id_template: id,
+          control_group: {
+            ...values,
+            attributes: selectedAttributes.value,
+            children: Object.keys(rowSelection).map((key) => pointList[key]),
+          },
+        }),
     };
     let url = isEdit
       ? Constants.API_URL.TEMPLATE.CONTROL_GROUP.UPDATE
@@ -154,12 +171,12 @@ function useEditControlGroupModal(
               setCurrentData({
                 ...new RowAdapter({ ...response.data }).getRow(),
               });
-              LibToast.toast("Point updated successfully", "info");
+              LibToast.toast("Control Group successfully", "info");
             } else {
-              setDefaultControlGroupList(response?.data?.control_group_list);
-              setDefaultPointList(response?.data?.point_list);
+              setDefaultControlGroupList(response.data?.control_group_list);
+              setDefaultPointList(response.data?.point_list);
               setPoint();
-              LibToast.toast("Point created successfully", "info");
+              LibToast.toast("Control Group created successfully", "info");
             }
           }, 100);
           close();
@@ -179,6 +196,30 @@ function useEditControlGroupModal(
     }, 500);
   };
 
+  const onRefreshTable = (reason) => {
+    if (reason === "onSelectAttribute" && Object.keys(rowSelection).length >= 0) {
+      setRowSelection({});
+    }
+
+    setRefreshTable(true);
+
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    setTimeout(() => {
+      setRefreshTable(false);
+      output.innerHTML = "";
+    }, 300);
+  }
+
+  useEffect(() => {
+    if (selectedAttributes.value === 0) return;
+
+    onRefreshTable("onSelectPoint");
+  }, [rowSelection]);
+
+  useEffect(() => {
+    onRefreshTable("onSelectAttribute");
+  }, [selectedAttributes]);
+
   return {
     initialValues,
     validationSchema,
@@ -190,6 +231,9 @@ function useEditControlGroupModal(
     setSelectedAttributes,
     defaultAttributes,
     setRowSelection,
+    isClone,
+    setIsClone,
+    refreshTable,
   };
 }
 

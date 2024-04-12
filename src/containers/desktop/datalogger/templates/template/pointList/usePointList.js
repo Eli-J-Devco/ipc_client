@@ -213,19 +213,6 @@ function usePointList() {
           setIsSetUp(true);
         }
       } catch (error) {
-        if (error.response?.status === 404) {
-          setTimeout(() => {
-            let newPoints = defaultPointList.filter(
-              (item) => !rowSelection[item.index]
-            );
-            setDefaultPointList([...newPoints]);
-            setRowSelection({});
-            setIsSetUp(true);
-            LibToast.toast("Delete points success", "info");
-          }, 100);
-          return;
-        }
-
         let msg = loginService.handleMissingInfo(error);
         if (typeof msg === "string") {
           LibToast.toast(msg, "error");

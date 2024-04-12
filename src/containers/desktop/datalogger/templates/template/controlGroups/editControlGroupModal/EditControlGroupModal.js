@@ -10,7 +10,6 @@ import Table from "../../../../../../../components/table/Table";
 
 function EditControlGroupModal({ isOpen, close, data, setPoint, isEdit }) {
   const [currentData, setCurrentData] = useState(data);
-  const [isClone, setIsClone] = useState(false);
 
   const {
     initialValues,
@@ -23,6 +22,9 @@ function EditControlGroupModal({ isOpen, close, data, setPoint, isEdit }) {
     selectedAttributes,
     setSelectedAttributes,
     setRowSelection,
+    isClone,
+    setIsClone,
+    refreshTable,
   } = useEditControlGroupModal(
     currentData,
     close,
@@ -119,18 +121,21 @@ function EditControlGroupModal({ isOpen, close, data, setPoint, isEdit }) {
                 <li>2: 3 points</li>
               </ul>
             </div>
-            <Table
-              className="mt-3"
-              visible
-              maxHeight="calc(100vh - 550px)"
-              columns={{ columnDefs: columns }}
-              data={pointList}
-              selectRow={{
-                enable: false,
-                rowSelection: rowSelection,
-                setRowSelection: setRowSelection,
-              }}
-            />
+            {
+              !refreshTable &&
+              <Table
+                className="mt-3"
+                visible
+                maxHeight="calc(100vh - 700px)"
+                columns={{ columnDefs: columns }}
+                data={pointList}
+                selectRow={{
+                  enable: false,
+                  rowSelection: rowSelection,
+                  setRowSelection: setRowSelection,
+                }}
+              />
+            }
           </div>
         )}
       </div>

@@ -89,6 +89,7 @@ const Constants = {
         UPDATE_ALL: "/template/point/edit/all/",
         DELETE: "/template/point/delete_multiple/",
         DELETE_MPPT: "/template/mppt/delete_multiple/",
+        REMOVE_GROUP: "/template/point/remove_group/",
         ADD_MPPT: "/template/mppt/create/",
         ADD_POINT: "/template/point/create/",
         ADD_CHILDREN: "/template/mppt/create/children/",

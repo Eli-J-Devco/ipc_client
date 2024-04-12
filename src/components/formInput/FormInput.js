@@ -1,5 +1,5 @@
 import Form from 'react-bootstrap/Form';
-import ReactSelect from 'react-select';
+import ReactSelect, { components } from 'react-select';
 import useValidate from './useValidate';
 import { createContext, forwardRef, useContext, useEffect, useRef, useState } from 'react';
 import styles from "./FormInput.module.scss";
@@ -292,5 +292,24 @@ function File({ className, name, value, disabled, readOnly, accept, onChange }) 
     );
 }
 FormInput.File = File;
+
+export const FormInputEnum = {
+    Text: {
+        component: (props) => <FormInput.Text {...props} />,
+        type: "Text"
+    },
+    Check: {
+        component: (props) => <FormInput.Check {...props} />,
+        type: "Check"
+    },
+    Select: {
+        component: (props) => <FormInput.Select {...props} />,
+        type: "Select"
+    },
+    File: {
+        component: (props) => <FormInput.File {...props} />,
+        type: "File"
+    },
+};
 
 export default FormInput;
