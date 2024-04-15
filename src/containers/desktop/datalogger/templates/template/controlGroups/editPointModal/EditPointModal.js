@@ -128,7 +128,7 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
             <div className="col-4"></div>
 
             <div className="col-4 align-self-end">
-              <FormInput.Check name="check_name" label="allow per-meter edit" />
+              <FormInput.Check name="nameedit" label="allow per-meter edit" />
             </div>
           </div>
 
@@ -159,7 +159,7 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
             <div className="col-4 align-self-end">
               {!_.isEqual(currentData?.type_point, type_point[2]) && (
                 <FormInput.Check
-                  name="check_unit"
+                  name="unitsedit"
                   label="allow per-meter edit"
                 />
               )}
@@ -253,7 +253,7 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
                 </div>
 
                 <div className="col-4 align-self-end">
-                  <FormInput.Check name="check_invalid" label="enabled" />
+                  <FormInput.Check name="invalidvalueenabled" label="enabled" />
                 </div>
               </div>
             </>
@@ -278,7 +278,7 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
                 </div>
 
                 <div className="col-4 align-self-end">
-                  <FormInput.Check name="check_slope" label="enabled" />
+                  <FormInput.Check name="slopeenabled" label="enabled" />
                 </div>
               </div>
 
@@ -292,7 +292,7 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
                 </div>
 
                 <div className="col-4 align-self-end">
-                  <FormInput.Check name="check_offset" label="enabled" />
+                  <FormInput.Check name="offsetenabled" label="enabled" />
                 </div>
               </div>
             </>
@@ -310,7 +310,7 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
                 </div>
 
                 <div className="col-4 align-self-end">
-                  <FormInput.Check name="check_multreg" label="enabled" />
+                  <FormInput.Check name="multregenabled" label="enabled" />
                 </div>
               </div>
             )}

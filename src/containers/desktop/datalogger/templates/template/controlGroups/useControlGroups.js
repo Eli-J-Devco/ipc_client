@@ -190,6 +190,7 @@ export default function useControlGroups() {
             if (isFound) return p;
 
             if (p.id === newPoint.id) {
+              isFound = true;
               return newPoint;
             }
 

@@ -7,16 +7,26 @@ import { createColumnHelper } from "@tanstack/react-table";
 import useEditControlGroupModal from "../editControlGroupModal/useEditControlGroupModal";
 import { POINT_CONFIG } from "../../../../../../../utils/TemplateHelper";
 
+const ADD_POINT_ACTION = {
+    ADD_NEW: 0,
+    CHOOSE_FROM_EXISTED: 1,
+};
+
+const ADD_POINT_EVENT = {
+    CLEAN_UP: "onCleanUp",
+    ROW_SELECTION: "onRowSelection",
+};
+
 export default function AddPointModal({ addChildrenModal, setAddChildrenModal }) {
     const { pointList } = useEditControlGroupModal();
     const [addTypes,] = useState([
         {
             label: "Add New",
-            value: 0,
+            value: ADD_POINT_ACTION.ADD_NEW,
         },
         {
             label: "Choose from existed",
-            value: 1,
+            value: ADD_POINT_ACTION.CHOOSE_FROM_EXISTED,
         },
     ]);
 
@@ -67,8 +77,7 @@ export default function AddPointModal({ addChildrenModal, setAddChildrenModal })
         }),
     ];
     const onRefreshTable = (reason) => {
-
-        if (reason === "onCleanUp" && Object.keys(rowSelection).length >= 0) {
+        if (reason === ADD_POINT_EVENT.CLEAN_UP && Object.keys(rowSelection).length >= 0) {
             setRowSelection({});
             return;
         }
@@ -84,14 +93,15 @@ export default function AddPointModal({ addChildrenModal, setAddChildrenModal })
     useEffect(() => {
         if (!(typeof addChildrenModal[POINT_CONFIG.CONTROL_GROUP.name].remainingSlots === "number") || selectedAddType.value === 0) return;
 
-        onRefreshTable("onRowSelection");
+        onRefreshTable(ADD_POINT_EVENT.ROW_SELECTION);
     }, [rowSelection]);
 
     useEffect(() => {
         setSelectedAddType(addTypes[0]);
         setIsClone(false);
-        onRefreshTable("onCleanUp");
+        onRefreshTable(ADD_POINT_EVENT.CLEAN_UP);
     }, [addChildrenModal]);
+
     return (
         <>
             {Object.values(addChildrenModal).filter((item) => item.isOpen === true)

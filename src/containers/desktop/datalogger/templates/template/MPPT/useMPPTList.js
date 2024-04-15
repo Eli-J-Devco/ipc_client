@@ -56,12 +56,12 @@ function useMPPTList() {
         ...(isClone
           ? {}
           : {
-              num_of_panel: yup
-                .number()
-                .required("Required")
-                .min(0, "Minimum 0 panel")
-                .max(10, "Maximum 10 panels per string"),
-            }),
+            num_of_panel: yup
+              .number()
+              .required("Required")
+              .min(0, "Minimum 0 panel")
+              .max(10, "Maximum 10 panels per string"),
+          }),
       }),
       fields: [
         {
@@ -140,17 +140,17 @@ function useMPPTList() {
       .max(10, "Maximum 10 MPPT"),
     ...(!isClone
       ? {
-          num_of_string: yup
-            .number()
-            .required("Required")
-            .min(0, "Minimum 0 string")
-            .max(10, "Maximum 10 strings per MPPT"),
-          num_of_panel: yup
-            .number()
-            .required("Required")
-            .min(0, "Minimum 0 panel")
-            .max(10, "Maximum 10 panels per string"),
-        }
+        num_of_string: yup
+          .number()
+          .required("Required")
+          .min(0, "Minimum 0 string")
+          .max(10, "Maximum 10 strings per MPPT"),
+        num_of_panel: yup
+          .number()
+          .required("Required")
+          .min(0, "Minimum 0 panel")
+          .max(10, "Maximum 10 panels per string"),
+      }
       : {}),
   });
 
@@ -184,13 +184,13 @@ function useMPPTList() {
                   {
                     ...string,
                     ...(string?.id_config_information ===
-                    POINT_CONFIG.STRING.value
+                      POINT_CONFIG.STRING.value
                       ? {
-                          config: POINT_CONFIG.PANEL,
-                        }
+                        config: POINT_CONFIG.PANEL,
+                      }
                       : {
-                          config: "",
-                        }),
+                        config: "",
+                      }),
                   },
                   sindex
                 ).getRow(),
@@ -354,7 +354,7 @@ function useMPPTList() {
             <Button.Image
               image={
                 table.getIsAllRowsExpanded() ||
-                table.getIsSomeRowsExpanded() ? (
+                  table.getIsSomeRowsExpanded() ? (
                   <CollapseIcon />
                 ) : (
                   <ExpandIcon />
@@ -412,6 +412,11 @@ function useMPPTList() {
       id: "name",
       header: "Name",
       size: 200,
+      cell: ({ row }) => (
+        <div style={{ paddingLeft: `${row.depth * 2}rem` }}>
+          {row.original?.name}
+        </div>
+      )
     }),
     columnsHelper.accessor("unit", {
       id: "unit",
