@@ -13,10 +13,17 @@ import useAuth from '../../../hooks/useAuth';
 import { loginService } from '../../../services/loginService';
 
 import Constants from '../../../utils/Constants';
-import LibToast from '../../../utils/LibToast';
 
 const ProjectSetupInformation = () => {
-    const { projectSetup, setProjectSetup } = useProjectSetup();
+    const {
+        projectSetup,
+        setProjectSetup,
+        setEthernetConfig,
+        setRS485Config,
+        setLoggingIntervalConfig,
+        setUploadChanelConfig,
+        setScreenList
+    } = useProjectSetup();
     const { auth, setAuth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
@@ -35,10 +42,67 @@ const ProjectSetupInformation = () => {
                 const response = await axiosPrivate.post(Constants.API_URL.PROJECT.PROJECT_INFO);
                 setProjectSetup(response.data);
             } catch (error) {
-                if (!loginService.handleMissingInfo(error)) {
-                    LibToast.toast("Error fetching project setup", "error");
-                }
-                else navigate("/", { replace: true });
+                loginService.handleMissingInfo(error, "Failed to fetch project setup information") && navigate("/", { replace: true });
+            } finally {
+            }
+        }, 300);
+    }, []);
+
+    useEffect(() => {
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.ETHERNET.IFCONFIG);
+                setEthernetConfig(response.data);
+            } catch (error) {
+                loginService.handleMissingInfo(error, "Failed to fetch ethernet configuration") && navigate("/", { replace: true });
+            } finally {
+            }
+        }, 300);
+    }, []);
+
+    useEffect(() => {
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.RS485.CONFIG);
+                setRS485Config(response.data);
+            } catch (error) {
+                loginService.handleMissingInfo(error, "Failed to fetch RS485 configuration") && navigate("/", { replace: true });
+            } finally {
+            }
+        }, 300);
+    }, []);
+
+    useEffect(() => {
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.PROJECT.LOGGING_RATE);
+                setLoggingIntervalConfig(response.data);
+            } catch (error) {
+                loginService.handleMissingInfo(error, "Failed to fetch logging interval configuration") && navigate("/", { replace: true });
+            } finally {
+            }
+        }, 300);
+    }, []);
+
+    useEffect(() => {
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.CONFIG);
+                setUploadChanelConfig(response.data);
+            } catch (error) {
+                loginService.handleMissingInfo(error, "Failed to fetch upload channel configuration") && navigate("/", { replace: true });
+            } finally {
+            }
+        }, 300);
+    }, []);
+
+    useEffect(() => {
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.PROJECT.SCREENS);
+                setScreenList(response.data);
+            } catch (error) {
+                loginService.handleMissingInfo(error, "Failed to fetch screen list") && navigate("/", { replace: true });
             } finally {
             }
         }, 300);

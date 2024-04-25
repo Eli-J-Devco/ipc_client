@@ -17,7 +17,8 @@ switch (url) {
     break;
   default:
     // serverAPI = "http://115.78.133.129:3001";
-    serverAPI = "http://127.0.0.1:3001";
+    // serverAPI = "http://127.0.0.1:3001";
+    serverAPI = "http://localhost:8000";
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -38,28 +39,36 @@ const Constants = {
 
   API_URL: {
     AUTH: {
-      LOGIN: "/login/",
-      REFRESH: "/refresh_token/",
-      LOGOUT: "/logout/",
+      LOGIN: "/authentication/login/",
+      REFRESH: "/authentication/refresh/",
+      LOGOUT: "/authentication/logout/",
     },
-    SITE: {
-      SITE_INFO: "/site_information/?id=",
-      SITE_UPDATE: "/site_information/update/?id=",
-    },
+    // SITE: {
+    //   SITE_INFO: "/site_information/?id=",
+    //   SITE_UPDATE: "/site_information/update/?id=",
+    // },
     ETHERNET: {
-      ETHERNET_INFO: "/ethernet/?id=",
-      ETHERNET_UPDATE: "/ethernet/update/?id=",
+      ETHERNET_INFO: "/ethernet/get/",
+      ETHERNET_UPDATE: "/ethernet/update/",
       IFCONFIG: "/ethernet/ifconfig/",
     },
     RS485: {
-      RS485_INFO: "/rs485/?id=",
-      RS485_UPDATE: "/rs485/update/?id=",
+      GET: "/rs485/get/",
+      UPDATE: "/rs485/update/",
+      CONFIG: "/rs485/config/",
+      SERIAL_PORT: "/rs485/serial_ports/",
     },
     PROJECT: {
-      PROJECT_INFO: "/project/",
-      LOGGING_RATE: "/project/logging_interval/",
-      UPDATE_LOGGING_RATE: "/project/update_logging_rate/",
-      UPDATE_FIRST_PAGE: "/project/update_first_page_login/",
+      PROJECT_INFO: "/project_setup/",
+      PROJECT_UPDATE: "/project_setup/update/",
+      LOGGING_RATE: "/project_setup/logging_interval/get/",
+      UPDATE_LOGGING_RATE: "/project_setup/logging_interval/update/",
+      FIRST_PAGE_ON_LOGIN: "/project_setup/first_page_on_login/get/",
+      UPDATE_FIRST_PAGE_ON_LOGIN: "/project_setup/first_page_on_login/update/",
+      REMOTE_ACCESS: "/project_setup/remote_access/get/",
+      UPDATE_REMOTE_ACCESS: "/project_setup/remote_access/update/",
+      UPDATE_SEARCH_RTU: "/project_setup/update_search_rtu/",
+      SCREENS: "/project_setup/screen/get/",
     },
     DEVICES: {
       LIST: "/device_list/all/",
@@ -75,6 +84,12 @@ const Constants = {
       DELETE: "/device_group/delete_group/",
       GET_TYPE: "/device_group/get_type/",
     },
+    POINT: {
+      LIST: "/point/get/",
+      ADD: "/point/add/",
+      UPDATE: "/point/update/",
+      DELETE: "/point/delete/",
+    },
     TEMPLATE: {
       CREATE: "/template/create/",
       DELETE: "/template/delete/",
@@ -84,16 +99,7 @@ const Constants = {
       GET_ONE: "/template/get/",
       CONFIG: "/template/config/",
       GET_MPTT: "/template/mppt/get/template/",
-      POINT: {
-        UPDATE: "/template/point/edit/",
-        UPDATE_ALL: "/template/point/edit/all/",
-        DELETE: "/template/point/delete_multiple/",
-        DELETE_MPPT: "/template/mppt/delete_multiple/",
-        REMOVE_GROUP: "/template/point/remove_group/",
-        ADD_MPPT: "/template/mppt/create/",
-        ADD_POINT: "/template/point/create/",
-        ADD_CHILDREN: "/template/mppt/create/children/",
-      },
+
       REGISTER: {
         CREATE: "/template/register/create/",
         DELETE: "/template/register/delete_multiple/",
@@ -106,9 +112,20 @@ const Constants = {
       },
     },
     UPLOAD_CHANNEL: {
-      ALL_CHANNELS: "/upload_channel/all_channel/",
-      UPDATE_CHANNEL: "/upload_channel/update/",
-      CONFIG_CHANNEL: "/upload_channel/config/",
+      GET: "/upload_channel/get/",
+      UPDATE: "/upload_channel/update/",
+      CONFIG: "/upload_channel/config/",
+    },
+    ROLE: {
+      GET_ONE: "/role/get/",
+      LIST: "/role/get/all/",
+      ADD: "/role/add/",
+      UPDATE: "/role/update/",
+      DELETE: "/role/delete/",
+      ACTIVATE: "/role/activate/",
+      DEACTIVATE: "/role/deactivate/",
+      PERMISSION: "/role/permission/get/",
+      UPDATE_PERMISSION: "/role/permission/update/",
     },
     USERS: {
       LIST: "/users/all_user/",

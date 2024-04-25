@@ -18,7 +18,7 @@ function EthernetOne() {
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
         setTimeout(async () => {
             ethernet.setId(1);
-            await ethernet.fetchEthernetOne(1);
+            await ethernet.fetchEthernet(1);
             output.innerHTML = "";
         }, 500);
     }, []);

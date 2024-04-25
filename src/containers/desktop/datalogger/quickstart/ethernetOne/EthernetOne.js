@@ -25,7 +25,7 @@ function EthernetOne() {
       ethernet.setId(1);
       ethernet.setFrom(from);
       ethernet.setTo(to);
-      await ethernet.fetchEthernetOne(1);
+      await ethernet.fetchEthernet(1);
       output.innerHTML = "";
     }, 500);
   }, []);

@@ -25,7 +25,7 @@ function EthernetTwo() {
       ethernet.setId(2);
       ethernet.setFrom(from);
       ethernet.setTo(to);
-      await ethernet.fetchEthernetOne(2);
+      await ethernet.fetchEthernet(2);
       output.innerHTML = "";
     }, 500);
   }, []);

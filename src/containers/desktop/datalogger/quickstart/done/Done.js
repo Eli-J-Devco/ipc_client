@@ -25,7 +25,11 @@ function Done() {
     const [selectedDone, setSelectedDone] = useState();
     const [link, setLink] = useState([]);
     const existedLink = useRef();
-    const { projectSetup, setProjectSetup } = useProjectSetup();
+    const {
+        projectSetup,
+        setProjectSetup,
+        screenList
+    } = useProjectSetup();
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -38,19 +42,18 @@ function Done() {
          * @author: nhan.tran 2024-03-07
          * @returns {Promise<void>}
          */
-        if (_.isEmpty(projectSetup)) return;
+        if (_.isEmpty(projectSetup) || !screenList?.length) return;
 
         var output = document.getElementById("progress");
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
         setTimeout(() => {
-            var screens = projectSetup?.screen_list;
-            setLink(screens.map((item) => ({ value: { id: item.id, path: item.path }, label: item.screen_name })));
-            var existed = screens.filter((item) => item.id === projectSetup?.id_first_page_on_login)[0];
+            setLink(screenList.map((item) => ({ value: { id: item.id, path: item.path }, label: item.screen_name })));
+            var existed = screenList.filter((item) => item.id === projectSetup?.id_first_page_on_login)[0];
             setSelectedDone({ value: { id: existed.id, path: existed.path }, label: existed.screen_name });
             existedLink.current = { value: { id: existed.id, path: existed.path }, label: existed.screen_name };
             output.innerHTML = "";
         }, 100);
-    }, [projectSetup]);
+    }, [projectSetup, screenList]);
 
     /**
      * Handle dropdown change
@@ -73,6 +76,7 @@ function Done() {
             return;
         }
         const data = {
+            id: projectSetup?.id,
             id_first_page_on_login: selectedDone.value.id
         }
 
@@ -80,7 +84,7 @@ function Done() {
             try {
                 var output = document.getElementById("progress");
                 output.innerHTML = "<div><img src='/loading.gif' /></div>";
-                const response = await axiosPrivate.post(Constants.API_URL.PROJECT.UPDATE_FIRST_PAGE, data,
+                const response = await axiosPrivate.post(Constants.API_URL.PROJECT.UPDATE_FIRST_PAGE_ON_LOGIN, data,
                     { headers: { "Content-Type": "application/json" } }
                 );
                 if (response.status === 200) {

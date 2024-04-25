@@ -40,10 +40,10 @@ function Rs485Template({ id, isBack, from, to, selectedDropdown, selectedOption,
                                         className="ethernet"
                                         inputId="rs485_baud_rate"
                                         inputName="rs485_baud_rate"
-                                        optionList={options.baud}
+                                        optionList={options.baud_rates}
                                         name="rs485_baud_rate"
-                                        value={selectedOption.baud}
-                                        onChange={(value) => handleDropdownChange(value, "baud")}
+                                        value={selectedOption.baud_rates}
+                                        onChange={(value) => handleDropdownChange(value, "baud_rates")}
                                     />
                                 </div>
                             </div>
@@ -54,10 +54,10 @@ function Rs485Template({ id, isBack, from, to, selectedDropdown, selectedOption,
                                         className="rs485_parity"
                                         inputId="rs485_parity"
                                         inputName="rs485_parity"
-                                        optionList={options.parity}
+                                        optionList={options.parities}
                                         name="rs485_parity"
-                                        value={selectedOption.parity}
-                                        onChange={(value) => handleDropdownChange(value, "parity")}
+                                        value={selectedOption.parities}
+                                        onChange={(value) => handleDropdownChange(value, "parities")}
                                     />
                                 </div>
                             </div>
@@ -87,9 +87,9 @@ function Rs485Template({ id, isBack, from, to, selectedDropdown, selectedOption,
                                         inputId="rs485_modbus"
                                         inputName="rs485_modbus"
                                         name="rs485_modbus"
-                                        value={selectedOption.timeout}
-                                        onChange={(value) => handleDropdownChange(value, "timeout")}
-                                        optionList={options.timeout}
+                                        value={selectedOption.timeouts}
+                                        onChange={(value) => handleDropdownChange(value, "timeouts")}
+                                        optionList={options.timeouts}
 
                                     />
                                 </div>
@@ -103,9 +103,9 @@ function Rs485Template({ id, isBack, from, to, selectedDropdown, selectedOption,
                                         inputId="rs485_debug"
                                         inputName="rs485_debug"
                                         name="rs485_debug"
-                                        value={selectedOption.debuglevel}
-                                        onChange={(value) => handleDropdownChange(value, "debuglevel")}
-                                        optionList={options.debuglevel}
+                                        value={selectedOption.debug_levels}
+                                        onChange={(value) => handleDropdownChange(value, "debug_levels")}
+                                        optionList={options.debug_levels}
 
                                     />
                                 </div>

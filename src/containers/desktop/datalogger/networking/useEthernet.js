@@ -3,7 +3,7 @@
 * All rights reserved.
 * 
 *********************************************************/
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import _ from "lodash";
@@ -14,11 +14,13 @@ import { loginService } from "../../../../services/loginService";
 import Constants from "../../../../utils/Constants";
 import LibToast from "../../../../utils/LibToast";
 import canEdit from "../../../../utils/DisabledStateByIPMode";
+import useProjectSetup from "../../../../hooks/useProjectSetup";
 
 export default function useEthernet() {
     const { t } = useTranslation();
     const axiosPrivate = useAxiosPrivate();
 
+    const { ethernetConfig } = useProjectSetup();
     const [NICOptions, setNICOptions] = useState([]);
     const [NICInfo, setNICInfo] = useState(null);
     const [selectedNIC, setSelectedNIC] = useState(null);
@@ -42,43 +44,48 @@ export default function useEthernet() {
     const back = (from) => navigate(from);
     const save = (to) => navigate(to);
 
+    useEffect(() => {
+        if (ethernetConfig?.network?.length === 0) return;
+        /**
+         * Get default ethernet config
+         * @return {Object}
+         */
+
+        setEthernet(ethernetConfig.network);
+        setNICOptions(ethernetConfig.network.map((item) => ({ value: item.namekey, label: item.namekey })));
+        setModeOptions(ethernetConfig.mode.map((item) => ({ value: item.id, label: t(`site.t_mode.${[item.name]}`) ? t(`site.t_mode.${[item.name]}`) : item.name })));
+    }, [ethernetConfig])
+
     /**
      * Fetch ethernet one data
      * @param {Int16Array} id 
      */
-    const fetchEthernetOne = async (id) => {
+    const fetchEthernet = async (id) => {
         try {
-            /**
-             * Get default ethernet config
-             * @return {Object}
-             */
-
-            const ifconfig = await axiosPrivate.post(`${Constants.API_URL.ETHERNET.IFCONFIG}`);
-
-            setEthernet(ifconfig.data.network);
-            setNICOptions(ifconfig.data.network.map((item) => ({ value: item.namekey, label: item.namekey })));
-            setModeOptions(ifconfig.data.mode.map((item) => ({ value: item.id, label: t(`site.t_mode.${[item.name]}`) ? t(`site.t_mode.${[item.name]}`) : item.name })));
-
             /**
              * Get ethernet info by id
              * @param {Int16Array} id
              * @return {Object} existed ethernet info
              */
-            var ethernet1 = await axiosPrivate.post(`${Constants.API_URL.ETHERNET.ETHERNET_INFO}${id}`);
-            ifconfig.data.network.forEach((item) => {
-                if (item.namekey === ethernet1.data.namekey && item.ip_address === "") {
+            var ethernet = await axiosPrivate.post(`${Constants.API_URL.ETHERNET.ETHERNET_INFO}`, { id: id });
+            ethernetConfig.network.forEach((item) => {
+                if (item.namekey === ethernet.data.namekey && item.ip_address === "") {
                     setIsPlugged(false);
                 }
             });
 
-            setNICInfo(ethernet1.data);
-            setSelectedNIC({ value: ethernet1.data.namekey, label: ethernet1.data.namekey });
-            existedEthernet.current = ethernet1.data;
-            setIsAutoDNS(ethernet1.data.allow_dns);
-            setModeInfo({ value: ethernet1.data.id_type_ethernet, label: t(`site.t_mode.${ethernet1.data.type_ethernet.name}`) ? t(`site.t_mode.${ethernet1.data.type_ethernet.name}`) : ethernet1.data.type_ethernet.name });
+            setNICInfo(ethernet.data);
+            setSelectedNIC({ value: ethernet.data.namekey, label: ethernet.data.namekey });
+            existedEthernet.current = ethernet.data;
+            setIsAutoDNS(ethernet.data.allow_dns);
+            setModeInfo({
+                value: ethernet.data.id_type_ethernet,
+                label: t(`site.t_mode.${ethernetConfig.mode.filter(item => item.id === ethernet.data.id_type_ethernet)[0].name}`) ?
+                    t(`site.t_mode.${ethernetConfig.mode.filter(item => item.id === ethernet.data.id_type_ethernet)[0].name}`) :
+                    ethernetConfig.mode.filter(item => item.id === ethernet.data.id_type_ethernet)[0].name
+            });
 
-            delete ethernet1.data.id;
-            delete ethernet1.data.type_ethernet;
+            delete ethernet.data.id;
         } catch (error) {
             if (!loginService.handleMissingInfo(error))
                 LibToast.toast(t("toastMessage.error.fetch"), "error");
@@ -164,7 +171,7 @@ export default function useEthernet() {
         setDropdownOption,
         options,
         selectedOption,
-        fetchEthernetOne,
+        fetchEthernet,
         onSubmit,
         back,
         save,

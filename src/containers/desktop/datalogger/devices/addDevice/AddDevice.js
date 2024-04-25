@@ -200,37 +200,10 @@ export default function AddDevice(props) {
     initialValues?.id_template ? setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.GET_MPTT, { id_template: initialValues?.id_template?.value?.id_template });
-        if (response.data.length === 0) return;
-        setMaxMppt(response.data.mppt.length);
-        setInitialValues({ ...initialValues, mptt_count: response.data.mppt.length })
-        let data = response.data.mppt.map(item => {
-          return {
-            ...item,
-            status: 1,
-            subRows: item.string,
-            name: item.name + " (" + item.string.length + " strings)",
-          }
-        });
-        data = data.map(item => {
-          return {
-            ...item,
-            subRows: item.subRows.map(item => {
-              return {
-                ...item,
-                status: 1,
-                subRows: item.panel.map(item => {
-                  return {
-                    ...item,
-                    status: 1,
-                  }
-                }),
-                name: item.name + " (" + item.panel.length + " panels)",
-              }
-            })
-          }
-        });
-
-        setMpttTemplate(data);
+        if (response.data?.length === 0) return;
+        setMaxMppt(response.data?.mppt_list?.length);
+        setInitialValues({ ...initialValues, mptt_count: response.data?.mppt_lis?.length })
+        setMpttTemplate(response.data?.mppt_list);
       } catch (error) {
         console.log(error);
       }

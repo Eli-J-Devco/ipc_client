@@ -93,19 +93,19 @@ export const loginService = {
    * @param {error} error
    * @return Boolean
    */
-  handleMissingInfo(error) {
-    if (error?.response?.data?.message) {
-      return error?.response?.data?.message;
-    }
-
-    if (error?.config?.signal?.reason?.message)
-      LibToast.toast(LoginErrors("", error?.config?.signal?.reason?.message), "error");
-
+  handleMissingInfo(error, msg = "") {
     if (error?.response?.status === 401) {
       LibToast.toast(LoginErrors(error, "Please login again!"), "error");
       clearToken();
       return true;
     }
+
+    if (error?.response?.data?.message) {
+      LibToast.toast(error?.response?.data?.message, "error");
+      return false;
+    }
+
+    LibToast.toast(msg, "error");
     return false;
   },
 };

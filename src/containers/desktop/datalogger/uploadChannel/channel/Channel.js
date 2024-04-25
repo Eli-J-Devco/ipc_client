@@ -17,6 +17,7 @@ import Constants from '../../../../../utils/Constants';
 import LibToast from '../../../../../utils/LibToast';
 import { RButton, RSwitch, RRadio } from '../../../../../components/Controls';
 import ReactSelectDropdown from '../../../../../components/ReactSelectDropdown';
+import useProjectSetup from '../../../../../hooks/useProjectSetup';
 
 function Channel() {
     const {
@@ -30,10 +31,10 @@ function Channel() {
 
     const { t } = useTranslation();
     const axiosPrivate = useAxiosPrivate();
+    const { uploadChanelConfig } = useProjectSetup();
 
     const [channels, setChannels] = useState([]);
     const channelsRef = useRef([]);
-    const [channelConfig, setChannelConfig] = useState({});
 
     const [devices, setDevices] = useState([]);
     const [protocol, setProtocol] = useState([]);
@@ -46,43 +47,21 @@ function Channel() {
 
     const output = document.getElementById('progress');
     useEffect(() => {
-        output.innerHTML = "<div><img src='/loading.gif' /></div>";
-        /**
-         * Get channel config
-         * @author nhan.tran 2024-03-13
-         * @return {Object}
-         */
-        const getChannelConfig = async () => {
-            try {
-                const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.CONFIG_CHANNEL);
-                if (response?.status === 200) {
-                    setTimeout(() => {
-                        setChannelConfig(response?.data);
-                    }, 100);
-                }
-            } catch (error) {
-                if (!loginService.handleMissingInfo(error)) {
-                    LibToast.toast(t('toastMessage.error.fetch'), 'error');
-                }
-                else navigate("/", { replace: true });
-            }
-            finally { };
-        };
-        getChannelConfig();
-    }, []);
+        if (!uploadChanelConfig) return;
 
-    useEffect(() => {
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
+
         /**
          * Set value for channel config when it is available
          * @author nhan.tran 2024-03-13
-         * @param {Object} channelConfig
+         * @param {Object} uploadChanelConfig
          * @return {Object}
          */
         setTimeout(() => {
-            setProtocol(channelConfig?.type_protocol?.map((protocol) => ({ value: protocol.id, label: protocol.Protocol })));
-            setDevices(channelConfig?.device_list?.map((device) => ({ value: device.id, label: device.name })));
-            setLoggingInterval(channelConfig?.type_logging_interval?.map((interval) => ({ value: interval.id, label: interval.time })));
-            defaultLoggingInterval.current = channelConfig?.type_logging_interval?.filter((interval) => interval.time === '5 minutes');
+            setProtocol(uploadChanelConfig?.type_protocols?.map((protocol) => ({ value: protocol.id, label: protocol.Protocol })));
+            setDevices(uploadChanelConfig?.devices?.map((device) => ({ value: device.id, label: device.name })));
+            setLoggingInterval(uploadChanelConfig?.logging_intervals?.map((interval) => ({ value: interval.id, label: interval.time })));
+            defaultLoggingInterval.current = uploadChanelConfig?.logging_intervals?.filter((interval) => interval.time === '5 minutes');
         }, 100);
 
         /**
@@ -90,34 +69,28 @@ function Channel() {
          * @author nhan.tran 2024-03-13
          * @return {Object}
          */
-        const getAllChannels = async () => {
+        setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.ALL_CHANNELS);
+                const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.GET);
                 if (response?.status === 200) {
-                    const all_channel = response?.data?.all_channel;
-                    setTimeout(() => {
-                        setChannels(all_channel);
-                        all_channel.forEach((channel, index) => {
-                            setValue(`upload_url_${channel?.name}`, channel?.uploadurl);
-                            setValue(`password_${channel?.name}`, channel?.password);
-                        });
-                        channelsRef.current = _.cloneDeep(all_channel);
-                        setIsShow(new Array(all_channel.length).fill(false));
-                    }, 100);
+                    const all_channel = response?.data;
+                    setChannels(all_channel);
+                    all_channel.forEach((channel, index) => {
+                        setValue(`upload_url_${channel?.name}`, channel?.uploadurl);
+                        setValue(`password_${channel?.name}`, channel?.password);
+                    });
+                    channelsRef.current = _.cloneDeep(all_channel);
+                    setIsShow(new Array(all_channel.length).fill(false));
                 }
             } catch (error) {
-                if (!loginService.handleMissingInfo(error)) {
-                    LibToast.toast(t('toastMessage.error.fetch'), 'error');
-                }
-                else navigate("/", { replace: true });
+                loginService.handleMissingInfo(error, "Failed to fetch upload channel") && navigate("/", { replace: true });
             }
             finally {
                 output.innerHTML = '';
             }
-        }
+        }, 300);
 
-        getAllChannels();
-    }, [channelConfig]);
+    }, [uploadChanelConfig]);
 
     /**
      * Handle save channel information when user click on save button
@@ -134,25 +107,20 @@ function Channel() {
             LibToast.toast(t('toastMessage.info.noChange'), 'info');
             return;
         }
-        const updateChannels = async () => {
+
+        setTimeout(async () => {
             try {
                 output.innerHTML = "<div><img src='/loading.gif' /></div>";
-                const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.UPDATE_CHANNEL, channels);
+                const response = await axiosPrivate.post(Constants.API_URL.UPLOAD_CHANNEL.UPDATE, channels);
                 if (response?.status === 200) {
                     LibToast.toast(`Upload channels ${t('toastMessage.info.update')}`, 'info');
                 }
             } catch (error) {
-                if (!loginService.handleMissingInfo(error)) {
-                    LibToast.toast(t('toastMessage.error.updateError'), 'error');
-                }
-                else navigate("/", { replace: true });
+                loginService.handleMissingInfo(error, "Failed to update upload channels") && navigate("/", { replace: true });
             }
             finally {
                 output.innerHTML = '';
             }
-        }
-        setTimeout(() => {
-            updateChannels();
         }, 200);
     };
 
@@ -179,7 +147,7 @@ function Channel() {
                     id: event.value,
                     Protocol: event.label,
                 },
-                device_list: [],
+                devices: [],
                 id_type_logging_interval: defaultLoggingInterval.current[0]?.id,
                 type_logging_interval: {
                     id: defaultLoggingInterval.current[0]?.id,
@@ -253,7 +221,12 @@ function Channel() {
                                                                 inputId="protocol"
                                                                 inputName="protocol"
                                                                 name="protocol"
-                                                                value={channel?.type_protocol?.id ? { value: channel?.type_protocol?.id, label: channel?.type_protocol.Protocol } : { value: '', label: '' }}
+                                                                value={channel?.type_protocol?.id ?
+                                                                    {
+                                                                        value: channel?.type_protocol?.id,
+                                                                        label: channel?.type_protocol.name
+                                                                    } :
+                                                                    { value: '', label: '' }}
                                                                 onChange={(event) => {
                                                                     onProtocolChange(event, index, channel?.name);
                                                                 }}
@@ -323,10 +296,11 @@ function Channel() {
                                                             inputId="select_device_only"
                                                             inputName="select_device_only"
                                                             name="select_device_only"
-                                                            value={channel?.device_list ? channel?.device_list.map((device) => ({ value: device.id, label: device.name })) : []}
+                                                            value={channel?.devices ?
+                                                                channel?.devices.map((device) => ({ value: device.id, label: device.name })) : []}
                                                             onChange={(event) => {
                                                                 let temp = [...channels];
-                                                                temp[index].device_list = event.map((device) => ({ id: device.value, name: device.label }));
+                                                                temp[index].devices = event.map((device) => ({ id: device.value, name: device.label }));
                                                                 setChannels(temp);
                                                             }}
                                                             optionList={devices}
@@ -345,12 +319,14 @@ function Channel() {
                                                                 inputId="logging_interval"
                                                                 inputName="logging_interval"
                                                                 name="logging_interval"
-                                                                value={channel?.type_logging_interval?.id ? { value: channel?.type_logging_interval?.id, label: channel?.type_logging_interval?.time } : { value: '', label: '' }}
+                                                                value={channel?.logging_interval?.id ?
+                                                                    { value: channel?.logging_interval?.id, label: channel?.logging_interval?.name } :
+                                                                    { value: '', label: '' }}
                                                                 onChange={(event) => {
                                                                     let temp = [...channels];
                                                                     temp[index].id_type_logging_interval = event.value;
-                                                                    temp[index].type_logging_interval.id = event.value;
-                                                                    temp[index].type_logging_interval.time = event.label;
+                                                                    temp[index].logging_interval.id = event.value;
+                                                                    temp[index].logging_interval.name = event.label;
                                                                     setChannels(temp);
                                                                 }}
                                                                 optionList={loggingInterval}
@@ -389,8 +365,6 @@ function Channel() {
                         </div>
                     );
                 })}
-
-
 
                 <div className='form-footer'>
                     <div className='mb-3'>
