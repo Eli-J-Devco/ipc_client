@@ -11,12 +11,12 @@ import styles from './PermissionsAndRoles.module.scss';
 import useAxiosPrivate from '../../../../hooks/useAxiosPrivate';
 import { loginService } from '../../../../services/loginService';
 import usePermissionsAndRoles from './usePermissionsAndRoles';
+import useProjectSetup from '../../../../hooks/useProjectSetup';
 
 import RolesModal from './rolesModal/RolesModal';
 import Permissions from './permissions/Permissions';
 
 import Constants from '../../../../utils/Constants';
-import LibToast from '../../../../utils/LibToast';
 import Breadcrumb from "../../../../components/breadCrumb/BreadCrumb";
 import Table from '../../../../components/table/Table';
 import Button from '../../../../components/button/Button';
@@ -40,9 +40,14 @@ export default function PermissionsAndRoles() {
     openConfirmDeleteRoles,
     closeConfirmDeleteRoles
   } = usePermissionsAndRoles();
+  const {
+    roles,
+    setRoles,
+  } = useProjectSetup();
+
   const [needRefresh, setNeedRefresh] = useState(true);
 
-  const [roles, setRoles] = useState([]);
+  // const [roles, setRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
   const [permissions, setPermissions] = useState([]);
   const navigate = useNavigate();
@@ -53,13 +58,13 @@ export default function PermissionsAndRoles() {
    * @param {Object} selectedRole selected role
    */
   useEffect(() => {
-    var output = document.getElementById("progress");
-    output.innerHTML = "<div><img src='/loading.gif' /></div>";
     if (selectedRole && !permissions[selectedRole?.id]) {
+      var output = document.getElementById("progress");
+      output.innerHTML = "<div><img src='/loading.gif' /></div>";
       setTimeout(async () => {
         try {
-          const response = await axiosPrivate.post(Constants.API_URL.USERS.ROLE_SCREEN, {
-            id_role: selectedRole?.id
+          const response = await axiosPrivate.post(Constants.API_URL.ROLE.PERMISSION, {
+            id: selectedRole?.id
           },
             { headers: { 'Content-Type': 'application/json' } }
           );
@@ -69,25 +74,13 @@ export default function PermissionsAndRoles() {
           }
         }
         catch (error) {
-          let msg = loginService.handleMissingInfo(error);
-          if (typeof msg === 'string') {
-            LibToast.toast(msg, 'error');
-          }
-          else {
-            if (!msg) {
-              LibToast.toast(t('toastMessage.error.fetch'), 'error');
-            }
-            else {
-              navigate('/');
-            }
-          }
+          loginService.handleMissingInfo(error, "Failed to fetch permissions") && navigate('/', { replace: true });
         }
         finally {
           output.innerHTML = "";
         }
       }, 300);
     }
-    output.innerHTML = "";
   }, [selectedRole, axiosPrivate, navigate, t, permissions]);
 
   /**
@@ -103,7 +96,7 @@ export default function PermissionsAndRoles() {
   useEffect(() => {
     needRefresh && setTimeout(async () => {
       try {
-        const response = await axiosPrivate.post(Constants.API_URL.USERS.ALL_ROLE);
+        const response = await axiosPrivate.post(Constants.API_URL.ROLE.LIST);
         if (response.status === 200) {
           let data = response.data.map(role => ({ id: role?.id, name: role?.name, description: role?.description }));
           setRoles(data);
@@ -120,18 +113,7 @@ export default function PermissionsAndRoles() {
         }
       }
       catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === 'string') {
-          LibToast.toast(msg, 'error');
-        }
-        else {
-          if (!msg) {
-            LibToast.toast(t('toastMessage.error.fetch'), 'error');
-          }
-          else {
-            navigate('/');
-          }
-        }
+        loginService.handleMissingInfo(error, "Failed to fetch roles") && navigate('/', { replace: true });
       }
       finally {
         setNeedRefresh(false);

@@ -12,23 +12,29 @@ import Button from '../../../../../components/button/Button';
 import Table from '../../../../../components/table/Table';
 
 import { ReactComponent as StatusIcon } from "../../../../../assets/images/status-circle.svg";
+import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
+import { useNavigate } from 'react-router-dom';
+import LibToast from '../../../../../utils/LibToast';
+import Constants from '../../../../../utils/Constants';
+import { loginService } from '../../../../../services/loginService';
 
-const PermissionForm = ({ screensData, setScreensData }) => {
-    const { initialValues } = useFormInput();
+const PermissionForm = ({ screensData, setScreensData, role_id, setPermissions }) => {
+    const axiosPrivate = useAxiosPrivate();
+    const navigate = useNavigate();
     const [onChecked, setOnChecked] = useState(null);
 
     const columnsPermissions = [
-        { id: 1, slug: "screen_name", name: "Screen Name", width: '400px' },
-        { id: 2, slug: "full", name: "Full", width: '100px' },
-        { id: 3, slug: "add", name: "Add", width: '100px' },
-        { id: 4, slug: "edit", name: "Edit", width: '100px' },
-        { id: 5, slug: "del", name: "Del", width: '100px' },
-        { id: 6, slug: "view", name: "View", width: '100px' },
-        { id: 7, slug: "print", name: "Print", width: '100px' },
-        { id: 8, slug: "approval", name: "Approval", width: '100px' },
-        { id: 10, slug: "pdf", name: "Pdf", width: '100px' },
-        { id: 11, slug: "excel", name: "Excel", width: '100px' },
-        { id: 12, slug: "translate", name: "Translate", width: '100px' }
+        { id: 1, slug: "name", name: <div style={{ textAlign: "center" }}>Screen Name</div>, width: '100px' },
+        { id: 2, slug: "full", name: <div style={{ textAlign: "center" }}>Full</div>, width: '10px' },
+        { id: 3, slug: "add", name: <div style={{ textAlign: "center" }}>Add</div>, width: '10px' },
+        { id: 4, slug: "edit", name: <div style={{ textAlign: "center" }}>Edit</div>, width: '10px' },
+        { id: 5, slug: "del", name: <div style={{ textAlign: "center" }}>Del</div>, width: '10px' },
+        { id: 6, slug: "view", name: <div style={{ textAlign: "center" }}>View</div>, width: '10px' },
+        { id: 7, slug: "print", name: <div style={{ textAlign: "center" }}>Print</div>, width: '10px' },
+        { id: 8, slug: "approval", name: <div style={{ textAlign: "center" }}>Approval</div>, width: '10px' },
+        { id: 10, slug: "pdf", name: <div style={{ textAlign: "center" }}>Pdf</div>, width: '10px' },
+        { id: 11, slug: "excel", name: <div style={{ textAlign: "center" }}>Excel</div>, width: '10px' },
+        { id: 12, slug: "translate", name: <div style={{ textAlign: "center" }}>Translate</div>, width: '10px' }
     ]
 
     /**
@@ -41,58 +47,55 @@ const PermissionForm = ({ screensData, setScreensData }) => {
 
         let field = onChecked.field.split('_')[0];
         let isChecked = onChecked.isChecked ? 1 : 0;
-        let newScreens = initialValues.map(item => {
-            if (item.screen_name === onChecked.screen) {
-                if (field === 'full') {
-                    item = {
-                        ...item,
-                        full: isChecked,
-                        add: isChecked,
-                        edit: isChecked,
-                        del: isChecked,
-                        view: isChecked,
-                        print: isChecked,
-                        approval: isChecked,
-                        pdf: isChecked,
-                        excel: isChecked,
-                        translate: isChecked
-                    };
-                }
-                else {
-                    item = {
-                        ...item,
-                        [field]: isChecked
-                    };
-                    if (isChecked === 0)
-                        item = {
-                            ...item,
-                            full: 0
-                        };
-                    else {
-                        let isFull = 1;
-                        for (let key in item) {
-                            if (key !== 'screen_name' && key !== 'full' && item[key] === 0) {
-                                isFull = 0;
-                                break;
-                            }
-                        }
-                        item = {
-                            ...item,
-                            full: isFull
-                        };
-                    }
-                }
 
+        setTimeout(async () => {
+            let screen = screensData.find(item => item.name === onChecked.screen);
+            if (screen) {
+                screen[field] = isChecked;
             }
-            return item;
-        });
 
-        setTimeout(() => {
-            setScreensData(_.cloneDeep(newScreens));
-            setOnChecked(null);
-        }, 100);
+            if (field === 'full') {
+                Object.keys(screen).forEach(key => {
+                    if (key !== 'name' && key !== 'id') {
+                        screen[key] = isChecked;
+                    }
+                });
+            }
 
-    }, [onChecked, setScreensData, screensData, initialValues]);
+            let permission = screen.add.toString() + screen.edit.toString() + screen.del.toString() + screen.view.toString() + screen.print.toString() + screen.approval.toString() + screen.pdf.toString() + screen.excel.toString() + screen.translate.toString();
+            permission = permission.split('').reverse().join('');
+            let auths = parseInt(permission, 2);
+
+            let data = {
+                id_role: role_id,
+                id_screen: screen.id,
+                auths: auths
+            }
+
+            var output = document.getElementById("progress");
+            output.innerHTML = "<div><img src='/loading.gif' /></div>";
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.ROLE.UPDATE_PERMISSION, data);
+                if (response.status === 200) {
+                    LibToast.toast(response?.data?.message, 'info');
+                    setScreensData(screensData.map(item => item.name === onChecked.screen ? screen : item));
+                    setPermissions(prevState => {
+                        let newPermissions = _.cloneDeep(prevState);
+                        let role = newPermissions[role_id];
+                        let new_screen = role.find(item => item.id === screen.id);
+                        new_screen.auth = auths;
+                        return newPermissions;
+                    });
+                }
+            } catch (error) {
+                loginService.handleMissingInfo(error, `Failed to update permissions`) && navigate('/', { replace: true });
+            } finally {
+                setOnChecked(null);
+                output.innerHTML = "";
+            }
+        }, 300);
+
+    }, [onChecked, screensData, role_id, setScreensData, axiosPrivate, navigate, setPermissions]);
 
     return (
         <div className={styles.permissions}>
@@ -104,6 +107,7 @@ const PermissionForm = ({ screensData, setScreensData }) => {
             <div className={styles.table_permissions}>
 
                 <Table
+                    resizable={true}
                     columns={columnsPermissions}
                     data={screensData}
 
@@ -118,12 +122,12 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                     full={item => (
                         <div className="d-flex flex-wrap justify-content-center">
                             <FormInput.Check
-                                name={`full_${item.screen_name}`}
+                                name={`full_${item.name}`}
                                 checked={item.full === 1 ? 1 : 0}
                                 onChange={(e) => setOnChecked({
                                     field: e.target.name,
                                     isChecked: e.target.checked,
-                                    screen: item?.screen_name
+                                    screen: item?.name
                                 })}
                             />
                         </div>
@@ -131,12 +135,12 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                     add={item => (
                         <div className="d-flex flex-wrap justify-content-center">
                             <FormInput.Check
-                                name={`add_${item.screen_name}`}
+                                name={`add_${item.name}`}
                                 checked={item.add === 1 ? 1 : 0}
                                 onChange={(e) => setOnChecked({
                                     field: e.target.name,
                                     isChecked: e.target.checked,
-                                    screen: item?.screen_name
+                                    screen: item?.name
                                 })}
                             />
                         </div>
@@ -144,12 +148,12 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                     edit={item => (
                         <div className="d-flex flex-wrap justify-content-center">
                             <FormInput.Check
-                                name={`edit_${item.screen_name}`}
+                                name={`edit_${item.name}`}
                                 checked={item.edit === 1 ? 1 : 0}
                                 onChange={(e) => setOnChecked({
                                     field: e.target.name,
                                     isChecked: e.target.checked,
-                                    screen: item?.screen_name
+                                    screen: item?.name
                                 })}
                             />
                         </div>
@@ -157,12 +161,12 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                     del={item => (
                         <div className="d-flex flex-wrap justify-content-center">
                             <FormInput.Check
-                                name={`del_${item.screen_name}`}
+                                name={`del_${item.name}`}
                                 checked={item.del === 1 ? 1 : 0}
                                 onChange={(e) => setOnChecked({
                                     field: e.target.name,
                                     isChecked: e.target.checked,
-                                    screen: item?.screen_name
+                                    screen: item?.name
                                 })}
                             />
                         </div>
@@ -170,12 +174,12 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                     view={item => (
                         <div className="d-flex flex-wrap justify-content-center">
                             <FormInput.Check
-                                name={`view_${item.screen_name}`}
+                                name={`view_${item.name}`}
                                 checked={item.view === 1 ? 1 : 0}
                                 onChange={(e) => setOnChecked({
                                     field: e.target.name,
                                     isChecked: e.target.checked,
-                                    screen: item?.screen_name
+                                    screen: item?.name
                                 })}
                             />
                         </div>
@@ -183,12 +187,12 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                     print={item => (
                         <div className="d-flex flex-wrap justify-content-center">
                             <FormInput.Check
-                                name={`print_${item.screen_name}`}
+                                name={`print_${item.name}`}
                                 checked={item.print === 1 ? 1 : 0}
                                 onChange={(e) => setOnChecked({
                                     field: e.target.name,
                                     isChecked: e.target.checked,
-                                    screen: item?.screen_name
+                                    screen: item?.name
                                 })}
                             />
                         </div>
@@ -196,12 +200,12 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                     approval={item => (
                         <div className="d-flex flex-wrap justify-content-center">
                             <FormInput.Check
-                                name={`approval_${item.screen_name}`}
+                                name={`approval_${item.name}`}
                                 checked={item.approval === 1 ? 1 : 0}
                                 onChange={(e) => setOnChecked({
                                     field: e.target.name,
                                     isChecked: e.target.checked,
-                                    screen: item?.screen_name
+                                    screen: item?.name
                                 })}
                             />
                         </div>
@@ -209,12 +213,12 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                     pdf={item => (
                         <div className="d-flex flex-wrap justify-content-center">
                             <FormInput.Check
-                                name={`pdf_${item.screen_name}`}
+                                name={`pdf_${item.name}`}
                                 checked={item.pdf === 1 ? 1 : 0}
                                 onChange={(e) => setOnChecked({
                                     field: e.target.name,
                                     isChecked: e.target.checked,
-                                    screen: item?.screen_name
+                                    screen: item?.name
                                 })}
                             />
                         </div>
@@ -222,12 +226,12 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                     excel={item => (
                         <div className="d-flex flex-wrap justify-content-center">
                             <FormInput.Check
-                                name={`excel_${item.screen_name}`}
+                                name={`excel_${item.name}`}
                                 checked={item.excel === 1 ? 1 : 0}
                                 onChange={(e) => setOnChecked({
                                     field: e.target.name,
                                     isChecked: e.target.checked,
-                                    screen: item?.screen_name
+                                    screen: item?.name
                                 })}
                             />
                         </div>
@@ -235,12 +239,12 @@ const PermissionForm = ({ screensData, setScreensData }) => {
                     translate={item => (
                         <div className="d-flex flex-wrap justify-content-center">
                             <FormInput.Check
-                                name={`translate_${item.screen_name}`}
+                                name={`translate_${item.name}`}
                                 checked={item.translate === 1 ? 1 : 0}
                                 onChange={(e) => setOnChecked({
                                     field: e.target.name,
                                     isChecked: e.target.checked,
-                                    screen: item?.screen_name
+                                    screen: item?.name
                                 })}
                             />
                         </div>

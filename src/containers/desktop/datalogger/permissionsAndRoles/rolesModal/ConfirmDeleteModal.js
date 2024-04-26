@@ -32,27 +32,16 @@ export default function ConfirmDeleteModal(props) {
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        const response = await axiosPrivate.post(Constants.API_URL.USERS.DELETE_ROLE, { id: role?.id });
+        const response = await axiosPrivate.post(Constants.API_URL.ROLE.DELETE, { id: role?.id });
         if (response.status === 200) {
-          LibToast.toast(`Role ${t('toastMessage.info.delete')}`, 'info');
+          LibToast.toast(response?.data?.message, 'info');
           closeRolesModal(true);
           setNeedRefresh(true);
         }
       }
       catch (error) {
         setNeedRefresh(false);
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === 'string') {
-          LibToast.toast(msg, 'error');
-        }
-        else {
-          if (!msg) {
-            LibToast.toast(t('toastMessage.error.delete'), 'error');
-          }
-          else {
-            navigate('/');
-          }
-        }
+        loginService.handleMissingInfo(error, `Failed to delete role`) && navigate('/', { replace: true });
       }
       finally {
         output.innerHTML = "";

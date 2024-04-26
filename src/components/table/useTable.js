@@ -34,6 +34,7 @@ function useTable({
                 id: item.id,
                 accessorKey: item.slug,
                 header: item.name,
+                size: item.width,
                 cell: ({ column, row, getValue }) => {
                     const slug = column.columnDef.accessorKey;
                     const value = getValue();
