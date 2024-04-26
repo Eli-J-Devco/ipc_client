@@ -17,7 +17,6 @@ import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 
 export default function ResetPasswordModal({ isOpenModal, closeModal }) {
-    const { t } = useTranslation();
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
 
@@ -29,24 +28,19 @@ export default function ResetPasswordModal({ isOpenModal, closeModal }) {
      * @param {Object} data
      */
     const handleResetPassword = () => {
+        var output = document.getElementById("progress");
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.USERS.RESET_PASSWORD, { username: isOpenModal?.user?.email });
+                const response = await axiosPrivate.post(Constants.API_URL.USERS.RESET_PASSWORD, { id: isOpenModal?.user?.id });
                 if (response?.status === 200) {
-                    LibToast.toast(`Password of user with id: ${isOpenModal?.user?.email} has been reset successfully`, 'info');
-                    setNewPassword(response?.data?.password);
+                    LibToast.toast(response?.data?.message, 'info');
+                    setNewPassword(response?.data?.new_password);
                 }
             } catch (error) {
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === "string") {
-                    LibToast.toast(msg, "error");
-                }
-                else {
-                    if (msg)
-                        LibToast.toast(t('toastMessage.error.fetch'), "error");
-                    else
-                        navigate("/")
-                }
+                loginService.handleMissingInfo(error, "Failed to reset password") && navigate("/", { replace: true });
+            } finally {
+                output.innerHTML = "";
             }
         }, 300);
     }

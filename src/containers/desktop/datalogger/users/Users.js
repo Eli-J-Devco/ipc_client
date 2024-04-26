@@ -26,11 +26,8 @@ import { ReactComponent as AddIcon } from "../../../../assets/images/add.svg";
 
 import Constants from '../../../../utils/Constants';
 import { loginService } from '../../../../services/loginService';
-import LibToast from '../../../../utils/LibToast';
 
 export default function Users() {
-  const { t } = useTranslation();
-
   const { columns, total, limit, offset, setLimit, setOffset, setTotal } = useUsers();
   const { actionOption, isOpenModal, openModal, closeModal } = useUserModal();
   const [statusFilter, setStatusFilter] = useState(undefined); // 1: Active, 0: Inactive
@@ -46,10 +43,6 @@ export default function Users() {
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(Constants.API_URL.USERS.LIST + `?page=${offset}&limit=${limit}${statusFilter !== undefined ? `&status=${statusFilter}` : ""}`);
-
-        if (response?.status === 204) {
-          throw response;
-        }
 
         setTotal(response.data?.total);
 
@@ -68,21 +61,7 @@ export default function Users() {
 
         setDataList(insertData);
       } catch (error) {
-        if (error?.status === 204) {
-          setOffset(offset - limit);
-          return;
-        }
-
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === 'string') {
-          LibToast.toast(msg, 'error');
-        }
-        else if (!msg) {
-          LibToast.toast(t('toastMessage.error.fetch'), 'error');
-        }
-        else {
-          navigate("/");
-        }
+        loginService.handleMissingInfo(error, "Failed to get users list") && navigate("/", { replace: true });
       } finally {
         needRefresh && setNeedRefresh(false);
         output.innerHTML = "";
@@ -108,11 +87,6 @@ export default function Users() {
         />
         <FormInput>
           <div className={styles.right_header}>
-            {/* <FormInput.Text
-              name="search"
-              className={styles.search}
-              placeholder="Keyword..."
-            /> */}
             <FormInput.Select
               className='me-3'
               name={"statusFilter"}
@@ -120,7 +94,7 @@ export default function Users() {
                 { value: 1, label: "Active" },
                 { value: 0, label: "Inactive" }
               ]}
-              onChange={e => setStatusFilter(e?.value)}
+              onChange={e => setStatusFilter(e?.value === 1 ? true : e?.value === 0 ? false : undefined)}
               isClearable={true}
               placeholder={"Status"}
             />

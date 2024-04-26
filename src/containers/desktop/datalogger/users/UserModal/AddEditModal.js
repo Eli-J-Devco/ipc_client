@@ -19,10 +19,13 @@ import Modal from '../../../../../components/modal/Modal';
 
 import LibToast from '../../../../../utils/LibToast';
 import Constants from '../../../../../utils/Constants';
+import useProjectSetup from '../../../../../hooks/useProjectSetup';
 
 export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }) {
     const { t } = useTranslation();
     const { actionOption } = useUserModal();
+    const { roles } = useProjectSetup();
+
     const [allRoles, setAllRoles] = useState([]);
     const statusOption = [{ value: 1, label: "Active" }, { value: 0, label: "Inactive" }]
     const axiosPrivate = useAxiosPrivate();
@@ -70,21 +73,12 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
             try {
                 const response = await axiosPrivate.post(url, dataPost);
                 if (response?.status === 200 || response?.status === 201) {
-                    LibToast.toast(`User ${data?.full_name} ${isOpenModal?.action === actionOption.Update ? t('toastMessage.info.update') : t('toastMessage.info.add')}`, "info");
+                    LibToast.toast(response?.data?.message, "info");
                     setNeedRefresh(true);
                     closeModal();
                 }
             } catch (error) {
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === "string") {
-                    LibToast.toast(msg, "error");
-                }
-                else {
-                    if (msg)
-                        LibToast.toast(t('toastMessage.error.update'), "error");
-                    else
-                        navigate("/")
-                }
+                loginService.handleMissingInfo(error, "Failed to add or edit user") && navigate("/", { replace: true });
             } finally {
                 output.innerHTML = "";
             }
@@ -101,26 +95,10 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
     </div>
 
     useEffect(() => {
-        !allRoles.length && setTimeout(async () => {
-            try {
-                const response = await axiosPrivate.post(Constants.API_URL.USERS.ALL_ROLE);
-                if (response?.status === 200) {
-                    setAllRoles(response.data.map(role => ({ value: role.id, label: role.name })));
-                }
-            } catch (error) {
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === "string") {
-                    LibToast.toast(msg, "error");
-                }
-                else {
-                    if (msg)
-                        LibToast.toast(t('toastMessage.error.fetch'), "error");
-                    else
-                        navigate("/")
-                }
-            }
-        }, 100);
-    }, [allRoles, isOpenModal?.action]);
+        if (!roles?.length) return;
+
+        setAllRoles(roles.map(role => ({ value: role.id, label: role.name })));
+    }, [roles, allRoles, isOpenModal?.action]);
 
     return (
         <FormInput id="userModal" validationSchema={schema} initialValues={isOpenModal?.user} onSubmit={handleSave}>

@@ -20,6 +20,7 @@ export const DataloggerProvider = ({ children }) => {
     const [loggingIntervalConfig, setLoggingIntervalConfig] = useState([]);
     const [uploadChanelConfig, setUploadChanelConfig] = useState([]);
     const [screenList, setScreenList] = useState([]);
+    const [roles, setRoles] = useState([]);
 
     return (
         <DataloggerContext.Provider
@@ -35,7 +36,9 @@ export const DataloggerProvider = ({ children }) => {
                 uploadChanelConfig,
                 setUploadChanelConfig,
                 screenList,
-                setScreenList
+                setScreenList,
+                roles,
+                setRoles
             }}>
             {children}
         </DataloggerContext.Provider>

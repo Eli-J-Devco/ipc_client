@@ -48,16 +48,7 @@ export default function ConfirmDeleteModal({ isOpenModal, closeModal, setNeedRef
                     setNeedRefresh(true);
                 }
             } catch (error) {
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === 'string') {
-                    LibToast.toast(msg, 'error');
-                }
-                else if (!msg) {
-                    LibToast.toast(t('toastMessage.error.delete'), 'error');
-                }
-                else {
-                    navigate("/");
-                }
+                loginService.handleMissingInfo(error, "Failed to delete user") && navigate("/", { replace: true });
             }
             finally {
                 output.innerHTML = "";

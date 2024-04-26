@@ -22,7 +22,8 @@ const ProjectSetupInformation = () => {
         setRS485Config,
         setLoggingIntervalConfig,
         setUploadChanelConfig,
-        setScreenList
+        setScreenList,
+        setRoles
     } = useProjectSetup();
     const { auth, setAuth } = useAuth();
     const axiosPrivate = useAxiosPrivate();
@@ -103,6 +104,18 @@ const ProjectSetupInformation = () => {
                 setScreenList(response.data);
             } catch (error) {
                 loginService.handleMissingInfo(error, "Failed to fetch screen list") && navigate("/", { replace: true });
+            } finally {
+            }
+        }, 300);
+    }, []);
+
+    useEffect(() => {
+        setTimeout(async () => {
+            try {
+                const response = await axiosPrivate.post(Constants.API_URL.ROLE.LIST);
+                setRoles(response.data);
+            } catch (error) {
+                loginService.handleMissingInfo(error, "Failed to fetch roles") && navigate("/", { replace: true });
             } finally {
             }
         }, 300);
