@@ -12,6 +12,7 @@ import _ from 'lodash';
 import Modal from '../../../../../components/modal/Modal';
 import { POINT_CONFIG, reverseFormatData } from '../../../../../utils/TemplateHelper';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { loginService } from '../../../../../services/loginService';
 
 function Template() {
     const {
@@ -33,18 +34,15 @@ function Template() {
 
         !isSetUp && setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.GET_ONE, { id_template: id });
+                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.LIST, { id: id });
                 if (response?.status === 200) {
-                    setDefaultPointList(response?.data?.point_list);
-                    setDefaultMPPTList(response?.data?.mppt_list);
-                    setDefaultRegisterList(response?.data?.register_list);
-                    setDefaultControlGroupList(response?.data?.control_group_list);
+                    setDefaultPointList(response?.data?.points);
+                    setDefaultMPPTList(response?.data?.point_mppt);
+                    setDefaultRegisterList(response?.data?.register_blocks);
+                    setDefaultControlGroupList(response?.data?.point_controls);
                 }
             } catch (error) {
-                if (error?.response?.status === 404) {
-                    LibToast.toast(`Template with id: ${id} not found`, "error");
-                    navigate(from, { replace: true });
-                }
+                loginService.handleMissingInfo(error, "Failed to fetch template") && navigate(from, { replace: true });
             } finally {
                 setIsSetUp(true);
             }
@@ -59,7 +57,7 @@ function Template() {
                     setConfig(response?.data);
                 }
             } catch (error) {
-                console.error(error);
+                loginService.handleMissingInfo(error, "Failed to fetch template config") && navigate(from, { replace: true });
             }
         }, 300);
     }, [setConfig]);
@@ -86,7 +84,7 @@ function Template() {
                             {
                                 path: `/datalogger/templates/${id}/registers`,
                                 name: "Register Blocks"
-                            },                            {
+                            }, {
                                 path: `/datalogger/templates/${id}/control-groups`,
                                 name: "Control Groups"
                             },

@@ -12,9 +12,9 @@ export default function TemplatesProvider({ children }) {
     const axiosPrivate = useAxiosPrivate();
 
     useEffect(() => {
-        deviceTypes.length > 0 && setTimeout(async () => {
+        deviceTypes?.length > 0 && setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.DEVICE_GROUP.LIST);
+                const response = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG.GROUP);
                 if (response?.status === 200) {
                     let output = []
                     deviceTypes.forEach(type => {
@@ -35,7 +35,7 @@ export default function TemplatesProvider({ children }) {
     useEffect(() => {
         deviceTypes.length === 0 && setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.DEVICE_GROUP.GET_TYPE);
+                const response = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG.TYPE);
                 if (response?.status === 200) {
                     setDeviceTypes(response?.data);
                 }

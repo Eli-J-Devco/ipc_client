@@ -165,10 +165,15 @@ function usePointList() {
   ];
 
   const updatePoint = (updatedPoint) => {
+    console.log(updatedPoint);
     setTimeout(() => {
-      if (!defaultPointList.find((item) => item.id === updatedPoint.id)) {
-        setDefaultPointList([...defaultPointList, updatedPoint]);
-      }
+      setDefaultPointList(defaultPointList.map((point) => {
+        if (point.id === updatedPoint.id) {
+          return updatedPoint;
+        }
+        return point;
+      }));
+      setIsSetUp(true);
       setPoint({});
     }, 100);
   };
@@ -185,21 +190,16 @@ function usePointList() {
         deletePoint.push(pointList[parseInt(key)]);
       });
 
-    let data = deletePoint.map((point) => {
-      return {
-        id_point: point?.id,
-        id_pointkey: point?.id_pointkey,
-      };
-    });
+    let data = deletePoint.map((point) => point?.id);
 
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.POINT.DELETE,
+          Constants.API_URL.POINT.DELETE,
           {
             id_template: id,
-            points: data,
+            id_points: data,
           },
           {
             headers: {
@@ -209,22 +209,11 @@ function usePointList() {
         );
         if (response?.status === 200) {
           LibToast.toast("Delete points success", "info");
-          setDefaultPointList(response?.data?.point_list);
+          setDefaultPointList(response?.data);
           setIsSetUp(true);
         }
       } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-          return;
-        }
-
-        if (!msg) {
-          LibToast.toast("Delete point failed", "error");
-          return;
-        }
-
-        navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to delete points") && navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }
@@ -241,9 +230,9 @@ function usePointList() {
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.POINT.ADD_POINT,
+          Constants.API_URL.POINT.ADD,
           {
-            number_of_point: count,
+            num_of_points: count,
             id_template: parseInt(id),
           },
           {
@@ -254,19 +243,13 @@ function usePointList() {
         );
 
         if (response?.status === 200) {
-          setDefaultPointList(response?.data?.point_list);
+          setDefaultPointList(response?.data);
           setIsSetUp(true);
           LibToast.toast(`Add ${count} success`, "info");
         }
       } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        } else if (!msg) {
-          LibToast.toast("Add points failed", "error");
-        } else {
-          navigate("/", { replace: true });
-        }
+        loginService.handleMissingInfo(error, "Failed to add points") && navigate("/", { replace: true });
+        output.innerHTML = "";
       }
     }, 100);
   };

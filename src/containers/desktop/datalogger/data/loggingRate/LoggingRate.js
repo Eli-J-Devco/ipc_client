@@ -14,7 +14,11 @@ function LoggingRate() {
     const axiosPrivate = useAxiosPrivate();
     const { t } = useTranslation();
 
-    const { projectSetup, setProjectSetup } = useProjectSetup();
+    const {
+        projectSetup,
+        setProjectSetup,
+        loggingIntervalConfig
+    } = useProjectSetup();
 
     const [selectedLoggingRate, setSelectedLoggingRate] = useState();
     const [loggingRate, setLoggingRate] = useState([]);
@@ -27,17 +31,17 @@ function LoggingRate() {
          * Get logging rate from project setup and set to state
          * @author: nhan.tran 2024-03-11
          */
-        if (!projectSetup) return;
+        if (!projectSetup || !loggingIntervalConfig) return;
+
         var output = document.getElementById("progress");
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
         setTimeout(() => {
-            var rate = projectSetup?.logging_interval_list;
-            setLoggingRate(rate.map((item) => ({ value: item.id, label: item.time })));
-            setSelectedLoggingRate({ value: projectSetup?.id_logging_interval, label: rate.filter((item) => item.id === projectSetup?.id_logging_interval)[0].time });
-            setExistedLoggingRate({ value: projectSetup?.id_logging_interval, label: rate.filter((item) => item.id === projectSetup?.id_logging_interval)[0].time });
+            setLoggingRate(loggingIntervalConfig.map((item) => ({ value: item.id, label: item["name"] })));
+            setSelectedLoggingRate({ value: projectSetup?.id_logging_interval, label: loggingIntervalConfig.filter((item) => item.id === projectSetup?.id_logging_interval)[0]["name"] });
+            setExistedLoggingRate({ value: projectSetup?.id_logging_interval, label: loggingIntervalConfig.filter((item) => item.id === projectSetup?.id_logging_interval)[0]["name"] });
             output.innerHTML = "";
         }, 100);
-    }, [projectSetup]);
+    }, [projectSetup, loggingIntervalConfig]);
 
     /**
      * Handle dropdown change
@@ -61,6 +65,7 @@ function LoggingRate() {
 
 
         const data = {
+            id: projectSetup?.id,
             id_logging_interval: selectedLoggingRate.value
         }
 
@@ -77,9 +82,7 @@ function LoggingRate() {
                     setProjectSetup({ ...projectSetup, id_logging_interval: selectedLoggingRate.value, logging_interval: { id: selectedLoggingRate.value, time: selectedLoggingRate.label } });
                 }
             } catch (error) {
-                if (!loginService.handleMissingInfo(error))
-                    LibToast.toast(t("toastMessage.error.update"), "error");
-                else navigate("/", { replace: true });
+                loginService.handleMissingInfo(error, "Failed to update logging interval rate") && navigate("/", { replace: true });
             } finally {
                 output.innerHTML = "";
             }

@@ -36,23 +36,23 @@ export class RowAdapter {
     id_config_information = 0,
     config = "",
     type_units = {
-      namekey: "",
+      name: "",
     },
     type_class = {
-      namekey: "",
+      name: "",
     },
-    register = "",
+    register_value = "",
     type_datatype = {
-      namekey: "",
+      name: "",
     },
     type_byteorder = {
-      namekey: "",
+      name: "",
     },
     type_point_list = {
-      namekey: "",
+      name: "",
     },
     type_control = {
-      namekey: "",
+      name: "",
     },
     slope = undefined,
     offset = undefined,
@@ -77,11 +77,11 @@ export class RowAdapter {
     this.namekey = namekey;
     this.id_config_information = id_config_information;
     this.config = config;
-    this.unit = type_units?.namekey;
-    this.class = type_class?.namekey;
-    this.register = register;
-    this.data_type = type_datatype?.namekey;
-    this.byte_order = type_byteorder?.namekey;
+    this.unit = type_units?.name;
+    this.class = type_class?.name;
+    this.register = register_value;
+    this.data_type = type_datatype?.name;
+    this.byte_order = type_byteorder?.name;
     this.slope = slope;
     this.offset = offset;
     this.multreg = multreg;

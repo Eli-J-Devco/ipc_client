@@ -81,12 +81,12 @@ function SiteInformation() {
          * @author nhan.tran 2024-03-01
          * @param {int} id site id - will be remove in future
          * */
-        const saveSiteInformation = async (id) => {
+        setTimeout(async () => {
 
             var output = document.getElementById("progress");
             try {
                 const response = await axiosPrivate.post(
-                    `${Constants.API_URL.SITE.SITE_UPDATE}${id}`,
+                    Constants.API_URL.PROJECT.PROJECT_UPDATE,
                     data,
                     {
                         headers: {
@@ -111,13 +111,9 @@ function SiteInformation() {
                     isChange.current = false;
                 }
             } catch (error) {
-                if (!loginService.handleMissingInfo(error))
-                    LibToast.toast(t("toastMessage.error.update"), "error");
-                else navigate("/", { replace: true });
+                loginService.handleMissingInfo(error, t("toastMessage.error.updateSiteInfo")) && navigate("/", { replace: true });
             }
-        };
-        const project_id = getToken("project_id");
-        saveSiteInformation(project_id);
+        }, 300);
     });
 
     const handleCancel = () => {

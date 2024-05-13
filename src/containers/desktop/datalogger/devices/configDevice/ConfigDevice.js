@@ -4,17 +4,17 @@
 * 
 *********************************************************/
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './ConfigDevice.module.scss';
 import Table from '../../../../../components/table/Table';
 import Button from '../../../../../components/button/Button';
 import useConfigDevice from './useConfigDevice';
 import { RText } from '../../../../../components/Controls'
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
 import Constants from '../../../../../utils/Constants';
 
-export default function ConfigDevice({ device }) {
+export default function ConfigDevice({ device, setDevice }) {
   const { handleEditAlarm, handleInputChange, curItem, setCurItem } = useConfigDevice();
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function ConfigDevice({ device }) {
   const from = location.state?.from || { pathname: '/datalogger/devices' };
   const columns = [
     { id: 1, slug: "id", name: "#", width: 150 },
-    { id: 2, slug: "function", name: "Function", width: 500 },
+    { id: 2, slug: "function", name: "Function", width: 200 },
     { id: 3, slug: "current_reading", name: "Current Reading", width: 200 },
     { id: 4, slug: "low_alarm", name: "Low Alarm", width: 100 },
     { id: 5, slug: "high_alarm", name: "High Alarm", width: 100 },
@@ -86,7 +86,7 @@ export default function ConfigDevice({ device }) {
         <Button variant="dark">
           <Button.Text text="Save" />
         </Button>
-        <Button variant="grey" className='ms-3' onClick={() => navigate(from, { replace: true })}>
+        <Button variant="grey" className='ms-3' onClick={() => setDevice(null)}>
           <Button.Text text="Cancel" />
         </Button>
       </div>

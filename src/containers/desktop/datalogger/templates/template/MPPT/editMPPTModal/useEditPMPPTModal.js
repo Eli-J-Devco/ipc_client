@@ -17,23 +17,23 @@ function useEditMPPTModal(data, close, setPoint, setCurrentData) {
   const [modbusRegisterType, setModbusRegisterType] = useState(1);
   const [selectedUnit, setSelectedUnit] = useState({
     value: data?.type_units?.id,
-    label: data?.type_units?.namekey,
+    label: data?.type_units?.name,
   });
   const [selectedDataType, setSelectedDataType] = useState({
     value: data?.type_datatype?.id,
-    label: data?.type_datatype?.namekey,
+    label: data?.type_datatype?.name,
   });
   const [selectedByteOrder, setSelectedByteOrder] = useState({
     value: data?.type_byteorder?.id,
-    label: data?.type_byteorder?.namekey,
+    label: data?.type_byteorder?.name,
   });
   const [selectedPointListType, setSelectedPointListType] = useState({
     value: data?.type_point_list?.id,
-    label: data?.type_point_list?.namekey,
+    label: data?.type_point_list?.name,
   });
   const [selectedControlGroup, setSelectedControlGroup] = useState({
     value: data?.type_control?.id,
-    label: data?.type_control?.namekey,
+    label: data?.type_control?.name,
   });
 
   const validationSchema = yup.object({
@@ -45,23 +45,23 @@ function useEditMPPTModal(data, close, setPoint, setCurrentData) {
   const initialValues = {
     ...data,
     index: `pt${data?.index}`,
-    unit: { value: data?.type_units?.id, label: data?.type_units?.namekey },
-    class: data?.type_class?.namekey,
+    unit: { value: data?.type_units?.id, label: data?.type_units?.name },
+    class: data?.type_class?.name,
     data_type: {
       value: data?.type_datatype?.id,
-      label: data?.type_datatype?.namekey,
+      label: data?.type_datatype?.name,
     },
     byte_order: {
       value: data?.type_byteorder?.id,
-      label: data?.type_byteorder?.namekey,
+      label: data?.type_byteorder?.name,
     },
     type_point_list: {
       value: data?.type_point_list?.id,
-      label: data?.type_point_list?.namekey,
+      label: data?.type_point_list?.name,
     },
     type_control: {
       value: data?.type_control?.id,
-      label: data?.type_control?.namekey,
+      label: data?.type_control?.name,
     },
     register: data?.register || 40000,
     slope: data?.slope || 0,
@@ -99,29 +99,29 @@ function useEditMPPTModal(data, close, setPoint, setCurrentData) {
       id_control_group: selectedControlGroup.value,
       data_type: selectedDataType.label,
       byte_order: selectedByteOrder.label,
-      class: modbusRegisterType?.namekey,
+      class: modbusRegisterType?.name,
       type_point: modbusConfig,
       type_class: modbusRegisterType,
       type_units: selectedUnit.value
-        ? { id: selectedUnit.value, namekey: selectedUnit.label }
+        ? { id: selectedUnit.value, name: selectedUnit.label }
         : null,
       type_datatype: selectedDataType.value
-        ? { id: selectedDataType.value, namekey: selectedDataType.label }
+        ? { id: selectedDataType.value, name: selectedDataType.label }
         : null,
       type_byteorder: selectedByteOrder.value
-        ? { id: selectedByteOrder.value, namekey: selectedByteOrder.label }
+        ? { id: selectedByteOrder.value, name: selectedByteOrder.label }
         : null,
       type_point_list: selectedPointListType.value
         ? {
-            id: selectedPointListType.value,
-            namekey: selectedPointListType.label,
-          }
+          id: selectedPointListType.value,
+          name: selectedPointListType.label,
+        }
         : null,
       type_control: selectedControlGroup.value
         ? {
-            id: selectedControlGroup.value,
-            namekey: selectedControlGroup.label,
-          }
+          id: selectedControlGroup.value,
+          name: selectedControlGroup.label,
+        }
         : null,
     };
     var output = document.getElementById("progress");
@@ -151,15 +151,7 @@ function useEditMPPTModal(data, close, setPoint, setCurrentData) {
           LibToast.toast("Point updated successfully", "info");
         }
       } catch (error) {
-        console.error("Failed to update point", error);
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        } else if (!msg) {
-          LibToast.toast("Failed to update point", "error");
-        } else {
-          navigate("/");
-        }
+        loginService.handleMissingInfo(error, "Failed to update point") && navigate("/", { replace: true });
       }
     }, 500);
   };

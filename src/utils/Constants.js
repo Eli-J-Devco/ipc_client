@@ -18,7 +18,8 @@ switch (url) {
   default:
     // serverAPI = "http://115.78.133.129:3001";
     // serverAPI = "http://127.0.0.1:3001";
-    serverAPI = "http://localhost:8000";
+    // serverAPI = "http://localhost:3002";
+    serverAPI = "http://115.78.133.129:3002";
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -29,6 +30,13 @@ const Constants = {
   API_HOST: serverAPI,
   SERVER_DATA: serverData,
   API_CONTEXT: "api-server",
+  MQTT_CONFIG: {
+    HOST: "115.78.133.129",
+    PORT: 1884,
+    USERNAME: "nextwave",
+    PASSWORD: "123654789",
+    CLIENT_ID: "setup_client",
+  },
   COMMON: {
     PER_PAGE: 10,
     LIMIT: 30,
@@ -43,10 +51,6 @@ const Constants = {
       REFRESH: "/authentication/refresh/",
       LOGOUT: "/authentication/logout/",
     },
-    // SITE: {
-    //   SITE_INFO: "/site_information/?id=",
-    //   SITE_UPDATE: "/site_information/update/?id=",
-    // },
     ETHERNET: {
       ETHERNET_INFO: "/ethernet/get/",
       ETHERNET_UPDATE: "/ethernet/update/",
@@ -71,18 +75,14 @@ const Constants = {
       SCREENS: "/project_setup/screen/get/",
     },
     DEVICES: {
-      LIST: "/device_list/all/",
-      GET_ONE: "/device_list/?id=",
-      CONFIG: "/device_list/config/",
-      CREATE: "/device_list/create_multiple/",
-    },
-    DEVICE_GROUP: {
-      LIST: "/device_group/get_all/",
-      GET_ONE: "/device_group/get_each/",
-      CREATE: "/device_group/create/",
-      UPDATE: "/device_group/edit_each/",
-      DELETE: "/device_group/delete_group/",
-      GET_TYPE: "/device_group/get_type/",
+      LIST: "/devices/get/all/",
+      GET_ONE: "/devices/get/",
+      ADD: "/devices/add/",
+      DELETE: "/devices/delete/",
+      CONFIG: {
+        TYPE: "/devices/config/type/get/",
+        GROUP: "/devices/config/group/get/",
+      },
     },
     POINT: {
       LIST: "/point/get/",
@@ -90,26 +90,29 @@ const Constants = {
       UPDATE: "/point/update/",
       DELETE: "/point/delete/",
     },
+    POINT_MPPT: {
+      ADD: "/point_mppt/add/",
+      ADD_STRING: "/point_mppt/add/string/",
+      ADD_PANEL: "/point_mppt/add/panel/",
+    },
+    POINT_CONTROL: {
+      LIST: "/point/get/",
+      ADD: "/point/add/",
+      UPDATE: "/point/update/",
+      DELETE: "/point/delete/",
+    },
+    REGISTER: {
+      LIST: "/register_block/get/",
+      ADD: "/register_block/add/",
+      UPDATE: "/register_block/update/",
+      DELETE: "/register_block/delete/",
+    },
     TEMPLATE: {
-      CREATE: "/template/create/",
+      LIST: "/template/get/",
+      ADD: "/template/add/",
+      UPDATE: "/template/update/",
       DELETE: "/template/delete/",
-      UPDATE: "/template/edit/",
-      LIST: "/template/get/all/",
-      LIST_BY_TYPE: "/template/get/all/type/",
-      GET_ONE: "/template/get/",
-      CONFIG: "/template/config/",
-      GET_MPTT: "/template/mppt/get/template/",
-
-      REGISTER: {
-        CREATE: "/template/register/create/",
-        DELETE: "/template/register/delete_multiple/",
-        UPDATE: "/template/register/edit_multiple/",
-      },
-      CONTROL_GROUP: {
-        CREATE: "/template/control_group/create/",
-        UPDATE: "/template/control_group/edit/",
-        DELETE: "/template/control_group/delete/",
-      },
+      CONFIG: "/template/config/get/",
     },
     UPLOAD_CHANNEL: {
       GET: "/upload_channel/get/",
@@ -151,6 +154,7 @@ const Constants = {
     ADD: 1,
     EDIT: 2,
   },
+
   AUTH_MODE: {
     VIEW: 0,
     NEW: 1,
@@ -164,6 +168,7 @@ const Constants = {
     SET: 9,
     FULL: 511,
   },
+
   AUTH_DATA_KEY: {
     VIEW: "view",
     NEW: "new",
@@ -176,10 +181,12 @@ const Constants = {
     APPROVAL: "approval",
     FULL: "auths",
   },
+
   TEMPLATE_TYPE: {
     BUILT_IN: 0,
     CUSTOM: 1,
   },
+
   PAGE_SIZES: [5, 10, 20, 50, 100],
   DEFAULT_PAGE_SIZE: 5,
   TOAST_AUTO_CLOSE: 1000,

@@ -43,7 +43,7 @@ function useSubmitTemplate(close, closeGroup) {
         output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
         setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.CREATE, {
+                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.ADD, {
                     name: values.name,
                     status: true,
                     id_device_group: values.group.value,

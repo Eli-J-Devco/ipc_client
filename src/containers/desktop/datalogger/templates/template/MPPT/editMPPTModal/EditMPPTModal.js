@@ -46,7 +46,7 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
         setModbusRegisterType(currentData?.type_class);
 
         let unitGroup = point_unit.filter((item) =>
-          item?.namekey.match(/---/i)
+          item?.name.match(/---/i)
         );
         let units = [];
         unitGroup.forEach((group) => {
@@ -54,14 +54,14 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
           let lastItemIndex = point_unit.indexOf(
             point_unit.find(
               (item, index) =>
-                index > firstItemIndex && item?.namekey.match(/---/i)
+                index > firstItemIndex && item?.name.match(/---/i)
             )
           );
           units.push({
-            label: group?.namekey.replaceAll("-", "").trim(),
+            label: group?.name.replaceAll("-", "").trim(),
             options: point_unit
               .slice(firstItemIndex, lastItemIndex)
-              .map((item) => ({ value: item?.id, label: item?.namekey })),
+              .map((item) => ({ value: item?.id, label: item?.name })),
           });
         });
         setPointUnits(units);
@@ -112,7 +112,7 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
                 option={
                   type_point_list.map((item) => ({
                     value: item.id,
-                    label: item.namekey,
+                    label: item.name,
                   })) || []
                 }
                 value={selectedPointListType}
@@ -171,8 +171,8 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
               <FormInput.Check
                 key={item?.id}
                 type="radio"
-                name={item?.namekey}
-                label={item?.namekey}
+                name={item?.name}
+                label={item?.name}
                 inline
                 checked={_.isEqual(modbusConfig, item)}
                 onChange={() => setModbusConfig(item)}
@@ -187,8 +187,8 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
                 <FormInput.Check
                   key={item?.id}
                   type="radio"
-                  name={item?.namekey}
-                  label={item?.namekey}
+                  name={item?.name}
+                  label={item?.name}
                   inline
                   checked={_.isEqual(modbusRegisterType, item)}
                   onChange={() => setModbusRegisterType(item)}
@@ -218,7 +218,7 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
                     value={selectedDataType}
                     option={data_type.map((item) => ({
                       value: item.id,
-                      label: item.data_type,
+                      label: item.name,
                     }))}
                     onChange={(value) => setSelectedDataType(value)}
                   />
@@ -234,7 +234,7 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
                     value={selectedByteOrder}
                     option={byte_order.map((item) => ({
                       value: item.id,
-                      label: item.byte_order,
+                      label: item.name,
                     }))}
                     onChange={(value) => setSelectedByteOrder(value)}
                   />

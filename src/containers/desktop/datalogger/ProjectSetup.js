@@ -4,12 +4,14 @@
  *
  *********************************************************/
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import mqtt from 'mqtt';
 
 import useAxiosPrivate from '../../../hooks/useAxiosPrivate';
 import useProjectSetup from '../../../hooks/useProjectSetup';
 import useAuth from '../../../hooks/useAuth';
+import useMQTT from '../../../hooks/useMQTT';
 import { loginService } from '../../../services/loginService';
 
 import Constants from '../../../utils/Constants';
@@ -26,6 +28,15 @@ const ProjectSetupInformation = () => {
         setRoles
     } = useProjectSetup();
     const { auth, setAuth } = useAuth();
+    const {
+        client,
+        setClient,
+        isSubscribed,
+        setIsSubscribed,
+        isConnected,
+        setIsConnected,
+        setData,
+    } = useMQTT();
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
     const location = useLocation();
@@ -120,6 +131,72 @@ const ProjectSetupInformation = () => {
             }
         }, 300);
     }, []);
+
+    useEffect(() => {
+        if (client) return;
+
+        const initialConnectionOptions = {
+            protocol: 'ws',
+            host: Constants.MQTT_CONFIG.HOST,
+            clientId: Constants.MQTT_CONFIG.CLIENT_ID + Math.random().toString(16).substring(2, 8),
+            port: Constants.MQTT_CONFIG.PORT,
+            username: Constants.MQTT_CONFIG.USERNAME,
+            password: Constants.MQTT_CONFIG.PASSWORD,
+        }
+        const { protocol, host, clientId, port, username, password } = initialConnectionOptions
+        const url = `${protocol}://${host}:${port}/mqtt`
+        const options = {
+            clientId,
+            username,
+            password,
+            clean: true,
+            reconnectPeriod: 1000, // ms
+            connectTimeout: 30 * 1000, // ms
+        }
+        setTimeout(() => {
+            setClient(mqtt.connect(url, options));
+        }, 300);
+    }, [client]);
+
+    useEffect(() => {
+        if (client && !isConnected) {
+            client.on('connect', () => {
+                setIsConnected(true)
+            })
+
+            client.on('error', (err) => {
+                client.end()
+            })
+        }
+    }, [client])
+
+    useEffect(() => {
+        if (isConnected) {
+            mqttSub({ topic: "G83VZT33/Devices/All", qos: 0 })
+        }
+    }, [isConnected])
+
+    const mqttSub = (subscription) => {
+        if (client) {
+            const { topic, qos } = subscription
+            client.subscribe(topic, { qos }, (error) => {
+                if (error) {
+                    return
+                }
+                setIsSubscribed(true);
+            })
+        }
+    }
+
+    useEffect(() => {
+        if (isConnected && isSubscribed) {
+            client.on('message', (topic, message) => {
+                const payload = { topic, message: message.toString() }
+                const devices = JSON.parse(payload.message)
+                setData(devices);
+            })
+        }
+    }, [isConnected, isSubscribed]);
 
     /**
      * Redirect to first page on login if user has just logged in and first page on login in project setup is available

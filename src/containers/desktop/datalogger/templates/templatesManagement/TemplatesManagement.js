@@ -28,21 +28,14 @@ function TemplatesManagement() {
         output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
         setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(`${Constants.API_URL.TEMPLATE.LIST_BY_TYPE}?type=${Constants.TEMPLATE_TYPE.CUSTOM}`);
+                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.LIST, {
+                    type: 1
+                });
                 if (response?.status === 200) {
                     setTemplateList(response?.data);
                 }
             } catch (error) {
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === "string") {
-                    LibToast.toast(msg, "error");
-                }
-                else {
-                    if (!msg)
-                        LibToast.toast(t('toastMessage.error.fetch'), "error");
-                    else
-                        navigate("/")
-                }
+                loginService.handleMissingInfo(error, "Failed to fetch templates") && navigate("/", { replace: true });
             } finally {
                 output.innerHTML = "";
             }

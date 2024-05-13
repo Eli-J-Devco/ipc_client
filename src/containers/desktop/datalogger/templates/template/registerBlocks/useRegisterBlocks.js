@@ -122,7 +122,7 @@ function useRegisterBlocks() {
                 is_checked: false,
                 function_select: {
                     name: `func${item?.id}`,
-                    value: { value: item?.type_function?.id, label: item?.type_function?.Function }
+                    value: { value: item?.id_type_function, label: config?.type_function?.find(f => f.id === item?.id_type_function)?.name }
                 }
             })));
             setRowSelection({});
@@ -130,7 +130,7 @@ function useRegisterBlocks() {
 
         setTimeout(() => {
             setFunctionList(config?.type_function.map(
-                item => ({ value: item?.id, label: item?.Function })
+                item => ({ value: item?.id, label: item?.name })
             ));
             setIsSetUp(false);
             output.innerHTML = "";
@@ -152,10 +152,11 @@ function useRegisterBlocks() {
         output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
         setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.REGISTER.CREATE, {
-                    number_of_register: num,
-                    id_template: parseInt(id),
-                },
+                const response = await axiosPrivate.post(Constants.API_URL.REGISTER.ADD,
+                    {
+                        num_of_register_blocks: num,
+                        id_template: parseInt(id),
+                    },
                     {
                         headers: {
                             "Content-Type": "application/json"
@@ -164,20 +165,14 @@ function useRegisterBlocks() {
                 );
 
                 if (response?.status === 200) {
-                    setDefaultRegisterList(response?.data?.register_list);
+                    setDefaultRegisterList(response?.data);
                     setRowSelection({});
                     setIsSetUp(true);
                     LibToast.toast("New registers added successfully", "info");
                 }
             } catch (error) {
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === "string") {
-                    LibToast.toast(msg, "error");
-                } else if (!msg) {
-                    LibToast.toast("Failed to add new registers", "error");
-                } else {
-                    navigate("/");
-                }
+                loginService.handleMissingInfo(error, "Failed to add new register blocks") && navigate('/', { replace: true });
+                output.innerHTML = "";
             }
         }, 300);
     }
@@ -185,35 +180,27 @@ function useRegisterBlocks() {
     const removeRegister = () => {
         let body = JSON.stringify({
             id_template: id,
-            registers: registerList.filter((item) => rowSelection[item.index]).map((item) => ({ id: item.id }))
+            id_register_block: registerList.filter((item) => rowSelection[item.index]).map((item) => item.id)
         });
 
         output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
         setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.REGISTER.DELETE, body,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
+                const response = await axiosPrivate.post(Constants.API_URL.REGISTER.DELETE, body, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
 
                 if (response?.status === 200) {
-                    setDefaultRegisterList(response?.data?.register_list);
+                    setDefaultRegisterList(response?.data);
                     setRowSelection({});
                     setIsSetUp(true);
                     LibToast.toast("Register deleted successfully", "info");
                 };
             } catch (error) {
-                console.error("Failed to delete register", error);
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === 'string') {
-                    LibToast.toast(msg, "error");
-                } else if (!msg) {
-                    LibToast.toast("Failed to delete register", "error");
-                } else {
-                    navigate('/');
-                }
+                loginService.handleMissingInfo(error, "Failed to delete register") && navigate('/', { replace: true });
+                output.innerHTML = "";
             }
         }, 300);
     };
@@ -221,7 +208,7 @@ function useRegisterBlocks() {
     const applyUpdate = (values) => {
         let body = JSON.stringify({
             id_template: id,
-            registers: registerList.map((item) => {
+            register_blocks: registerList.map((item) => {
                 return {
                     id: item.id,
                     addr: values[`addr${item.id}`],
@@ -234,29 +221,21 @@ function useRegisterBlocks() {
         output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
         setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.REGISTER.UPDATE, body,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
+                const response = await axiosPrivate.post(Constants.API_URL.REGISTER.UPDATE, body, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
 
                 if (response?.status === 200) {
-                    setDefaultRegisterList(response?.data?.register_list);
+                    setDefaultRegisterList(response?.data);
                     setRowSelection({});
                     setIsSetUp(true);
                     LibToast.toast("Register updated successfully", "info");
                 };
             } catch (error) {
-                console.error("Failed to update register", error);
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === 'string') {
-                    LibToast.toast(msg, "error");
-                } else if (!msg) {
-                    LibToast.toast("Failed to update register", "error");
-                } else {
-                    navigate('/');
-                }
+                loginService.handleMissingInfo(error, "Failed to update register") && navigate('/', { replace: true });
+                output.innerHTML = "";
             }
         }, 300);
     };

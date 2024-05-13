@@ -43,12 +43,12 @@ function useMPPTList() {
     [POINT_CONFIG.STRING.name]: {
       isOpen: false,
       initialValues: {
-        num_of_string: 1,
-        num_of_panel: 0,
+        num_of_strings: 1,
+        num_of_panels: 0,
         is_clone_from_last: false,
       },
       validationSchema: yup.object().shape({
-        num_of_string: yup
+        num_of_strings: yup
           .number()
           .required("Required")
           .min(1, "Minimum 1 string")
@@ -56,7 +56,7 @@ function useMPPTList() {
         ...(isClone
           ? {}
           : {
-            num_of_panel: yup
+            num_of_panels: yup
               .number()
               .required("Required")
               .min(0, "Minimum 0 panel")
@@ -65,7 +65,7 @@ function useMPPTList() {
       }),
       fields: [
         {
-          name: "num_of_string",
+          name: "num_of_strings",
           type: "number",
           label: "Number of String",
           placeholder: "Number of String",
@@ -80,7 +80,7 @@ function useMPPTList() {
           onChange: (e) => setIsClone(e.target.checked),
         },
         {
-          name: "num_of_panel",
+          name: "num_of_panels",
           type: "number",
           label: "Number of Panel",
           placeholder: "Number of Panel",
@@ -93,11 +93,11 @@ function useMPPTList() {
     [POINT_CONFIG.PANEL.name]: {
       isOpen: false,
       initialValues: {
-        num_of_panel: 1,
+        num_of_panels: 1,
         is_clone_from_last: false,
       },
       validationSchema: yup.object().shape({
-        num_of_panel: yup
+        num_of_panels: yup
           .number()
           .required("Required")
           .min(1, "Minimum 1 panel")
@@ -105,7 +105,7 @@ function useMPPTList() {
       }),
       fields: [
         {
-          name: "num_of_panel",
+          name: "num_of_panels",
           type: "number",
           label: "Number of Panel",
           placeholder: "Number of Panel",
@@ -128,8 +128,8 @@ function useMPPTList() {
   const addNewMPPTInit = {
     num_of_mppt: 1,
     is_clone_from_last: isClone,
-    num_of_string: 0,
-    num_of_panel: 0,
+    num_of_strings: 0,
+    num_of_panels: 0,
   };
 
   const addNewMPPTSchema = yup.object().shape({
@@ -140,12 +140,12 @@ function useMPPTList() {
       .max(10, "Maximum 10 MPPT"),
     ...(!isClone
       ? {
-        num_of_string: yup
+        num_of_strings: yup
           .number()
           .required("Required")
           .min(0, "Minimum 0 string")
           .max(10, "Maximum 10 strings per MPPT"),
-        num_of_panel: yup
+        num_of_panels: yup
           .number()
           .required("Required")
           .min(0, "Minimum 0 panel")
@@ -508,7 +508,7 @@ function useMPPTList() {
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.POINT.ADD_MPPT,
+          Constants.API_URL.POINT_MPPT.ADD,
           {
             ...data,
             id_template: id,
@@ -520,20 +520,14 @@ function useMPPTList() {
           }
         );
         if (response?.status === 200) {
-          setDefaultMPPTList(response?.data?.mppt_list);
+          setDefaultMPPTList(response?.data);
           setRowSelection({});
           setIsSetUp(true);
           LibToast.toast("Add new MPPT success", "info");
         }
       } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        } else if (!msg) {
-          LibToast.toast("Add new MPPT failed", "error");
-        } else {
-          navigate("/", { replace: true });
-        }
+        loginService.handleMissingInfo(error, "Failed to add new MPPT") && navigate("/", { replace: true });
+        output.innerHTML = "";
       }
     }, 300);
   };
@@ -620,12 +614,15 @@ function useMPPTList() {
    * @author nhan.tran 2024-04-10
    */
   const addNewChildren = (data) => {
+    let url = data.num_of_strings > 0 ?
+      Constants.API_URL.POINT_MPPT.ADD_STRING :
+      Constants.API_URL.POINT_MPPT.ADD_PANEL;
     let body = {
-      num_of_string: data.num_of_string,
-      num_of_panel: data.num_of_panel,
+      num_of_strings: data.num_of_strings,
+      num_of_panels: data.num_of_panels,
       is_clone_from_last: data.is_clone_from_last,
       id_template: id,
-      id: data.id,
+      parent: data.id,
     };
 
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
@@ -633,7 +630,7 @@ function useMPPTList() {
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.POINT.ADD_CHILDREN,
+          url,
           body,
           {
             headers: {
@@ -642,20 +639,14 @@ function useMPPTList() {
           }
         );
         if (response?.status === 200) {
-          setDefaultMPPTList(response?.data?.mppt_list);
+          setDefaultMPPTList(response?.data);
           setRowSelection({});
           setIsSetUp(true);
           LibToast.toast("Add new children success", "info");
         }
       } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        } else if (!msg) {
-          LibToast.toast("Add new children failed", "error");
-        } else {
-          navigate("/", { replace: true });
-        }
+        loginService.handleMissingInfo(error, "Failed to add new children") && navigate("/", { replace: true });
+        output.innerHTML = "";
       } finally {
         setAddChildrenModal({
           ...addChildrenModal,

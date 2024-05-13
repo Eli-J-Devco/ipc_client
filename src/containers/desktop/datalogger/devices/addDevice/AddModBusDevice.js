@@ -13,9 +13,9 @@ export const AddModBusDevice = ({ communication, initialValues, setInitialValues
                     <FormInput.Select
                         label="How is Modbus Device connected?"
                         name="id_communication"
-                        value={initialValues?.id_communication}
+                        value={initialValues?.communication}
                         option={communication}
-                        onChange={(e) => setInitialValues({ ...initialValues, id_communication: e })}
+                        onChange={(e) => setInitialValues({ ...initialValues, communication: e, id_communication: e.value })}
                     />
                 </div>
             </div>
@@ -31,7 +31,7 @@ export const AddModBusDevice = ({ communication, initialValues, setInitialValues
                         onChange={(e) => setInitialValues({ ...initialValues, rtu_bus_address: e.target.value })}
                     />
                 </div>
-                {initialValues?.id_communication?.label && initialValues?.id_communication?.label.search(/RS485/g) === -1 ?
+                {initialValues?.communication?.label && initialValues?.communication?.label.search(/COM/g) === -1 ?
                     <>
                         <div className='col-xl-6 col-md-6'>
                             <FormInput.Text

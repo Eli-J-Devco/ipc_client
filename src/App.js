@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Routes, Route, createBrowserRouter, createRoutesFromElements, RouterProvider, BrowserRouter } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Datalogger from "./layouts/datalogger/Datalogger";
 import Error from "./layouts/error/Error";
@@ -20,11 +20,9 @@ import ConfigDevice from "./containers/desktop/datalogger/devices/configDevice/C
 
 import Templates from "./containers/desktop/datalogger/templates/Templates";
 import TemplatesManagement from "./containers/desktop/datalogger/templates/templatesManagement/TemplatesManagement";
-import Template from "./containers/desktop/datalogger/templates/template/Template";
 import PointList from "./containers/desktop/datalogger/templates/template/pointList/PointList";
 import MPPTList from "./containers/desktop/datalogger/templates/template/MPPT/MPPTList";
 import RegisterBlocks from "./containers/desktop/datalogger/templates/template/registerBlocks/RegisterBlocks";
-import Advanced from "./containers/desktop/datalogger/templates/template/advanced/Advanced";
 import TemplateConfigContext from "./containers/desktop/datalogger/templates/template/TemplateConfigContext";
 import ControlGroups from "./containers/desktop/datalogger/templates/template/controlGroups/ControlGroups";
 
@@ -95,6 +93,7 @@ import SetupControl from "./containers/desktop/scada/setupControl/SetupControl";
 import Basic from "./containers/desktop/scada/setupControl/basic/Basic";
 import ExportLimitationControl from "./containers/desktop/scada/setupControl/exportLimitationControl/ExportLimitationControl";
 import ScheduleControl from "./containers/desktop/scada/setupControl/scheduleControl/ScheduleControl";
+import { DeviceManagement } from "./containers/desktop/datalogger/devices/DeviceManagement";
 
 export default class App extends Component {
   render() {
@@ -139,7 +138,7 @@ export default class App extends Component {
                     <Route path="group-options" element={<GroupOptions />} />
                   </Route>
 
-                  <Route path="devices" element={<Devices />} />
+                  {/* <Route path="devices" element={<Devices />} /> */}
                   <Route path="" element={<UploadChannel />} />
 
                   <Route path="upload" element={<UploadChannel />}>
@@ -157,7 +156,8 @@ export default class App extends Component {
                     <Route path="static-routes" element={<StaticRoutes />} />
                   </Route>
 
-                  <Route path="devices" element={<Devices />}>
+                  <Route path="devices" element={<DeviceManagement />}>
+                    <Route index element={<Devices />} />
                     <Route path=":id" element={<ConfigDevice />} />
                   </Route>
 

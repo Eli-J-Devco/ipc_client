@@ -105,7 +105,7 @@ export const loginService = {
       return false;
     }
 
-    LibToast.toast(msg, "error");
+    LibToast.toast(msg || "Something went wrong", "error");
     return false;
   },
 };
