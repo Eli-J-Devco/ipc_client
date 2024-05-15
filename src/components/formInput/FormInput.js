@@ -33,6 +33,7 @@ function Text({
     className,
     inputClassName = "",
     invalidClassName = "",
+    lablClassName = "",
     label,
     placeholder,
     name,
@@ -63,14 +64,14 @@ function Text({
             hidden={isHidden}
         >
             {label &&
-                <Form.Label>
+                <Form.Label className={lablClassName}>
                     {label}
                     {
                         required ? <span className="required">*</span> : ""
                     }
                 </Form.Label>
             }
-            <div style={{ position: "relative" }}>
+            <div style={type === "password" ? { position: "relative" } : { flex: 1 }}>
                 <div>
                     <Form.Control
                         className={`${styles["form-text"]} ${inputClassName ? inputClassName : ""}`}
@@ -148,7 +149,27 @@ const Check = forwardRef(({ className, label, name, checked, disabled, inline, t
 });
 FormInput.Check = Check;
 
-function Select({ className, label, name, required, groupOption, option, horizontal, closeMenuOnSelect, hideSelectedOptions, isClearable, isDisabled, isMulti, isSearchable, onChange, onBlur, value, placeholder }) {
+function Select({
+    className,
+    labelClassName = "",
+    inputClassName = "",
+    label,
+    name,
+    required,
+    groupOption,
+    option,
+    horizontal,
+    closeMenuOnSelect,
+    hideSelectedOptions,
+    isClearable,
+    isDisabled,
+    isMulti,
+    isSearchable,
+    onChange,
+    onBlur,
+    value,
+    placeholder
+}) {
     const validate = useContext(FormInputContext);
     const customStyles = {
         indicatorSeparator: (baseStyles, state) => ({
@@ -203,7 +224,7 @@ function Select({ className, label, name, required, groupOption, option, horizon
     return (
         <div className={`${styles["form-select"]} ${className ? className : ""} ${horizontal ? styles.horizontal : ""}`}>
             {label &&
-                <label>
+                <label className={labelClassName}>
                     {label}
                     {
                         required ? <span className="required">*</span> : ""
@@ -213,7 +234,7 @@ function Select({ className, label, name, required, groupOption, option, horizon
 
             <ReactSelect
                 name={name}
-                className={styles.select}
+                className={`${styles.select} ${inputClassName}`}
                 options={option}
                 captureMenuScroll={true}
                 styles={customStyles}

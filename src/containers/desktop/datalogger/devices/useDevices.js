@@ -4,7 +4,7 @@
 * 
 *********************************************************/
 import { useEffect, useState } from "react";
-import { json, useNavigate } from "react-router-dom";
+import { json, useNavigate, useParams } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../utils/Constants";
 import { loginService } from "../../../../services/loginService";
@@ -16,79 +16,28 @@ import { ReactComponent as DeleteIcon } from "../../../../assets/images/delete.s
 import { ReactComponent as ViewIcon } from "../../../../assets/images/eye_view.svg";
 import Button from "../../../../components/button/Button";
 import _ from "lodash";
+import { useDeviceManagement } from "./DeviceManagement";
+import LibToast from "../../../../utils/LibToast";
 
 
 export default function useDevices() {
   const { data } = useMQTT();
   const axiosPrivate = useAxiosPrivate();
+  const { name } = useParams();
+  const {
+    routes,
+    setRoutes,
+    setDevice,
+    deviceConfig,
+    allDevices,
+    setAllDevices,
+  } = useDeviceManagement();
   const navigate = useNavigate();
   const [isAddDevice, setIsAddDevice] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState({});
-  const handleConfigDevice = item => {
-    setSelectedDevice(item);
-    // setIsAddDevice(true);
-  };
-
-  const openAddDevice = () => setIsAddDevice(true);
-  const closeAddDevice = () => setIsAddDevice(false);
+  const [isUpdateDevice, setIsUpdateDevice] = useState(false);
+  const [isDeleteDevice, setIsDeleteDevice] = useState(false);
   const [dataDevices, setDataDevices] = useState([]);
-  const [allDevices, setAllDevices] = useState([]);
-  const [deviceConfig, setDeviceConfig] = useState({
-    device_types: [],
-    device_groups: [],
-    template: [],
-    communication: [],
-  });
   const output = document.getElementById("progress");
-
-  useEffect(() => {
-    if (allDevices.length) return;
-
-    output.innerHTML = "<div><img src='/loading.gif' /></div>";
-    setTimeout(async () => {
-      try {
-        const { data } = await axiosPrivate.post(Constants.API_URL.DEVICES.LIST);
-        let devices = data.map((d) => {
-          d["status"] = "";
-          return d;
-        });
-        setAllDevices(_.cloneDeep(devices));
-
-        var device_type = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG.TYPE);
-        var device_group = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG.GROUP);
-        var template = await axiosPrivate.post(Constants.API_URL.TEMPLATE.LIST, {});
-        var communication = await axiosPrivate.post(Constants.API_URL.RS485.GET, {});
-
-        setDeviceConfig({
-          device_types: device_type.data,
-          device_groups: device_group.data,
-          template: template.data,
-          communication: communication.data,
-        });
-      } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to get device configuration") && navigate("/", { replace: true });
-      } finally {
-        output.innerHTML = "";
-      }
-    }, 500);
-  }, [allDevices]);
-
-  useEffect(() => {
-    let new_data = _.cloneDeep(allDevices.map((d) => {
-      const index = data.findIndex((item) => item.id_device === d.id);
-      if (index !== -1) {
-        d["status"] = data[index]["status_device"];
-        d["is_online"] = 1;
-      }
-      else {
-        d["is_online"] = 0;
-      }
-      return d;
-    }));
-    new_data = new_data.filter((d) => d["is_online"] === 1);
-    setDataDevices(new_data);
-  }, [data]);
-
   const columnsHelper = createColumnHelper();
   const columns = [
     columnsHelper.accessor("id_checkbox", {
@@ -168,15 +117,45 @@ export default function useDevices() {
             onClick={() => handleConfigDevice(row.original)}
             className={"mx-2"}
           />
-          <Button.Image
-            image={<DeleteIcon />}
-            onClick={() => handleConfigDevice(row.original)}
-            className={"mx-2"}
-          />
         </div>
       ),
     }),
   ];
+
+  const handleConfigDevice = item => {
+    setDevice(item);
+    navigate(`/datalogger/devices/${item?.name.trim()}`, { state: { from: "/datalogger/devices" } });
+    setRoutes((prev) => [...prev, { path: `/datalogger/devices/${item?.name.trim()}`, name: item?.name.trim() }]);
+  };
+
+  const openAddDevice = () => setIsAddDevice(true);
+  const closeAddDevice = () => setIsAddDevice(false);
+  const openUpdateDevice = () => setIsUpdateDevice(true);
+  const closeUpdateDevice = () => setIsUpdateDevice(false);
+
+  useEffect(() => {
+    if (!name) {
+      setRoutes(routes.slice(0, 2));
+    }
+  }, [name]);
+
+  useEffect(() => {
+    let new_data = _.cloneDeep(allDevices.map((d) => {
+      const index = data.findIndex((item) => item.id_device === d.id);
+      if (index !== -1) {
+        d["status"] = data[index]["status_device"];
+        d["message"] = data[index]["message"];
+        d["is_online"] = 1;
+      }
+      else {
+        d["is_online"] = 0;
+      }
+      return d;
+    }));
+    new_data = new_data.filter((d) => d["is_online"] === 1);
+    setDataDevices(new_data);
+  }, [data]);
+
 
   const deleteDevices = (devices) => {
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
@@ -184,6 +163,7 @@ export default function useDevices() {
       try {
         const response = await axiosPrivate.post(Constants.API_URL.DEVICES.DELETE, devices);
         setAllDevices(response.data);
+        LibToast.toast("Devices are being deleted. It would take a few minutes.", "info");
       } catch (error) {
         loginService.handleMissingInfo(error, "Failed to delete devices") && navigate("/", { replace: true });
       } finally {
@@ -194,15 +174,17 @@ export default function useDevices() {
 
   return {
     isAddDevice,
-    openAddDevice,
-    closeAddDevice,
-    handleConfigDevice,
+    isUpdateDevice,
+    isDeleteDevice,
     dataDevices,
-    setAllDevices,
     deviceConfig,
     columns,
-    selectedDevice,
-    setSelectedDevice,
+    openAddDevice,
+    closeAddDevice,
+    openUpdateDevice,
+    closeUpdateDevice,
+    handleConfigDevice,
     deleteDevices,
+    setIsDeleteDevice,
   }
 }

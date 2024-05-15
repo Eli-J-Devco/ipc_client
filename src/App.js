@@ -15,8 +15,10 @@ import ScadaOverview from "./containers/desktop/scada/overview/Overview";
 import ScadaSetup from "./containers/desktop/scada/devices/setup/Setup";
 import ScadaDCCombiner from "./containers/desktop/scada/devices/dcCombiner/DCCombiner";
 
+import { DeviceManagement } from "./containers/desktop/datalogger/devices/DeviceManagement";
 import Devices from "./containers/desktop/datalogger/devices/Devices";
-import ConfigDevice from "./containers/desktop/datalogger/devices/configDevice/ConfigDevice";
+import ConfigEachPoint from "./containers/desktop/datalogger/devices/configDevice/ConfigEachPoint";
+import ConfigPoints from "./containers/desktop/datalogger/devices/configDevice/ConfigPoints";
 
 import Templates from "./containers/desktop/datalogger/templates/Templates";
 import TemplatesManagement from "./containers/desktop/datalogger/templates/templatesManagement/TemplatesManagement";
@@ -93,7 +95,6 @@ import SetupControl from "./containers/desktop/scada/setupControl/SetupControl";
 import Basic from "./containers/desktop/scada/setupControl/basic/Basic";
 import ExportLimitationControl from "./containers/desktop/scada/setupControl/exportLimitationControl/ExportLimitationControl";
 import ScheduleControl from "./containers/desktop/scada/setupControl/scheduleControl/ScheduleControl";
-import { DeviceManagement } from "./containers/desktop/datalogger/devices/DeviceManagement";
 
 export default class App extends Component {
   render() {
@@ -139,7 +140,7 @@ export default class App extends Component {
                   </Route>
 
                   {/* <Route path="devices" element={<Devices />} /> */}
-                  <Route path="" element={<UploadChannel />} />
+                  <Route path="" element={<Overview />} />
 
                   <Route path="upload" element={<UploadChannel />}>
                     <Route index element={<Channel />} />
@@ -158,7 +159,9 @@ export default class App extends Component {
 
                   <Route path="devices" element={<DeviceManagement />}>
                     <Route index element={<Devices />} />
-                    <Route path=":id" element={<ConfigDevice />} />
+                    <Route path=":name" element={<ConfigPoints />}>
+                      <Route path=":id" element={<ConfigEachPoint />} />
+                    </Route>
                   </Route>
 
                   <Route path="templates" element={<Templates />}>
@@ -243,155 +246,3 @@ export default class App extends Component {
     );
   }
 }
-
-// let router = createBrowserRouter(
-//   createRoutesFromElements(
-//     <>
-//       <Route element={<PersistLogin />}>
-//         <Route path="/" element={<LoginAdmin />}>
-//           {" "}
-//         </Route>
-//         <Route path="/forgot-password" element={<ForgotPassword />}>
-//           {" "}
-//         </Route>
-//         <Route path="/reset-password" element={<ResetPassword />}>
-//           {" "}
-//         </Route>
-//         <Route element={<RequiredAuth />}>
-//           <Route element={<ProjectSetupInformation />}>
-//             <Route path="/datalogger" element={<Datalogger />}>
-//               <Route path="quickstart" element={<QuickStart />}>
-//                 <Route index element={<SiteInformation />} />
-//                 <Route path="ethernet-1" element={<EnthernetOne />} />
-//                 <Route path="ethernet-2" element={<EnthernetTwo />} />
-//                 <Route path="firmware" element={<Firmware />} />
-//                 <Route path="rs485-1" element={<RS485One />} />
-//                 <Route path="rs485-2" element={<RS485Two />} />
-//                 <Route path="logging-rate" element={<LoggingRate />} />
-//                 <Route path="upload-channels" element={<UploadChannels />} />
-//                 <Route path="remote-access" element={<RemoteAccess />} />
-//                 <Route path="done" element={<Done />} />
-//               </Route>
-//               <Route path="overview" element={<Overview />} />
-//               <Route path="rs485" element={<RS485 />}>
-//                 <Route index element={<RS485OneRS />} />
-//                 <Route path="2" element={<RS485TwoRS />} />
-//                 <Route path="options" element={<RS485Options />} />
-//               </Route>
-
-//               <Route path="modHoppers" element={<ModHoppers />}>
-//                 <Route index element={<ModHoppersOne />} />
-//                 <Route path="2" element={<ModHoppersTwo />} />
-//                 <Route path="group-options" element={<GroupOptions />} />
-//               </Route>
-
-//               <Route path="devices" element={<Devices />} />
-//               <Route path="" element={<UploadChannel />} />
-
-//               <Route path="upload" element={<UploadChannel />}>
-//                 <Route index element={<Channel />} />
-//                 <Route path="channel" element={<Channel />} />
-//                 <Route path="schedule" element={<Schedule />} />
-//               </Route>
-
-//               <Route path="networking" element={<Networking />}>
-//                 <Route index element={<NetworkEnthernetOne />} />
-//                 <Route path="ethernet-1" element={<NetworkEnthernetOne />} />
-//                 <Route path="ethernet-2" element={<NetworkEnthernetTwo />} />
-//                 <Route path="network-access" element={<NetworkAccess />} />
-//                 <Route path="remote-acesss" element={<NWRemoteAccess />} />
-//                 <Route path="static-routes" element={<StaticRoutes />} />
-//               </Route>
-
-//               <Route path="devices" element={<Devices />}>
-//                 <Route path=":id" element={<ConfigDevice />} />
-//               </Route>
-
-//               <Route path="templates" element={<Templates />}>
-//                 <Route index element={<TemplatesManagement />} />
-//                 <Route path=":id" element={
-//                   <>
-//                     <TemplateConfigContext />
-//                     <ImportantForm />
-//                   </>
-//                 }>
-//                   <Route path="points" element={<PointList />} />
-//                   <Route path="mppt" element={<MPPTList />} />
-//                   <Route path="registers" element={<RegisterBlocks />} />
-//                 </Route>
-//               </Route>
-
-//               <Route path="data" element={<Data />}>
-//                 <Route index element={<DataLogs />} />
-//                 <Route path="logging-rate" element={<DataLoggingRate />} />
-//                 <Route path="sync-history" element={<SyncHistory />} />
-//               </Route>
-
-//               <Route path="alarms" element={<Alarms />} />
-
-//               <Route path="system" element={<System />}>
-//                 <Route index element={<SystemSiteInformation />} />
-//                 <Route path="datetime" element={<DateTime />} />
-//                 <Route path="backup-restore" element={<BackupRestore />} />
-//                 <Route path="firmware" element={<SystemFirmware />} />
-//                 <Route path="auto-update" element={<AutoUpdate />} />
-//                 <Route path="reboot-shutdown" element={<RebootShutdown />} />
-//                 <Route path="synchronized" element={<Synchronized />} />
-//                 <Route path="alarm" element={<Alarm />} />
-//               </Route>
-
-//               <Route path="users" element={<Users />}></Route>
-
-//               <Route
-//                 path="permissions-roles"
-//                 element={<PermissionsAndRoles />}
-//               ></Route>
-//             </Route>
-//           </Route>
-
-//           <Route path="/scada" element={<Scada />}>
-//             <Route index element={<ScadaOverview />} />
-//             <Route path="overview" element={<ScadaOverview />} />
-//             <Route path="dashboard" element={<ScadaDashboard />} />
-//             <Route path="devices" element={<Scada />}>
-//               <Route index element={<ScadaDevices />} />
-//               <Route path="setup/:id" element={<ScadaSetup />} />
-//               <Route path="dc-combiner/:id" element={<ScadaDCCombiner />} />
-//             </Route>
-
-//             <Route path="alarms" element={<ScadaAlarm />} />
-
-//             <Route path="trend" element={<Trend />}>
-//               <Route index element={<Realtime />} />
-//               <Route path="historical" element={<Historical />} />
-//               <Route path="weather" element={<Weather />} />
-//               <Route path="ups" element={<UPS />} />
-//               <Route path="meter" element={<Meter />} />
-//             </Route>
-
-//             <Route path="charting" element={<ScadaCharting />} />
-//             <Route path="report" element={<ScadaReport />} />
-
-//             <Route path="setup-control" element={<SetupControl />}>
-//               <Route index element={<Basic />} />
-//               <Route
-//                 path="export-limitation-control"
-//                 element={<ExportLimitationControl />}
-//               />
-//               <Route
-//                 path="schedule-control"
-//                 element={<ScheduleControl />}
-//               />
-//             </Route>
-//           </Route>
-//         </Route>
-//       </Route>
-
-//       <Route path="/*" element={<Error />} />
-//     </>
-//   )
-// );
-
-// export default function App() {
-//   return <RouterProvider router={router} />;
-// }

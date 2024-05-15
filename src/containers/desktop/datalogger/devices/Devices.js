@@ -10,35 +10,73 @@ import AddDevice from './addDevice/AddDevice';
 
 import Button from '../../../../components/button/Button';
 import useDevices from './useDevices';
-import ConfigDevice from './configDevice/ConfigDevice';
+import ConfigDevice from './configDevice/ConfigPoints';
 import _ from "lodash";
 import { TreeProvider } from "../../../../components/treeView/useTree";
+import { useParams } from "react-router-dom";
+import Modal from "../../../../components/modal/Modal";
 
 export default function Devices() {
   const {
     isAddDevice,
-    openAddDevice,
-    closeAddDevice,
+    isDeleteDevice,
     dataDevices,
-    setAllDevices,
     deviceConfig,
     columns,
-    selectedDevice,
-    setSelectedDevice,
+    openAddDevice,
+    closeAddDevice,
     deleteDevices,
+    setIsDeleteDevice,
   } = useDevices();
 
   const [rowSelection, setRowSelection] = useState([]);
+  const { name } = useParams();
 
   return (
     <div className={`main ${styles.main_devices}`}>
       {isAddDevice &&
         <TreeProvider>
-          <AddDevice closeAddDevice={closeAddDevice} deviceConfig={deviceConfig} setdataDevices={setAllDevices} />
+          <AddDevice closeAddDevice={closeAddDevice} deviceConfig={deviceConfig} />
         </TreeProvider>
       }
       {
-        selectedDevice?.id ? <ConfigDevice device={selectedDevice} setDevice={setSelectedDevice} /> :
+        isDeleteDevice &&
+        <Modal
+          title="Delete Devices"
+          isOpen={isDeleteDevice}
+          close={() => setIsDeleteDevice(false)}
+          footer={(
+            <>
+              <Button
+                variant="white"
+                onClick={() => {
+                  setIsDeleteDevice(false);
+                }}
+              >
+                <Button.Text text="Cancel" />
+              </Button>
+              <Button
+                variant="dark"
+                onClick={() => {
+                  let ids = [];
+                  Object.keys(rowSelection).forEach((key) => {
+                    if (rowSelection[key]) ids.push(dataDevices[key].id);
+                  });
+                  deleteDevices(ids);
+                  setRowSelection([]);
+                  setIsDeleteDevice(false);
+                }}
+              >
+                <Button.Text text="Delete" />
+              </Button>
+            </>
+          )}
+        >
+          Are you sure you want to delete the selected devices?
+        </Modal>
+      }
+      {
+        name ? <ConfigDevice /> :
           <>
             <Table
               columns={{ columnDefs: columns }}
@@ -62,12 +100,7 @@ export default function Devices() {
                 className="mt-3 ms-3"
                 variant="dark"
                 onClick={() => {
-                  let ids = [];
-                  Object.keys(rowSelection).forEach((key) => {
-                    if (rowSelection[key]) ids.push(dataDevices[key].id);
-                  });
-                  deleteDevices(ids);
-                  setRowSelection([]);
+                  setIsDeleteDevice(true);
                 }}
               >
                 <Button.Text text="Delete Device" />

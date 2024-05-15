@@ -21,7 +21,7 @@ import _ from 'lodash';
 export default function AddDevice(props) {
   const navigate = useNavigate();
 
-  const { closeAddDevice, deviceConfig, setdataDevices } = props;
+  const { closeAddDevice, deviceConfig } = props;
   const {
     isAddMultipleDevice,
     setIsOpenAddMultipleDevice,
@@ -35,7 +35,7 @@ export default function AddDevice(props) {
     handleSave,
     handleAddMultipleDevice,
     deviceConfigDropdown,
-  } = useAddDevice(closeAddDevice, deviceConfig, setdataDevices);
+  } = useAddDevice(closeAddDevice, deviceConfig);
   const [protocol, setProtocol] = useState({
     Physical: 1,
     Virtual: 0
@@ -186,7 +186,10 @@ export default function AddDevice(props) {
                         };
                       })}
                       onChange={(e) => {
-                        let template = deviceConfigDropdown?.template.map(item => item.options.filter(item => item.value.id_device_group === e?.value))[0][0];
+                        let template = deviceConfigDropdown?.template.map(item => item.options.filter(item => item.value.id_device_group === e?.value)).flat() || {};
+                        if (template.length >= 0) {
+                          template = template[0];
+                        }
                         setInitialValues({
                           ...initialValues,
                           device_group: e,

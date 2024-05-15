@@ -10,8 +10,10 @@ import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
 import Constants from '../../../../../utils/Constants';
 import LibToast from '../../../../../utils/LibToast';
 import { loginService } from '../../../../../services/loginService';
+import { useDeviceManagement } from '../DeviceManagement';
 
-export default function useAddDevice(closeAddDevice, deviceConfig, setdataDevices) {
+export default function useAddDevice(closeAddDevice, deviceConfig) {
+  const { setAllDevices } = useDeviceManagement();
   const [isAddMultipleDevice, setIsAddMultipleDevice] = useState(false);
   const [isOpenAddMultipleDevice, setIsOpenAddMultipleDevice] = useState(false);
   const navigate = useNavigate();
@@ -51,7 +53,6 @@ export default function useAddDevice(closeAddDevice, deviceConfig, setdataDevice
     num_of_devices: yup.number().required("Number of devices is required").min(1, "Number of devices must be greater than 0").max(16, "Number of devices must be less than 16"),
     mode: yup.number().required("Mode is required"),
     id_device_type: yup.number().required("Device type is required"),
-    id_device_group: yup.number().required("Device group is required"),
     id_communication: yup.number().required("Communication is required"),
     rtu_bus_address: yup.number().required("RTU Bus Address is required").min(502, "RTU Bus Address must be greater than 501").max(65535, "RTU Bus Address must be less than 65536"),
     ...(
@@ -176,7 +177,6 @@ export default function useAddDevice(closeAddDevice, deviceConfig, setdataDevice
     setTimeout(() => {
       setData(data);
       setInitialValues({ ...initialValues, ...data });
-
       if (!data?.id_template) {
         LibToast.toast("Please select a template", "error");
         return;
@@ -202,8 +202,8 @@ export default function useAddDevice(closeAddDevice, deviceConfig, setdataDevice
             },
           });
 
-          setdataDevices(response.data)
-          LibToast.toast("Device added successfully", "info")
+          setAllDevices(response.data)
+          LibToast.toast("New devices are being added. It would take a few minutes.", "info")
         } catch (error) {
           loginService.handleMissingInfo(error, "Failed to add device") && navigate("/", { replace: true });
         }

@@ -4,6 +4,7 @@
     position: sticky;
     top: 0;
     text-wrap: nowrap;
+    z-index: 1000;
 
     &:first-child {
         padding-left: 20px;
