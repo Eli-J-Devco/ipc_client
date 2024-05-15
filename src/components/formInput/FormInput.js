@@ -314,6 +314,38 @@ function File({ className, name, value, disabled, readOnly, accept, onChange }) 
 }
 FormInput.File = File;
 
+function Switch({
+    className,
+    label,
+    name,
+    checked,
+    disabled,
+    inline,
+    onChange,
+    onBlur
+}) {
+    const validate = useContext(FormInputContext);
+
+    return (
+        <Form.Check
+            type="switch"
+            id={name}
+            name={name}
+            label={label}
+            disabled={disabled}
+            inline={inline}
+            className={`${styles["form-check"]} ${className ? className : ""} ${styles.switch}`}
+            checked={validate && checked === undefined ? validate.values[name] : checked}
+            onChange={validate && onChange === undefined ? validate.handleChange : onChange}
+            onBlur={validate && onBlur === undefined ? validate.handleBlur : onBlur}
+            isInvalid={validate ? validate.touched[name] && validate.errors[name] : false}
+            feedback={validate ? validate.errors[name] : ""}
+            feedbackType="invalid"
+        />
+    );
+}
+FormInput.Switch = Switch;
+
 export const FormInputEnum = {
     Text: {
         component: (props) => <FormInput.Text {...props} />,
@@ -331,6 +363,10 @@ export const FormInputEnum = {
         component: (props) => <FormInput.File {...props} />,
         type: "File"
     },
+    Switch: {
+        component: (props) => <FormInput.Switch {...props} />,
+        type: "Switch"
+    }
 };
 
 export default FormInput;

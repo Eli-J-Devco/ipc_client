@@ -21,7 +21,7 @@ $box-shadow-dark: 0 0 0 0.25rem rgba(56, 52, 52, 0.25);
 
     @media screen and (max-width: 768px) {
         &.horizontal {
-            flex-direction: column;
+            display: block;
 
             label {
                 margin-right: 0;
@@ -33,7 +33,10 @@ $box-shadow-dark: 0 0 0 0.25rem rgba(56, 52, 52, 0.25);
 }
 
 .form-check {
+    cursor: pointer;
+
     input {
+        cursor: pointer;
 
         &:checked,
         &[type=checkbox]:indeterminate {

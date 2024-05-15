@@ -15,10 +15,12 @@ import _ from "lodash";
 import { TreeProvider } from "../../../../components/treeView/useTree";
 import { useParams } from "react-router-dom";
 import Modal from "../../../../components/modal/Modal";
+import UpdateDevice from "./updateDevice/UpdateDevice";
 
 export default function Devices() {
   const {
     isAddDevice,
+    isUpdateDevice,
     isDeleteDevice,
     dataDevices,
     deviceConfig,
@@ -27,6 +29,8 @@ export default function Devices() {
     closeAddDevice,
     deleteDevices,
     setIsDeleteDevice,
+    openUpdateDevice,
+    closeUpdateDevice
   } = useDevices();
 
   const [rowSelection, setRowSelection] = useState([]);
@@ -35,9 +39,11 @@ export default function Devices() {
   return (
     <div className={`main ${styles.main_devices}`}>
       {isAddDevice &&
-        <TreeProvider>
-          <AddDevice closeAddDevice={closeAddDevice} deviceConfig={deviceConfig} />
-        </TreeProvider>
+        <AddDevice closeAddDevice={closeAddDevice} deviceConfig={deviceConfig} />
+      }
+      {
+        isUpdateDevice &&
+        <UpdateDevice isShow={isUpdateDevice} closeUpdateDevice={closeUpdateDevice} />
       }
       {
         isDeleteDevice &&

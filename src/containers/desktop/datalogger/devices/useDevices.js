@@ -114,7 +114,7 @@ export default function useDevices() {
           />
           <Button.Image
             image={<EditIcon />}
-            onClick={() => handleConfigDevice(row.original)}
+            onClick={() => handleUpdateDevice(row.original)}
             className={"mx-2"}
           />
         </div>
@@ -127,6 +127,11 @@ export default function useDevices() {
     navigate(`/datalogger/devices/${item?.name.trim()}`, { state: { from: "/datalogger/devices" } });
     setRoutes((prev) => [...prev, { path: `/datalogger/devices/${item?.name.trim()}`, name: item?.name.trim() }]);
   };
+
+  const handleUpdateDevice = (device) => {
+    setDevice(device);
+    openUpdateDevice();
+  }
 
   const openAddDevice = () => setIsAddDevice(true);
   const closeAddDevice = () => setIsAddDevice(false);
@@ -141,18 +146,28 @@ export default function useDevices() {
 
   useEffect(() => {
     let new_data = _.cloneDeep(allDevices.map((d) => {
+      if (d["is_online"] === -2) {
+        return d;
+      }
+
       const index = data.findIndex((item) => item.id_device === d.id);
-      if (index !== -1) {
-        d["status"] = data[index]["status_device"];
+      if (d["is_online"] === -1) {
+        if (index === -1) {
+          d["status"] = "Deleted";
+          d["is_online"] = -2;
+        }
+      } else if (index !== -1) {
+        d["status"] = data[index]["status_device"] === "" ? "offline" : data[index]["status_device"];
         d["message"] = data[index]["message"];
         d["is_online"] = 1;
       }
       else {
+        d["status"] = "Initiating...";
         d["is_online"] = 0;
       }
       return d;
     }));
-    new_data = new_data.filter((d) => d["is_online"] === 1);
+    new_data = new_data.filter((d) => d["is_online"] !== -2);
     setDataDevices(new_data);
   }, [data]);
 
@@ -162,7 +177,14 @@ export default function useDevices() {
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(Constants.API_URL.DEVICES.DELETE, devices);
-        setAllDevices(response.data);
+        setAllDevices(response.data.map((d) => {
+          if (devices.includes(d.id)) {
+            console.log(d);
+            d["status"] = "Deleting...";
+            d["is_online"] = -1;
+          }
+          return d;
+        }));
         LibToast.toast("Devices are being deleted. It would take a few minutes.", "info");
       } catch (error) {
         loginService.handleMissingInfo(error, "Failed to delete devices") && navigate("/", { replace: true });
