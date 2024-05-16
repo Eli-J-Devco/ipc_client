@@ -4,7 +4,7 @@ import FormInput from "../../../../../../../components/formInput/FormInput";
 import Modal from "../../../../../../../components/modal/Modal";
 import { useTemplate } from "../../useTemplate";
 import styles from "./EditMPPTModal.module.scss";
-import useEditMPPTModal from "./useEditPMPPTModal";
+import useEditMPPTModal from "./useEditMPPTModal";
 import _ from "lodash";
 
 function EditMPPTModal({ isOpen, close, data, setPoint }) {
@@ -45,9 +45,7 @@ function EditMPPTModal({ isOpen, close, data, setPoint }) {
         setModbusConfig(currentData?.type_point);
         setModbusRegisterType(currentData?.type_class);
 
-        let unitGroup = point_unit.filter((item) =>
-          item?.name.match(/---/i)
-        );
+        let unitGroup = point_unit.filter((item) => item?.name.match(/---/i));
         let units = [];
         unitGroup.forEach((group) => {
           let firstItemIndex = point_unit.indexOf(group) + 1;

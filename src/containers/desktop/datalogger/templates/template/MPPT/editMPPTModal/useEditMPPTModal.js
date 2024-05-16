@@ -113,15 +113,15 @@ function useEditMPPTModal(data, close, setPoint, setCurrentData) {
         : null,
       type_point_list: selectedPointListType.value
         ? {
-          id: selectedPointListType.value,
-          name: selectedPointListType.label,
-        }
+            id: selectedPointListType.value,
+            name: selectedPointListType.label,
+          }
         : null,
       type_control: selectedControlGroup.value
         ? {
-          id: selectedControlGroup.value,
-          name: selectedControlGroup.label,
-        }
+            id: selectedControlGroup.value,
+            name: selectedControlGroup.label,
+          }
         : null,
     };
     var output = document.getElementById("progress");
@@ -129,7 +129,7 @@ function useEditMPPTModal(data, close, setPoint, setCurrentData) {
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.POINT.UPDATE,
+          Constants.API_URL.POINT.UPDATE,
           {
             ...point,
           },
@@ -151,7 +151,8 @@ function useEditMPPTModal(data, close, setPoint, setCurrentData) {
           LibToast.toast("Point updated successfully", "info");
         }
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to update point") && navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to update point") &&
+          navigate("/", { replace: true });
       }
     }, 500);
   };
