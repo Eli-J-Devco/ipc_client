@@ -106,7 +106,7 @@ export default function AddPointModal({ addChildrenModal, setAddChildrenModal })
         <>
             {Object.values(addChildrenModal).filter((item) => item.isOpen === true)
                 .length > 0 && (
-                    <>
+                    <div className="container">
                         {Object.keys(addChildrenModal).map((key, index) => {
                             let item = addChildrenModal[key];
                             return (
@@ -217,7 +217,7 @@ export default function AddPointModal({ addChildrenModal, setAddChildrenModal })
                                                                         <Table
                                                                             className="mt-3"
                                                                             visible
-                                                                            maxHeight="calc(100vh - 550px)"
+                                                                            maxHeight="40vh"
                                                                             columns={{ columnDefs: columns }}
                                                                             data={pointList}
                                                                             selectRow={{
@@ -237,7 +237,7 @@ export default function AddPointModal({ addChildrenModal, setAddChildrenModal })
                                 )
                             );
                         })}
-                    </>
+                    </div>
                 )}
         </>
     );

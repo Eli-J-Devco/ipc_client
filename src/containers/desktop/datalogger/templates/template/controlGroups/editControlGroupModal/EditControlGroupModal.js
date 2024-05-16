@@ -126,7 +126,7 @@ function EditControlGroupModal({ isOpen, close, data, setPoint, isEdit }) {
               <Table
                 className="mt-3"
                 visible
-                maxHeight="calc(100vh - 700px)"
+                maxHeight="40vh"
                 columns={{ columnDefs: columns }}
                 data={pointList}
                 selectRow={{

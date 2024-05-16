@@ -564,24 +564,16 @@ function useMPPTList() {
         }
       });
 
-    let data = deletePoint.map((point) => {
-      return {
-        id_point: point?.id,
-        id_pointkey: point?.id_pointkey,
-        id_config_information: point?.id_config_information,
-        parent: point?.parent,
-      };
-    });
+    let data = {
+      id_points: deletePoint.map((point) => point?.id),
+      id_template: id,
+    }
 
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.POINT.DELETE_MPPT,
-          {
-            id_template: id,
-            points: data,
-          },
+          Constants.API_URL.POINT_MPPT.DELETE, data,
           {
             headers: {
               "Content-Type": "application/json",
@@ -590,18 +582,11 @@ function useMPPTList() {
         );
         if (response?.status === 200) {
           LibToast.toast("Delete points success", "info");
-          setDefaultMPPTList(response?.data?.mppt_list);
+          setDefaultMPPTList(response?.data);
           setIsSetUp(true);
         }
       } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        } else if (!msg) {
-          LibToast.toast("Delete point failed", "error");
-        } else {
-          navigate("/", { replace: true });
-        }
+        loginService.handleMissingInfo(error, "Failed to delete points") && navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }

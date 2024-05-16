@@ -100,10 +100,11 @@ const Constants = {
       ADD: "/point_mppt/add/",
       ADD_STRING: "/point_mppt/add/string/",
       ADD_PANEL: "/point_mppt/add/panel/",
+      DELETE: "/point_mppt/delete/",
     },
     POINT_CONTROL: {
       LIST: "/point/get/",
-      ADD: "/point/add/",
+      ADD: "/point_control/add/",
       UPDATE: "/point/update/",
       DELETE: "/point/delete/",
     },

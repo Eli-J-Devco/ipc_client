@@ -136,17 +136,15 @@ function useEditControlGroupModal(
         }
         : {
           id_template: id,
-          control_group: {
-            ...values,
-            attributes: selectedAttributes.value,
-            children: Object.keys(rowSelection).map((key) => pointList[key]),
-          },
+          ...values,
+          attributes: selectedAttributes.value,
+          id_points: Object.keys(rowSelection).map((key) => pointList[key]?.id),
         }),
     };
     let url = isEdit
-      ? Constants.API_URL.TEMPLATE.CONTROL_GROUP.UPDATE
-      : Constants.API_URL.TEMPLATE.CONTROL_GROUP.CREATE;
-
+      ? Constants.API_URL.POINT_CONTROL.UPDATE
+      : Constants.API_URL.POINT_CONTROL.ADD;
+    console.log(group);
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
@@ -173,8 +171,8 @@ function useEditControlGroupModal(
               });
               LibToast.toast("Control Group successfully", "info");
             } else {
-              setDefaultControlGroupList(response.data?.control_group_list);
-              setDefaultPointList(response.data?.point_list);
+              setDefaultControlGroupList(response.data?.point_controls);
+              setDefaultPointList(response.data?.points);
               setPoint();
               LibToast.toast("Control Group created successfully", "info");
             }
@@ -182,14 +180,8 @@ function useEditControlGroupModal(
           close();
         }
       } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        } else if (!msg) {
-          LibToast.toast("Failed to update point", "error");
-        } else {
-          navigate("/");
-        }
+        loginService.handleMissingInfo(error, "Failed to create control group") &&
+          navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }
