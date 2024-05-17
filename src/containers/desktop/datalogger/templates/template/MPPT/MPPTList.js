@@ -229,7 +229,7 @@ function MPPTList() {
             visible
             resizable
             draggable
-            maxHeight="80vh"
+            maxHeight="60vh"
             columns={{ columnDefs: columns }}
             data={pointList}
             selectRow={{

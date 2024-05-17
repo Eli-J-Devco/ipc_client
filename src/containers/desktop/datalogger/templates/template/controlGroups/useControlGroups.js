@@ -141,7 +141,10 @@ export default function useControlGroups() {
       setIsSetUp(false);
       output.innerHTML = "";
     }, 100);
-  }, [defaultControlGroupList]);
+  }, [defaultControlGroupList, isSetUp]);
+
+  useEffect(() => {
+  }, [isSetUp]);
 
   /**
    * Close the modal
@@ -299,21 +302,23 @@ export default function useControlGroups() {
       ),
       cell: ({ row }) => {
         return (
-          <FormInput.Check
-            {...{
-              inline: true,
-              name: row.original.index,
-              label: !_.isEqual(
-                row.original?.config,
-                POINT_CONFIG.CONTROL_GROUP
-              )
-                ? `pt${row.original.index}`
-                : `Group${row.original.index}`,
-              checked: row.getIsSelected(),
-              onChange: row.getToggleSelectedHandler(),
-              indeterminate: row.getIsSomeSelected(),
-            }}
-          />
+          <div style={{ paddingLeft: `${row.depth * 2}rem` }}>
+            <FormInput.Check
+              {...{
+                inline: true,
+                name: row.original.index,
+                label: !_.isEqual(
+                  row.original?.config,
+                  POINT_CONFIG.CONTROL_GROUP
+                )
+                  ? `pt${row.original.index}`
+                  : `Group${row.original.index}`,
+                checked: row.getIsSelected(),
+                onChange: row.getToggleSelectedHandler(),
+                indeterminate: row.getIsSomeSelected(),
+              }}
+            />
+          </div>
         );
       },
     }),
@@ -405,7 +410,7 @@ export default function useControlGroups() {
                       }),
                       isOpen: true,
                       id: row.original.id,
-                      has_children: row.original?.subRows?.length > 0,
+                      hasChildren: row.original?.subRows?.length > 0,
                     },
                   })
                 }, 100);
@@ -435,10 +440,11 @@ export default function useControlGroups() {
     }
 
     let url = isDeletePoints ?
-      Constants.API_URL.TEMPLATE.POINT.DELETE :
+      Constants.API_URL.POINT.DELETE :
       isChildrenSelected ?
-        Constants.API_URL.TEMPLATE.POINT.REMOVE_GROUP :
-        Constants.API_URL.TEMPLATE.CONTROL_GROUP.DELETE;
+        Constants.API_URL.POINT_CONTROL.REMOVE :
+        Constants.API_URL.POINT_CONTROL.GROUP.DELETE;
+
     let successMsg = isDeletePoints ?
       "Delete points success" :
       isChildrenSelected ?
@@ -457,36 +463,32 @@ export default function useControlGroups() {
         }
       });
 
-      let data = deletePoint.map((point) => {
-        return {
-          id_point: point?.id,
-          id_pointkey: point?.id_pointkey,
-        };
-      });
+      let data = deletePoint.map(point => point.id);
       body = {
         id_template: id,
-        points: data,
+        id_points: data,
       }
     }
 
     if (isGroupSelected) {
       let deleteGroup = [];
+      let deletePoint = [];
       Object.keys(rowSelection).forEach((key) => {
-        if (key?.split(".").length > 1) {
-          return;
-        }
+        let parent = key.length > 1 ? key.split(".")[0] : key;
+        let child = key.length > 1 ? key.split(".")[1] : null;
 
-        if (isGroupSelected && !isGroupOnly) {
-          deleteGroup.push(pointList[parseInt(key)]);
-          return;
-        }
+        if (deleteGroup.indexOf(pointList[parseInt(parent)]?.id) === -1)
+          deleteGroup.push(pointList[parseInt(parent)]?.id);
 
-        deleteGroup.push({ ...pointList[parseInt(key)], children: [] });
+        if (!isGroupOnly && child !== null) {
+          deletePoint.push(pointList[parseInt(key)]?.children[parseInt(child)]?.id);
+        }
       });
 
       body = {
         id_template: id,
-        control_group: deleteGroup,
+        id_group: deleteGroup,
+        id_points: deletePoint,
       };
     }
 
@@ -505,24 +507,13 @@ export default function useControlGroups() {
 
         if (response?.status === 200) {
           LibToast.toast(successMsg, "info");
-          setDefaultControlGroupList(response?.data?.control_group_list);
-          setDefaultPointList(response?.data?.point_list);
+          setDefaultControlGroupList(response?.data?.point_controls);
+          setDefaultPointList(response?.data?.points);
           setRowSelection({});
           setIsSetUp(true);
         }
       } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-          return;
-        }
-
-        if (!msg) {
-          LibToast.toast("Delete point failed", "error");
-          return;
-        }
-
-        navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to remove points") && navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }
@@ -535,21 +526,31 @@ export default function useControlGroups() {
    * @author nhan.tran 2024-04-10
    */
   const addNewChildren = (data) => {
-    console.log(data);
-    let body = {
-      number_of_point: data.num_of_point,
-      id_template: id,
-      id_control_group: data.id_control_group,
-      is_clone_from_last: data.is_clone_from_last || false,
-      selected_points: data?.selected_points || null,
-    };
+    let body = {};
+    let url = "";
+    if (data?.selected_points.length > 0) {
+      body = {
+        id_control_group: data.id_control_group,
+        id_template: id,
+        id_points: data.selected_points?.map(point => point.id),
+      }
+      url = Constants.API_URL.POINT_CONTROL.ADD_EXIST;
+    } else {
+      body = {
+        number_of_points: data.num_of_point,
+        id_template: id,
+        id_control_group: data.id_control_group,
+        is_clone_from_last: data.is_clone_from_last || false,
+      };
+      url = Constants.API_URL.POINT_CONTROL.ADD_NEW;
+    }
 
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
 
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.POINT.ADD_POINT,
+          url,
           body,
           {
             headers: {
@@ -558,21 +559,14 @@ export default function useControlGroups() {
           }
         );
         if (response?.status === 200) {
-          setDefaultControlGroupList(response?.data?.control_group_list);
-          setDefaultPointList(response?.data?.point_list);
+          setDefaultControlGroupList(response?.data?.point_controls);
+          setDefaultPointList(response?.data?.points);
           setRowSelection({});
           setIsSetUp(true);
           LibToast.toast("Add new children success", "info");
         }
       } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        } else if (!msg) {
-          LibToast.toast("Add new children failed", "error");
-        } else {
-          navigate("/", { replace: true });
-        }
+        loginService.handleMissingInfo(error, "Failed to add new children") && navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
         setAddChildrenModal({

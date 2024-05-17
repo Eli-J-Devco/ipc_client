@@ -16,11 +16,23 @@ import { useNavigate } from "react-router-dom";
 import Modal from "../../../../../components/modal/Modal";
 
 function TemplatesManagement() {
-    const { isModalOpen, openModal, closeModal, template, columns, templateList, setTemplateList, handleOnItemEdit, fileUpload, handleFileUploadChange } = useTemplatesManagement();
+    const {
+        isModalOpen,
+        openModal,
+        closeModal,
+        template,
+        columns,
+        templateList,
+        setTemplateList,
+        handleOnItemEdit,
+        fileUpload,
+        handleFileUploadChange
+    } = useTemplatesManagement();
     const axiosPrivate = useAxiosPrivate();
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [isConfirmDelete, setIsConfirmDelete] = useState({ state: false, item: {} });
+
     useEffect(() => {
         if (templateList.length > 0) return;
 
@@ -48,22 +60,13 @@ function TemplatesManagement() {
         setTimeout(async () => {
             let id = item.id;
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.DELETE, { id_template: id });
+                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.DELETE, { id: id });
                 if (response?.status === 200) {
                     setTemplateList(templateList.filter(item => item.id !== id));
                     LibToast.toast(`Tempate ${item?.name} ${t('toastMessage.info.delete')}`, "info");
                 }
             } catch (error) {
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === "string") {
-                    LibToast.toast(msg, "error");
-                }
-                else {
-                    if (!msg)
-                        LibToast.toast(t('toastMessage.error.delete'), "error");
-                    else
-                        navigate("/")
-                }
+                loginService.handleMissingInfo(error, "Failed to delete template") && navigate("/", { replace: true });
             } finally {
                 output.innerHTML = "";
                 setIsConfirmDelete({ state: false, item: "" });

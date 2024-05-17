@@ -392,19 +392,21 @@ function useMPPTList() {
       ),
       cell: ({ row }) => {
         return (
-          <FormInput.Check
-            {...{
-              inline: true,
-              name: row.original.index,
-              label: `pt${row.original.index}`,
-              checked: row.getIsSelected(),
-              onChange: row.getToggleSelectedHandler(),
-              disabled: POINT_CONFIG.MPPT_CONFIG.values.includes(
-                row.original?.id_config_information
-              ),
-              indeterminate: row.getIsSomeSelected(),
-            }}
-          />
+          <div style={{ paddingLeft: `${row.depth * 2}rem` }}>
+            <FormInput.Check
+              {...{
+                inline: true,
+                name: row.original.index,
+                label: `pt${row.original.index}`,
+                checked: row.getIsSelected(),
+                onChange: row.getToggleSelectedHandler(),
+                disabled: POINT_CONFIG.MPPT_CONFIG.values.includes(
+                  row.original?.id_config_information
+                ),
+                indeterminate: row.getIsSomeSelected(),
+              }}
+            />
+          </div>
         );
       },
     }),

@@ -132,7 +132,7 @@ function RegisterBlocks() {
                         onSubmit={applyUpdate}
                     >
                         <Table
-                            maxHeight="600px"
+                            maxHeight="60vh"
                             columns={{ columnDefs: columns }}
                             data={registerList}
                             selectRow={

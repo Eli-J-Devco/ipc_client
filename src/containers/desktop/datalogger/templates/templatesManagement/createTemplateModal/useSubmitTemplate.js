@@ -55,16 +55,7 @@ function useSubmitTemplate(close, closeGroup) {
                     navigate(`/datalogger/templates/${response.data?.id}/points`);
                 }
             } catch (error) {
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === "string") {
-                    LibToast.toast(msg, "error");
-                }
-                else {
-                    if (msg)
-                        LibToast.toast(t('toastMessage.error.create'), "error");
-                    else
-                        navigate("/")
-                }
+                loginService.handleMissingInfo(error, "Failed to create new template") && navigate("/", { replace: true });
             } finally {
                 output.innerHTML = "";
             }
@@ -85,16 +76,7 @@ function useSubmitTemplate(close, closeGroup) {
                     closeGroup();
                 }
             } catch (error) {
-                let msg = loginService.handleMissingInfo(error);
-                if (typeof msg === "string") {
-                    LibToast.toast(msg, "error");
-                }
-                else {
-                    if (msg)
-                        LibToast.toast(t('toastMessage.error.create'), "error");
-                    else
-                        navigate("/")
-                }
+                loginService.handleMissingInfo(error, "Failed to create new group") && navigate("/", { replace: true });
             } finally {
                 output.innerHTML = "";
             }

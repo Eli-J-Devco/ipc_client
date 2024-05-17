@@ -103,10 +103,14 @@ const Constants = {
       DELETE: "/point_mppt/delete/",
     },
     POINT_CONTROL: {
-      LIST: "/point/get/",
-      ADD: "/point_control/add/",
-      UPDATE: "/point/update/",
-      DELETE: "/point/delete/",
+      ADD_EXIST: "/point_control/add/exist/",
+      ADD_NEW: "/point_control/add/new/",
+      REMOVE: "/point_control/remove/",
+      GROUP: {
+        ADD: "/point_control/group/add/",
+        UPDATE: "/point_control/group/update/",
+        DELETE: "/point_control/group/delete/",
+      }
     },
     REGISTER: {
       LIST: "/register_block/get/",

@@ -12,13 +12,12 @@ import {
 } from "../../../../../../../utils/TemplateHelper";
 import { createColumnHelper } from "@tanstack/react-table";
 import FormInput from "../../../../../../../components/formInput/FormInput";
-import _, { at } from "lodash";
+import _ from "lodash";
 
 function useEditControlGroupModal(
   data,
   close,
-  setPoint,
-  setCurrentData,
+  refresh,
   isEdit
 ) {
   const axiosPrivate = useAxiosPrivate();
@@ -142,9 +141,13 @@ function useEditControlGroupModal(
         }),
     };
     let url = isEdit
-      ? Constants.API_URL.POINT_CONTROL.UPDATE
-      : Constants.API_URL.POINT_CONTROL.ADD;
-    console.log(group);
+      ? Constants.API_URL.POINT_CONTROL.GROUP.UPDATE
+      : Constants.API_URL.POINT_CONTROL.GROUP.ADD;
+
+    let msg = isEdit
+      ? "Update control group successfully"
+      : "Create control group successfully";
+
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
@@ -161,26 +164,14 @@ function useEditControlGroupModal(
         );
 
         if (response?.status === 200) {
-          setTimeout(() => {
-            if (isEdit) {
-              setPoint({
-                ...new RowAdapter({ ...response.data }).getRow(),
-              });
-              setCurrentData({
-                ...new RowAdapter({ ...response.data }).getRow(),
-              });
-              LibToast.toast("Control Group successfully", "info");
-            } else {
-              setDefaultControlGroupList(response.data?.point_controls);
-              setDefaultPointList(response.data?.points);
-              setPoint();
-              LibToast.toast("Control Group created successfully", "info");
-            }
-          }, 100);
+          LibToast.toast(msg, "info");
+          setDefaultControlGroupList(response.data?.point_controls);
+          setDefaultPointList(response.data?.points);
+          refresh();
           close();
         }
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to create control group") &&
+        loginService.handleMissingInfo(error, "Failed to create or update control group") &&
           navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
@@ -189,6 +180,8 @@ function useEditControlGroupModal(
   };
 
   const onRefreshTable = (reason) => {
+    if (isEdit) return;
+
     if (reason === "onSelectAttribute" && Object.keys(rowSelection).length >= 0) {
       setRowSelection({});
     }

@@ -2,14 +2,11 @@ import { useEffect, useState } from "react";
 import Button from "../../../../../../../components/button/Button";
 import FormInput from "../../../../../../../components/formInput/FormInput";
 import Modal from "../../../../../../../components/modal/Modal";
-import { useTemplate } from "../../useTemplate";
-import styles from "./EditControlGroupModal.module.scss";
 import useEditControlGroupModal from "./useEditControlGroupModal";
-import _ from "lodash";
 import Table from "../../../../../../../components/table/Table";
 
-function EditControlGroupModal({ isOpen, close, data, setPoint, isEdit }) {
-  const [currentData, setCurrentData] = useState(data);
+function EditControlGroupModal({ isOpen, close, data, refreshData, isEdit }) {
+  const [currentData,] = useState(data);
 
   const {
     initialValues,
@@ -28,10 +25,13 @@ function EditControlGroupModal({ isOpen, close, data, setPoint, isEdit }) {
   } = useEditControlGroupModal(
     currentData,
     close,
-    setPoint,
-    setCurrentData,
+    refreshData,
     isEdit
   );
+
+  useEffect(() => {
+    console.log(refreshData, "refresh");
+  }, [refreshData]);
 
   return (
     <Modal
