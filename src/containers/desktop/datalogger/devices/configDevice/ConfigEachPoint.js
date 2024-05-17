@@ -92,7 +92,7 @@ export default function ConfigEachPoint({ point, setPoints }) {
         }, 300);
     }
 
-    return (
+    return device && (
         <div className={styles.config_point}>
             <FormInput
                 initialValues={initialValues}

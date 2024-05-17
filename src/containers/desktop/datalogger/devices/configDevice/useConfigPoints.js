@@ -26,7 +26,6 @@ export default function useConfigPoints() {
   const { device } = useDeviceManagement();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || { pathname: '/datalogger/devices' };
 
   const noUnits = ["None", "(No units)"];
   const [initialValues, setInitialValues] = useState({});
@@ -128,7 +127,8 @@ export default function useConfigPoints() {
 
   useEffect(() => {
     if (!device?.id) {
-      navigate(from, { replace: true });
+      navigate("/datalogger/devices/", { replace: true });
+      console.log("No device id found");
       return;
     };
 

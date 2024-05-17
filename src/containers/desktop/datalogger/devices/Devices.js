@@ -29,7 +29,6 @@ export default function Devices() {
     closeAddDevice,
     deleteDevices,
     setIsDeleteDevice,
-    openUpdateDevice,
     closeUpdateDevice
   } = useDevices();
 
