@@ -83,6 +83,7 @@ const Constants = {
       CONFIG: {
         TYPE: "/devices/config/type/get/",
         GROUP: "/devices/config/group/get/",
+        ADD_GROUP: "/devices/config/group/add/",
         POINT_MAP: "/device_point/",
         POINT_ACTION: "/device_point/action/",
         ALARM: "/device_point/alarm/",

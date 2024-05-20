@@ -66,10 +66,9 @@ function useSubmitTemplate(close, closeGroup) {
         output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
         setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.DEVICE_GROUP.CREATE, {
+                const response = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG.ADD_GROUP, {
                     name: values.name,
                     id_device_type: values.type.value,
-                    type: Constants.TEMPLATE_TYPE.CUSTOM
                 });
                 if (response?.status === 200) {
                     LibToast.toast(`Group ${values.name} ${t("toastMessage.info.create")}`, "info");
