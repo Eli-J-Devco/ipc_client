@@ -106,6 +106,7 @@ const Constants = {
       ADD_EXIST: "/point_control/add/exist/",
       ADD_NEW: "/point_control/add/new/",
       REMOVE: "/point_control/remove/",
+      DELETE: "/point_control/delete/",
       GROUP: {
         ADD: "/point_control/group/add/",
         UPDATE: "/point_control/group/update/",

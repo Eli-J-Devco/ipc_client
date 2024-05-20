@@ -440,7 +440,7 @@ export default function useControlGroups() {
     }
 
     let url = isDeletePoints ?
-      Constants.API_URL.POINT.DELETE :
+      Constants.API_URL.POINT_CONTROL.DELETE :
       isChildrenSelected ?
         Constants.API_URL.POINT_CONTROL.REMOVE :
         Constants.API_URL.POINT_CONTROL.GROUP.DELETE;
