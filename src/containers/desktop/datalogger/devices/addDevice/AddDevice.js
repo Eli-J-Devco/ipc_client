@@ -235,8 +235,8 @@ export default function AddDevice(props) {
                     <FormInput.Check
                       label="Manual"
                       name="manual_mode"
-                      checked={initialValues?.mode === 1}
-                      onChange={(e) => setInitialValues({ ...initialValues, mode: 1 })}
+                      checked={initialValues?.mode === 0}
+                      onChange={(e) => setInitialValues({ ...initialValues, mode: 0 })}
                       type='radio'
                     />
                   </div>
@@ -244,8 +244,8 @@ export default function AddDevice(props) {
                     <FormInput.Check
                       label="Auto"
                       name="auto_mode"
-                      checked={initialValues?.mode === 0}
-                      onChange={(e) => setInitialValues({ ...initialValues, mode: 0 })}
+                      checked={initialValues?.mode === 1}
+                      onChange={(e) => setInitialValues({ ...initialValues, mode: 1 })}
                       type='radio'
                     />
                   </div>

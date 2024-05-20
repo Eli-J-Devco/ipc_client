@@ -18,8 +18,8 @@ switch (url) {
   default:
     // serverAPI = "http://115.78.133.129:3001";
     // serverAPI = "http://127.0.0.1:3001";
-    serverAPI = "http://localhost:3002";
-    // serverAPI = "http://115.78.133.129:3002";
+    // serverAPI = "http://localhost:3002";
+    serverAPI = "http://115.78.133.129:3002";
     serverData = "http://localhost:3015/uploads";
     break;
 }
