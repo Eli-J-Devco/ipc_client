@@ -32,6 +32,10 @@ export const DeviceManagementProvider = ({ children }) => {
         template: [],
         communication: [],
     });
+    const [offset, setOffset] = useState(0);
+    const [limit, setLimit] = useState(Constants.DEFAULT_PAGE_SIZE);
+    const [total, setTotal] = useState(0);
+
     return (
         <DeviceManagementContext.Provider
             value={{
@@ -42,7 +46,13 @@ export const DeviceManagementProvider = ({ children }) => {
                 deviceConfig,
                 setDeviceConfig,
                 allDevices,
-                setAllDevices
+                setAllDevices,
+                offset,
+                setOffset,
+                limit,
+                setLimit,
+                total,
+                setTotal,
             }}
         >
             {children}
@@ -55,25 +65,52 @@ export function Device() {
         routes,
         setDeviceConfig,
         allDevices,
-        setAllDevices
+        setAllDevices,
+        offset,
+        limit,
+        total,
+        setTotal,
+        setOffset,
     } = useDeviceManagement();
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
     const output = document.getElementById("progress");
 
     useEffect(() => {
-        if (allDevices.length) return;
+        setTimeout(() => {
+            if (total < offset) {
+                setOffset(offset - limit > 0 ? offset - limit : 0);
+                return;
+            }
+            setAllDevices([]);
+        }, 100);
+    }, [offset, limit, total]);
+
+    useEffect(() => {
+        if (allDevices.length > 0) return;
 
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
         setTimeout(async () => {
             try {
-                const { data } = await axiosPrivate.post(Constants.API_URL.DEVICES.LIST);
-                let devices = data.map((d) => {
+                const { data } = await axiosPrivate.post(Constants.API_URL.DEVICES.LIST + `?page=${offset}&limit=${limit}`);
+                let devices = data?.data.map((d) => {
                     d["status"] = "";
                     return d;
                 });
                 setAllDevices(_.cloneDeep(devices));
+                setTotal(data?.total);
+            } catch (error) {
+                loginService.handleMissingInfo(error, "Failed to get devices") && navigate("/", { replace: true });
+            } finally {
+                output.innerHTML = "";
+            }
+        }, 500);
+    }, [allDevices]);
 
+
+    useEffect(() => {
+        setTimeout(async () => {
+            try {
                 var device_type = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG.TYPE);
                 var device_group = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG.GROUP);
                 var template = await axiosPrivate.post(Constants.API_URL.TEMPLATE.LIST, {});
@@ -87,11 +124,9 @@ export function Device() {
                 });
             } catch (error) {
                 loginService.handleMissingInfo(error, "Failed to get device configuration") && navigate("/", { replace: true });
-            } finally {
-                output.innerHTML = "";
             }
-        }, 500);
-    }, [allDevices]);
+        }, 300);
+    }, []);
 
     return (
         <div className="main">

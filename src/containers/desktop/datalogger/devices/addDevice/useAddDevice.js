@@ -13,7 +13,12 @@ import { loginService } from '../../../../../services/loginService';
 import { useDeviceManagement } from '../DeviceManagement';
 
 export default function useAddDevice(closeAddDevice, deviceConfig) {
-  const { setAllDevices } = useDeviceManagement();
+  const {
+    setAllDevices,
+    offset,
+    limit,
+    setTotal,
+  } = useDeviceManagement();
   const [isAddMultipleDevice, setIsAddMultipleDevice] = useState(false);
   const [isOpenAddMultipleDevice, setIsOpenAddMultipleDevice] = useState(false);
   const navigate = useNavigate();
@@ -196,13 +201,14 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
       output.innerHTML = "<div><img src='/loading.gif' /></div>";
       setTimeout(async () => {
         try {
-          const response = await axiosPrivate.post(Constants.API_URL.DEVICES.ADD, data, {
+          const response = await axiosPrivate.post(Constants.API_URL.DEVICES.ADD + `?page=${offset}&limit=${limit}`, data, {
             headers: {
               "Content-Type": "application/json",
             },
           });
 
-          setAllDevices(response.data)
+          setAllDevices(response.data?.data);
+          setTotal(response.data?.total);
           LibToast.toast("New devices are being added. It would take a few minutes.", "info")
         } catch (error) {
           loginService.handleMissingInfo(error, "Failed to add device") && navigate("/", { replace: true });

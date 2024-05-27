@@ -97,8 +97,10 @@ export default function AddEditModal({ isOpenModal, closeModal, setNeedRefresh }
     useEffect(() => {
         if (!roles?.length) return;
 
+        if (allRoles?.length) return;
+
         setAllRoles(roles.map(role => ({ value: role.id, label: role.name })));
-    }, [roles, allRoles, isOpenModal?.action]);
+    }, [roles, allRoles]);
 
     return (
         <FormInput id="userModal" validationSchema={schema} initialValues={isOpenModal?.user} onSubmit={handleSave}>

@@ -60,18 +60,22 @@ function useEditControlGroupModal(
     columnsHelper.accessor("id_checkbox", {
       id: "id_checkbox",
       size: 10,
-      header: ({ table }) => (
-        <FormInput.Check
-          {...{
-            inline: true,
-            name: "all",
-            label: "Point#",
-            checked: table.getIsAllRowsSelected(),
-            onChange: (e) => table.toggleAllRowsSelected(e.target.checked),
-            disabled: selectedAttributes.value !== 0 && Object.keys(rowSelection).length >= selectedAttributes.value + 1,
-          }}
-        />
-      ),
+      header: ({ table }) => {
+        return selectedAttributes.value === 0 ?
+          (<FormInput.Check
+            {...{
+              inline: true,
+              name: "all",
+              label: "Point#",
+              checked: table.getIsAllRowsSelected(),
+              onChange: (e) => table.toggleAllRowsSelected(e.target.checked),
+              disabled: selectedAttributes.value !== 0 && Object.keys(rowSelection).length >= selectedAttributes.value + 1,
+            }}
+          />
+          ) : (
+            <div>Point</div>
+          );
+      },
       cell: ({ row }) => {
         return (
           <FormInput.Check

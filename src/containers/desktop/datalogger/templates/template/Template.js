@@ -22,6 +22,8 @@ function Template() {
         setDefaultRegisterList,
         setDefaultControlGroupList,
         setConfig,
+        deviceType,
+        setDeviceType
     } = useTemplate();
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
@@ -40,6 +42,7 @@ function Template() {
                     setDefaultMPPTList(response?.data?.point_mppt);
                     setDefaultRegisterList(response?.data?.register_blocks);
                     setDefaultControlGroupList(response?.data?.point_controls);
+                    setDeviceType(response?.data?.device_type);
                 }
             } catch (error) {
                 loginService.handleMissingInfo(error, "Failed to fetch template") && navigate(from, { replace: true });
@@ -62,7 +65,7 @@ function Template() {
         }, 300);
     }, [setConfig]);
 
-    return isSetUp && (
+    return isSetUp && deviceType && (
         <div className={styles.template} >
             <header className={styles.header} >
                 {`Modbus Template: [${id}]`}
@@ -77,10 +80,11 @@ function Template() {
                                 path: `/datalogger/templates/${id}/points`,
                                 name: "Point List"
                             },
-                            {
-                                path: `/datalogger/templates/${id}/mppt`,
-                                name: "MPPT"
-                            },
+                            ...(
+                                deviceType.toLowerCase().search(/inverter/g) !== -1 ? [{
+                                    path: `/datalogger/templates/${id}/mppt`,
+                                    name: "MPPT"
+                                }] : []),
                             {
                                 path: `/datalogger/templates/${id}/registers`,
                                 name: "Register Blocks"

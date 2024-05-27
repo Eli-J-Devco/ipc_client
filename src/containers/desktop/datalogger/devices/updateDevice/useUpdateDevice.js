@@ -12,7 +12,10 @@ export default function useUpdateDevice() {
     const navigate = useNavigate();
     const {
         device,
-        setAllDevices
+        setAllDevices,
+        offset,
+        limit,
+        setTotal,
     } = useDeviceManagement();
     const [mode, setMode] = useState(device?.mode || 0);
     const [enablePowerOff, setEnablePowerOff] = useState(device?.enable_poweroff || false);
@@ -49,8 +52,9 @@ export default function useUpdateDevice() {
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
         setTimeout(async () => {
             try {
-                const response = await axiosPrivate.post(Constants.API_URL.DEVICES.UPDATE, body);
-                setAllDevices(response.data);
+                const response = await axiosPrivate.post(Constants.API_URL.DEVICES.UPDATE + `?page=${offset}&limit=${limit}`, body);
+                setAllDevices(response.data?.data);
+                setTotal(response.data?.total);
                 LibToast.toast("Device updated successfully", "info");
             } catch (error) {
                 loginService.handleMissingInfo(error, "Failed to update device") && navigate("/", { replace: true });

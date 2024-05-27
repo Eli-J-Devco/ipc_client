@@ -11,6 +11,8 @@ export default function TemplateProvider({ children }) {
     const [defaultRegisterList, setDefaultRegisterList] = useState([]);
     const [defaultControlGroupList, setDefaultControlGroupList] = useState([]);
     const [config, setConfig] = useState({});
+    const [deviceType, setDeviceType] = useState('');
+
     const { id } = useParams();
 
     return (
@@ -26,6 +28,8 @@ export default function TemplateProvider({ children }) {
             setDefaultControlGroupList,
             config,
             setConfig,
+            deviceType,
+            setDeviceType,
         }}>
             {children}
         </TemplateContext.Provider>

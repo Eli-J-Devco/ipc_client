@@ -16,6 +16,7 @@ import { TreeProvider } from "../../../../components/treeView/useTree";
 import { useParams } from "react-router-dom";
 import Modal from "../../../../components/modal/Modal";
 import UpdateDevice from "./updateDevice/UpdateDevice";
+import { useDeviceManagement } from "./DeviceManagement";
 
 export default function Devices() {
   const {
@@ -29,11 +30,14 @@ export default function Devices() {
     closeAddDevice,
     deleteDevices,
     setIsDeleteDevice,
-    closeUpdateDevice
+    closeUpdateDevice,
   } = useDevices();
+
+  const { total, offset, setOffset, setLimit } = useDeviceManagement();
 
   const [rowSelection, setRowSelection] = useState([]);
   const { name } = useParams();
+
 
   return (
     <div className={`main ${styles.main_devices}`}>
@@ -82,7 +86,27 @@ export default function Devices() {
       }
       {
         name ? <ConfigDevice /> :
-          <>
+          <div>
+            <div className="mb-2">
+              <Button
+                variant="dark"
+                onClick={openAddDevice}
+              >
+                <Button.Text text="Add Device" />
+              </Button>
+              {
+                Object.keys(rowSelection).length > 0 &&
+                <Button
+                  className="ms-3"
+                  variant="dark"
+                  onClick={() => {
+                    setIsDeleteDevice(true);
+                  }}
+                >
+                  <Button.Text text="Delete Device" />
+                </Button>
+              }
+            </div>
             <Table
               columns={{ columnDefs: columns }}
               data={dataDevices}
@@ -91,27 +115,16 @@ export default function Devices() {
                 rowSelection: rowSelection,
                 setRowSelection: setRowSelection
               }}
+              control={true}
+              pagination={{
+                enable: true,
+                total: total,
+                offset: offset,
+                setLimit: setLimit,
+                setOffset: setOffset
+              }}
             />
-            <Button
-              className="mt-3"
-              variant="dark"
-              onClick={openAddDevice}
-            >
-              <Button.Text text="Add Device" />
-            </Button>
-            {
-              Object.keys(rowSelection).length > 0 &&
-              <Button
-                className="mt-3 ms-3"
-                variant="dark"
-                onClick={() => {
-                  setIsDeleteDevice(true);
-                }}
-              >
-                <Button.Text text="Delete Device" />
-              </Button>
-            }
-          </>
+          </div>
       }
 
     </div>

@@ -31,6 +31,11 @@ export default function useDevices() {
     deviceConfig,
     allDevices,
     setAllDevices,
+    offset,
+    limit,
+    total,
+    setTotal,
+    setOffset,
   } = useDeviceManagement();
   const navigate = useNavigate();
   const [isAddDevice, setIsAddDevice] = useState(false);
@@ -75,7 +80,7 @@ export default function useDevices() {
       width: 200,
       cell: ({ row }) => (
         <div>
-          {row.original.tcp_gateway_ip}@{row.original.tcp_gateway_port}
+          {row.original.tcp_gateway_ip}@{row.original.tcp_gateway_port} {row.original.rtu_bus_address}
         </div>
       ),
     }),
@@ -145,7 +150,8 @@ export default function useDevices() {
   }, [name]);
 
   useEffect(() => {
-    let new_data = _.cloneDeep(allDevices.map((d) => {
+    let newTotal = total;
+    let newData = _.cloneDeep(allDevices.map((d) => {
       if (d["is_online"] === -2) {
         return d;
       }
@@ -155,6 +161,7 @@ export default function useDevices() {
         if (index === -1) {
           d["status"] = "Deleted";
           d["is_online"] = -2;
+          newTotal -= 1;
         }
       } else if (index !== -1) {
         d["status"] = data[index]["status_device"] === "" ? "offline" : data[index]["status_device"];
@@ -167,8 +174,24 @@ export default function useDevices() {
       }
       return d;
     }));
-    new_data = new_data.filter((d) => d["is_online"] !== -2);
-    setDataDevices(new_data);
+    newData = newData.filter((d) => d["is_online"] !== -2);
+
+    setTimeout(() => {
+      // if (newData.length < 1 && offset > offset - limit) {
+      //   setOffset((prev) => prev - 1);
+      //   return;
+      // }
+
+      if (newTotal !== total) {
+        setTotal(newTotal);
+        // if (newTotal / limit < offset) {
+        //   setOffset((prev) => prev - 1);
+        // }
+        return;
+      }
+
+      setDataDevices(newData);
+    }, 100);
   }, [data]);
 
 
@@ -176,15 +199,15 @@ export default function useDevices() {
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        const response = await axiosPrivate.post(Constants.API_URL.DEVICES.DELETE, devices);
-        setAllDevices(response.data.map((d) => {
+        const response = await axiosPrivate.post(Constants.API_URL.DEVICES.DELETE + `?page=${offset}&limit=${limit}`, devices);
+        setAllDevices(response.data?.data.map((d) => {
           if (devices.includes(d.id)) {
-            console.log(d);
             d["status"] = "Deleting...";
             d["is_online"] = -1;
           }
           return d;
         }));
+        setTotal(response.data?.total);
         LibToast.toast("Devices are being deleted. It would take a few minutes.", "info");
       } catch (error) {
         loginService.handleMissingInfo(error, "Failed to delete devices") && navigate("/", { replace: true });
