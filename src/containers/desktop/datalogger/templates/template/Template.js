@@ -5,12 +5,6 @@ import { useTemplate } from "./useTemplate";
 import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
 import { useEffect, useState } from 'react';
 import Constants from '../../../../../utils/Constants';
-import Button from '../../../../../components/button/Button';
-import LibToast from '../../../../../utils/LibToast';
-import { useTranslation } from 'react-i18next';
-import _ from 'lodash';
-import Modal from '../../../../../components/modal/Modal';
-import { POINT_CONFIG, reverseFormatData } from '../../../../../utils/TemplateHelper';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { loginService } from '../../../../../services/loginService';
 

@@ -5,7 +5,6 @@
 *********************************************************/
 import React, { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
@@ -19,7 +18,6 @@ import LibToast from '../../../../../utils/LibToast';
 
 
 export default function RolesModal(props) {
-  const { t } = useTranslation();
   const { closeRolesModal, action, role, setNeedRefresh } = props;
   const methods = useForm({ mode: "onChange" });
   const axiosPrivate = useAxiosPrivate();

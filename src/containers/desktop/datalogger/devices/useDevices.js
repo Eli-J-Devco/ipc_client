@@ -4,7 +4,7 @@
 * 
 *********************************************************/
 import { useEffect, useState } from "react";
-import { json, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../utils/Constants";
 import { loginService } from "../../../../services/loginService";
@@ -12,7 +12,6 @@ import useMQTT from "../../../../hooks/useMQTT";
 import FormInput from "../../../../components/formInput/FormInput";
 import { createColumnHelper } from "@tanstack/react-table";
 import { ReactComponent as EditIcon } from "../../../../assets/images/edit.svg";
-import { ReactComponent as DeleteIcon } from "../../../../assets/images/delete.svg";
 import { ReactComponent as ViewIcon } from "../../../../assets/images/eye_view.svg";
 import Button from "../../../../components/button/Button";
 import _ from "lodash";
@@ -35,7 +34,6 @@ export default function useDevices() {
     limit,
     total,
     setTotal,
-    setOffset,
   } = useDeviceManagement();
   const navigate = useNavigate();
   const [isAddDevice, setIsAddDevice] = useState(false);

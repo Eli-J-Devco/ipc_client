@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "../../../../../../components/button/Button";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import Table from "../../../../../../components/table/Table";

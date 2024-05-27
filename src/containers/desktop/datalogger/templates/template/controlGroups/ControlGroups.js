@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Modal from "../../../../../../components/modal/Modal";
 import Button from "../../../../../../components/button/Button";
-import FormInput, { FormInputEnum } from "../../../../../../components/formInput/FormInput";
 import { POINT_CONFIG } from "../../../../../../utils/TemplateHelper";
 import Table from "../../../../../../components/table/Table";
 import useControlGroups from "./useControlGroups";

@@ -8,11 +8,9 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import useRefreshToken from "../../../hooks/useRefreshToken";
-import useAuth from "../../../hooks/useAuth";
 
 import LibToast from "../../../utils/LibToast";
 import { LoginErrors } from "../../../utils/Errors";
-import { clearToken } from "../../../utils/Token";
 import { loginService } from "../../../services/loginService";
 
 /**
@@ -22,7 +20,6 @@ import { loginService } from "../../../services/loginService";
  */
 const PersistLogin = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { setAuth } = useAuth();
   const refresh = useRefreshToken();
   const persist = window.localStorage.getItem("persist");
 

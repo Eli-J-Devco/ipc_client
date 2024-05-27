@@ -6,17 +6,16 @@
 *********************************************************/
 import React, { useState } from 'react';
 import styles from './ForgotPassword.module.scss';
-import { RText, RButton } from '../../../components/Controls'
 import FormInput from '../../../components/formInput/FormInput';
 import Button from '../../../components/button/Button';
 import * as Yup from 'yup';
-import useAxiosPrivate from '../../../hooks/useAxiosPrivate';
 import api from '../../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import Constants from '../../../utils/Constants';
 import { loginService } from '../../../services/loginService';
 import LibToast from '../../../utils/LibToast';
 import { useTranslation } from 'react-i18next';
+
 export default function ForgotPassword() {
     const { t } = useTranslation();
     const navigate = useNavigate();

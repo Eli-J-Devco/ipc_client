@@ -3,7 +3,6 @@
 * All rights reserved.
 * 
 *********************************************************/
-import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 

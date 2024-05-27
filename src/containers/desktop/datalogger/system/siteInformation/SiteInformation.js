@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import Button from '../../../../../components/button/Button';
-import FormInput from '../../../../../components/formInput/FormInput';
 import useProjectSetup from '../../../../../hooks/useProjectSetup';
 import { useEffect, useRef, useState } from 'react';
 import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
@@ -10,9 +9,9 @@ import _ from 'lodash';
 import LibToast from '../../../../../utils/LibToast';
 import Constants from '../../../../../utils/Constants';
 import { loginService } from '../../../../../services/loginService';
-import { getToken } from '../../../../../utils/Token';
-import styles from "./SiteInformation.module.scss";
 import { RTextForm } from '../../../../../components/Controls';
+import styles from './SiteInformation.module.scss';
+
 function SiteInformation() {
     const { t } = useTranslation();
     const { projectSetup, setProjectSetup } = useProjectSetup();

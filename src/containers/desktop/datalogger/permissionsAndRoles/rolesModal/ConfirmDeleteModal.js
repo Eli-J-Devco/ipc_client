@@ -4,7 +4,6 @@
 * 
 *********************************************************/
 import React from 'react'
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
@@ -17,7 +16,6 @@ import LibToast from '../../../../../utils/LibToast';
 
 
 export default function ConfirmDeleteModal(props) {
-  const { t } = useTranslation();
   const { closeRolesModal, action, role, setNeedRefresh } = props;
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();

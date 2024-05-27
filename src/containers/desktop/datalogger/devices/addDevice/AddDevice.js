@@ -16,7 +16,6 @@ import Modal from '../../../../../components/modal/Modal';
 import Button from '../../../../../components/button/Button';
 import AddMultipleDevice from './AddMultipleDevice';
 import FormInput from '../../../../../components/formInput/FormInput';
-import _ from 'lodash';
 
 export default function AddDevice(props) {
   const navigate = useNavigate();

@@ -17,7 +17,6 @@ import { loginService } from "../../../../../services/loginService";
 
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
-import { getToken } from "../../../../../utils/Token";
 import { RTextForm } from "../../../../../components/Controls";
 
 function SiteInformation() {

@@ -3,7 +3,6 @@ import { useTemplate } from "../useTemplate";
 import { createColumnHelper } from "@tanstack/react-table";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import _ from "lodash";
-import { resortIndex } from "../../../../../../utils/TemplateHelper";
 import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../../../utils/Constants";
 import { loginService } from "../../../../../../services/loginService";

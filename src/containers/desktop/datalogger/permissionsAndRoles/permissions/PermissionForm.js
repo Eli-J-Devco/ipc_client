@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import styles from '../PermissionsAndRoles.module.scss';
 import _ from 'lodash';
 
-import FormInput, { useFormInput } from '../../../../../components/formInput/FormInput';
+import FormInput from '../../../../../components/formInput/FormInput';
 import Button from '../../../../../components/button/Button';
 import Table from '../../../../../components/table/Table';
 

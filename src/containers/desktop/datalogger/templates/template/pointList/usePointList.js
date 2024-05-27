@@ -4,7 +4,6 @@ import { createColumnHelper } from "@tanstack/react-table";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import Button from "../../../../../../components/button/Button";
 import {
-  POINT_CONFIG,
   RowAdapter,
   resortIndex,
 } from "../../../../../../utils/TemplateHelper";

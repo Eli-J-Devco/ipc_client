@@ -11,8 +11,6 @@ import AddDevice from './addDevice/AddDevice';
 import Button from '../../../../components/button/Button';
 import useDevices from './useDevices';
 import ConfigDevice from './configDevice/ConfigPoints';
-import _ from "lodash";
-import { TreeProvider } from "../../../../components/treeView/useTree";
 import { useParams } from "react-router-dom";
 import Modal from "../../../../components/modal/Modal";
 import UpdateDevice from "./updateDevice/UpdateDevice";
