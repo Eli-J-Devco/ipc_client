@@ -36,6 +36,7 @@ const ProjectSetupInformation = () => {
         isConnected,
         setIsConnected,
         setData,
+        setCPUData
     } = useMQTT();
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
@@ -171,10 +172,11 @@ const ProjectSetupInformation = () => {
     }, [client])
 
     useEffect(() => {
-        if (isConnected) {
-            mqttSub({ topic: "G83VZT33/Devices/All", qos: 0 })
+        if (isConnected && projectSetup?.serial_number) {
+            mqttSub({ topic: `${projectSetup?.serial_number}/Devices/All`, qos: 0 })
+            mqttSub({ topic: `${projectSetup?.serial_number}/CPU/Information`, qos: 0 })
         }
-    }, [isConnected])
+    }, [isConnected, projectSetup?.serial_number])
 
     const mqttSub = (subscription) => {
         if (client) {
@@ -189,14 +191,22 @@ const ProjectSetupInformation = () => {
     }
 
     useEffect(() => {
-        if (isConnected && isSubscribed) {
+        if (isConnected && isSubscribed && projectSetup?.serial_number) {
             client.on('message', (topic, message) => {
                 const payload = { topic, message: message.toString() }
-                const devices = JSON.parse(payload.message)
-                setData(devices);
+
+                if (topic === `${projectSetup?.serial_number}/CPU/Information`) {
+                    const cpu = JSON.parse(payload.message)
+                    setCPUData(cpu);
+                }
+
+                if (topic === `${projectSetup?.serial_number}/Devices/All`) {
+                    const devices = JSON.parse(payload.message)
+                    setData(devices);
+                }
             })
         }
-    }, [isConnected, isSubscribed]);
+    }, [isConnected, isSubscribed, projectSetup?.serial_number]);
 
     /**
      * Redirect to first page on login if user has just logged in and first page on login in project setup is available

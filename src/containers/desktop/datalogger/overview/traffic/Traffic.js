@@ -7,8 +7,9 @@ import bellcurve from "highcharts/modules/histogram-bellcurve";
 import highchartsMore from "highcharts/highcharts-more.js";
 import solidGauge from "highcharts/modules/solid-gauge.js";
 import accessibility from 'highcharts/modules/accessibility.js';
-
-
+import { createRef, useEffect, useRef, useState } from 'react';
+import useMQTT from '../../../../../hooks/useMQTT';
+import _ from 'lodash';
 
 // init the module
 highchartsGantt(Highcharts);
@@ -22,14 +23,29 @@ solidGauge(Highcharts);
 accessibility(Highcharts);
 
 function Traffic() {
-    const optionsTraffic = {
+    const chartRef = useRef(null);
+    const [curItem, setCurItem] = useState({});
+    const [networkInfo, setNetworkInfo] = useState({
+        Downstream: "",
+        Upstream: "",
+        TotalSent: "",
+        TotalReceived: ""
+    });
+    const [optionsTraffic] = useState({
         chart: {
             type: 'areaspline',
-            height: 300
+            height: 300,
         },
         title: {
             text: '',
             align: 'left',
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+
+        credits: {
             enabled: false
         },
 
@@ -45,16 +61,10 @@ function Traffic() {
             backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
         },
         xAxis: {
-            categories: [
-                '10:01:01', '10:01:02', '10:01:03', '10:01:04', '10:01:05', '10:01:06', '10:01:07', '10:01:08', '10:01:09', '10:01:10',
-                '10:01:11', '10:01:12', '10:01:13', '10:01:14', '10:01:15', '10:01:16', '10:01:17', '10:01:18', '10:01:19', '10:01:20',
-            ],
-            tickInterval: 2,
-            title: { text: "Power", enabled: false },
-            tickWidth: 1,
-            alignTicks: true,
-            gridLineWidth: 1,
-            crosshair: true,
+            type: 'datetime',
+            labels: {
+                format: '{value:%H:%M:%S}'
+            },
         },
         yAxis: {
             title: {
@@ -63,15 +73,14 @@ function Traffic() {
         },
         tooltip: {
             shared: true,
-            headerFormat: '<b>{point.x}</b><br>'
         },
         credits: {
             enabled: false
         },
-
+        colors: ['#32CD32', '#52a9ff'],
         plotOptions: {
             areaspline: {
-                color: '#32CD32',
+
                 fillColor: {
                     linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
                     stops: [
@@ -90,77 +99,60 @@ function Traffic() {
 
         series: [{
             name: 'Upstream',
-            data:
-                [
-                    38000,
-                    37300,
-                    37892,
-                    38564,
-                    36770,
-                    36026,
-                    34978,
-                    35657,
-                    35620,
-                    35971,
-                    36409,
-                    36435,
-                    34643,
-                    34956,
-                    33199,
-                    31136,
-                    30835,
-                    31611,
-                    30666,
-                    30319
-                ]
+            data: []
         }, {
             name: 'Downstream',
-            data:
-                [
-                    22534,
-                    23599,
-                    24533,
-                    25195,
-                    25896,
-                    27635,
-                    29173,
-                    32646,
-                    35686,
-                    37709,
-                    39143,
-                    36829,
-                    35031,
-                    36202,
-                    35140,
-                    33718,
-                    37773,
-                    42556,
-                    43820,
-                    46445
-                ]
+            data: []
         }],
-    }
+    });
+    const { cpuData } = useMQTT();
+
+    useEffect(() => {
+        if (_.isEmpty(cpuData) || _.isEmpty(cpuData.NetworkSpeed) || _.isEqual(cpuData, curItem)) return;
+
+        setCurItem(cpuData);
+        let networkInfo = {}
+        networkInfo.Downstream = !_.isEmpty(cpuData.NetworkSpeed.Downstream) ? cpuData.NetworkSpeed.Downstream : "";
+        networkInfo.Upstream = !_.isEmpty(cpuData.NetworkSpeed.Upstream) ? cpuData.NetworkSpeed.Upstream : "";
+        networkInfo.TotalSent = !_.isEmpty(cpuData.NetworkSpeed.TotalSent) ? cpuData.NetworkSpeed.TotalSent : "";
+        networkInfo.TotalReceived = !_.isEmpty(cpuData.NetworkSpeed.TotalReceived) ? cpuData.NetworkSpeed.TotalReceived : "";
+
+        let UpstreamPercentage = !_.isEmpty(cpuData.NetworkSpeed.Upstream) ? cpuData.NetworkSpeed.Upstream.split(" ") : 0;
+        let DownstreamPercentage = !_.isEmpty(cpuData.NetworkSpeed.Downstream) ? cpuData.NetworkSpeed.Downstream.split(" ") : 0;
+        let time = Math.floor(cpuData.Time / 1000) * 1000;
+        const chart = chartRef.current.chart;
+        const pointUpstream = [new Date(time).getTime(), parseFloat(UpstreamPercentage[0])];
+        const pointDownstream = [new Date(time).getTime(), parseFloat(DownstreamPercentage[0])];
+        const seriesUpstream = chart.series[0],
+            shiftUpstream = seriesUpstream.data.length > 20; // shift if the series is longer than 20
+        const seriesDownstream = chart.series[1],
+            shiftDownstream = seriesDownstream.data.length > 20; // shift if the series is longer than 20
+
+        chartRef.current.chart.series[0].addPoint(pointUpstream, false, shiftUpstream);
+        chartRef.current.chart.series[1].addPoint(pointDownstream, true, shiftDownstream);
+        setNetworkInfo(networkInfo);
+    }, [cpuData]);
 
     return (
         <div className={styles.group_cpu_traffic}>
             <div className="row">
                 <div className="col-md-3">
                     <p><span className={styles.ico_up}></span>Upstream</p>
-                    <p>2387.36 KB</p>
+                    <p>{networkInfo.Upstream}</p>
                 </div>
                 <div className="col-md-3">
                     <p><span className={styles.ico_down}></span>Downstream</p>
-                    <p>658.05 KB</p>
+                    <p>{networkInfo.Downstream}</p>
                 </div>
 
                 <div className="col-md-3">
                     <p>Total sent</p>
-                    <p>30.62 GB</p>
+                    <p>{networkInfo.TotalSent}</p>
                 </div>
 
                 <div className="col-md-3">
                     <p>Total received</p>
-                    <p>24.39 GB</p>
+                    <p>{networkInfo.TotalReceived}</p>
                 </div>
             </div>
             <div className={styles.chart_traffic}>
@@ -169,6 +161,7 @@ function Traffic() {
                     options={optionsTraffic}
                     allowChartUpdate={true}
                     immutable={true}
+                    ref={chartRef}
                 />
             </div>
 

@@ -4,6 +4,7 @@
  *
  *********************************************************/
 
+import _ from "lodash";
 import { createContext, useState } from "react";
 
 const MQTTReader = createContext({});
@@ -18,7 +19,16 @@ export const MQTTProvider = ({ children }) => {
     const [client, setClient] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const [isSubscribed, setIsSubscribed] = useState(false);
-    const [data, setData] = useState([]);
+    const [deviceData, setDeviceData] = useState([]);
+    const [cpuData, setCPUData] = useState([]);
+
+    const publishMessage = (topic, message) => {
+        if (!client) return;
+
+        if (!(typeof topic === "string") && _.isEmpty(message)) return;
+
+        client.publish(topic, JSON.stringify(message));
+    };
 
     return (
         <MQTTReader.Provider
@@ -29,8 +39,11 @@ export const MQTTProvider = ({ children }) => {
                 setIsConnected,
                 isSubscribed,
                 setIsSubscribed,
-                data,
-                setData
+                data: deviceData,
+                setData: setDeviceData,
+                cpuData,
+                setCPUData,
+                publishMessage,
             }}>
             {children}
         </MQTTReader.Provider>
