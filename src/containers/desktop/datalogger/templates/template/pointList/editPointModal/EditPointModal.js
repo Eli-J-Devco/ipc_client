@@ -25,10 +25,13 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
     setSelectedByteOrder,
     selectedPointListType,
     setSelectedPointListType,
+    selectedTypeFunction,
+    setSelectedTypeFunction,
     onSubmit,
   } = useEditPointModal(currentData, close, setPoint, setCurrentData);
   const { config } = useTemplate();
   const [pointUnits, setPointUnits] = useState([]);
+  const [typeFunctions, setTypeFunctions] = useState([]);
 
   const {
     data_type,
@@ -37,6 +40,7 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
     type_point,
     type_class,
     type_point_list,
+    type_function,
   } = config;
   useEffect(() => {
     if (Object.keys(config).length > 0) {
@@ -67,6 +71,35 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
       }, 100);
     }
   }, [config, currentData]);
+
+  useEffect(() => {
+    if (modbusRegisterType?.id === 1) {
+      setTypeFunctions(type_function.filter((item) => item.type !== 1));
+    }
+    if (modbusRegisterType?.id === 2) {
+      setTypeFunctions(type_function.filter((item) => item.type > 0));
+    }
+
+    if (modbusRegisterType?.id === 3) {
+      setTypeFunctions(type_function.filter((item) => item.type === 2));
+    }
+  }, [modbusRegisterType]);
+
+  useEffect(() => {
+    if (typeFunctions.find((item) => item.id === selectedTypeFunction?.id) === undefined) {
+      if (modbusRegisterType?.id === currentData?.type_class?.id) {
+        setSelectedTypeFunction({
+          value: currentData?.type_function?.id,
+          label: currentData?.type_function?.name,
+        });
+        return;
+      }
+      setSelectedTypeFunction({
+        value: typeFunctions[0]?.id,
+        label: typeFunctions[0]?.name,
+      });
+    }
+  }, [typeFunctions]);
 
   return (
     currentData &&
@@ -198,6 +231,21 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
 
           {_.isEqual(modbusConfig, type_point[0]) && (
             <>
+              <div className="row my-2">
+                <div className="col-4">
+                  <FormInput.Select
+                    label="Type function:"
+                    name="type_function"
+                    isSearchable={false}
+                    value={selectedTypeFunction}
+                    option={typeFunctions.map((item) => ({
+                      value: item.id,
+                      label: item.name,
+                    }))}
+                    onChange={(value) => setSelectedTypeFunction(value)}
+                  />
+                </div>
+              </div>
               <div className="row my-2">
                 <div className="col-4">
                   <FormInput.Text label="Register Address:" name="register" />

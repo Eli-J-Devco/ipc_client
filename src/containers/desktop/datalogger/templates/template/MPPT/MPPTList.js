@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Button from "../../../../../../components/button/Button";
 import Table from "../../../../../../components/table/Table";
-import EditMPPTModal from "./editMPPTModal/EditMPPTModal";
+import EditPointModal from "../pointList/editPointModal/EditPointModal";
 import useMPPTList from "./useMPPTList";
 import Modal from "../../../../../../components/modal/Modal";
 import FormInput from "../../../../../../components/formInput/FormInput";
@@ -240,7 +240,7 @@ function MPPTList() {
           />
 
           {isModalOpen && (
-            <EditMPPTModal
+            <EditPointModal
               isOpen={isModalOpen}
               close={closeModal}
               data={point}

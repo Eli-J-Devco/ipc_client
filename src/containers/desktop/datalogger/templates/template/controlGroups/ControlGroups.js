@@ -5,7 +5,7 @@ import { POINT_CONFIG } from "../../../../../../utils/TemplateHelper";
 import Table from "../../../../../../components/table/Table";
 import useControlGroups from "./useControlGroups";
 import _ from "lodash";
-import EditPointModal from "./editPointModal/EditPointModal";
+import EditPointModal from "../pointList/editPointModal/EditPointModal";
 import EditControlGroupModal from "./editControlGroupModal/EditControlGroupModal";
 import LibToast from "../../../../../../utils/LibToast";
 import AddPointModal from "./addPointModal/AddPointModal";

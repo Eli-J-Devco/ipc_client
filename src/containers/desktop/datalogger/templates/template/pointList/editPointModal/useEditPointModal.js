@@ -35,6 +35,10 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
     value: data?.type_control?.id,
     label: data?.type_control?.name,
   });
+  const [selectedTypeFunction, setSelectedTypeFunction] = useState({
+    value: data?.type_function?.id,
+    label: data?.type_function?.name,
+  });
 
   const validationSchema = yup.object({
     // index: yup.string().required('Required'),
@@ -62,6 +66,10 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
     type_control: {
       value: data?.type_control?.id,
       label: data?.type_control?.name,
+    },
+    type_function: {
+      value: data?.type_function?.id,
+      label: data?.type_function?.name,
     },
     register: data?.register || 40000,
     slope: data?.slope || 0,
@@ -94,6 +102,7 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
       id_type_units: selectedUnit.value,
       id_type_datatype: selectedDataType.value,
       id_type_byteorder: selectedByteOrder.value,
+      id_type_function: selectedTypeFunction.value,
       id_pointtype: modbusConfig.id,
       id_point_list_type: selectedPointListType.value,
       id_control_group: selectedControlGroup.value,
@@ -121,6 +130,12 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
         ? {
           id: selectedControlGroup.value,
           name: selectedControlGroup.label,
+        }
+        : null,
+      type_function: selectedTypeFunction.value
+        ? {
+          id: selectedTypeFunction.value,
+          name: selectedTypeFunction.label,
         }
         : null,
     };
@@ -176,6 +191,8 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
     setSelectedPointListType,
     selectedControlGroup,
     setSelectedControlGroup,
+    selectedTypeFunction,
+    setSelectedTypeFunction,
     onSubmit,
   };
 }
