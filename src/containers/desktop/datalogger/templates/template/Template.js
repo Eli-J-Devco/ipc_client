@@ -1,102 +1,125 @@
-import styles from './Template.module.scss';
+import styles from "./Template.module.scss";
 import NavTabs from "../../../../../components/navTabs/NavTabs";
 import { Outlet } from "react-router-dom";
 import { useTemplate } from "./useTemplate";
-import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
-import { useEffect, useState } from 'react';
-import Constants from '../../../../../utils/Constants';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { loginService } from '../../../../../services/loginService';
+import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
+import { useEffect, useState } from "react";
+import Constants from "../../../../../utils/Constants";
+import { useLocation, useNavigate } from "react-router-dom";
+import { loginService } from "../../../../../services/loginService";
 
 function Template() {
-    const {
-        id,
-        setDefaultPointList,
-        setDefaultMPPTList,
-        setDefaultRegisterList,
-        setDefaultControlGroupList,
-        setConfig,
-        deviceType,
-        setDeviceType
-    } = useTemplate();
-    const axiosPrivate = useAxiosPrivate();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const from = location?.state?.from || '/datalogger/templates';
+  const {
+    id,
+    setDefaultPointList,
+    setDefaultMPPTList,
+    setDefaultRegisterList,
+    setDefaultControlGroupList,
+    setConfig,
+    deviceType,
+    setDeviceType,
+    setControlGroups,
+  } = useTemplate();
+  const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state?.from || "/datalogger/templates";
 
-    const [isSetUp, setIsSetUp] = useState(false);
-    useEffect(() => {
-        if (!id) return;
+  const [isSetUp, setIsSetUp] = useState(false);
+  useEffect(() => {
+    if (!id) return;
 
-        !isSetUp && setTimeout(async () => {
-            try {
-                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.LIST, { id: id });
-                if (response?.status === 200) {
-                    setDefaultPointList(response?.data?.points);
-                    setDefaultMPPTList(response?.data?.point_mppt);
-                    setDefaultRegisterList(response?.data?.register_blocks);
-                    setDefaultControlGroupList(response?.data?.point_controls);
-                    setDeviceType(response?.data?.device_type);
-                }
-            } catch (error) {
-                loginService.handleMissingInfo(error, "Failed to fetch template") && navigate(from, { replace: true });
-            } finally {
-                setIsSetUp(true);
-            }
-        }, 300);
-    }, [id, isSetUp]);
+    !isSetUp &&
+      setTimeout(async () => {
+        try {
+          const response = await axiosPrivate.post(
+            Constants.API_URL.TEMPLATE.LIST,
+            { id: id }
+          );
+          if (response?.status === 200) {
+            setDefaultPointList(response?.data?.points);
+            setDefaultMPPTList(response?.data?.point_mppt);
+            setDefaultRegisterList(response?.data?.register_blocks);
+            setDefaultControlGroupList(response?.data?.point_controls);
+            setDeviceType(response?.data?.device_type);
+          }
 
-    useEffect(() => {
-        setTimeout(async () => {
-            try {
-                const response = await axiosPrivate.post(Constants.API_URL.TEMPLATE.CONFIG);
-                if (response?.status === 200) {
-                    setConfig(response?.data);
-                }
-            } catch (error) {
-                loginService.handleMissingInfo(error, "Failed to fetch template config") && navigate(from, { replace: true });
-            }
-        }, 300);
-    }, [setConfig]);
+          const responseControlGroups = await axiosPrivate.post(
+            `${Constants.API_URL.TEMPLATE.CONFIG.CONTROL_GROUPS}?id_template=${id}`
+          );
 
-    return isSetUp && deviceType && (
-        <div className={styles.template} >
-            <header className={styles.header} >
-                {`Modbus Template: [${id}]`}
-            </header>
+          if (responseControlGroups?.status === 200) {
+            setControlGroups(responseControlGroups?.data);
+          }
+        } catch (error) {
+          loginService.handleMissingInfo(error, "Failed to fetch template") &&
+            navigate(from, { replace: true });
+        } finally {
+          setIsSetUp(true);
+        }
+      }, 300);
+  }, [id, isSetUp]);
 
-            <div className={styles.body}>
-                <div className='row'>
-                    <NavTabs
-                        className="col-10"
-                        routes={[
-                            {
-                                path: `/datalogger/templates/${id}/points`,
-                                name: "Point List"
-                            },
-                            ...(
-                                deviceType.toLowerCase().search(/inverter/g) !== -1 ? [{
-                                    path: `/datalogger/templates/${id}/mppt`,
-                                    name: "MPPT"
-                                }] : []),
-                            {
-                                path: `/datalogger/templates/${id}/registers`,
-                                name: "Register Blocks"
-                            }, {
-                                path: `/datalogger/templates/${id}/control-groups`,
-                                name: "Control Groups"
-                            },
-                        ]}
-                    />
-                </div>
+  useEffect(() => {
+    setTimeout(async () => {
+      try {
+        const response = await axiosPrivate.post(
+          Constants.API_URL.TEMPLATE.CONFIG.GET
+        );
+        if (response?.status === 200) {
+          setConfig(response?.data);
+        }
+      } catch (error) {
+        loginService.handleMissingInfo(
+          error,
+          "Failed to fetch template config"
+        ) && navigate(from, { replace: true });
+      }
+    }, 300);
+  }, [setConfig]);
 
-                <div className={styles.outlet}>
-                    <Outlet />
-                </div>
-            </div>
+  return (
+    isSetUp &&
+    deviceType && (
+      <div className={styles.template}>
+        <header className={styles.header}>{`Modbus Template: [${id}]`}</header>
+
+        <div className={styles.body}>
+          <div className="row">
+            <NavTabs
+              className="col-10"
+              routes={[
+                {
+                  path: `/datalogger/templates/${id}/points`,
+                  name: "Point List",
+                },
+                ...(deviceType.toLowerCase().search(/inverter/g) !== -1
+                  ? [
+                      {
+                        path: `/datalogger/templates/${id}/mppt`,
+                        name: "MPPT",
+                      },
+                    ]
+                  : []),
+                {
+                  path: `/datalogger/templates/${id}/registers`,
+                  name: "Register Blocks",
+                },
+                {
+                  path: `/datalogger/templates/${id}/control-groups`,
+                  name: "Control Groups",
+                },
+              ]}
+            />
+          </div>
+
+          <div className={styles.outlet}>
+            <Outlet />
+          </div>
         </div>
-
-    );
+      </div>
+    )
+  );
 }
 
 export default Template;

@@ -111,7 +111,8 @@ const Constants = {
         ADD: "/point_control/group/add/",
         UPDATE: "/point_control/group/update/",
         DELETE: "/point_control/group/delete/",
-      }
+        LIST: "/point_control/get/",
+      },
     },
     REGISTER: {
       LIST: "/register_block/get/",
@@ -124,7 +125,10 @@ const Constants = {
       ADD: "/template/add/",
       UPDATE: "/template/update/",
       DELETE: "/template/delete/",
-      CONFIG: "/template/config/get/",
+      CONFIG: {
+        GET: "/template/config/get/",
+        CONTROL_GROUPS: "/template/config/control_group/",
+      },
     },
     UPLOAD_CHANNEL: {
       GET: "/upload_channel/get/",
