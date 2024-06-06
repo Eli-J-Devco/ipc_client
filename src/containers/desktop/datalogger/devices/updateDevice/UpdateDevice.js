@@ -72,8 +72,8 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                         label="Manual"
                         name="manual_mode"
                         type="radio"
-                        checked={mode === 1}
-                        onChange={() => setMode(1)}
+                        checked={mode === 0}
+                        onChange={() => setMode(0)}
                       />
                     </div>
                     <div className="col-sm-8 col-md-6 col-lg-5 col-4">
@@ -81,8 +81,8 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                         label="Auto"
                         name="auto_mode"
                         type="radio"
-                        checked={mode === 0}
-                        onChange={() => setMode(0)}
+                        checked={mode === 1}
+                        onChange={() => setMode(1)}
                       />
                     </div>
                   </div>
