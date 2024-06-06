@@ -39,7 +39,7 @@ export default function ControlGroups() {
           if (onclick) {
             onclick();
             return;
-          };
+          }
 
           removePoint({
             isGroupSelected: true,
@@ -62,19 +62,20 @@ export default function ControlGroups() {
         <Button.Text text="No" />
       </Button>
     ),
-  }
+  };
 
   const unselectedPoints = () => {
     setTimeout(() => {
-      let new_rowSelection = Object.entries(rowSelection).filter(([key, value]) => {
-        if (key?.split('.').length > 1) {
-          return false;
-        }
-        return true;
-      }).map(([key, value]) => {
-        return { [key]: value };
-      });
-      console.log(...new_rowSelection);
+      let new_rowSelection = Object.entries(rowSelection)
+        .filter(([key, value]) => {
+          if (key?.split(".").length > 1) {
+            return false;
+          }
+          return true;
+        })
+        .map(([key, value]) => {
+          return { [key]: value };
+        });
       setRowSelection(...new_rowSelection);
       LibToast.toast("Points unselected successfully", "info");
 
@@ -92,22 +93,19 @@ export default function ControlGroups() {
   };
 
   const checkDelete = () => {
-    console.log(rowSelection);
     let groupSelected = Object.keys(rowSelection).reduce((acc, key) => {
-      let splitedKey = key.split('.');
+      let splitedKey = key.split(".");
       if (splitedKey.length > 1) {
         return {
           ...acc,
-          ...(
-            acc[splitedKey[0]] ?
-              {
-                [splitedKey[0]]: [...(acc[splitedKey[0]] || []), key]
+          ...(acc[splitedKey[0]]
+            ? {
+                [splitedKey[0]]: [...(acc[splitedKey[0]] || []), key],
               }
-              : {
-                [key]: []
-              }
-          ),
-        }
+            : {
+                [key]: [],
+              }),
+        };
       }
 
       return {
@@ -116,33 +114,44 @@ export default function ControlGroups() {
       };
     }, {});
 
-    let isGroupSelected = Object.keys(groupSelected).some((key) => groupSelected[key].length > 0);
-    let isChildrenSelected = Object.keys(groupSelected).some((key) => key.split('.').length > 1);
+    let isGroupSelected = Object.keys(groupSelected).some(
+      (key) => groupSelected[key].length > 0
+    );
+    let isChildrenSelected = Object.keys(groupSelected).some(
+      (key) => key.split(".").length > 1
+    );
 
     var removePoints = {};
     if (isChildrenSelected) {
       removePoints = {
         title: "Remove Points",
-        message: "No group are selected. Are you sure you want to remove the selected points out of group?",
+        message:
+          "No group are selected. Are you sure you want to remove the selected points out of group?",
         footer: (
           <>
-            <Button className="ms-3" onClick={() => {
-              removePoint({
-                isChildrenSelected: true,
-                isDeletePoints: true,
-              });
-              setConfirmDelete({});
-              setIsDeleteModalOpen(false);
-            }}>
+            <Button
+              className="ms-3"
+              onClick={() => {
+                removePoint({
+                  isChildrenSelected: true,
+                  isDeletePoints: true,
+                });
+                setConfirmDelete({});
+                setIsDeleteModalOpen(false);
+              }}
+            >
               <Button.Text text="Delete points" />
             </Button>
-            <Button className="ms-3" onClick={() => {
-              removePoint({
-                isChildrenSelected: true,
-              });
-              setConfirmDelete({});
-              setIsDeleteModalOpen(false);
-            }}>
+            <Button
+              className="ms-3"
+              onClick={() => {
+                removePoint({
+                  isChildrenSelected: true,
+                });
+                setConfirmDelete({});
+                setIsDeleteModalOpen(false);
+              }}
+            >
               <Button.Text text="Remove points only" />
             </Button>
           </>
@@ -153,7 +162,8 @@ export default function ControlGroups() {
     if (isGroupSelected) {
       setConfirmDelete({
         title: "Delete Control Group with Points",
-        message: "You have selected the points within control group. Do you want to remove them too?",
+        message:
+          "You have selected the points within control group. Do you want to remove them too?",
         footer: (
           <>
             {footer.no}
@@ -171,33 +181,29 @@ export default function ControlGroups() {
 
     setConfirmDelete({
       title: removePoints.title || "Delete Control Group",
-      message: removePoints.message || "Are you sure you want to delete the selected control group?",
+      message:
+        removePoints.message ||
+        "Are you sure you want to delete the selected control group?",
       footer: (
         <>
-          {
-            removePoints.footer ?
-              (
-                <>
-                  {footer.no}
-                  {removePoints.footer}
-                </>
-              ) : (
-                <>
-                  {footer.no}
-                  {footer.yes(() => {
-                    removePoint(
-                      {
-                        isGroupSelected: true,
-                        isGroupOnly: true,
-                      }
-                    )
-                    setConfirmDelete({});
-                    setIsDeleteModalOpen(false);
-
-                  })}
-                </>
-              )
-          }
+          {removePoints.footer ? (
+            <>
+              {footer.no}
+              {removePoints.footer}
+            </>
+          ) : (
+            <>
+              {footer.no}
+              {footer.yes(() => {
+                removePoint({
+                  isGroupSelected: true,
+                  isGroupOnly: true,
+                });
+                setConfirmDelete({});
+                setIsDeleteModalOpen(false);
+              })}
+            </>
+          )}
         </>
       ),
       size: "md",
@@ -226,20 +232,16 @@ export default function ControlGroups() {
           isOpen={confirmDelete || false}
           close={() => {
             setIsDeleteModalOpen(false);
-            setConfirmDelete({})
+            setConfirmDelete({});
           }}
           title={confirmDelete.title || ""}
-          footer={
-            confirmDelete.footer || footer
-          }
+          footer={confirmDelete.footer || footer}
           size={confirmDelete.size || "md"}
         >
           <div>
             <p>
-              {
-                confirmDelete.message ||
-                "Are you sure you want to delete the selected control group?"
-              }
+              {confirmDelete.message ||
+                "Are you sure you want to delete the selected control group?"}
             </p>
           </div>
         </Modal>
@@ -292,10 +294,13 @@ export default function ControlGroups() {
             )
           ) : null}
           {Object.keys(rowSelection).length > 0 && (
-            <Button className="mt-3" onClick={() => {
-              setTimeout(() => setIsDeleteModalOpen(true), 100);
-              checkDelete()
-            }}>
+            <Button
+              className="mt-3"
+              onClick={() => {
+                setTimeout(() => setIsDeleteModalOpen(true), 100);
+                checkDelete();
+              }}
+            >
               <Button.Text text="Delete Selected Points" />
             </Button>
           )}

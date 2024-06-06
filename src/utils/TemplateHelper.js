@@ -238,6 +238,5 @@ export const reverseFormatData = (data, type = POINT_CONFIG.MPPT) => {
       });
     });
   });
-  console.log("selectedPoints", selectedPoints);
   return selectedPoints;
 };

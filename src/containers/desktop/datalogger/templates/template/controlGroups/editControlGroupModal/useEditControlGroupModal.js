@@ -256,17 +256,16 @@ function useEditControlGroupModal(data, close, refresh, isEdit) {
         selectedKindOfClone.value === 0 &&
         Object.keys(groupSelection).length === 0
       ) {
-        LibToast.toast("Please select at least one point", "error");
+        LibToast.toast("Please select at least one group", "error");
         return;
       } else if (
         selectedKindOfClone.value === 1 &&
         Object.keys(pointSelection).length === 0
       ) {
-        LibToast.toast("Please select at least one group", "error");
+        LibToast.toast("Please select at least one point", "error");
         return;
       }
     }
-    console.log(id);
     let group = {
       ...(isEdit
         ? {

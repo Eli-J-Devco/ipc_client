@@ -164,14 +164,15 @@ function usePointList() {
   ];
 
   const updatePoint = (updatedPoint) => {
-    console.log(updatedPoint);
     setTimeout(() => {
-      setDefaultPointList(defaultPointList.map((point) => {
-        if (point.id === updatedPoint.id) {
-          return updatedPoint;
-        }
-        return point;
-      }));
+      setDefaultPointList(
+        defaultPointList.map((point) => {
+          if (point.id === updatedPoint.id) {
+            return updatedPoint;
+          }
+          return point;
+        })
+      );
       setIsSetUp(true);
       setPoint({});
     }, 100);
@@ -212,7 +213,8 @@ function usePointList() {
           setIsSetUp(true);
         }
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to delete points") && navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to delete points") &&
+          navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }
@@ -247,7 +249,8 @@ function usePointList() {
           LibToast.toast(`Add ${count} success`, "info");
         }
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to add points") && navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to add points") &&
+          navigate("/", { replace: true });
         output.innerHTML = "";
       }
     }, 100);
