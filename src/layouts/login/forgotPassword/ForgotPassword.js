@@ -12,11 +12,8 @@ import api from "../../../api/axios";
 import { useNavigate } from "react-router-dom";
 import Constants from "../../../utils/Constants";
 import { loginService } from "../../../services/loginService";
-import LibToast from "../../../utils/LibToast";
-import { useTranslation } from "react-i18next";
 
 export default function ForgotPassword() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState("");
   const initialValues = {
@@ -42,12 +39,7 @@ export default function ForgotPassword() {
           setNewPassword(response?.data?.new_password);
         }
       } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        } else {
-          LibToast.toast(t("toastMessage.error.fetch"), "error");
-        }
+        loginService.handleMissingInfo(error, "Failed to reset password");
       } finally {
         output.innerHTML = "";
       }
