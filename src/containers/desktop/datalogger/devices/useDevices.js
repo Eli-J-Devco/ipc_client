@@ -1,8 +1,8 @@
 /********************************************************
-* Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
-* All rights reserved.
-* 
-*********************************************************/
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
@@ -17,7 +17,6 @@ import Button from "../../../../components/button/Button";
 import _ from "lodash";
 import { useDeviceManagement } from "./DeviceManagement";
 import LibToast from "../../../../utils/LibToast";
-
 
 export default function useDevices() {
   const { data } = useMQTT();
@@ -42,6 +41,11 @@ export default function useDevices() {
   const [dataDevices, setDataDevices] = useState([]);
   const output = document.getElementById("progress");
   const columnsHelper = createColumnHelper();
+  const statusColor = {
+    online: "bg-success",
+    offline: "bg-danger",
+    [Constants.COMMON.SPECIAL_DEVICE_TYPE]: "bg-warning",
+  };
   const columns = [
     columnsHelper.accessor("id_checkbox", {
       id: "id_checkbox",
@@ -78,7 +82,8 @@ export default function useDevices() {
       width: 200,
       cell: ({ row }) => (
         <div>
-          {row.original.tcp_gateway_ip}@{row.original.tcp_gateway_port} {row.original.rtu_bus_address}
+          {row.original.tcp_gateway_ip}@{row.original.tcp_gateway_port}{" "}
+          {row.original.rtu_bus_address}
         </div>
       ),
     }),
@@ -86,12 +91,9 @@ export default function useDevices() {
       id: "status",
       header: "Status",
       size: 100,
-      cell: ({ row }) =>
-      (
-        <div className={`badge ${row.original.status === "online" ? "bg-success" : "bg-danger"}`}>
-          <span>
-            {row.original.status}
-          </span>
+      cell: ({ row }) => (
+        <div className={`badge ${statusColor[row.original.status]}`}>
+          <span>{row.original.status}</span>
         </div>
       ),
     }),
@@ -125,16 +127,24 @@ export default function useDevices() {
     }),
   ];
 
-  const handleConfigDevice = item => {
+  const handleConfigDevice = (item) => {
     setDevice(item);
-    navigate(`/datalogger/devices/${item?.name.trim()}`, { state: { from: "/datalogger/devices" } });
-    setRoutes((prev) => [...prev, { path: `/datalogger/devices/${item?.name.trim()}`, name: item?.name.trim() }]);
+    navigate(`/datalogger/devices/${item?.name.trim()}`, {
+      state: { from: "/datalogger/devices" },
+    });
+    setRoutes((prev) => [
+      ...prev,
+      {
+        path: `/datalogger/devices/${item?.name.trim()}`,
+        name: item?.name.trim(),
+      },
+    ]);
   };
 
   const handleUpdateDevice = (device) => {
     setDevice(device);
     openUpdateDevice();
-  }
+  };
 
   const openAddDevice = () => setIsAddDevice(true);
   const closeAddDevice = () => setIsAddDevice(false);
@@ -149,29 +159,38 @@ export default function useDevices() {
 
   useEffect(() => {
     let newTotal = total;
-    let newData = _.cloneDeep(allDevices.map((d) => {
-      if (d["is_online"] === -2) {
-        return d;
-      }
-
-      const index = data.findIndex((item) => item.id_device === d.id);
-      if (d["is_online"] === -1) {
-        if (index === -1) {
-          d["status"] = "Deleted";
-          d["is_online"] = -2;
-          newTotal -= 1;
+    let newData = _.cloneDeep(
+      allDevices.map((d) => {
+        if (d["is_online"] === -2) {
+          return d;
         }
-      } else if (index !== -1) {
-        d["status"] = data[index]["status_device"] === "" ? "offline" : data[index]["status_device"];
-        d["message"] = data[index]["message"];
-        d["is_online"] = 1;
-      }
-      else {
-        d["status"] = "Initiating...";
-        d["is_online"] = 0;
-      }
-      return d;
-    }));
+
+        const index = data.findIndex((item) => item.id_device === d.id);
+        if (d["is_online"] === -1) {
+          if (index === -1) {
+            d["status"] = "Deleted";
+            d["is_online"] = -2;
+            newTotal -= 1;
+          }
+        } else if (index !== -1) {
+          d["status"] =
+            data[index]["status_device"] === ""
+              ? "offline"
+              : data[index]["status_device"];
+          d["message"] = data[index]["message"];
+          d["is_online"] = 1;
+        } else {
+          if (d?.device_type === Constants.COMMON.SPECIAL_DEVICE_TYPE) {
+            d["status"] = Constants.COMMON.SPECIAL_DEVICE_TYPE;
+            d["is_online"] = 0;
+          } else {
+            d["status"] = "Initiating...";
+            d["is_online"] = 0;
+          }
+        }
+        return d;
+      })
+    );
     newData = newData.filter((d) => d["is_online"] !== -2);
 
     setTimeout(() => {
@@ -192,28 +211,36 @@ export default function useDevices() {
     }, 100);
   }, [data]);
 
-
   const deleteDevices = (devices) => {
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        const response = await axiosPrivate.post(Constants.API_URL.DEVICES.DELETE + `?page=${offset}&limit=${limit}`, devices);
-        setAllDevices(response.data?.data.map((d) => {
-          if (devices.includes(d.id)) {
-            d["status"] = "Deleting...";
-            d["is_online"] = -1;
-          }
-          return d;
-        }));
+        const response = await axiosPrivate.post(
+          Constants.API_URL.DEVICES.DELETE + `?page=${offset}&limit=${limit}`,
+          devices
+        );
+        setAllDevices(
+          response.data?.data.map((d) => {
+            if (devices.includes(d.id)) {
+              d["status"] = "Deleting...";
+              d["is_online"] = -1;
+            }
+            return d;
+          })
+        );
         setTotal(response.data?.total);
-        LibToast.toast("Devices are being deleted. It would take a few minutes.", "info");
+        LibToast.toast(
+          "Devices are being deleted. It would take a few minutes.",
+          "info"
+        );
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to delete devices") && navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to delete devices") &&
+          navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }
     }, 500);
-  }
+  };
 
   return {
     isAddDevice,
@@ -229,5 +256,5 @@ export default function useDevices() {
     handleConfigDevice,
     deleteDevices,
     setIsDeleteDevice,
-  }
+  };
 }

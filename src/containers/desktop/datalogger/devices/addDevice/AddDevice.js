@@ -15,6 +15,7 @@ import Modal from "../../../../../components/modal/Modal";
 import Button from "../../../../../components/button/Button";
 import AddMultipleDevice from "./AddMultipleDevice";
 import FormInput from "../../../../../components/formInput/FormInput";
+import Constants from "../../../../../utils/Constants";
 
 export default function AddDevice(props) {
   const navigate = useNavigate();
@@ -103,6 +104,8 @@ export default function AddDevice(props) {
                 schema={schema}
                 closeAddMultipleDevice={closeAddMultipleDevice}
                 handleSave={handleAddMultipleDevice}
+                deviceType={initialValues?.device_type?.label}
+                comunicationType={initialValues?.communication?.label}
               />
             </ModalDefault.Body>
           </ModalDefault>
@@ -121,58 +124,9 @@ export default function AddDevice(props) {
             />
           </div>
 
-          <div className="col-xl-6 col-md-12">
-            <div>What kind of your device?</div>
-            <div className="d-flex my-2">
-              <div className="col-xl-4 col-md-4">
-                <div>
-                  <FormInput.Check
-                    label="Physical"
-                    name="RS485"
-                    checked={protocol.Physical}
-                    onChange={(e) => {
-                      setProtocol({ ...protocol, Physical: 1, Virtual: 0 });
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="col-xl-4 col-md-4">
-                <div>
-                  <FormInput.Check
-                    label="Virtual"
-                    name="Virtual"
-                    checked={protocol.Virtual}
-                    onChange={(e) => {
-                      setProtocol({ ...protocol, Physical: 0, Virtual: 1 });
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {protocol.Physical === 1 ? (
-            <AddModBusDevice
-              communication={deviceConfigDropdown?.communicationProtocol}
-              initialValues={initialValues}
-              setInitialValues={setInitialValues}
-            />
-          ) : (
-            ""
-          )}
-
-          <div>
-            Auto-detect requires \"Search for Modbus Devices\" be enable in{" "}
-            <u>RS485 Options</u>.
-          </div>
-          <div>
-            To create a Virtual Meter, use the <u>Device Framework</u> to create
-            a template, then add a meter using that template.
-          </div>
           <div className="col-xl-6 col-md-12 col-sm-12 d-flex mt-2 ml-5 align-items-center">
             <div className="col-xl-6 col-md-6 col-sm-6">
-              <div className="form_dropdown">
+              <div className="w-75">
                 <FormInput.Select
                   label="Device type"
                   name="id_device_type"
@@ -222,7 +176,7 @@ export default function AddDevice(props) {
             {initialValues?.device_group ? (
               <>
                 <div className="col-xl-6 col-md-6 col-sm-6">
-                  <div className="form_dropdown">
+                  <div className="w-75">
                     <FormInput.Select
                       label="Device Group"
                       name="device_group"
@@ -263,7 +217,7 @@ export default function AddDevice(props) {
                 </div>
                 {initialValues?.template ? (
                   <div className="col-xl-6 col-md-6 col-sm-6">
-                    <div className="form_dropdown">
+                    <div className="w-75">
                       <FormInput.Select
                         label="Template Library"
                         className="template_library"
@@ -298,78 +252,137 @@ export default function AddDevice(props) {
               createTemplateBTN
             )}
           </div>
-          {initialValues?.device_type?.label.indexOf("Inverter") !== -1 ? (
-            <div className="mt-3 note">
-              <div>Inverter mode:</div>
-              <div className="row">
-                <div className="col-2">
-                  <FormInput.Check
-                    label="Manual"
-                    name="manual_mode"
-                    checked={initialValues?.mode === 0}
-                    onChange={(e) =>
-                      setInitialValues({ ...initialValues, mode: 0 })
-                    }
-                    type="radio"
-                  />
-                </div>
-                <div className="col-2">
-                  <FormInput.Check
-                    label="Auto"
-                    name="auto_mode"
-                    checked={initialValues?.mode === 1}
-                    onChange={(e) =>
-                      setInitialValues({ ...initialValues, mode: 1 })
-                    }
-                    type="radio"
-                  />
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-4">
-                  <FormInput.Select
-                    label="Inverter Type"
-                    name="inverter_type"
-                    value={initialValues?.inverterType}
-                    option={deviceConfigDropdown?.inverterType}
-                    onChange={(e) =>
-                      setInitialValues({
-                        ...initialValues,
-                        inverter_type: e.value,
-                        inverterType: e,
-                      })
-                    }
-                    required={true}
-                  />
-                </div>
-                <div className="col-4">
-                  <FormInput.Text
-                    label="Rated Power"
-                    name="rated_power"
-                    placeholder="Enter rated power"
-                    type="number"
-                    required={true}
-                  />
+
+          {initialValues?.device_type?.label.indexOf(
+            Constants.COMMON.SPECIAL_DEVICE_TYPE
+          ) === -1 && (
+            <>
+              <div className="col-xl-6 col-md-12">
+                <div>What kind of your device?</div>
+                <div className="d-flex my-2">
+                  <div className="col-xl-4 col-md-4">
+                    <div>
+                      <FormInput.Check
+                        label="Physical"
+                        name="RS485"
+                        checked={protocol.Physical}
+                        onChange={(e) => {
+                          setProtocol({ ...protocol, Physical: 1, Virtual: 0 });
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-xl-4 col-md-4">
+                    <div>
+                      <FormInput.Check
+                        label="Virtual"
+                        name="Virtual"
+                        checked={protocol.Virtual}
+                        onChange={(e) => {
+                          setProtocol({ ...protocol, Physical: 0, Virtual: 1 });
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            initialValues?.device_type?.label.indexOf("Meter") !== -1 && (
-              <div className="mt-3 note">
-                <FormInput.Select
-                  label={"Meter Type"}
-                  className="col-4"
-                  name={"meter_type"}
-                  value={meterType}
-                  option={meterTypes}
-                  onChange={(e) => {
-                    setMeterType(e);
-                    setInitialValues({ ...initialValues, meter_type: e.value });
-                  }}
-                  required={true}
+
+              {protocol.Physical === 1 ? (
+                <AddModBusDevice
+                  communication={deviceConfigDropdown?.communicationProtocol}
+                  initialValues={initialValues}
+                  setInitialValues={setInitialValues}
                 />
+              ) : (
+                ""
+              )}
+
+              <div>
+                Auto-detect requires \"Search for Modbus Devices\" be enable in{" "}
+                <u>RS485 Options</u>.
               </div>
-            )
+              <div>
+                To create a Virtual Meter, use the <u>Device Framework</u> to
+                create a template, then add a meter using that template.
+              </div>
+              {initialValues?.device_type?.label.indexOf("Inverter") !== -1 ? (
+                <div className="mt-3 note">
+                  <div>Inverter mode:</div>
+                  <div className="row">
+                    <div className="col-2">
+                      <FormInput.Check
+                        label="Manual"
+                        name="manual_mode"
+                        checked={initialValues?.mode === 0}
+                        onChange={(e) =>
+                          setInitialValues({ ...initialValues, mode: 0 })
+                        }
+                        type="radio"
+                      />
+                    </div>
+                    <div className="col-2">
+                      <FormInput.Check
+                        label="Auto"
+                        name="auto_mode"
+                        checked={initialValues?.mode === 1}
+                        onChange={(e) =>
+                          setInitialValues({ ...initialValues, mode: 1 })
+                        }
+                        type="radio"
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-4">
+                      <FormInput.Select
+                        label="Inverter Type"
+                        name="inverter_type"
+                        value={initialValues?.inverterType}
+                        option={deviceConfigDropdown?.inverterType}
+                        onChange={(e) =>
+                          setInitialValues({
+                            ...initialValues,
+                            inverter_type: e.value,
+                            inverterType: e,
+                          })
+                        }
+                        required={true}
+                      />
+                    </div>
+                    <div className="col-4">
+                      <FormInput.Text
+                        label="Rated Power"
+                        name="rated_power"
+                        placeholder="Enter rated power"
+                        type="number"
+                        required={true}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                initialValues?.device_type?.label.indexOf("Meter") !== -1 && (
+                  <div className="mt-3 note">
+                    <FormInput.Select
+                      label={"Meter Type"}
+                      className="col-4"
+                      name={"meter_type"}
+                      value={meterType}
+                      option={meterTypes}
+                      onChange={(e) => {
+                        setMeterType(e);
+                        setInitialValues({
+                          ...initialValues,
+                          meter_type: e.value,
+                        });
+                      }}
+                      required={true}
+                    />
+                  </div>
+                )
+              )}
+            </>
           )}
         </div>
       </Modal>

@@ -47,36 +47,50 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
     { value: 5, label: "Grid Meter" },
   ]);
 
+  const tcpSchema = {
+    tcp_gateway_ip: yup
+      .string()
+      .required("MB/TCP Gateway IP-Address is required"),
+    tcp_gateway_port: yup
+      .number()
+      .required("MB/TCP Gateway Port is required")
+      .min(502, "MB/TCP Gateway Port must be greater than 502")
+      .max(65535, "MB/TCP Gateway Port must be less than 65536"),
+  };
+
+  const normalDeviceSchema = {
+    mode: yup.number().required("Mode is required"),
+    id_device_type: yup.number().required("Device type is required"),
+    id_communication: yup.number().required("Communication is required"),
+    rtu_bus_address: yup
+      .number()
+      .required("RTU Bus Address is required")
+      .min(1, "RTU Bus Address must be greater than 0")
+      .max(255, "RTU Bus Address must be less than 256"),
+  };
+
+  const defaultSchema = {
+    name: yup.string().required("Name is required"),
+    num_of_devices: yup
+      .number()
+      .required("Number of devices is required")
+      .min(1, "Number of devices must be greater than 0")
+      .max(16, "Number of devices must be less than 16"),
+  };
+
   const [schema, setSchema] = useState(
     yup.object().shape({
-      name: yup.string().required("Name is required"),
-      num_of_devices: yup
-        .number()
-        .required("Number of devices is required")
-        .min(1, "Number of devices must be greater than 0")
-        .max(16, "Number of devices must be less than 16"),
-      mode: yup.number().required("Mode is required"),
-      id_device_type: yup.number().required("Device type is required"),
-      id_communication: yup.number().required("Communication is required"),
-      rtu_bus_address: yup
-        .number()
-        .required("RTU Bus Address is required")
-        .min(1, "RTU Bus Address must be greater than 0")
-        .max(255, "RTU Bus Address must be less than 256"),
-      ...(initialValues?.communication &&
-      initialValues?.communication?.label &&
-      initialValues?.communication?.label.search(/RS485/g) === -1
-        ? {
-            tcp_gateway_ip: yup
-              .string()
-              .required("MB/TCP Gateway IP-Address is required"),
-            tcp_gateway_port: yup
-              .number()
-              .required("MB/TCP Gateway Port is required")
-              .min(502, "MB/TCP Gateway Port must be greater than 502")
-              .max(65535, "MB/TCP Gateway Port must be less than 65536"),
-          }
-        : {}),
+      ...defaultSchema,
+      ...(initialValues?.device_type?.label.indexOf(
+        Constants.COMMON.SPECIAL_DEVICE_TYPE
+      ) === -1 && {
+        ...normalDeviceSchema,
+        ...(initialValues?.communication &&
+        initialValues?.communication?.label &&
+        initialValues?.communication?.label.search(/COM\w*/g) === -1
+          ? tcpSchema
+          : {}),
+      }),
     })
   );
 
@@ -87,23 +101,15 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
           yup.object().shape({
             ...schema.fields,
             ...(initialValues?.communication?.label.search(/COM\w*/g) === -1
-              ? {
-                  tcp_gateway_ip: yup
-                    .string()
-                    .required("MB/TCP Gateway IP-Address is required")
-                    .matches(
-                      /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/,
-                      "Invalid IP Address"
-                    ),
-                  tcp_gateway_port: yup
-                    .number()
-                    .required("MB/TCP Gateway Port is required")
-                    .min(1, "MB/TCP Gateway Port must be greater than 1")
-                    .max(65535, "MB/TCP Gateway Port must be less than 65536"),
-                }
+              ? tcpSchema
               : {}),
           })
         );
+        setInitialValues({
+          ...initialValues,
+          tcp_gateway_port: 502,
+          tcp_gateway_ip: "1.1.1.1",
+        });
       }, 100);
   }, [initialValues?.communication?.label]);
 
@@ -112,20 +118,33 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
       setTimeout(() => {
         setSchema(
           yup.object().shape({
-            ...schema.fields,
-            ...(initialValues?.device_type?.label.indexOf("Inverter") !== -1
-              ? {
-                  rated_power: yup
-                    .number()
-                    .required("Rated Power is required")
-                    .min(0, "Rated Power must be greater than 0")
-                    .max(1500, "Rated Power must be less than 1500"),
+            ...(initialValues?.device_type?.label.indexOf(
+              Constants.COMMON.SPECIAL_DEVICE_TYPE
+            )
+              ? -1 && {
+                  ...schema.fields,
+                  ...normalDeviceSchema,
+                  ...(initialValues?.communication &&
+                  initialValues?.communication?.label &&
+                  initialValues?.communication?.label.search(/COM\w*/g) === -1
+                    ? tcpSchema
+                    : {}),
+                  ...(initialValues?.device_type?.label.indexOf("Inverter") !==
+                  -1
+                    ? {
+                        rated_power: yup
+                          .number()
+                          .required("Rated Power is required")
+                          .min(0, "Rated Power must be greater than 0")
+                          .max(1500, "Rated Power must be less than 1500"),
+                      }
+                    : {}),
                 }
-              : {}),
+              : defaultSchema),
           })
         );
       }, 100);
-  }, [initialValues?.device_type?.value]);
+  }, [initialValues?.device_type?.label]);
 
   const openAddMultipleDevice = () => setIsAddMultipleDevice(true);
   const closeAddMultipleDevice = () => {

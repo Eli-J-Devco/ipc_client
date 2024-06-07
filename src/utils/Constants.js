@@ -42,6 +42,7 @@ const Constants = {
     LIMIT_ALERT: 20,
     TOKEN: "nwm-access-token",
     ACCESS_PARAM: "access-param",
+    SPECIAL_DEVICE_TYPE: "Circuit Breaker",
   },
 
   API_URL: {
