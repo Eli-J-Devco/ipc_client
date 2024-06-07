@@ -145,42 +145,27 @@ export class RowAdapter {
   }
 }
 
-export const resortIndex = (rows, type = POINT_CONFIG.MPPT) => {
+export const resortIndex = (rows) => {
   let index = 0;
   let updateSelectedPoints = rows?.map((point) => {
-    if (!_.isEqual(type, POINT_CONFIG.CONTROL_GROUP)) {
-      point.index = index++;
-    }
+    point.index = index++;
 
-    if (
-      !_.isEqual(type, POINT_CONFIG.MPPT) &&
-      !_.isEqual(type, POINT_CONFIG.CONTROL_GROUP)
-    ) {
-      return point;
-    }
-
-    let subRows = point?.subRows?.map((string) => {
-      string.index = index++;
-
-      if (!_.isEqual(type, POINT_CONFIG.MPPT)) {
+    if (point?.subRows && point?.subRows.length > 0) {
+      point.subRows = point.subRows.map((string) => {
+        string.index = index++;
+        if (string?.subRows && string?.subRows.length > 0) {
+          string.subRows = string.subRows.map((panel) => {
+            return {
+              ...panel,
+              index: index++,
+            };
+          });
+        }
         return string;
-      }
-
-      let subRows = string?.subRows?.map((panel) => {
-        return {
-          ...panel,
-          index: index++,
-        };
       });
-      return {
-        ...string,
-        subRows: subRows || [],
-      };
-    });
-    return {
-      ...point,
-      subRows: subRows || [],
-    };
+    }
+
+    return point;
   });
 
   return updateSelectedPoints;

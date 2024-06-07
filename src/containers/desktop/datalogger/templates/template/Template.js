@@ -13,6 +13,7 @@ function Template() {
     id,
     setDefaultPointList,
     setDefaultMPPTList,
+    setDefaultStringList,
     setDefaultRegisterList,
     setDefaultControlGroupList,
     setConfig,
@@ -39,6 +40,7 @@ function Template() {
           if (response?.status === 200) {
             setDefaultPointList(response?.data?.points);
             setDefaultMPPTList(response?.data?.point_mppt);
+            setDefaultStringList(response?.data?.point_string);
             setDefaultRegisterList(response?.data?.register_blocks);
             setDefaultControlGroupList(response?.data?.point_controls);
             setDeviceType(response?.data?.device_type);
@@ -78,6 +80,29 @@ function Template() {
     }, 300);
   }, [setConfig]);
 
+  useEffect(() => {
+    if (!deviceType) return;
+    if (
+      deviceType.toLowerCase().search(/inverter/g) === -1 &&
+      location.pathname.search(/mppt/g) !== -1
+    ) {
+      navigate(`/datalogger/templates/${id}/points`, { replace: true });
+      return;
+    }
+
+    if (deviceType.toLowerCase().search(/combiner/g) === -1) {
+      if (location.pathname.search(/string/g) !== -1) {
+        navigate(`/datalogger/templates/${id}/points`, { replace: true });
+        return;
+      }
+    } else {
+      if (location.pathname.search(/points/g) !== -1) {
+        navigate(`/datalogger/templates/${id}/string`, { replace: true });
+        return;
+      }
+    }
+  }, [location, deviceType]);
+
   return (
     isSetUp &&
     deviceType && (
@@ -89,10 +114,19 @@ function Template() {
             <NavTabs
               className="col-10"
               routes={[
-                {
-                  path: `/datalogger/templates/${id}/points`,
-                  name: "Point List",
-                },
+                ...(deviceType.toLowerCase().search(/combiner/g) !== -1
+                  ? [
+                      {
+                        path: `/datalogger/templates/${id}/string`,
+                        name: "String",
+                      },
+                    ]
+                  : [
+                      {
+                        path: `/datalogger/templates/${id}/points`,
+                        name: "Point List",
+                      },
+                    ]),
                 ...(deviceType.toLowerCase().search(/inverter/g) !== -1
                   ? [
                       {
@@ -101,6 +135,7 @@ function Template() {
                       },
                     ]
                   : []),
+
                 {
                   path: `/datalogger/templates/${id}/registers`,
                   name: "Register Blocks",

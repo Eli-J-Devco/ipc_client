@@ -8,6 +8,7 @@ export const useTemplate = () => useContext(TemplateContext);
 export default function TemplateProvider({ children }) {
   const [defaultPointList, setDefaultPointList] = useState([]);
   const [defaultMPPTList, setDefaultMPPTList] = useState([]);
+  const [defaultStringList, setDefaultStringList] = useState([]);
   const [defaultRegisterList, setDefaultRegisterList] = useState([]);
   const [defaultControlGroupList, setDefaultControlGroupList] = useState([]);
   const [config, setConfig] = useState({});
@@ -24,6 +25,8 @@ export default function TemplateProvider({ children }) {
         setDefaultPointList,
         defaultMPPTList,
         setDefaultMPPTList,
+        defaultStringList,
+        setDefaultStringList,
         defaultRegisterList,
         setDefaultRegisterList,
         defaultControlGroupList,

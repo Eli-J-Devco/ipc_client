@@ -1,3 +1,8 @@
+/********************************************************
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
 import { useEffect, useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useNavigate } from "react-router-dom";
@@ -8,9 +13,7 @@ import { useTemplate } from "../useTemplate";
 import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate";
 import { loginService } from "../../../../../../services/loginService";
 
-import FormInput, {
-  FormInputEnum,
-} from "../../../../../../components/formInput/FormInput";
+import FormInput from "../../../../../../components/formInput/FormInput";
 import Button from "../../../../../../components/button/Button";
 import Constants from "../../../../../../utils/Constants";
 import LibToast from "../../../../../../utils/LibToast";
@@ -23,13 +26,8 @@ import {
 import { ReactComponent as ExpandIcon } from "../../../../../../assets/images/chevron-down.svg";
 import { ReactComponent as CollapseIcon } from "../../../../../../assets/images/chevron-up.svg";
 
-export default function useControlGroups() {
-  const {
-    id,
-    defaultControlGroupList,
-    setDefaultControlGroupList,
-    setDefaultPointList,
-  } = useTemplate();
+function useStringList() {
+  const { id, defaultStringList, setDefaultStringList } = useTemplate();
 
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
@@ -40,49 +38,36 @@ export default function useControlGroups() {
 
   const [rowSelection, setRowSelection] = useState({});
   const [isSetUp, setIsSetUp] = useState(true);
+  const [isClone, setIsClone] = useState(false);
   const [addChildrenModal, setAddChildrenModal] = useState({
-    [POINT_CONFIG.CONTROL_GROUP.name]: {
+    [POINT_CONFIG.PANEL.name]: {
       isOpen: false,
       initialValues: {
-        num_of_point: 1,
+        num_of_panels: 1,
         is_clone_from_last: false,
       },
       validationSchema: yup.object().shape({
-        num_of_point: yup
+        num_of_panels: yup
           .number()
           .required("Required")
-          .min(1, "Minimum 1")
-          .max(3, "Maximum 3"),
+          .min(1, "Minimum 1 panel")
+          .max(10, "Maximum 10 panels per string"),
       }),
       fields: [
         {
-          key: "add_type",
-          name: "add_type",
-          label: "Add Type",
-          required: true,
-          enum: FormInputEnum.Select.type,
-          isShow: true,
-        },
-        {
-          key: "num_of_point",
-          name: "num_of_point",
+          name: "num_of_panels",
           type: "number",
-          label: "Number of Points",
-          placeholder: "Number of Points",
+          label: "Number of Panel",
+          placeholder: "Number of Panel",
           required: true,
-          enum: FormInputEnum.Text.type,
-          isShow: true,
         },
         {
-          key: "is_clone_from_last",
           name: "is_clone_from_last",
           type: "checkbox",
           label: "Clone from last",
-          placeholder: "Clone from last Point",
+          placeholder: "Clone from last Panel",
           required: false,
-          enum: FormInputEnum.Check.type,
-          isShow: true,
-          // onChange: (e) => setIsClone(e.target.checked),
+          onChange: (e) => setIsClone(e.target.checked),
         },
       ],
       onSubmit: (data) => addNewChildren(data),
@@ -90,24 +75,33 @@ export default function useControlGroups() {
   });
   const output = document.getElementById("progress");
 
-  const addNewControlGroupInit = {
-    name: "",
-    description: "",
-    value: 0,
-    attributes: 0,
+  const addNewStringInit = {
+    is_clone_from_last: isClone,
+    num_of_strings: 1,
+    num_of_panels: 0,
   };
 
-  const addNewCGSchema = yup.object().shape({
-    name: yup.string().required("Required"),
-    attributes: yup
+  const addNewStringSchema = yup.object().shape({
+    num_of_strings: yup
       .number()
       .required("Required")
-      .min(0, "Minimum 0")
-      .max(2, "Maximum 2"),
+      .min(1, "Minimum 1 point")
+      .max(10, "Maximum 10 string"),
+    ...(!isClone
+      ? {
+          num_of_panels: yup
+            .number()
+            .required("Required")
+            .min(0, "Minimum 0 panel")
+            .max(10, "Maximum 10 panels per string"),
+        }
+      : {}),
   });
 
   /**
-   * Add a new control group to the pointList and update the pointList with the updated control group list
+   * This useEffect is used to set the initial state of the pointList
+   * It is only called once when the convertedPointList is set
+   * It is also used to set the initial state of the editedMPPT, defaultStringList, isReset and rowSelection
    * @author nhan.tran 2024-04-02
    */
   useEffect(() => {
@@ -118,23 +112,24 @@ export default function useControlGroups() {
     }
 
     setTimeout(() => {
-      let groupCount = 0;
-      let data = defaultControlGroupList?.map((group) => {
+      let data = defaultStringList?.map((string, index) => {
         return {
-          ...new RowAdapter({
-            ...group,
-            index: groupCount++,
-            config: POINT_CONFIG.CONTROL_GROUP,
-          }).getRow(),
+          ...new RowAdapter(
+            {
+              ...string,
+              config: POINT_CONFIG.PANEL,
+            },
+            index
+          ).getRow(),
           subRows:
-            group?.children?.map((point) => {
+            string?.children?.map((panel, pindex) => {
               return {
-                ...new RowAdapter(point).getRow(),
+                ...new RowAdapter(panel, pindex).getRow(),
               };
             }) || [],
         };
       });
-      setPointList(resortIndex(data));
+      setPointList(resortIndex(_.cloneDeep(data)));
       setRowSelection({});
     }, 100);
 
@@ -142,9 +137,7 @@ export default function useControlGroups() {
       setIsSetUp(false);
       output.innerHTML = "";
     }, 100);
-  }, [defaultControlGroupList, isSetUp]);
-
-  useEffect(() => {}, [isSetUp]);
+  }, [defaultStringList]);
 
   /**
    * Close the modal
@@ -170,17 +163,15 @@ export default function useControlGroups() {
    * @param {Object} newPoint The new point to be updated
    */
   const updatePoint = (newPoint) => {
-    if (!newPoint) return;
-
     let updatedPoint = { ...newPoint };
     setTimeout(() => {
       var isFound = false;
-      setDefaultControlGroupList([
-        ...defaultControlGroupList.map((group) => {
-          if (isFound) return group;
+      setDefaultStringList([
+        ...defaultStringList.map((mppt) => {
+          if (isFound) return mppt;
 
-          let children = group?.children || [];
-          if (group.id === newPoint.id) {
+          let children = mppt?.children || [];
+          if (mppt.id === newPoint.id) {
             updatedPoint = {
               ...updatedPoint,
               children: children,
@@ -189,20 +180,44 @@ export default function useControlGroups() {
             return updatedPoint;
           }
 
-          let updatedPoints = children.map((p) => {
-            if (isFound) return p;
+          let updatedString = children.map((string) => {
+            if (isFound) return string;
 
-            if (p.id === newPoint.id) {
+            let panels = string?.children || [];
+            if (string.id === newPoint.id) {
+              updatedPoint = {
+                ...updatedPoint,
+                children: panels,
+              };
+
               isFound = true;
-              return newPoint;
+              return updatedPoint;
             }
 
-            return p;
+            let updatedPanel = panels.map((panel) => {
+              if (isFound) return panel;
+
+              if (panel.id === newPoint.id) {
+                updatedPoint = {
+                  ...updatedPoint,
+                };
+
+                isFound = true;
+                return updatedPoint;
+              }
+
+              return panel;
+            });
+
+            return {
+              ...string,
+              children: updatedPanel,
+            };
           });
 
           return {
-            ...group,
-            children: updatedPoints,
+            ...mppt,
+            children: updatedString,
           };
         }),
       ]);
@@ -307,14 +322,12 @@ export default function useControlGroups() {
               {...{
                 inline: true,
                 name: row.original.index,
-                label: !_.isEqual(
-                  row.original?.config,
-                  POINT_CONFIG.CONTROL_GROUP
-                )
-                  ? `pt${row.original.index}`
-                  : `Group${row.original.index}`,
+                label: `pt${row.original.index}`,
                 checked: row.getIsSelected(),
                 onChange: row.getToggleSelectedHandler(),
+                disabled: POINT_CONFIG.MPPT_CONFIG.values.includes(
+                  row.original?.id_config_information
+                ),
                 indeterminate: row.getIsSomeSelected(),
               }}
             />
@@ -388,41 +401,22 @@ export default function useControlGroups() {
           {row.original?.config && (
             <Button
               className="mx-2"
-              onClick={() => {
-                let nums =
-                  row?.original?.attributes - row.original?.subRows?.length + 1;
-                let canAddMoreChildren =
-                  row?.original?.attributes !== 0 && nums > 0;
-                setTimeout(() => {
-                  setAddChildrenModal({
-                    ...addChildrenModal,
-                    [row.original?.config.name]: {
-                      ...addChildrenModal[row.original?.config.name],
-                      isReachedLimit:
-                        !canAddMoreChildren && row?.original?.attributes !== 0,
-                      remainingSlots:
-                        row?.original?.attributes !== 0 ? nums : "unlimited",
-                      validationSchema: yup.object().shape({
-                        num_of_point: yup
-                          .number()
-                          .required("Required")
-                          .min(1, "Minimum is 1")
-                          .max(
-                            canAddMoreChildren ? nums : 10,
-                            `${
-                              canAddMoreChildren
-                                ? `Maximum is ${nums}`
-                                : "Maximum is 10"
-                            }`
-                          ),
-                      }),
-                      isOpen: true,
-                      id: row.original.id,
-                      hasChildren: row.original?.subRows?.length > 0,
-                    },
-                  });
-                }, 100);
-              }}
+              onClick={() =>
+                setAddChildrenModal({
+                  ...addChildrenModal,
+                  [row.original?.config.name]: {
+                    ...addChildrenModal[row.original?.config.name],
+                    isOpen: true,
+                    id: row.original.id,
+                    has_children: _.isEqual(
+                      row.original?.config,
+                      POINT_CONFIG.STRING
+                    )
+                      ? row.original?.subRows?.length - 2
+                      : row.original?.subRows?.length,
+                  },
+                })
+              }
             >
               <Button.Text text={`Add ${row.original?.config.name}`} />
             </Button>
@@ -433,95 +427,97 @@ export default function useControlGroups() {
   ];
 
   /**
+   * Add a new MPPT to the pointList
+   * @author nhan.tran 2024-04-02
+   */
+  const addNewString = (data) => {
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    setTimeout(async () => {
+      try {
+        const response = await axiosPrivate.post(
+          Constants.API_URL.POINT_MPPT.ADD_STRING,
+          {
+            ...data,
+            id_template: id,
+            is_string_only: true,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response?.status === 200) {
+          setDefaultStringList(response?.data);
+          setRowSelection({});
+          setIsSetUp(true);
+          LibToast.toast("Add new string success", "info");
+        }
+      } catch (error) {
+        loginService.handleMissingInfo(error, "Failed to add new MPPT") &&
+          navigate("/", { replace: true });
+        output.innerHTML = "";
+      }
+    }, 300);
+  };
+
+  /**
    * Remove the selected points from the pointList and update the pointList with the updated points
    * @author nhan.tran 2024-04-02
    */
-  const removePoint = ({
-    isGroupSelected,
-    isGroupOnly,
-    isChildrenSelected,
-    isDeletePoints,
-  }) => {
+  const removePoint = () => {
     if (Object.keys(rowSelection).length === 0) {
       LibToast.toast("No point selected", "error");
       return;
     }
 
-    let url = isDeletePoints
-      ? Constants.API_URL.POINT_CONTROL.DELETE
-      : isChildrenSelected
-      ? Constants.API_URL.POINT_CONTROL.REMOVE
-      : Constants.API_URL.POINT_CONTROL.GROUP.DELETE;
-
-    let successMsg = isDeletePoints
-      ? "Delete points success"
-      : isChildrenSelected
-      ? "Remove points success. You can see them in the Point List Tab"
-      : isGroupOnly
-      ? "Delete control group success. You can see the points of this group in the Point List Tab"
-      : "Delete control group success";
-    let body = {};
-
-    if (isChildrenSelected) {
-      let deletePoint = [];
+    let deletePoint = [];
+    rowSelection &&
       Object.keys(rowSelection).forEach((key) => {
-        let splitKey = key.split(".");
-        if (splitKey.length > 1) {
+        let keys = key.split(".");
+        if (keys.length === 1) {
+          deletePoint.push(pointList[keys[0]]);
+        }
+
+        if (keys.length === 2 && pointList[keys[0]]?.subRows) {
+          deletePoint.push(pointList[keys[0]].subRows[keys[1]]);
+        }
+
+        if (
+          keys.length === 3 &&
+          pointList[keys[0]]?.subRows[keys[1]]?.subRows
+        ) {
           deletePoint.push(
-            pointList[parseInt(splitKey[0])].subRows[parseInt(splitKey[1])]
+            pointList[keys[0]].subRows[keys[1]].subRows[keys[2]]
           );
         }
       });
 
-      let data = deletePoint.map((point) => point.id);
-      body = {
-        id_template: id,
-        id_points: data,
-      };
-    }
-
-    if (isGroupSelected) {
-      let deleteGroup = [];
-      let deletePoint = [];
-      Object.keys(rowSelection).forEach((key) => {
-        let parent = key.length > 1 ? key.split(".")[0] : key;
-        let child = key.length > 1 ? key.split(".")[1] : null;
-
-        if (deleteGroup.indexOf(pointList[parseInt(parent)]?.id) === -1)
-          deleteGroup.push(pointList[parseInt(parent)]?.id);
-
-        if (!isGroupOnly && child !== null) {
-          deletePoint.push(
-            pointList[parseInt(key)]?.children[parseInt(child)]?.id
-          );
-        }
-      });
-
-      body = {
-        id_template: id,
-        id_group: deleteGroup,
-        id_points: deletePoint,
-      };
-    }
+    let data = {
+      id_points: deletePoint.map((point) => point?.id),
+      id_template: id,
+      is_string_only: true,
+    };
 
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        const response = await axiosPrivate.post(url, body, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
+        const response = await axiosPrivate.post(
+          Constants.API_URL.POINT_MPPT.DELETE,
+          data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         if (response?.status === 200) {
-          LibToast.toast(successMsg, "info");
-          setDefaultControlGroupList(response?.data?.point_controls);
-          setDefaultPointList(response?.data?.points);
-          setRowSelection({});
+          LibToast.toast("Delete points success", "info");
+          setDefaultStringList(response?.data);
           setIsSetUp(true);
         }
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to remove points") &&
+        loginService.handleMissingInfo(error, "Failed to delete points") &&
           navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
@@ -535,24 +531,14 @@ export default function useControlGroups() {
    * @author nhan.tran 2024-04-10
    */
   const addNewChildren = (data) => {
-    let body = {};
-    let url = "";
-    if (data?.selected_points.length > 0) {
-      body = {
-        id_control_group: data.id_control_group,
-        id_template: id,
-        id_points: data.selected_points?.map((point) => point.id),
-      };
-      url = Constants.API_URL.POINT_CONTROL.ADD_EXIST;
-    } else {
-      body = {
-        number_of_points: data.num_of_point,
-        id_template: id,
-        id_control_group: data.id_control_group,
-        is_clone_from_last: data.is_clone_from_last || false,
-      };
-      url = Constants.API_URL.POINT_CONTROL.ADD_NEW;
-    }
+    let url = Constants.API_URL.POINT_MPPT.ADD_PANEL;
+    let body = {
+      num_of_panels: data.num_of_panels,
+      is_clone_from_last: data.is_clone_from_last,
+      id_template: id,
+      is_string_only: true,
+      parent: data.id,
+    };
 
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
 
@@ -564,8 +550,7 @@ export default function useControlGroups() {
           },
         });
         if (response?.status === 200) {
-          setDefaultControlGroupList(response?.data?.point_controls);
-          setDefaultPointList(response?.data?.points);
+          setDefaultStringList(response?.data);
           setRowSelection({});
           setIsSetUp(true);
           LibToast.toast("Add new children success", "info");
@@ -573,12 +558,12 @@ export default function useControlGroups() {
       } catch (error) {
         loginService.handleMissingInfo(error, "Failed to add new children") &&
           navigate("/", { replace: true });
-      } finally {
         output.innerHTML = "";
+      } finally {
         setAddChildrenModal({
           ...addChildrenModal,
-          [POINT_CONFIG.CONTROL_GROUP.name]: {
-            ...addChildrenModal[POINT_CONFIG.CONTROL_GROUP.name],
+          [POINT_CONFIG.PANEL.name]: {
+            ...addChildrenModal[POINT_CONFIG.PANEL.name],
             isOpen: false,
           },
         });
@@ -596,11 +581,15 @@ export default function useControlGroups() {
     updatePoint,
     rowSelection,
     setRowSelection,
+    addNewString,
     removePoint,
-    addNewControlGroupInit,
-    addNewCGSchema,
+    addNewStringInit,
+    addNewStringSchema,
+    isClone,
+    setIsClone,
     addChildrenModal,
     setAddChildrenModal,
-    setIsSetUp,
   };
 }
+
+export default useStringList;

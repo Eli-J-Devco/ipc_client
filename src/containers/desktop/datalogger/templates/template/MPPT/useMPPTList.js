@@ -56,12 +56,12 @@ function useMPPTList() {
         ...(isClone
           ? {}
           : {
-            num_of_panels: yup
-              .number()
-              .required("Required")
-              .min(0, "Minimum 0 panel")
-              .max(10, "Maximum 10 panels per string"),
-          }),
+              num_of_panels: yup
+                .number()
+                .required("Required")
+                .min(0, "Minimum 0 panel")
+                .max(10, "Maximum 10 panels per string"),
+            }),
       }),
       fields: [
         {
@@ -140,17 +140,17 @@ function useMPPTList() {
       .max(10, "Maximum 10 MPPT"),
     ...(!isClone
       ? {
-        num_of_strings: yup
-          .number()
-          .required("Required")
-          .min(0, "Minimum 0 string")
-          .max(10, "Maximum 10 strings per MPPT"),
-        num_of_panels: yup
-          .number()
-          .required("Required")
-          .min(0, "Minimum 0 panel")
-          .max(10, "Maximum 10 panels per string"),
-      }
+          num_of_strings: yup
+            .number()
+            .required("Required")
+            .min(0, "Minimum 0 string")
+            .max(10, "Maximum 10 strings per MPPT"),
+          num_of_panels: yup
+            .number()
+            .required("Required")
+            .min(0, "Minimum 0 panel")
+            .max(10, "Maximum 10 panels per string"),
+        }
       : {}),
   });
 
@@ -184,13 +184,13 @@ function useMPPTList() {
                   {
                     ...string,
                     ...(string?.id_config_information ===
-                      POINT_CONFIG.STRING.value
+                    POINT_CONFIG.STRING.value
                       ? {
-                        config: POINT_CONFIG.PANEL,
-                      }
+                          config: POINT_CONFIG.PANEL,
+                        }
                       : {
-                        config: "",
-                      }),
+                          config: "",
+                        }),
                   },
                   sindex
                 ).getRow(),
@@ -204,7 +204,7 @@ function useMPPTList() {
             }) || [],
         };
       });
-      setPointList(resortIndex(data, POINT_CONFIG.MPPT));
+      setPointList(resortIndex(data));
       setRowSelection({});
     }, 100);
 
@@ -354,7 +354,7 @@ function useMPPTList() {
             <Button.Image
               image={
                 table.getIsAllRowsExpanded() ||
-                  table.getIsSomeRowsExpanded() ? (
+                table.getIsSomeRowsExpanded() ? (
                   <CollapseIcon />
                 ) : (
                   <ExpandIcon />
@@ -418,7 +418,7 @@ function useMPPTList() {
         <div style={{ paddingLeft: `${row.depth * 2}rem` }}>
           {row.original?.name}
         </div>
-      )
+      ),
     }),
     columnsHelper.accessor("unit", {
       id: "unit",
@@ -528,7 +528,8 @@ function useMPPTList() {
           LibToast.toast("Add new MPPT success", "info");
         }
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to add new MPPT") && navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to add new MPPT") &&
+          navigate("/", { replace: true });
         output.innerHTML = "";
       }
     }, 300);
@@ -569,13 +570,14 @@ function useMPPTList() {
     let data = {
       id_points: deletePoint.map((point) => point?.id),
       id_template: id,
-    }
+    };
 
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.POINT_MPPT.DELETE, data,
+          Constants.API_URL.POINT_MPPT.DELETE,
+          data,
           {
             headers: {
               "Content-Type": "application/json",
@@ -588,7 +590,8 @@ function useMPPTList() {
           setIsSetUp(true);
         }
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to delete points") && navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to delete points") &&
+          navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }
@@ -601,9 +604,10 @@ function useMPPTList() {
    * @author nhan.tran 2024-04-10
    */
   const addNewChildren = (data) => {
-    let url = data.num_of_strings > 0 ?
-      Constants.API_URL.POINT_MPPT.ADD_STRING :
-      Constants.API_URL.POINT_MPPT.ADD_PANEL;
+    let url =
+      data.num_of_strings > 0
+        ? Constants.API_URL.POINT_MPPT.ADD_STRING
+        : Constants.API_URL.POINT_MPPT.ADD_PANEL;
     let body = {
       num_of_strings: data.num_of_strings,
       num_of_panels: data.num_of_panels,
@@ -616,15 +620,11 @@ function useMPPTList() {
 
     setTimeout(async () => {
       try {
-        const response = await axiosPrivate.post(
-          url,
-          body,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await axiosPrivate.post(url, body, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         if (response?.status === 200) {
           setDefaultMPPTList(response?.data);
           setRowSelection({});
@@ -632,7 +632,8 @@ function useMPPTList() {
           LibToast.toast("Add new children success", "info");
         }
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to add new children") && navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to add new children") &&
+          navigate("/", { replace: true });
         output.innerHTML = "";
       } finally {
         setAddChildrenModal({

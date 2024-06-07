@@ -95,6 +95,7 @@ import SetupControl from "./containers/desktop/scada/setupControl/SetupControl";
 import Basic from "./containers/desktop/scada/setupControl/basic/Basic";
 import ExportLimitationControl from "./containers/desktop/scada/setupControl/exportLimitationControl/ExportLimitationControl";
 import ScheduleControl from "./containers/desktop/scada/setupControl/scheduleControl/ScheduleControl";
+import StringList from "./containers/desktop/datalogger/templates/template/string/stringList";
 
 export default class App extends Component {
   render() {
@@ -122,7 +123,10 @@ export default class App extends Component {
                     <Route path="rs485-1" element={<RS485One />} />
                     <Route path="rs485-2" element={<RS485Two />} />
                     <Route path="logging-rate" element={<LoggingRate />} />
-                    <Route path="upload-channels" element={<UploadChannels />} />
+                    <Route
+                      path="upload-channels"
+                      element={<UploadChannels />}
+                    />
                     <Route path="remote-access" element={<RemoteAccess />} />
                     <Route path="done" element={<Done />} />
                   </Route>
@@ -150,8 +154,14 @@ export default class App extends Component {
 
                   <Route path="networking" element={<Networking />}>
                     <Route index element={<NetworkEnthernetOne />} />
-                    <Route path="ethernet-1" element={<NetworkEnthernetOne />} />
-                    <Route path="ethernet-2" element={<NetworkEnthernetTwo />} />
+                    <Route
+                      path="ethernet-1"
+                      element={<NetworkEnthernetOne />}
+                    />
+                    <Route
+                      path="ethernet-2"
+                      element={<NetworkEnthernetTwo />}
+                    />
                     <Route path="network-access" element={<NetworkAccess />} />
                     <Route path="remote-acesss" element={<NWRemoteAccess />} />
                     <Route path="static-routes" element={<StaticRoutes />} />
@@ -169,8 +179,12 @@ export default class App extends Component {
                     <Route path=":id" element={<TemplateConfigContext />}>
                       <Route path="points" element={<PointList />} />
                       <Route path="mppt" element={<MPPTList />} />
+                      <Route path="string" element={<StringList />} />
                       <Route path="registers" element={<RegisterBlocks />} />
-                      <Route path="control-groups" element={<ControlGroups />} />
+                      <Route
+                        path="control-groups"
+                        element={<ControlGroups />}
+                      />
                     </Route>
                   </Route>
 
@@ -188,7 +202,10 @@ export default class App extends Component {
                     <Route path="backup-restore" element={<BackupRestore />} />
                     <Route path="firmware" element={<SystemFirmware />} />
                     <Route path="auto-update" element={<AutoUpdate />} />
-                    <Route path="reboot-shutdown" element={<RebootShutdown />} />
+                    <Route
+                      path="reboot-shutdown"
+                      element={<RebootShutdown />}
+                    />
                     <Route path="synchronized" element={<Synchronized />} />
                     <Route path="alarm" element={<Alarm />} />
                   </Route>
