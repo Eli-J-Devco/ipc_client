@@ -32,8 +32,9 @@ export const DeviceManagementProvider = ({ children }) => {
     communication: [],
   });
   const [offset, setOffset] = useState(0);
-  const [limit, setLimit] = useState(Constants.DEFAULT_PAGE_SIZE);
+  const [limit, setLimit] = useState(20);
   const [total, setTotal] = useState(0);
+  const [deviceTypeComponents, setDeviceTypeComponents] = useState([]);
 
   return (
     <DeviceManagementContext.Provider
@@ -52,6 +53,8 @@ export const DeviceManagementProvider = ({ children }) => {
         setLimit,
         total,
         setTotal,
+        deviceTypeComponents,
+        setDeviceTypeComponents,
       }}
     >
       {children}
@@ -69,6 +72,7 @@ export function Device() {
     offset,
     limit,
     setTotal,
+    setDeviceTypeComponents,
   } = useDeviceManagement();
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
@@ -124,6 +128,9 @@ export function Device() {
             Constants.API_URL.RS485.GET,
             {}
           );
+          var deviceTypeComponents = await axiosPrivate.post(
+            Constants.API_URL.DEVICES.COMPONENT.LIST
+          );
 
           setDeviceConfig({
             device_types: device_type.data,
@@ -131,6 +138,7 @@ export function Device() {
             template: template.data,
             communication: communication.data,
           });
+          setDeviceTypeComponents(deviceTypeComponents.data);
         } catch (error) {
           loginService.handleMissingInfo(
             error,

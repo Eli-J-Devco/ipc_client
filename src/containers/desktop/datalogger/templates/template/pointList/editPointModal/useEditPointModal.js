@@ -39,6 +39,13 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
     value: data?.type_function?.id,
     label: data?.type_function?.name,
   });
+  const [selectedControlInputType, setSelectedControlInputType] = useState({
+    value: data?.type_control_input?.id,
+    label:
+      data?.type_control_input?.id === 0
+        ? "Not Control"
+        : data?.type_control_input?.name,
+  });
 
   const validationSchema = yup.object({
     // index: yup.string().required('Required'),
@@ -70,6 +77,10 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
     type_function: {
       value: data?.type_function?.id,
       label: data?.type_function?.name,
+    },
+    type_control_input: {
+      value: data?.type_control_input?.id,
+      label: data?.type_control_input?.name,
     },
     register: data?.register || 40000,
     slope: data?.slope || 0,
@@ -108,6 +119,7 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
       id_control_group: selectedControlGroup.value,
       data_type: selectedDataType.label,
       byte_order: selectedByteOrder.label,
+      control_type_input: selectedControlInputType.value,
       class: modbusRegisterType?.name,
       type_point: modbusConfig,
       type_class: modbusRegisterType,
@@ -122,21 +134,27 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
         : null,
       type_point_list: selectedPointListType.value
         ? {
-          id: selectedPointListType.value,
-          name: selectedPointListType.label,
-        }
+            id: selectedPointListType.value,
+            name: selectedPointListType.label,
+          }
         : null,
       type_control: selectedControlGroup.value
         ? {
-          id: selectedControlGroup.value,
-          name: selectedControlGroup.label,
-        }
+            id: selectedControlGroup.value,
+            name: selectedControlGroup.label,
+          }
         : null,
       type_function: selectedTypeFunction.value
         ? {
-          id: selectedTypeFunction.value,
-          name: selectedTypeFunction.label,
-        }
+            id: selectedTypeFunction.value,
+            name: selectedTypeFunction.label,
+          }
+        : null,
+      type_control_input: selectedControlInputType.value
+        ? {
+            id: selectedControlInputType.value,
+            name: selectedControlInputType.label,
+          }
         : null,
     };
 
@@ -167,7 +185,8 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
           LibToast.toast("Point updated successfully", "info");
         }
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to update point") && navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to update point") &&
+          navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }
@@ -193,6 +212,8 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
     setSelectedControlGroup,
     selectedTypeFunction,
     setSelectedTypeFunction,
+    selectedControlInputType,
+    setSelectedControlInputType,
     onSubmit,
   };
 }

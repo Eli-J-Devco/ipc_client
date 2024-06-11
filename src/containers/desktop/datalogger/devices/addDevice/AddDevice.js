@@ -16,6 +16,10 @@ import Button from "../../../../../components/button/Button";
 import AddMultipleDevice from "./AddMultipleDevice";
 import FormInput from "../../../../../components/formInput/FormInput";
 import Constants from "../../../../../utils/Constants";
+import { AddComponentsModal } from "./AddComponentsModal";
+import { useDeviceManagement } from "../DeviceManagement";
+import _ from "lodash";
+import Table from "../../../../../components/table/Table";
 
 export default function AddDevice(props) {
   const navigate = useNavigate();
@@ -24,6 +28,10 @@ export default function AddDevice(props) {
   const {
     isAddMultipleDevice,
     setIsOpenAddMultipleDevice,
+    isOpenAddComponents,
+    setIsOpenAddComponents,
+    addingComponents,
+    setAddingComponents,
     meterType,
     meterTypes,
     setMeterType,
@@ -34,10 +42,17 @@ export default function AddDevice(props) {
     handleSave,
     handleAddMultipleDevice,
     deviceConfigDropdown,
+    columns,
   } = useAddDevice(closeAddDevice, deviceConfig);
   const [protocol, setProtocol] = useState({
     Physical: 1,
     Virtual: 0,
+  });
+  const { deviceTypeComponents } = useDeviceManagement();
+  const [components, setComponents] = useState({
+    deviceTypes: [],
+    deviceGroups: [],
+    templates: [],
   });
 
   const footer = (
@@ -55,6 +70,34 @@ export default function AddDevice(props) {
         }}
       >
         <Button.Text text="Add Multiple" />
+      </Button>
+      <Button
+        variant="dark"
+        className="ms-3"
+        onClick={() => {
+          let haveComponents = deviceTypeComponents?.find((item) => {
+            if (
+              item.device_type.id === initialValues?.id_device_type &&
+              item.component.length > 0
+            ) {
+              return true;
+            }
+            return false;
+          });
+          if (haveComponents) {
+            setIsOpenAddComponents(true);
+            setComponents({
+              deviceTypes: haveComponents.component.map((item) => ({
+                label: item.name,
+                value: item.component,
+              })),
+              deviceGroups: deviceConfigDropdown.deviceGroup,
+              templates: deviceConfigDropdown.template,
+            });
+          }
+        }}
+      >
+        <Button.Text text="Add components" />
       </Button>
       <Button variant="grey" className="ms-3" onClick={() => closeAddDevice()}>
         <Button.Text text="Cancel" />
@@ -109,6 +152,28 @@ export default function AddDevice(props) {
               />
             </ModalDefault.Body>
           </ModalDefault>
+
+          {isOpenAddComponents && (
+            <ModalDefault
+              show={isOpenAddComponents}
+              style={{ top: "100px" }}
+              onHide={() => setIsOpenAddComponents(false)}
+              size="lg"
+            >
+              <ModalDefault.Header
+                style={{ backgroundColor: "#383434", color: "#fff" }}
+              >
+                Add Components
+              </ModalDefault.Header>
+              <ModalDefault.Body>
+                <AddComponentsModal
+                  close={() => setIsOpenAddComponents(false)}
+                  components={components}
+                  setComponents={(data) => setAddingComponents(data)}
+                />
+              </ModalDefault.Body>
+            </ModalDefault>
+          )}
 
           <div className="col-xl-6 col-md-12">
             <FormInput.Text
@@ -381,6 +446,22 @@ export default function AddDevice(props) {
                     />
                   </div>
                 )
+              )}
+              {!_.isEmpty(addingComponents) && (
+                <div className="note mt-3">
+                  <div>Components:</div>
+                  <Table
+                    variant="light"
+                    columns={columns}
+                    data={addingComponents.map((item) => ({
+                      id: item.device.value.id,
+                      name: item.device.label,
+                      template: item.template.label,
+                      device_group: item.device_group.label,
+                      device_type: item.device_type.label,
+                    }))}
+                  />
+                </div>
               )}
             </>
           )}

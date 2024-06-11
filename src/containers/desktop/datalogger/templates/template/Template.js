@@ -11,6 +11,7 @@ import { loginService } from "../../../../../services/loginService";
 function Template() {
   const {
     id,
+    config,
     setDefaultPointList,
     setDefaultMPPTList,
     setDefaultStringList,
@@ -69,7 +70,10 @@ function Template() {
           Constants.API_URL.TEMPLATE.CONFIG.GET
         );
         if (response?.status === 200) {
-          setConfig(response?.data);
+          setConfig({
+            ...config,
+            ...response?.data,
+          });
         }
       } catch (error) {
         loginService.handleMissingInfo(

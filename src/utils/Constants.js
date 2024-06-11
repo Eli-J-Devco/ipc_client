@@ -91,6 +91,10 @@ const Constants = {
         UNITS: "/device_point/config/unit/",
         CONFIG_POINT: "/device_point/config/point/",
       },
+      COMPONENT: {
+        GET: "/devices/component/get/",
+        LIST: "/devices/component/get/all/",
+      },
     },
     POINT: {
       LIST: "/point/get/",

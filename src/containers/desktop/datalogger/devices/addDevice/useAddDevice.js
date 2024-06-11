@@ -16,6 +16,8 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
   const { setAllDevices, offset, limit, setTotal } = useDeviceManagement();
   const [isAddMultipleDevice, setIsAddMultipleDevice] = useState(false);
   const [isOpenAddMultipleDevice, setIsOpenAddMultipleDevice] = useState(false);
+  const [isOpenAddComponents, setIsOpenAddComponents] = useState(false);
+  const [addingComponents, setAddingComponents] = useState([]);
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [initialValues, setInitialValues] = useState({
@@ -93,6 +95,33 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
       }),
     })
   );
+  const [columns] = useState([
+    {
+      id: 1,
+      slug: "id",
+      name: "No.",
+    },
+    {
+      id: 2,
+      slug: "name",
+      name: "Device Name",
+    },
+    {
+      id: 3,
+      slug: "device_type",
+      name: "Device Type",
+    },
+    {
+      id: 4,
+      slug: "device_group",
+      name: "Device Group",
+    },
+    {
+      id: 5,
+      slug: "template",
+      name: "Template",
+    },
+  ]);
 
   useEffect(() => {
     initialValues?.communication?.label &&
@@ -379,6 +408,10 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
     setIsAddMultipleDevice,
     isOpenAddMultipleDevice,
     setIsOpenAddMultipleDevice,
+    isOpenAddComponents,
+    setIsOpenAddComponents,
+    addingComponents,
+    setAddingComponents,
     meterType,
     setMeterType,
     meterTypes,
@@ -391,5 +424,6 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
     handleSave,
     handleAddMultipleDevice,
     deviceConfigDropdown,
+    columns,
   };
 }

@@ -1,0 +1,38 @@
+.add_component {
+    max-height: 30vh;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    .checkbox {
+        position: absolute;
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        margin-bottom: 1rem;
+        thead {
+            background-color: var(--bg-color-light);
+            th {
+                padding: 0.5rem;
+                text-align: left;
+                border-bottom: 1px solid var(--bg-color-grey);
+            }
+        }
+        tbody {
+            tr {
+                td {
+                    padding: 0.5rem;
+                    border-bottom: 1px solid var(--bg-color-grey);
+                    width: 23.75%;
+                    &:first-child {
+                        width: 5%;
+                    }
+                }
+            }
+        }
+    }
+}

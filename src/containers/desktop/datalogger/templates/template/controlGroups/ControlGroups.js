@@ -282,6 +282,7 @@ export default function ControlGroups() {
                 setPoint={(newPoint) => {
                   updatePoint(newPoint);
                 }}
+                isPointInGroup={true}
               />
             ) : (
               <EditControlGroupModal

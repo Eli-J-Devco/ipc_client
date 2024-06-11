@@ -118,7 +118,7 @@ function TemplatesManagement() {
       )}
       <div className={styles["template-management"]}>
         <div className="row">
-          <div className="col-12 col-lg-6">
+          <div className="col-12 col-lg-7">
             <div className={styles.section}>
               <div className={styles.title}>Edit Or Manage Your Templates</div>
 

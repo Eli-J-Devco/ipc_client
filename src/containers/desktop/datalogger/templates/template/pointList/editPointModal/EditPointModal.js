@@ -7,7 +7,7 @@ import styles from "./EditPointModal.module.scss";
 import useEditPointModal from "./useEditPointModal";
 import _ from "lodash";
 
-function EditPointModal({ isOpen, close, data, setPoint }) {
+function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
   const [currentData, setCurrentData] = useState(data);
 
   const {
@@ -27,6 +27,8 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
     setSelectedPointListType,
     selectedTypeFunction,
     setSelectedTypeFunction,
+    selectedControlInputType,
+    setSelectedControlInputType,
     onSubmit,
   } = useEditPointModal(currentData, close, setPoint, setCurrentData);
   const { config } = useTemplate();
@@ -41,6 +43,7 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
     type_class,
     type_point_list,
     type_function,
+    control_input_types,
   } = config;
   useEffect(() => {
     if (Object.keys(config).length > 0) {
@@ -48,9 +51,7 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
         setModbusConfig(currentData?.type_point);
         setModbusRegisterType(currentData?.type_class);
 
-        let unitGroup = point_unit.filter((item) =>
-          item?.name.match(/---/i)
-        );
+        let unitGroup = point_unit.filter((item) => item?.name.match(/---/i));
         let units = [];
         unitGroup.forEach((group) => {
           let firstItemIndex = point_unit.indexOf(group) + 1;
@@ -86,7 +87,10 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
   }, [modbusRegisterType]);
 
   useEffect(() => {
-    if (typeFunctions.find((item) => item.id === selectedTypeFunction?.id) === undefined) {
+    if (
+      typeFunctions.find((item) => item.id === selectedTypeFunction?.id) ===
+      undefined
+    ) {
       if (modbusRegisterType?.id === currentData?.type_class?.id) {
         setSelectedTypeFunction({
           value: currentData?.type_function?.id,
@@ -136,7 +140,7 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
               <FormInput.Text label="Point Identifier:" name="index" disabled />
             </div>
             <div className="col-1"></div>
-            <div className="col-5">
+            <div className="col-3">
               <FormInput.Select
                 label="Point list type:"
                 isSearchable={true}
@@ -149,6 +153,21 @@ function EditPointModal({ isOpen, close, data, setPoint }) {
                 }
                 value={selectedPointListType}
                 onChange={(value) => setSelectedPointListType(value)}
+              />
+            </div>
+            <div className="col-3">
+              <FormInput.Select
+                label="Control input type:"
+                isSearchable={true}
+                name="control_input_type"
+                option={
+                  control_input_types?.map((item) => ({
+                    value: item.id,
+                    label: item.name,
+                  })) || []
+                }
+                value={selectedControlInputType}
+                onChange={(value) => setSelectedControlInputType(value)}
               />
             </div>
           </div>
