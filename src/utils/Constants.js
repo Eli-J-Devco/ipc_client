@@ -43,6 +43,7 @@ const Constants = {
     TOKEN: "nwm-access-token",
     ACCESS_PARAM: "access-param",
     SPECIAL_DEVICE_TYPE: "Circuit Breaker",
+    MPPT_CONFIG_INFORMATION: 277,
   },
 
   API_URL: {

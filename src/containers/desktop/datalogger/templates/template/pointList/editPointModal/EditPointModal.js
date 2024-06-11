@@ -6,6 +6,7 @@ import { useTemplate } from "../../useTemplate";
 import styles from "./EditPointModal.module.scss";
 import useEditPointModal from "./useEditPointModal";
 import _ from "lodash";
+import Constants from "../../../../../../../utils/Constants";
 
 function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
   const [currentData, setCurrentData] = useState(data);
@@ -34,7 +35,6 @@ function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
   const { config } = useTemplate();
   const [pointUnits, setPointUnits] = useState([]);
   const [typeFunctions, setTypeFunctions] = useState([]);
-
   const {
     data_type,
     byte_order,
@@ -140,7 +140,7 @@ function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
               <FormInput.Text label="Point Identifier:" name="index" disabled />
             </div>
             <div className="col-1"></div>
-            <div className="col-3">
+            <div className={isPointInGroup ? "col-3" : "col-5"}>
               <FormInput.Select
                 label="Point list type:"
                 isSearchable={true}
@@ -155,21 +155,23 @@ function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
                 onChange={(value) => setSelectedPointListType(value)}
               />
             </div>
-            <div className="col-3">
-              <FormInput.Select
-                label="Control input type:"
-                isSearchable={true}
-                name="control_input_type"
-                option={
-                  control_input_types?.map((item) => ({
-                    value: item.id,
-                    label: item.name,
-                  })) || []
-                }
-                value={selectedControlInputType}
-                onChange={(value) => setSelectedControlInputType(value)}
-              />
-            </div>
+            {isPointInGroup && (
+              <div className="col-3">
+                <FormInput.Select
+                  label="Control input type:"
+                  isSearchable={true}
+                  name="control_input_type"
+                  option={
+                    control_input_types?.map((item) => ({
+                      value: item.id,
+                      label: item.name,
+                    })) || []
+                  }
+                  value={selectedControlInputType}
+                  onChange={(value) => setSelectedControlInputType(value)}
+                />
+              </div>
+            )}
           </div>
 
           <div className="row my-2">
@@ -204,12 +206,18 @@ function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
                 groupOption={true}
                 value={selectedUnit}
                 onChange={(value) => setSelectedUnit(value)}
-                isDisabled={_.isEqual(currentData?.type_point, type_point[2])}
+                isDisabled={
+                  data.id_config_information ===
+                    Constants.COMMON.MPPT_CONFIG_INFORMATION &&
+                  _.isEqual(currentData?.type_point, type_point[2])
+                }
               />
             </div>
 
             <div className="col-4 align-self-end">
-              {!_.isEqual(currentData?.type_point, type_point[2]) && (
+              {data.id_config_information ===
+                Constants.COMMON.MPPT_CONFIG_INFORMATION &&
+              _.isEqual(currentData?.type_point, type_point[2]) ? null : (
                 <FormInput.Check
                   name="unitsedit"
                   label="allow per-meter edit"
@@ -227,7 +235,11 @@ function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
                 inline
                 checked={_.isEqual(modbusConfig, item)}
                 onChange={() => setModbusConfig(item)}
-                disabled={_.isEqual(currentData?.type_point, type_point[2])}
+                disabled={
+                  data.id_config_information ===
+                    Constants.COMMON.MPPT_CONFIG_INFORMATION &&
+                  _.isEqual(currentData?.type_point, type_point[2])
+                }
               />
             ))}
           </div>

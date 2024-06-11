@@ -63,8 +63,9 @@ function MPPTList() {
             >
               <div>
                 <FormInput.Text
-                  className={`d-inline-block ${pointList.length <= 0 && "w-100"
-                    }`}
+                  className={`d-inline-block ${
+                    pointList.length <= 0 && "w-100"
+                  }`}
                   label="Number of MPPT"
                   name="num_of_mppt"
                   type="number"
@@ -129,93 +130,93 @@ function MPPTList() {
       )}
       {Object.values(addChildrenModal).filter((item) => item.isOpen === true)
         .length > 0 && (
-          <>
-            {Object.keys(addChildrenModal).map((key, index) => {
-              let item = addChildrenModal[key];
-              return (
-                item.isOpen && (
-                  <Modal
-                    key={index}
-                    isOpen={item.isOpen}
-                    close={() =>
-                      setAddChildrenModal({
-                        ...addChildrenModal,
-                        [key]: { ...item, isOpen: false },
-                      })
-                    }
-                    title={`Add ${key}`}
-                    footer={
-                      <div>
-                        <Button
-                          className="me-3"
-                          onClick={() =>
-                            setAddChildrenModal({
-                              ...addChildrenModal,
-                              [key]: { ...item, isOpen: false },
-                            })
-                          }
-                        >
-                          <Button.Text text="Cancel" />
-                        </Button>
-                        <Button className="ms-3" type="submit" formId={key}>
-                          <Button.Text text="Save" />
-                        </Button>
-                      </div>
-                    }
-                  >
+        <>
+          {Object.keys(addChildrenModal).map((key, index) => {
+            let item = addChildrenModal[key];
+            return (
+              item.isOpen && (
+                <Modal
+                  key={index}
+                  isOpen={item.isOpen}
+                  close={() =>
+                    setAddChildrenModal({
+                      ...addChildrenModal,
+                      [key]: { ...item, isOpen: false },
+                    })
+                  }
+                  title={`Add ${key}`}
+                  footer={
                     <div>
-                      <FormInput
-                        id={key}
-                        initialValues={item.initialValues}
-                        validationSchema={item.validationSchema}
-                        onSubmit={(values) => {
-                          item.onSubmit({
-                            ...values,
-                            is_clone_from_last: isClone,
-                            id: item.id,
-                          });
+                      <Button
+                        className="me-3"
+                        onClick={() =>
                           setAddChildrenModal({
                             ...addChildrenModal,
                             [key]: { ...item, isOpen: false },
-                          });
-                        }}
+                          })
+                        }
                       >
-                        <div>
-                          {item.fields.map((field, index) => {
-                            return field.type !== "checkbox" ? (
-                              <FormInput.Text
+                        <Button.Text text="Cancel" />
+                      </Button>
+                      <Button className="ms-3" type="submit" formId={key}>
+                        <Button.Text text="Save" />
+                      </Button>
+                    </div>
+                  }
+                >
+                  <div>
+                    <FormInput
+                      id={key}
+                      initialValues={item.initialValues}
+                      validationSchema={item.validationSchema}
+                      onSubmit={(values) => {
+                        item.onSubmit({
+                          ...values,
+                          is_clone_from_last: isClone,
+                          id: item.id,
+                        });
+                        setAddChildrenModal({
+                          ...addChildrenModal,
+                          [key]: { ...item, isOpen: false },
+                        });
+                      }}
+                    >
+                      <div>
+                        {item.fields.map((field, index) => {
+                          return field.type !== "checkbox" ? (
+                            <FormInput.Text
+                              key={index}
+                              label={field.label}
+                              name={field.name}
+                              type={field.type}
+                              required={field.required}
+                              isHidden={
+                                isClone &&
+                                key === POINT_CONFIG.STRING.name &&
+                                field.name === "num_of_panels"
+                              }
+                            />
+                          ) : (
+                            item.has_children > 0 && (
+                              <FormInput.Check
                                 key={index}
                                 label={field.label}
                                 name={field.name}
-                                type={field.type}
-                                required={field.required}
-                                isHidden={
-                                  isClone &&
-                                  key === POINT_CONFIG.STRING.name &&
-                                  field.name === "num_of_panels"
-                                }
+                                checked={isClone}
+                                onChange={field.onChange}
                               />
-                            ) : (
-                              item.has_children > 0 && (
-                                <FormInput.Check
-                                  key={index}
-                                  label={field.label}
-                                  name={field.name}
-                                  checked={isClone}
-                                  onChange={field.onChange}
-                                />
-                              )
-                            );
-                          })}
-                        </div>
-                      </FormInput>
-                    </div>
-                  </Modal>
-                )
-              );
-            })}
-          </>
-        )}
+                            )
+                          );
+                        })}
+                      </div>
+                    </FormInput>
+                  </div>
+                </Modal>
+              )
+            );
+          })}
+        </>
+      )}
       <div className="m-2">
         <div className="d-inline-block">
           <Button onClick={() => setAddNewMPPTModal(true)}>

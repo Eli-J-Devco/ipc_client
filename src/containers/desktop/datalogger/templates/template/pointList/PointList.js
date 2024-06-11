@@ -28,7 +28,7 @@ function PointList() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmAddPoints, setConfirmAddPoints] = useState({
     values: {},
-    resetForm: () => { },
+    resetForm: () => {},
     state: false,
   });
   const onChangeNumOfPoint = (values, { resetForm }) => {
@@ -47,7 +47,7 @@ function PointList() {
       resetForm();
       setConfirmAddPoints({
         values: {},
-        resetForm: () => { },
+        resetForm: () => {},
         state: false,
       });
     }, 300);
@@ -95,7 +95,7 @@ function PointList() {
           close={() =>
             setConfirmAddPoints({
               values: {},
-              resetForm: () => { },
+              resetForm: () => {},
               state: false,
             })
           }
@@ -107,7 +107,7 @@ function PointList() {
                 onClick={() =>
                   setConfirmAddPoints({
                     values: {},
-                    resetForm: () => { },
+                    resetForm: () => {},
                     state: false,
                   })
                 }

@@ -144,8 +144,6 @@ export default function useControlGroups() {
     }, 100);
   }, [defaultControlGroupList, isSetUp]);
 
-  useEffect(() => {}, [isSetUp]);
-
   /**
    * Close the modal
    * @author nhan.tran 2024-04-02
