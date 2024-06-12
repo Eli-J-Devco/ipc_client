@@ -118,6 +118,8 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
           <div className="row">
             <div
               className={
+                device?.device_type &&
+                device?.driver_type &&
                 device?.device_type.indexOf("Inverter") !== -1 &&
                 device?.driver_type.search(/RS485/g) === -1
                   ? "col-sm-8 col-md-6 col-lg-4"
@@ -130,78 +132,82 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                 type="number"
                 required={true}
               />
-              {device?.driver_type.search(/RS485/g) === -1 && (
+              {device?.driver_type &&
+                device?.driver_type.search(/RS485/g) === -1 && (
+                  <>
+                    <FormInput.Text
+                      label="MB/TCP Gateway Port"
+                      name="tcp_gateway_port"
+                      type="number"
+                      required={true}
+                    />
+                    <FormInput.Text
+                      label="MB/TCP Gateway IP-Address"
+                      name="tcp_gateway_ip"
+                      required={true}
+                    />
+                  </>
+                )}
+            </div>
+            {device?.device_type &&
+              device?.device_type.indexOf("Inverter") !== -1 && (
                 <>
-                  <FormInput.Text
-                    label="MB/TCP Gateway Port"
-                    name="tcp_gateway_port"
-                    type="number"
-                    required={true}
-                  />
-                  <FormInput.Text
-                    label="MB/TCP Gateway IP-Address"
-                    name="tcp_gateway_ip"
-                    required={true}
-                  />
+                  <div
+                    className={
+                      device?.driver_type &&
+                      device?.driver_type.search(/RS485/g) === -1
+                        ? "col-sm-8 col-md-6 col-lg-4"
+                        : "col-6"
+                    }
+                  >
+                    <FormInput.Text
+                      label="Rated power"
+                      name="rated_power"
+                      required={true}
+                      type="number"
+                    />
+                    <FormInput.Text
+                      label="Custom rated power"
+                      name="rated_power_custom"
+                      required={true}
+                      type="number"
+                    />
+                    <FormInput.Text
+                      label="Min watt (%)"
+                      name="min_watt_in_percent"
+                      required={true}
+                      type="number"
+                    />
+                  </div>
+                  <div
+                    className={
+                      device?.driver_type &&
+                      device?.driver_type.search(/RS485/g) === -1
+                        ? "col-sm-8 col-md-6 col-lg-4"
+                        : "col-6"
+                    }
+                  >
+                    <FormInput.Text
+                      label="DC voltage"
+                      name="DC_voltage"
+                      required={true}
+                      type="number"
+                    />
+                    <FormInput.Text
+                      label="DC current"
+                      name="DC_current"
+                      required={true}
+                      type="number"
+                    />
+                    <FormInput.Text
+                      label="Efficiency"
+                      name="efficiency"
+                      required={true}
+                      type="number"
+                    />
+                  </div>
                 </>
               )}
-            </div>
-            {device?.device_type.indexOf("Inverter") !== -1 && (
-              <>
-                <div
-                  className={
-                    device?.driver_type.search(/RS485/g) === -1
-                      ? "col-sm-8 col-md-6 col-lg-4"
-                      : "col-6"
-                  }
-                >
-                  <FormInput.Text
-                    label="Rated power"
-                    name="rated_power"
-                    required={true}
-                    type="number"
-                  />
-                  <FormInput.Text
-                    label="Custom rated power"
-                    name="rated_power_custom"
-                    required={true}
-                    type="number"
-                  />
-                  <FormInput.Text
-                    label="Min watt (%)"
-                    name="min_watt_in_percent"
-                    required={true}
-                    type="number"
-                  />
-                </div>
-                <div
-                  className={
-                    device?.driver_type.search(/RS485/g) === -1
-                      ? "col-sm-8 col-md-6 col-lg-4"
-                      : "col-6"
-                  }
-                >
-                  <FormInput.Text
-                    label="DC voltage"
-                    name="DC_voltage"
-                    required={true}
-                    type="number"
-                  />
-                  <FormInput.Text
-                    label="DC current"
-                    name="DC_current"
-                    required={true}
-                    type="number"
-                  />
-                  <FormInput.Text
-                    label="Efficiency"
-                    name="efficiency"
-                    required={true}
-                    type="number"
-                  />
-                </div>
-              </>
-            )}
           </div>
         </FormInput>
       </div>

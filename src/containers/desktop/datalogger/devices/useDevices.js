@@ -33,6 +33,9 @@ export default function useDevices() {
     limit,
     total,
     setTotal,
+    clientSecret,
+    deadletter,
+    setDeadletter,
   } = useDeviceManagement();
   const navigate = useNavigate();
   const [isAddDevice, setIsAddDevice] = useState(false);
@@ -44,8 +47,22 @@ export default function useDevices() {
   const statusColor = {
     online: "bg-success",
     offline: "bg-danger",
+    "Initiating...": "bg-warning",
+    "Deleting...": "bg-warning",
+    deleted: "bg-danger",
+    failed: "bg-danger",
     [Constants.COMMON.SPECIAL_DEVICE_TYPE]: "bg-warning",
   };
+  const statusEnum = {
+    online: 1,
+    offline: 0,
+    "Initiating...": 2,
+    "Deleting...": -1,
+    deleted: -2,
+    failed: -4,
+    [Constants.COMMON.SPECIAL_DEVICE_TYPE]: 3,
+  };
+
   const columns = [
     columnsHelper.accessor("id_checkbox", {
       id: "id_checkbox",
@@ -71,6 +88,11 @@ export default function useDevices() {
               checked: row.getIsSelected(),
               onChange: row.getToggleSelectedHandler(),
               indeterminate: row.getIsSomeSelected(),
+              disabled: [
+                statusEnum["Deleting..."],
+                statusEnum.deleted,
+                statusEnum["Initiating..."],
+              ].includes(row.original.state),
             }}
           />
         );
@@ -112,16 +134,24 @@ export default function useDevices() {
       header: <div className="text-center">Actions</div>,
       cell: ({ row }) => (
         <div className="d-flex flex-wrap justify-content-center">
-          <Button.Image
-            image={<ViewIcon />}
-            onClick={() => handleConfigDevice(row.original)}
-            className={"mx-2"}
-          />
-          <Button.Image
-            image={<EditIcon />}
-            onClick={() => handleUpdateDevice(row.original)}
-            className={"mx-2"}
-          />
+          {[
+            statusEnum["Deleting..."],
+            statusEnum.deleted,
+            statusEnum["Initiating..."],
+          ].includes(row.original.state) ? null : (
+            <>
+              <Button.Image
+                image={<ViewIcon />}
+                onClick={() => handleConfigDevice(row.original)}
+                className={"mx-2"}
+              />
+              <Button.Image
+                image={<EditIcon />}
+                onClick={() => handleUpdateDevice(row.original)}
+                className={"mx-2"}
+              />
+            </>
+          )}
         </div>
       ),
     }),
@@ -161,37 +191,60 @@ export default function useDevices() {
     let newTotal = total;
     let newData = _.cloneDeep(
       allDevices.map((d) => {
-        if (d["is_online"] === -2) {
+        if (d["state"] === statusEnum.deleted) {
           return d;
         }
 
         const index = data.findIndex((item) => item.id_device === d.id);
-        if (d["is_online"] === -1) {
-          if (index === -1) {
-            d["status"] = "Deleted";
-            d["is_online"] = -2;
-            newTotal -= 1;
-          }
-        } else if (index !== -1) {
-          d["status"] =
-            data[index]["status_device"] === ""
-              ? "offline"
-              : data[index]["status_device"];
-          d["message"] = data[index]["message"];
-          d["is_online"] = 1;
+
+        if (d?.device_type === Constants.COMMON.SPECIAL_DEVICE_TYPE) {
+          d["state"] = statusEnum[Constants.COMMON.SPECIAL_DEVICE_TYPE];
         } else {
-          if (d?.device_type === Constants.COMMON.SPECIAL_DEVICE_TYPE) {
-            d["status"] = Constants.COMMON.SPECIAL_DEVICE_TYPE;
-            d["is_online"] = 0;
+          if (index !== -1) {
+            if (d["state"] !== statusEnum["Deleting..."]) {
+              d["state"] = statusEnum[data[index]["status_device"]];
+            }
           } else {
-            d["status"] = "Initiating...";
-            d["is_online"] = 0;
+            if (d["state"] === statusEnum["Deleting..."])
+              d["state"] = statusEnum.deleted;
+            else if (d["state"] !== statusEnum["Initiating..."]) {
+              d["state"] = statusEnum.failed;
+            }
           }
+        }
+
+        switch (d["state"]) {
+          case statusEnum.deleted:
+            d["status"] = "Deleted";
+            d["state"] = statusEnum.deleted;
+            break;
+          case statusEnum["Deleting..."]:
+            d["status"] = "Deleting...";
+            break;
+          case statusEnum.failed:
+            d["status"] = "failed";
+            break;
+          case statusEnum.online:
+            d["status"] = data[index]["status_device"];
+            d["message"] = data[index]["message"];
+            break;
+          case statusEnum.offline:
+            d["status"] = data[index]["status_device"];
+            d["message"] = data[index]["message"];
+            break;
+          case statusEnum["Initiating..."]:
+            d["status"] = "Initiating...";
+            break;
+          case statusEnum[Constants.COMMON.SPECIAL_DEVICE_TYPE]:
+            d["status"] = Constants.COMMON.SPECIAL_DEVICE_TYPE;
+            break;
+          default:
+            break;
         }
         return d;
       })
     );
-    newData = newData.filter((d) => d["is_online"] !== -2);
+    newData = newData.filter((d) => d["state"] !== statusEnum.deleted);
 
     setTimeout(() => {
       // if (newData.length < 1 && offset > offset - limit) {
@@ -217,13 +270,16 @@ export default function useDevices() {
       try {
         const response = await axiosPrivate.post(
           Constants.API_URL.DEVICES.DELETE + `?page=${offset}&limit=${limit}`,
-          devices
+          {
+            device_id: devices,
+            secret: clientSecret,
+          }
         );
         setAllDevices(
           response.data?.data.map((d) => {
             if (devices.includes(d.id)) {
-              d["status"] = "Deleting...";
-              d["is_online"] = -1;
+              // d["status"] = "Deleting...";
+              d["state"] = statusEnum["Deleting..."];
             }
             return d;
           })
@@ -241,6 +297,23 @@ export default function useDevices() {
       }
     }, 500);
   };
+
+  useEffect(() => {
+    if (!deadletter) return;
+
+    LibToast.toast(deadletter.message, "error");
+
+    setAllDevices(
+      allDevices.map((item) => {
+        if (deadletter.devices.includes(item.id)) {
+          // item["status"] = "Add failed";
+          item["state"] = statusEnum.failed;
+        }
+        return item;
+      })
+    );
+    setDeadletter(null);
+  }, [deadletter]);
 
   return {
     isAddDevice,

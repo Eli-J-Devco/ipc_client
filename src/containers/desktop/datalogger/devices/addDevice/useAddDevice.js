@@ -13,11 +13,19 @@ import { loginService } from "../../../../../services/loginService";
 import { useDeviceManagement } from "../DeviceManagement";
 
 export default function useAddDevice(closeAddDevice, deviceConfig) {
-  const { setAllDevices, offset, limit, setTotal } = useDeviceManagement();
+  const {
+    deviceTypeComponents,
+    setAllDevices,
+    offset,
+    limit,
+    setTotal,
+    clientSecret,
+  } = useDeviceManagement();
   const [isAddMultipleDevice, setIsAddMultipleDevice] = useState(false);
   const [isOpenAddMultipleDevice, setIsOpenAddMultipleDevice] = useState(false);
   const [isOpenAddComponents, setIsOpenAddComponents] = useState(false);
   const [addingComponents, setAddingComponents] = useState([]);
+  const [haveComponents, setHaveComponents] = useState({});
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [initialValues, setInitialValues] = useState({
@@ -35,6 +43,7 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
     tcp_gateway_port: 502,
     rated_power: 0,
     inverter_type: 1,
+    secret: clientSecret,
   });
   const [data, setData] = useState(initialValues);
   const [meterType, setMeterType] = useState({
@@ -172,6 +181,16 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
               : defaultSchema),
           })
         );
+        let haveComponents = deviceTypeComponents?.find((item) => {
+          if (
+            item.device_type.id === initialValues?.id_device_type &&
+            item.component.length > 0
+          ) {
+            return true;
+          }
+          return false;
+        });
+        setHaveComponents(haveComponents);
       }, 100);
   }, [initialValues?.device_type?.label]);
 
@@ -202,6 +221,7 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
               device_types.map((item) => ({
                 value: item.id,
                 label: item.name,
+                type: item.type,
               })),
             deviceGroup: [
               {
@@ -350,11 +370,32 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
           tcp_gateway_ip: "",
           tcp_gateway_port: null,
         }),
+        components:
+          addingComponents.length > 0
+            ? addingComponents.map((item) => {
+                if (item.device) {
+                  return {
+                    id:
+                      typeof item.device.value.id === "number"
+                        ? item.device.value.id
+                        : null,
+                    name: item.device.label,
+                    id_device_type: item.device_type.value,
+                  };
+                }
+                return null;
+              })
+            : [],
       };
       setData(newData);
 
       setInitialValues({ ...initialValues, ...newData });
-      if (!data?.id_template) {
+      if (
+        initialValues?.device_type?.label.indexOf(
+          Constants.COMMON.SPECIAL_DEVICE_TYPE
+        ) === -1 &&
+        !data?.id_template
+      ) {
         LibToast.toast("Please select a template", "error");
         return;
       }
@@ -375,7 +416,11 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
         try {
           const response = await axiosPrivate.post(
             Constants.API_URL.DEVICES.ADD + `?page=${offset}&limit=${limit}`,
-            data,
+            initialValues?.device_type?.label.indexOf(
+              Constants.COMMON.SPECIAL_DEVICE_TYPE
+            ) === -1
+              ? data
+              : { ...data, id_template: null },
             {
               headers: {
                 "Content-Type": "application/json",
@@ -383,21 +428,27 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
             }
           );
 
-          setAllDevices(response.data?.data);
+          setAllDevices(
+            response.data?.data.map((d) => {
+              d["state"] = 2;
+              return d;
+            })
+          );
           setTotal(response.data?.total);
           LibToast.toast(
             "New devices are being added. It would take a few minutes.",
             "info"
           );
-        } catch (error) {
-          loginService.handleMissingInfo(error, "Failed to add device") &&
-            navigate("/", { replace: true });
-        } finally {
-          output.innerHTML = "";
           if (isAddMultipleDevice) {
             closeAddMultipleDevice();
           }
           closeAddDevice();
+        } catch (error) {
+          setInitialValues({ ...initialValues, is_add: false });
+          loginService.handleMissingInfo(error, "Failed to add device") &&
+            navigate("/", { replace: true });
+        } finally {
+          output.innerHTML = "";
         }
       }, 500);
     }
@@ -425,5 +476,6 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
     handleAddMultipleDevice,
     deviceConfigDropdown,
     columns,
+    haveComponents,
   };
 }

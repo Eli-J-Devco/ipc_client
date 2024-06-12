@@ -16,6 +16,10 @@
         margin-bottom: 1rem;
         thead {
             background-color: var(--bg-color-light);
+            position: sticky;
+            top: 0;
+            text-wrap: nowrap;
+            z-index: 1;
             th {
                 padding: 0.5rem;
                 text-align: left;

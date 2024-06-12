@@ -5,6 +5,8 @@ import { loginService } from "../../../../services/loginService";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../utils/Constants";
 import _ from "lodash";
+import useMQTT from "../../../../hooks/useMQTT";
+import useProjectSetup from "../../../../hooks/useProjectSetup";
 
 const DeviceManagementContext = createContext();
 
@@ -35,6 +37,8 @@ export const DeviceManagementProvider = ({ children }) => {
   const [limit, setLimit] = useState(20);
   const [total, setTotal] = useState(0);
   const [deviceTypeComponents, setDeviceTypeComponents] = useState([]);
+  const [clientSecret, setClientSecret] = useState("");
+  const [deadletter, setDeadletter] = useState("");
 
   return (
     <DeviceManagementContext.Provider
@@ -55,6 +59,10 @@ export const DeviceManagementProvider = ({ children }) => {
         setTotal,
         deviceTypeComponents,
         setDeviceTypeComponents,
+        clientSecret,
+        setClientSecret,
+        deadletter,
+        setDeadletter,
       }}
     >
       {children}
@@ -73,10 +81,16 @@ export function Device() {
     limit,
     setTotal,
     setDeviceTypeComponents,
+    clientSecret,
+    setClientSecret,
+    setDeadletter,
   } = useDeviceManagement();
+  const { client, isConnected, isSubscribed, mqttSub } = useMQTT();
+  const { projectSetup } = useProjectSetup();
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const output = document.getElementById("progress");
+  const [feedbackTopic, setFeedbackTopic] = useState("");
 
   useEffect(() => {
     if (allDevices.length > 0) return;
@@ -147,6 +161,46 @@ export function Device() {
         }
       }, 300);
   }, []);
+
+  useEffect(() => {
+    if (clientSecret) return;
+
+    setClientSecret(
+      Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
+    );
+  }, [clientSecret]);
+
+  useEffect(() => {
+    if (isConnected && projectSetup?.serial_number) {
+      let fbTopic = `${projectSetup?.serial_number}/InitDevices/dead-letter`;
+      setFeedbackTopic(fbTopic);
+      mqttSub({ topic: fbTopic, qos: 0 });
+    }
+  }, [isConnected, projectSetup?.serial_number]);
+
+  useEffect(() => {
+    if (
+      isConnected &&
+      isSubscribed &&
+      projectSetup?.serial_number &&
+      feedbackTopic
+    ) {
+      client.on("message", (topic, message) => {
+        const payload = { topic, message: message.toString() };
+        if (topic === feedbackTopic) {
+          const response = JSON.parse(atob(payload.message));
+          if (response?.metadata?.code === clientSecret) {
+            let action = response?.message?.type.split("/");
+            action = action[action.length - 1];
+            setDeadletter({
+              message: `An error occurred while ${action} devices`,
+              devices: response?.message?.devices,
+            });
+          }
+        }
+      });
+    }
+  }, [isConnected, isSubscribed, projectSetup?.serial_number, feedbackTopic]);
 
   return (
     <div className="main">

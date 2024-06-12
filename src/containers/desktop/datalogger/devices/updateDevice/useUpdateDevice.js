@@ -28,33 +28,37 @@ export default function useUpdateDevice() {
       .required("Please fill this field")
       .min(1, "RTU bus address must be greater than 0")
       .max(255, "RTU bus address must be less than 256"),
-    ...(device?.driver_type.search(/RS485/g) === -1 && {
-      tcp_gateway_port: yup
-        .number()
-        .required("Please fill this field")
-        .min(502, "TCP gateway port must be greater than 501")
-        .max(65535, "TCP gateway port must be less than 65536"),
-      tcp_gateway_ip: yup
-        .string()
-        .required("Please fill this field")
-        .matches(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/, "Invalid IP Address"),
-    }),
-    ...(device?.device_type.search("Inverter") !== -1 && {
-      rated_power: yup.number().required("Please fill this field"),
-      rated_power_custom: yup.number().required("Please fill this field"),
-      min_watt_in_percent: yup
-        .number()
-        .required("Please fill this field")
-        .min(0, "Must between 0% and 100%")
-        .max(100, "Must between 0% and 100%"),
-      DC_voltage: yup.number().required("Please fill this field"),
-      DC_current: yup.number().required("Please fill this field"),
-      efficiency: yup
-        .number()
-        .required("Please fill this field")
-        .min(0, "Must greater than or equal to 0")
-        .max(100, "Must less than or equal to 100"),
-    }),
+    ...(device?.driver_type
+      ? device?.driver_type.search(/RS485/g) === -1 && {
+          tcp_gateway_port: yup
+            .number()
+            .required("Please fill this field")
+            .min(502, "TCP gateway port must be greater than 501")
+            .max(65535, "TCP gateway port must be less than 65536"),
+          tcp_gateway_ip: yup
+            .string()
+            .required("Please fill this field")
+            .matches(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/, "Invalid IP Address"),
+        }
+      : {}),
+    ...(device?.device_type
+      ? device?.device_type.search("Inverter") !== -1 && {
+          rated_power: yup.number().required("Please fill this field"),
+          rated_power_custom: yup.number().required("Please fill this field"),
+          min_watt_in_percent: yup
+            .number()
+            .required("Please fill this field")
+            .min(0, "Must between 0% and 100%")
+            .max(100, "Must between 0% and 100%"),
+          DC_voltage: yup.number().required("Please fill this field"),
+          DC_current: yup.number().required("Please fill this field"),
+          efficiency: yup
+            .number()
+            .required("Please fill this field")
+            .min(0, "Must greater than or equal to 0")
+            .max(100, "Must less than or equal to 100"),
+        }
+      : {}),
   });
 
   const handleUpdateDevice = (values) => {
@@ -62,7 +66,7 @@ export default function useUpdateDevice() {
     setUpdating(true);
     const body = {
       ...values,
-      ...(device?.device_type.indexOf("Inverter") !== -1
+      ...(device?.device_type && device?.device_type.indexOf("Inverter") !== -1
         ? {
             mode: mode,
             enable_poweroff: enablePowerOff,

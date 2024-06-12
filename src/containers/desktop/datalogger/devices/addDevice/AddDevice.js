@@ -4,7 +4,7 @@
  *
  *********************************************************/
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ModalDefault from "react-bootstrap/Modal";
 import { useNavigate } from "react-router-dom";
 
@@ -17,7 +17,6 @@ import AddMultipleDevice from "./AddMultipleDevice";
 import FormInput from "../../../../../components/formInput/FormInput";
 import Constants from "../../../../../utils/Constants";
 import { AddComponentsModal } from "./AddComponentsModal";
-import { useDeviceManagement } from "../DeviceManagement";
 import _ from "lodash";
 import Table from "../../../../../components/table/Table";
 
@@ -43,12 +42,12 @@ export default function AddDevice(props) {
     handleAddMultipleDevice,
     deviceConfigDropdown,
     columns,
+    haveComponents,
   } = useAddDevice(closeAddDevice, deviceConfig);
   const [protocol, setProtocol] = useState({
     Physical: 1,
     Virtual: 0,
   });
-  const { deviceTypeComponents } = useDeviceManagement();
   const [components, setComponents] = useState({
     deviceTypes: [],
     deviceGroups: [],
@@ -71,34 +70,57 @@ export default function AddDevice(props) {
       >
         <Button.Text text="Add Multiple" />
       </Button>
-      <Button
-        variant="dark"
-        className="ms-3"
-        onClick={() => {
-          let haveComponents = deviceTypeComponents?.find((item) => {
-            if (
-              item.device_type.id === initialValues?.id_device_type &&
-              item.component.length > 0
-            ) {
-              return true;
-            }
-            return false;
-          });
-          if (haveComponents) {
-            setIsOpenAddComponents(true);
-            setComponents({
-              deviceTypes: haveComponents.component.map((item) => ({
+      {haveComponents && (
+        <Button
+          variant="dark"
+          className="ms-3"
+          onClick={() => {
+            let deviceTypes = haveComponents.component
+              .filter((item) => {
+                if (item.type !== 1) return false;
+
+                if (item.sub_type !== null) {
+                  return (
+                    item.sub_type === initialValues?.inverter_type?.value ||
+                    item.sub_type === meterType?.value
+                  );
+                }
+
+                return true;
+              })
+              .map((item) => ({
                 label: item.name,
                 value: item.component,
-              })),
+                type: item.type,
+              }));
+            setIsOpenAddComponents(true);
+            setComponents({
+              deviceTypes:
+                deviceTypes.length > 1
+                  ? deviceTypes.reduce((acc, item) => {
+                      let output = [];
+                      if (typeof acc[Symbol.iterator] !== "function")
+                        output.push(acc);
+                      else output = acc;
+                      // if (!item) return output;
+
+                      if (
+                        !output.find((element) => element.value === item.value)
+                      ) {
+                        output.push(item);
+                      }
+                      return output;
+                    })
+                  : deviceTypes,
               deviceGroups: deviceConfigDropdown.deviceGroup,
               templates: deviceConfigDropdown.template,
+              existedComponents: addingComponents,
             });
-          }
-        }}
-      >
-        <Button.Text text="Add components" />
-      </Button>
+          }}
+        >
+          <Button.Text text="Add components" />
+        </Button>
+      )}
       <Button variant="grey" className="ms-3" onClick={() => closeAddDevice()}>
         <Button.Text text="Cancel" />
       </Button>
@@ -114,6 +136,10 @@ export default function AddDevice(props) {
       <Button.Text text="Create template" />
     </Button>
   );
+
+  useEffect(() => {
+    setAddingComponents([]);
+  }, [initialValues?.device_type?.label]);
 
   return (
     <FormInput
@@ -310,7 +336,9 @@ export default function AddDevice(props) {
                     </div>
                   </div>
                 ) : (
-                  createTemplateBTN
+                  initialValues?.device_type?.label.indexOf(
+                    Constants.COMMON.SPECIAL_DEVICE_TYPE
+                  ) === -1 && createTemplateBTN
                 )}
               </>
             ) : (
