@@ -17,6 +17,8 @@ import Button from "../../../../components/button/Button";
 import _ from "lodash";
 import { useDeviceManagement } from "./DeviceManagement";
 import LibToast from "../../../../utils/LibToast";
+import { ReactComponent as ExpandIcon } from "../../../../assets/images/chevron-down.svg";
+import { ReactComponent as CollapseIcon } from "../../../../assets/images/chevron-up.svg";
 
 export default function useDevices() {
   const { data } = useMQTT();
@@ -64,6 +66,44 @@ export default function useDevices() {
   };
 
   const columns = [
+    columnsHelper.accessor("toggle", {
+      id: "toggle",
+      size: 10,
+      header: ({ table }) => (
+        <div>
+          <Button
+            variant="dark"
+            onClick={() =>
+              table.getIsSomeRowsExpanded()
+                ? table.toggleAllRowsExpanded(false)
+                : table.toggleAllRowsExpanded()
+            }
+          >
+            <Button.Image
+              image={
+                table.getIsAllRowsExpanded() ||
+                table.getIsSomeRowsExpanded() ? (
+                  <CollapseIcon />
+                ) : (
+                  <ExpandIcon />
+                )
+              }
+            />
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div style={{ paddingLeft: `${row.depth * 2}rem` }}>
+          {row.getCanExpand() && (
+            <Button variant="dark" onClick={() => row.toggleExpanded()}>
+              <Button.Image
+                image={row.getIsExpanded() ? <CollapseIcon /> : <ExpandIcon />}
+              />
+            </Button>
+          )}
+        </div>
+      ),
+    }),
     columnsHelper.accessor("id_checkbox", {
       id: "id_checkbox",
       size: 10,
@@ -190,6 +230,71 @@ export default function useDevices() {
   }, [name]);
 
   useEffect(() => {
+    const setDeviceState = (index, d) => {
+      if (index !== -1) {
+        if (d["state"] !== statusEnum["Deleting..."]) {
+          if (d?.device_type?.type === 1) {
+            d["state"] = statusEnum.symbolic;
+          } else {
+            d["state"] = statusEnum[data[index]["status_device"]];
+          }
+        }
+      } else {
+        if (d["state"] === statusEnum["Deleting..."])
+          d["state"] = statusEnum.deleted;
+        else if (d["state"] !== statusEnum["Initiating..."]) {
+          d["state"] = statusEnum.failed;
+        }
+      }
+
+      switch (d["state"]) {
+        case statusEnum.deleted:
+          d["status"] = "Deleted";
+          d["state"] = statusEnum.deleted;
+          break;
+        case statusEnum["Deleting..."]:
+          d["status"] = "Deleting...";
+          break;
+        case statusEnum.failed:
+          d["status"] = "failed";
+          break;
+        case statusEnum.online:
+          d["status"] = data[index]["status_device"];
+          d["message"] = data[index]["message"];
+          break;
+        case statusEnum.offline:
+          d["status"] = data[index]["status_device"];
+          d["message"] = data[index]["message"];
+          break;
+        case statusEnum["Initiating..."]:
+          d["status"] = "Initiating...";
+          break;
+        case statusEnum.symbolic:
+          d["status"] = "symbolic";
+          break;
+        default:
+          break;
+      }
+      return d;
+    };
+
+    const getDeepestDepth = (data) => {
+      if (!data.subRows) return;
+
+      data.subRows = data.subRows.map((d) => {
+        if (d["state"] === statusEnum.deleted) {
+          return d;
+        }
+
+        if (d.subRows) {
+          d.subRows = getDeepestDepth(d.subRows, d);
+        }
+
+        const index = data.findIndex((item) => item.id_device === d.id);
+        return setDeviceState(index, d);
+      });
+    };
+
     let newTotal = total;
     let newData = _.cloneDeep(
       allDevices.map((d) => {
@@ -197,53 +302,12 @@ export default function useDevices() {
           return d;
         }
 
+        if (d.subRows) {
+          d.subRows = getDeepestDepth(d.subRows, d);
+        }
+
         const index = data.findIndex((item) => item.id_device === d.id);
-
-        if (d?.device_type === Constants.COMMON.SPECIAL_DEVICE_TYPE) {
-          d["state"] = statusEnum[Constants.COMMON.SPECIAL_DEVICE_TYPE];
-        } else {
-          if (index !== -1) {
-            if (d["state"] !== statusEnum["Deleting..."]) {
-              d["state"] = statusEnum[data[index]["status_device"]];
-            }
-          } else {
-            if (d["state"] === statusEnum["Deleting..."])
-              d["state"] = statusEnum.deleted;
-            else if (d["state"] !== statusEnum["Initiating..."]) {
-              d["state"] = statusEnum.failed;
-            }
-          }
-        }
-
-        switch (d["state"]) {
-          case statusEnum.deleted:
-            d["status"] = "Deleted";
-            d["state"] = statusEnum.deleted;
-            break;
-          case statusEnum["Deleting..."]:
-            d["status"] = "Deleting...";
-            break;
-          case statusEnum.failed:
-            d["status"] = "failed";
-            break;
-          case statusEnum.online:
-            d["status"] = data[index]["status_device"];
-            d["message"] = data[index]["message"];
-            break;
-          case statusEnum.offline:
-            d["status"] = data[index]["status_device"];
-            d["message"] = data[index]["message"];
-            break;
-          case statusEnum["Initiating..."]:
-            d["status"] = "Initiating...";
-            break;
-          case statusEnum[Constants.COMMON.SPECIAL_DEVICE_TYPE]:
-            d["status"] = Constants.COMMON.SPECIAL_DEVICE_TYPE;
-            break;
-          default:
-            break;
-        }
-        return d;
+        return setDeviceState(index, { ...d });
       })
     );
     newData = newData.filter((d) => d["state"] !== statusEnum.deleted);
