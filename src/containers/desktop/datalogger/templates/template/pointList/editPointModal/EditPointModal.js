@@ -283,7 +283,12 @@ function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
                 </div>
 
                 <div className="col-2 align-self-end mb-1 fst-italic">
-                  e.g: 40001
+                  e.g:{" "}
+                  {selectedTypeFunction.label.slice(
+                    selectedTypeFunction.label.search(/\d(?=x)/),
+                    selectedTypeFunction.label.search(/\d(?=x)/) + 1
+                  )}
+                  0001
                 </div>
               </div>
 

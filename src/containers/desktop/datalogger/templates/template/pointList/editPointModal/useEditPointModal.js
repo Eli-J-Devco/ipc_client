@@ -82,7 +82,7 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
       value: data?.type_control_input?.id,
       label: data?.type_control_input?.name,
     },
-    register: data?.register || 40000,
+    register: data?.register || 1,
     slope: data?.slope || 0,
     offset: data?.offset || 0,
     invalidvalueenabled: data?.invalidvalueenabled,
