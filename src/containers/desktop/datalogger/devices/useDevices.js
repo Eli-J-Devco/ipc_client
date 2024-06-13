@@ -278,38 +278,19 @@ export default function useDevices() {
       return d;
     };
 
-    const getDeepestDepth = (data) => {
-      if (!data.subRows) return;
-
-      data.subRows = data.subRows.map((d) => {
-        if (d["state"] === statusEnum.deleted) {
-          return d;
-        }
-
+    const getDeepestDepth = (devs) => {
+      return devs.map((d) => {
         if (d.subRows) {
-          d.subRows = getDeepestDepth(d.subRows, d);
-        }
-
-        const index = data.findIndex((item) => item.id_device === d.id);
-        return setDeviceState(index, d);
-      });
-    };
-
-    let newTotal = total;
-    let newData = _.cloneDeep(
-      allDevices.map((d) => {
-        if (d["state"] === statusEnum.deleted) {
-          return d;
-        }
-
-        if (d.subRows) {
-          d.subRows = getDeepestDepth(d.subRows, d);
+          d.subRows = getDeepestDepth(d.subRows);
         }
 
         const index = data.findIndex((item) => item.id_device === d.id);
         return setDeviceState(index, { ...d });
-      })
-    );
+      });
+    };
+
+    let newTotal = total;
+    let newData = _.cloneDeep(getDeepestDepth(allDevices));
     newData = newData.filter((d) => d["state"] !== statusEnum.deleted);
 
     setTimeout(() => {

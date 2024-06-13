@@ -101,24 +101,11 @@ export function Device() {
         const { data } = await axiosPrivate.post(
           Constants.API_URL.DEVICES.LIST + `?page=${offset}&limit=${limit}`
         );
-        let devices = data?.data.reduce((acc, cur) => {
-          let device = {
-            ...cur,
-            status: "",
-          };
-          if (device.parent) {
-            let parent = acc.find((item) => item.id === device.parent);
-
-            if (parent?.subRows) {
-              parent.subRows.push(device);
-            } else {
-              parent.subRows = [device];
-            }
-          } else {
-            acc.push(device);
-          }
-          return acc;
-        }, []);
+        let devices = data?.data.map((item) => ({
+          ...item,
+          status: "",
+          state: 0,
+        }));
         setAllDevices(_.cloneDeep(devices));
         setTotal(data?.total);
       } catch (error) {
