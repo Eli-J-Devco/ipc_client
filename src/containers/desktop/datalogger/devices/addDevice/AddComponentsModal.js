@@ -10,8 +10,7 @@ import useAddComponentsModal from "./useAddComponentsModal";
 import { Tooltip } from "react-tooltip";
 
 export function AddComponentsModal({ close, components, setComponents }) {
-  const { deviceTypes, deviceGroups, templates, existedComponents } =
-    components;
+  const { deviceTypes, templates, existedComponents } = components;
   const {
     addingComponents,
     rowSelection,
@@ -25,7 +24,8 @@ export function AddComponentsModal({ close, components, setComponents }) {
     onCreateOption,
     onGroupCreateOption,
     addComponent,
-  } = useAddComponentsModal(existedComponents);
+    deviceGroups,
+  } = useAddComponentsModal(components.deviceGroups, existedComponents);
   return (
     <>
       <div className={styles.add_component}>

@@ -4,7 +4,7 @@
  *
  *********************************************************/
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ModalDefault from "react-bootstrap/Modal";
 import { useNavigate } from "react-router-dom";
 
@@ -15,7 +15,6 @@ import Modal from "../../../../../components/modal/Modal";
 import Button from "../../../../../components/button/Button";
 import AddMultipleDevice from "./AddMultipleDevice";
 import FormInput from "../../../../../components/formInput/FormInput";
-import Constants from "../../../../../utils/Constants";
 import { AddComponentsModal } from "./AddComponentsModal";
 import _ from "lodash";
 import Table from "../../../../../components/table/Table";
@@ -23,7 +22,7 @@ import Table from "../../../../../components/table/Table";
 export default function AddDevice(props) {
   const navigate = useNavigate();
 
-  const { closeAddDevice, deviceConfig } = props;
+  const { closeAddDevice } = props;
   const {
     isAddMultipleDevice,
     setIsOpenAddMultipleDevice,
@@ -43,7 +42,8 @@ export default function AddDevice(props) {
     deviceConfigDropdown,
     columns,
     haveComponents,
-  } = useAddDevice(closeAddDevice, deviceConfig);
+    onGroupCreateOption,
+  } = useAddDevice(closeAddDevice);
   const [protocol, setProtocol] = useState({
     Physical: 1,
     Virtual: 0,
@@ -102,7 +102,6 @@ export default function AddDevice(props) {
                       if (typeof acc[Symbol.iterator] !== "function")
                         output.push(acc);
                       else output = acc;
-                      // if (!item) return output;
 
                       if (
                         !output.find((element) => element.value === item.value)
@@ -137,10 +136,6 @@ export default function AddDevice(props) {
     </Button>
   );
 
-  useEffect(() => {
-    setAddingComponents([]);
-  }, [initialValues?.device_type?.label]);
-
   return (
     <FormInput
       id="addDeviceForm"
@@ -173,7 +168,7 @@ export default function AddDevice(props) {
                 schema={schema}
                 closeAddMultipleDevice={closeAddMultipleDevice}
                 handleSave={handleAddMultipleDevice}
-                deviceType={initialValues?.device_type?.label}
+                deviceType={initialValues?.device_type?.type}
                 comunicationType={initialValues?.communication?.label}
               />
             </ModalDefault.Body>
@@ -264,91 +259,81 @@ export default function AddDevice(props) {
                 />
               </div>
             </div>
-            {initialValues?.device_group ? (
-              <>
-                <div className="col-xl-6 col-md-6 col-sm-6">
-                  <div className="w-75">
-                    <FormInput.Select
-                      label="Device Group"
-                      name="device_group"
-                      value={initialValues?.device_group}
-                      option={deviceConfigDropdown?.deviceGroup.map((item) => {
-                        let option = item.options.filter(
-                          (item) =>
-                            item.id_device_type === initialValues.id_device_type
-                        );
-                        return {
-                          label: item.label,
-                          options: option,
-                        };
-                      })}
-                      onChange={(e) => {
-                        let template =
-                          deviceConfigDropdown?.template
-                            .map((item) =>
-                              item.options.filter(
-                                (item) =>
-                                  item.value.id_device_group === e?.value
-                              )
-                            )
-                            .flat() || {};
-                        if (template.length >= 0) {
-                          template = template[0];
-                        }
-                        setInitialValues({
-                          ...initialValues,
-                          device_group: e,
-                          id_device_group: e?.value,
-                          template: template,
-                          id_template: template?.value?.id_template,
-                        });
-                      }}
-                    />
-                  </div>
+            <div className="col-xl-6 col-md-6 col-sm-6">
+              <div className="w-75">
+                <FormInput.CreatableSelect
+                  label="Device Group"
+                  name="device_group"
+                  value={initialValues?.device_group || ""}
+                  option={deviceConfigDropdown?.deviceGroup.map((item) => {
+                    let option = item.options.filter(
+                      (item) =>
+                        item.id_device_type === initialValues.id_device_type
+                    );
+                    return {
+                      label: item.label,
+                      options: option,
+                    };
+                  })}
+                  onChange={(e) => {
+                    let template =
+                      deviceConfigDropdown?.template
+                        .map((item) =>
+                          item.options.filter(
+                            (item) => item.value.id_device_group === e?.value
+                          )
+                        )
+                        .flat() || {};
+                    if (template.length >= 0) {
+                      template = template[0];
+                    }
+                    setInitialValues({
+                      ...initialValues,
+                      device_group: e,
+                      id_device_group: e?.value,
+                      template: template,
+                      id_template: template?.value?.id_template,
+                    });
+                  }}
+                  onCreateOption={(e) => onGroupCreateOption(e)}
+                />
+              </div>
+            </div>
+            {initialValues?.template ? (
+              <div className="col-xl-6 col-md-6 col-sm-6">
+                <div className="w-75">
+                  <FormInput.Select
+                    label="Template Library"
+                    className="template_library"
+                    name="id_template"
+                    value={initialValues?.template}
+                    option={deviceConfigDropdown?.template.map((item) => {
+                      let option = item.options.filter(
+                        (item) =>
+                          item.value.id_device_group ===
+                          initialValues.id_device_group
+                      );
+                      return {
+                        label: item.label,
+                        options: option,
+                      };
+                    })}
+                    onChange={(e) =>
+                      setInitialValues({
+                        ...initialValues,
+                        template: e,
+                        id_template: e?.value?.id_template,
+                      })
+                    }
+                  />
                 </div>
-                {initialValues?.template ? (
-                  <div className="col-xl-6 col-md-6 col-sm-6">
-                    <div className="w-75">
-                      <FormInput.Select
-                        label="Template Library"
-                        className="template_library"
-                        name="id_template"
-                        value={initialValues?.template}
-                        option={deviceConfigDropdown?.template.map((item) => {
-                          let option = item.options.filter(
-                            (item) =>
-                              item.value.id_device_group ===
-                              initialValues.id_device_group
-                          );
-                          return {
-                            label: item.label,
-                            options: option,
-                          };
-                        })}
-                        onChange={(e) =>
-                          setInitialValues({
-                            ...initialValues,
-                            template: e,
-                            id_template: e?.value?.id_template,
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  initialValues?.device_type?.label.indexOf(
-                    Constants.COMMON.SPECIAL_DEVICE_TYPE
-                  ) === -1 && createTemplateBTN
-                )}
-              </>
+              </div>
             ) : (
-              createTemplateBTN
+              initialValues?.device_type?.type !== 1 && createTemplateBTN
             )}
           </div>
 
-          {initialValues?.device_type?.label.indexOf(
-            Constants.COMMON.SPECIAL_DEVICE_TYPE
-          ) === -1 && (
+          {initialValues?.device_type?.type !== 1 && (
             <>
               <div className="col-xl-6 col-md-12">
                 <div>What kind of your device?</div>

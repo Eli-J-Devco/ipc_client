@@ -11,8 +11,9 @@ import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 import { loginService } from "../../../../../services/loginService";
 import { useDeviceManagement } from "../DeviceManagement";
+import _ from "lodash";
 
-export default function useAddDevice(closeAddDevice, deviceConfig) {
+export default function useAddDevice(closeAddDevice) {
   const {
     deviceTypeComponents,
     setAllDevices,
@@ -20,6 +21,8 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
     limit,
     setTotal,
     clientSecret,
+    deviceConfig,
+    setDeviceConfig,
   } = useDeviceManagement();
   const [isAddMultipleDevice, setIsAddMultipleDevice] = useState(false);
   const [isOpenAddMultipleDevice, setIsOpenAddMultipleDevice] = useState(false);
@@ -191,6 +194,7 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
           return false;
         });
         setHaveComponents(haveComponents);
+        setAddingComponents([]);
       }, 100);
   }, [initialValues?.device_type?.label]);
 
@@ -318,21 +322,27 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
     deviceConfigDropdown &&
       Object.keys(deviceConfigDropdown).length > 0 &&
       setTimeout(() => {
-        let communication =
-          deviceConfigDropdown?.communicationProtocol[0] || [];
-        let device_type = deviceConfigDropdown?.deviceType[0] || [];
-        let device_group =
-          deviceConfigDropdown?.deviceGroup.map((item) =>
-            item.options.filter(
-              (item) => item.id_device_type === device_type?.value
-            )
-          )[0][0] || null;
-        let template =
-          deviceConfigDropdown?.template.map((item) =>
-            item.options.filter(
-              (item) => item.value.id_device_group === device_group[0]?.value
-            )
-          )[0][0] || null;
+        let communication = initialValues?.communication
+          ? initialValues?.communication
+          : deviceConfigDropdown?.communicationProtocol[0] || [];
+        let device_type = initialValues?.device_type
+          ? initialValues?.device_type
+          : deviceConfigDropdown?.deviceType[0] || [];
+        let device_group = initialValues?.device_group
+          ? initialValues?.device_group
+          : deviceConfigDropdown?.deviceGroup.map((item) =>
+              item.options.filter(
+                (item) => item.id_device_type === device_type?.value
+              )
+            )[0][0] || null;
+        let template = initialValues?.template
+          ? initialValues?.template
+          : device_group &&
+            deviceConfigDropdown?.template.map((item) =>
+              item.options.filter(
+                (item) => item.value.id_device_group === device_group[0]?.value
+              )
+            )[0][0];
         setInitialValues({
           ...initialValues,
           id_communication: communication?.value,
@@ -454,6 +464,57 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
     }
   }, [initialValues?.is_add]);
 
+  const onGroupCreateOption = (e) => {
+    setTimeout(async () => {
+      if (e === "") return;
+
+      let body = {
+        id_device_type: initialValues?.id_device_type,
+        name: e,
+      };
+
+      try {
+        const response = await axiosPrivate.post(
+          Constants.API_URL.DEVICES.CONFIG.ADD_GROUP,
+          body
+        );
+
+        if (response.status === 200) {
+          LibToast.toast("Device group created successfully", "success");
+          setDeviceConfig((prev) => ({
+            ...prev,
+            device_groups: [
+              ...prev.device_groups,
+              {
+                id: response.data.id,
+                name: e,
+                id_device_type: initialValues?.id_device_type,
+                status: 1,
+                type: 1,
+              },
+            ],
+          }));
+          let newDeviceGroups = _.cloneDeep(deviceConfigDropdown.deviceGroup);
+          newDeviceGroups[0].options.push({
+            label: e,
+            value: response.data.id,
+            id_device_type: initialValues?.id_device_type,
+          });
+          setDeviceConfigDropdown((prev) => ({
+            ...prev,
+            deviceGroup: newDeviceGroups,
+          }));
+        }
+      } catch (error) {
+        loginService.handleMissingInfo(
+          error,
+          "Failed to create device group"
+        ) && navigate("/", { replace: true });
+        console.error(error);
+      }
+    }, 100);
+  };
+
   return {
     isAddMultipleDevice,
     setIsAddMultipleDevice,
@@ -477,5 +538,6 @@ export default function useAddDevice(closeAddDevice, deviceConfig) {
     deviceConfigDropdown,
     columns,
     haveComponents,
+    onGroupCreateOption,
   };
 }

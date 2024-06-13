@@ -6,7 +6,7 @@ import DatePicker from "../../../../../components/datePicker/DatePicker";
 
 export default function UpdateDevice({ isShow, closeUpdateDevice }) {
   const {
-    device,
+    initialValues,
     schema,
     mode,
     setMode,
@@ -36,7 +36,7 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
     >
       <div className="container">
         <FormInput
-          initialValues={device}
+          initialValues={initialValues}
           validationSchema={schema}
           onSubmit={handleUpdateDevice}
           id="updateDevice"
@@ -61,67 +61,68 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
               />
             </div>
           </div>
-          {device?.device_type.indexOf("Inverter") !== -1 && (
-            <>
-              <div className="row mb-2 mt-2">
-                <div className="col-sm-8 col-md-6 col-lg-4 mb-2">
-                  <div>Mode:</div>
-                  <div className="row align-items-center">
-                    <div className="col-sm-8 col-md-6 col-lg-5 col-4">
-                      <FormInput.Check
-                        label="Manual"
-                        name="manual_mode"
-                        type="radio"
-                        checked={mode === 0}
-                        onChange={() => setMode(0)}
-                      />
-                    </div>
-                    <div className="col-sm-8 col-md-6 col-lg-5 col-4">
-                      <FormInput.Check
-                        label="Auto"
-                        name="auto_mode"
-                        type="radio"
-                        checked={mode === 1}
-                        onChange={() => setMode(1)}
-                      />
+          {initialValues?.device_type &&
+            initialValues?.device_type.indexOf("Inverter") !== -1 && (
+              <>
+                <div className="row mb-2 mt-2">
+                  <div className="col-sm-8 col-md-6 col-lg-4 mb-2">
+                    <div>Mode:</div>
+                    <div className="row align-items-center">
+                      <div className="col-sm-8 col-md-6 col-lg-5 col-4">
+                        <FormInput.Check
+                          label="Manual"
+                          name="manual_mode"
+                          type="radio"
+                          checked={mode === 0}
+                          onChange={() => setMode(0)}
+                        />
+                      </div>
+                      <div className="col-sm-8 col-md-6 col-lg-5 col-4">
+                        <FormInput.Check
+                          label="Auto"
+                          name="auto_mode"
+                          type="radio"
+                          checked={mode === 1}
+                          onChange={() => setMode(1)}
+                        />
+                      </div>
                     </div>
                   </div>
+                  <div className="col-sm-8 col-md-6 col-lg-4 mb-2">
+                    <FormInput.Switch
+                      label="Enable Power Off"
+                      name="enable_poweroff"
+                      checked={enablePowerOff}
+                      onChange={() => setEnablePowerOff(!enablePowerOff)}
+                    />
+                    <DatePicker
+                      label="Poweroff Time"
+                      name="inverter_shutdown"
+                      required={true}
+                      selected={inverterShutdown}
+                      onChange={(date) => setInverterShutdown(date)}
+                      disabled={!enablePowerOff}
+                      minDate={new Date()}
+                      maxDate={
+                        new Date(
+                          new Date().setFullYear(new Date().getFullYear() + 1)
+                        )
+                      }
+                      showMonthDropdown={true}
+                      showYearDropdown={true}
+                      // onKeyDown={(e) => e.preventDefault()}
+                    />
+                  </div>
                 </div>
-                <div className="col-sm-8 col-md-6 col-lg-4 mb-2">
-                  <FormInput.Switch
-                    label="Enable Power Off"
-                    name="enable_poweroff"
-                    checked={enablePowerOff}
-                    onChange={() => setEnablePowerOff(!enablePowerOff)}
-                  />
-                  <DatePicker
-                    label="Poweroff Time"
-                    name="inverter_shutdown"
-                    required={true}
-                    selected={inverterShutdown}
-                    onChange={(date) => setInverterShutdown(date)}
-                    disabled={!enablePowerOff}
-                    minDate={new Date()}
-                    maxDate={
-                      new Date(
-                        new Date().setFullYear(new Date().getFullYear() + 1)
-                      )
-                    }
-                    showMonthDropdown={true}
-                    showYearDropdown={true}
-                    // onKeyDown={(e) => e.preventDefault()}
-                  />
-                </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
           <div className="row">
             <div
               className={
-                device?.device_type &&
-                device?.driver_type &&
-                device?.device_type.indexOf("Inverter") !== -1 &&
-                device?.driver_type.search(/RS485/g) === -1
+                initialValues?.device_type &&
+                initialValues?.driver_type &&
+                initialValues?.device_type.indexOf("Inverter") !== -1 &&
+                initialValues?.driver_type.search(/RS485/g) === -1
                   ? "col-sm-8 col-md-6 col-lg-4"
                   : "col-12"
               }
@@ -132,8 +133,8 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                 type="number"
                 required={true}
               />
-              {device?.driver_type &&
-                device?.driver_type.search(/RS485/g) === -1 && (
+              {initialValues?.driver_type &&
+                initialValues?.driver_type.search(/TCP/g) !== -1 && (
                   <>
                     <FormInput.Text
                       label="MB/TCP Gateway Port"
@@ -149,13 +150,13 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                   </>
                 )}
             </div>
-            {device?.device_type &&
-              device?.device_type.indexOf("Inverter") !== -1 && (
+            {initialValues?.device_type &&
+              initialValues?.device_type.indexOf("Inverter") !== -1 && (
                 <>
                   <div
                     className={
-                      device?.driver_type &&
-                      device?.driver_type.search(/RS485/g) === -1
+                      initialValues?.driver_type &&
+                      initialValues?.driver_type.search(/RS485/g) === -1
                         ? "col-sm-8 col-md-6 col-lg-4"
                         : "col-6"
                     }
@@ -181,8 +182,8 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                   </div>
                   <div
                     className={
-                      device?.driver_type &&
-                      device?.driver_type.search(/RS485/g) === -1
+                      initialValues?.driver_type &&
+                      initialValues?.driver_type.search(/RS485/g) === -1
                         ? "col-sm-8 col-md-6 col-lg-4"
                         : "col-6"
                     }

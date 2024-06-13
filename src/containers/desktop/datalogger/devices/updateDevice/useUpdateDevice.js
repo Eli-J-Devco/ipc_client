@@ -42,7 +42,7 @@ export default function useUpdateDevice() {
         }
       : {}),
     ...(device?.device_type
-      ? device?.device_type.search("Inverter") !== -1 && {
+      ? device?.device_type?.name.indexOf("Inverter") !== -1 && {
           rated_power: yup.number().required("Please fill this field"),
           rated_power_custom: yup.number().required("Please fill this field"),
           min_watt_in_percent: yup
@@ -60,13 +60,17 @@ export default function useUpdateDevice() {
         }
       : {}),
   });
-
+  const initialValues = {
+    ...device,
+    device_type: device?.device_type?.name,
+  };
   const handleUpdateDevice = (values) => {
     if (updating) return;
     setUpdating(true);
     const body = {
       ...values,
-      ...(device?.device_type && device?.device_type.indexOf("Inverter") !== -1
+      ...(device?.device_type &&
+      device?.device_type?.name.indexOf("Inverter") !== -1
         ? {
             mode: mode,
             enable_poweroff: enablePowerOff,
@@ -97,7 +101,7 @@ export default function useUpdateDevice() {
   };
 
   return {
-    device,
+    initialValues,
     schema,
     mode,
     setMode,

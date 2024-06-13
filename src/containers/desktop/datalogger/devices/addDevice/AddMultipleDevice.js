@@ -17,7 +17,7 @@ const AddMultipleDevice = ({
 
   useEffect(() => {
     setAddMode([
-      ...(comunicationType.indexOf("Com") !== -1
+      ...(comunicationType.indexOf("Com") === -1
         ? [
             {
               value: 1,
@@ -54,7 +54,7 @@ const AddMultipleDevice = ({
           required={true}
         />
 
-        {deviceType.indexOf(Constants.COMMON.SPECIAL_DEVICE_TYPE) === -1 && (
+        {deviceType === 0 && (
           <FormInput.Select
             label="Increase Mode"
             className="inc_mode"

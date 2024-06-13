@@ -4,13 +4,17 @@ import LibToast from "../../../../../utils/LibToast";
 import _ from "lodash";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../../utils/Constants";
+import { loginService } from "../../../../../services/loginService";
+import { useNavigate } from "react-router-dom";
 
-export default function useAddComponentsModal(existedComponents) {
-  const { axiosPrivate } = useAxiosPrivate();
+export default function useAddComponentsModal(deviceGroup, existedComponents) {
+  const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
   const [rowSelection, setRowSelection] = useState([]);
   const [addingComponents, setAddingComponents] = useState([]);
-  const { allDevices } = useDeviceManagement();
+  const { allDevices, setDeviceConfig } = useDeviceManagement();
   const [cloneDevices, setCloneDevices] = useState([]);
+  const [deviceGroups, setDeviceGroups] = useState(deviceGroup);
 
   useEffect(() => {
     if (_.isEmpty(existedComponents)) return;
@@ -253,10 +257,56 @@ export default function useAddComponentsModal(existedComponents) {
         name: e,
       };
 
-      const response = await axiosPrivate.post(
-        Constants.API_URL.DEVICES.CONFIG.GROUP,
-        body
-      );
+      try {
+        const response = await axiosPrivate.post(
+          Constants.API_URL.DEVICES.CONFIG.ADD_GROUP,
+          body
+        );
+
+        if (response.status === 200) {
+          LibToast.toast("Device group created successfully", "success");
+          setAddingComponents(
+            addingComponents.map((item, idx) => {
+              if (idx === index) {
+                return {
+                  ...item,
+                  device_group: {
+                    label: e,
+                    value: response.data.id,
+                  },
+                };
+              }
+              return item;
+            })
+          );
+          setDeviceConfig((prev) => ({
+            ...prev,
+            device_groups: [
+              ...prev.device_groups,
+              {
+                id: response.data.id,
+                name: e,
+                id_device_type: addingComponents[index]?.device_type?.value,
+                status: 1,
+                type: 1,
+              },
+            ],
+          }));
+          let newDeviceGroups = _.cloneDeep(deviceGroups);
+          newDeviceGroups[0].options.push({
+            label: e,
+            value: response.data.id,
+            id_device_type: addingComponents[index]?.device_type?.value,
+          });
+          setDeviceGroups(newDeviceGroups);
+        }
+      } catch (error) {
+        loginService.handleMissingInfo(
+          error,
+          "Failed to create device group"
+        ) && navigate("/", { replace: true });
+        console.error(error);
+      }
     }, 100);
   };
 
@@ -288,5 +338,6 @@ export default function useAddComponentsModal(existedComponents) {
     onCreateOption,
     onGroupCreateOption,
     addComponent,
+    deviceGroups,
   };
 }
