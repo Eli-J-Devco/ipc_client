@@ -37,6 +37,7 @@ export default function TemplateProvider({ children }) {
   });
   const [deviceType, setDeviceType] = useState("");
   const [controlGroups, setControlGroups] = useState([]);
+  const [templateName, setTemplateName] = useState("");
 
   const { id } = useParams();
 
@@ -60,6 +61,8 @@ export default function TemplateProvider({ children }) {
         setDeviceType,
         controlGroups,
         setControlGroups,
+        templateName,
+        setTemplateName,
       }}
     >
       {children}

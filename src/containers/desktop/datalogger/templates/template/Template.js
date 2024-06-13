@@ -12,6 +12,7 @@ function Template() {
   const {
     id,
     config,
+    templateName,
     setDefaultPointList,
     setDefaultMPPTList,
     setDefaultStringList,
@@ -21,6 +22,7 @@ function Template() {
     deviceType,
     setDeviceType,
     setControlGroups,
+    setTemplateName,
   } = useTemplate();
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
@@ -45,6 +47,7 @@ function Template() {
             setDefaultRegisterList(response?.data?.register_blocks);
             setDefaultControlGroupList(response?.data?.point_controls);
             setDeviceType(response?.data?.device_type);
+            setTemplateName(response?.data?.name);
           }
 
           const responseControlGroups = await axiosPrivate.post(
@@ -111,7 +114,9 @@ function Template() {
     isSetUp &&
     deviceType && (
       <div className={styles.template}>
-        <header className={styles.header}>{`Modbus Template: [${id}]`}</header>
+        <header
+          className={styles.header}
+        >{`Modbus Template: [${templateName}]`}</header>
 
         <div className={styles.body}>
           <div className="row">
