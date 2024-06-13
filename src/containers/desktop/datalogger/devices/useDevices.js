@@ -51,7 +51,7 @@ export default function useDevices() {
     "Deleting...": "bg-warning",
     deleted: "bg-danger",
     failed: "bg-danger",
-    [Constants.COMMON.SPECIAL_DEVICE_TYPE]: "bg-warning",
+    symbolic: "bg-warning",
   };
   const statusEnum = {
     online: 1,
@@ -60,7 +60,7 @@ export default function useDevices() {
     "Deleting...": -1,
     deleted: -2,
     failed: -4,
-    [Constants.COMMON.SPECIAL_DEVICE_TYPE]: 3,
+    symbolic: 3,
   };
 
   const columns = [
@@ -140,11 +140,13 @@ export default function useDevices() {
             statusEnum["Initiating..."],
           ].includes(row.original.state) ? null : (
             <>
-              <Button.Image
-                image={<ViewIcon />}
-                onClick={() => handleConfigDevice(row.original)}
-                className={"mx-2"}
-              />
+              {row.original?.device_type?.type !== 1 && (
+                <Button.Image
+                  image={<ViewIcon />}
+                  onClick={() => handleConfigDevice(row.original)}
+                  className={"mx-2"}
+                />
+              )}
               <Button.Image
                 image={<EditIcon />}
                 onClick={() => handleUpdateDevice(row.original)}

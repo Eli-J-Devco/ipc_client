@@ -1,16 +1,16 @@
 /********************************************************
-* Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
-* All rights reserved.
-* 
-*********************************************************/
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
 import React, { useState } from "react";
-import styles from './Devices.module.scss';
-import Table from '../../../../components/table/Table';
-import AddDevice from './addDevice/AddDevice';
+import styles from "./Devices.module.scss";
+import Table from "../../../../components/table/Table";
+import AddDevice from "./addDevice/AddDevice";
 
-import Button from '../../../../components/button/Button';
-import useDevices from './useDevices';
-import ConfigDevice from './configDevice/ConfigPoints';
+import Button from "../../../../components/button/Button";
+import useDevices from "./useDevices";
+import ConfigDevice from "./configDevice/ConfigPoints";
 import { useParams } from "react-router-dom";
 import Modal from "../../../../components/modal/Modal";
 import UpdateDevice from "./updateDevice/UpdateDevice";
@@ -22,7 +22,6 @@ export default function Devices() {
     isUpdateDevice,
     isDeleteDevice,
     dataDevices,
-    deviceConfig,
     columns,
     openAddDevice,
     closeAddDevice,
@@ -36,23 +35,21 @@ export default function Devices() {
   const [rowSelection, setRowSelection] = useState([]);
   const { name } = useParams();
 
-
   return (
     <div className={`main ${styles.main_devices}`}>
-      {isAddDevice &&
-        <AddDevice closeAddDevice={closeAddDevice} deviceConfig={deviceConfig} />
-      }
-      {
-        isUpdateDevice &&
-        <UpdateDevice isShow={isUpdateDevice} closeUpdateDevice={closeUpdateDevice} />
-      }
-      {
-        isDeleteDevice &&
+      {isAddDevice && <AddDevice closeAddDevice={closeAddDevice} />}
+      {isUpdateDevice && (
+        <UpdateDevice
+          isShow={isUpdateDevice}
+          closeUpdateDevice={closeUpdateDevice}
+        />
+      )}
+      {isDeleteDevice && (
         <Modal
           title="Delete Devices"
           isOpen={isDeleteDevice}
           close={() => setIsDeleteDevice(false)}
-          footer={(
+          footer={
             <>
               <Button
                 variant="white"
@@ -77,54 +74,50 @@ export default function Devices() {
                 <Button.Text text="Delete" />
               </Button>
             </>
-          )}
+          }
         >
           Are you sure you want to delete the selected devices?
         </Modal>
-      }
-      {
-        name ? <ConfigDevice /> :
-          <div>
-            <div className="mb-2">
+      )}
+      {name ? (
+        <ConfigDevice />
+      ) : (
+        <div>
+          <div className="mb-2">
+            <Button variant="dark" onClick={openAddDevice}>
+              <Button.Text text="Add Device" />
+            </Button>
+            {Object.keys(rowSelection).length > 0 && (
               <Button
+                className="ms-3"
                 variant="dark"
-                onClick={openAddDevice}
+                onClick={() => {
+                  setIsDeleteDevice(true);
+                }}
               >
-                <Button.Text text="Add Device" />
+                <Button.Text text="Delete Device" />
               </Button>
-              {
-                Object.keys(rowSelection).length > 0 &&
-                <Button
-                  className="ms-3"
-                  variant="dark"
-                  onClick={() => {
-                    setIsDeleteDevice(true);
-                  }}
-                >
-                  <Button.Text text="Delete Device" />
-                </Button>
-              }
-            </div>
-            <Table
-              columns={{ columnDefs: columns }}
-              data={dataDevices}
-              selectRow={{
-                enable: false,
-                rowSelection: rowSelection,
-                setRowSelection: setRowSelection
-              }}
-              control={true}
-              pagination={{
-                enable: true,
-                total: total,
-                offset: offset,
-                setLimit: setLimit,
-                setOffset: setOffset
-              }}
-            />
+            )}
           </div>
-      }
-
+          <Table
+            columns={{ columnDefs: columns }}
+            data={dataDevices}
+            selectRow={{
+              enable: false,
+              rowSelection: rowSelection,
+              setRowSelection: setRowSelection,
+            }}
+            control={true}
+            pagination={{
+              enable: true,
+              total: total,
+              offset: offset,
+              setLimit: setLimit,
+              setOffset: setOffset,
+            }}
+          />
+        </div>
+      )}
     </div>
   );
-};
+}

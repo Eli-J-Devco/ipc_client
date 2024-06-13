@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Button from "../../../../../components/button/Button";
 import FormInput from "../../../../../components/formInput/FormInput";
-import Constants from "../../../../../utils/Constants";
 
 const AddMultipleDevice = ({
   initialValues,
