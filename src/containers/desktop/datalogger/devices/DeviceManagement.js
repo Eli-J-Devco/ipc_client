@@ -92,27 +92,43 @@ export function Device() {
   const output = document.getElementById("progress");
   const [feedbackTopic, setFeedbackTopic] = useState("");
 
+  const fetchDevices = async ({ id, isPagination }) => {
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    try {
+      const { data } = await axiosPrivate.post(
+        `${Constants.API_URL.DEVICES.LIST}${
+          isPagination && `?page=${offset}&limit=${limit}`
+        }`,
+        {
+          id: id,
+        }
+      );
+      let devices = data?.data.map((item) => ({
+        ...item,
+        status: "",
+        state: 0,
+      }));
+
+      return { devices, total: data?.total };
+    } catch (error) {
+      loginService.handleMissingInfo(error, "Failed to get devices") &&
+        navigate("/", { replace: true });
+    } finally {
+      output.innerHTML = "";
+    }
+  };
+
   useEffect(() => {
     if (allDevices.length > 0) return;
 
-    output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        const { data } = await axiosPrivate.post(
-          Constants.API_URL.DEVICES.LIST + `?page=${offset}&limit=${limit}`
-        );
-        let devices = data?.data.map((item) => ({
-          ...item,
-          status: "",
-          state: 0,
-        }));
-        setAllDevices(_.cloneDeep(devices));
-        setTotal(data?.total);
+        const devices = await fetchDevices({ id: null, isPagination: true });
+        setAllDevices(_.cloneDeep(devices.devices));
+        setTotal(devices.total);
       } catch (error) {
         loginService.handleMissingInfo(error, "Failed to get devices") &&
           navigate("/", { replace: true });
-      } finally {
-        output.innerHTML = "";
       }
     }, 300);
   }, [allDevices]);

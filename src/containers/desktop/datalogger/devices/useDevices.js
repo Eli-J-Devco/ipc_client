@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  *********************************************************/
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../utils/Constants";
@@ -33,7 +33,6 @@ export default function useDevices() {
     setAllDevices,
     offset,
     limit,
-    total,
     setTotal,
     clientSecret,
     deadletter,
@@ -43,7 +42,11 @@ export default function useDevices() {
   const [isAddDevice, setIsAddDevice] = useState(false);
   const [isUpdateDevice, setIsUpdateDevice] = useState(false);
   const [isDeleteDevice, setIsDeleteDevice] = useState(false);
-  const [dataDevices, setDataDevices] = useState([]);
+  const [newDevices, setNewDevices] = useState({
+    parent: 0,
+    devices: [],
+  });
+  const [rowSelection, setRowSelection] = useState({});
   const output = document.getElementById("progress");
   const columnsHelper = createColumnHelper();
   const statusColor = {
@@ -93,9 +96,24 @@ export default function useDevices() {
         </div>
       ),
       cell: ({ row }) => (
-        <div style={{ paddingLeft: `${row.depth * 2}rem` }}>
-          {row.getCanExpand() && (
-            <Button variant="dark" onClick={() => row.toggleExpanded()}>
+        <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
+          {row.original.children && (
+            <Button
+              variant="dark"
+              onClick={() => {
+                row.toggleExpanded();
+                !row.getIsExpanded() &&
+                  row.subRows.length === 0 &&
+                  setTimeout(async () => {
+                    if (row.getIsExpanded()) {
+                      await fetchDevices({
+                        id: row.original.id,
+                        isPagination: false,
+                      });
+                    }
+                  }, 500);
+              }}
+            >
               <Button.Image
                 image={row.getIsExpanded() ? <CollapseIcon /> : <ExpandIcon />}
               />
@@ -120,21 +138,23 @@ export default function useDevices() {
       ),
       cell: ({ row }) => {
         return (
-          <FormInput.Check
-            {...{
-              inline: true,
-              name: row.original.id,
-              label: `${row.original.id}`,
-              checked: row.getIsSelected(),
-              onChange: row.getToggleSelectedHandler(),
-              indeterminate: row.getIsSomeSelected(),
-              disabled: [
-                statusEnum["Deleting..."],
-                statusEnum.deleted,
-                statusEnum["Initiating..."],
-              ].includes(row.original.state),
-            }}
-          />
+          <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
+            <FormInput.Check
+              {...{
+                inline: true,
+                name: row.original.id,
+                label: `${row.original.id}`,
+                checked: row.getIsSelected(),
+                onChange: row.getToggleSelectedHandler(),
+                indeterminate: row.getIsSomeSelected(),
+                disabled: [
+                  statusEnum["Deleting..."],
+                  statusEnum.deleted,
+                  statusEnum["Initiating..."],
+                ].includes(row.original.state),
+              }}
+            />
+          </div>
         );
       },
     }),
@@ -143,7 +163,7 @@ export default function useDevices() {
       header: "Port",
       width: 200,
       cell: ({ row }) => (
-        <div>
+        <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
           {row.original.tcp_gateway_ip}@{row.original.tcp_gateway_port}{" "}
           {row.original.rtu_bus_address}
         </div>
@@ -154,8 +174,10 @@ export default function useDevices() {
       header: "Status",
       size: 100,
       cell: ({ row }) => (
-        <div className={`badge ${statusColor[row.original.status]}`}>
-          <span>{row.original.status}</span>
+        <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
+          <div className={`badge ${statusColor[row.original.status]}`}>
+            <span>{row.original.status}</span>
+          </div>
         </div>
       ),
     }),
@@ -163,17 +185,31 @@ export default function useDevices() {
       id: "name",
       header: "Name and Purpose",
       size: 200,
+      cell: ({ row }) => (
+        <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
+          <div>{row.original.name}</div>
+          <div>{row.original.purpose}</div>
+        </div>
+      ),
     }),
     columnsHelper.accessor("driver_type", {
       id: "driver_type",
       header: "Type",
       size: 200,
+      cell: ({ row }) => (
+        <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
+          {row.original.driver_type}
+        </div>
+      ),
     }),
     columnsHelper.accessor("action", {
       id: "action",
       header: <div className="text-center">Actions</div>,
       cell: ({ row }) => (
-        <div className="d-flex flex-wrap justify-content-center">
+        <div
+          className="d-flex flex-wrap justify-content-center"
+          style={{ paddingLeft: `${row.depth * 1.2}rem` }}
+        >
           {[
             statusEnum["Deleting..."],
             statusEnum.deleted,
@@ -229,7 +265,9 @@ export default function useDevices() {
     }
   }, [name]);
 
-  useEffect(() => {
+  const dataDevices = useMemo(() => {
+    if (_.isEmpty(allDevices)) return [];
+
     const setDeviceState = (index, d) => {
       if (index !== -1) {
         if (d["state"] !== statusEnum["Deleting..."]) {
@@ -288,43 +326,36 @@ export default function useDevices() {
         return setDeviceState(index, { ...d });
       });
     };
-
-    let newTotal = total;
     let newData = _.cloneDeep(getDeepestDepth(allDevices));
     newData = newData.filter((d) => d["state"] !== statusEnum.deleted);
 
-    setTimeout(() => {
-      // if (newData.length < 1 && offset > offset - limit) {
-      //   setOffset((prev) => prev - 1);
-      //   return;
-      // }
+    return newData;
+  }, [allDevices, data]);
 
-      if (newTotal !== total) {
-        setTotal(newTotal);
-        // if (newTotal / limit < offset) {
-        //   setOffset((prev) => prev - 1);
-        // }
+  const deleteDevices = () => {
+    let ids = [];
+    Object.keys(rowSelection).forEach((key) => {
+      let splitedKey = key.split(".");
+      if (splitedKey.length === 1) {
+        ids.push(dataDevices[parseInt(key)].id);
         return;
       }
 
-      setDataDevices(newData);
-    }, 100);
-  }, [data]);
-
-  const deleteDevices = (devices) => {
+      ids.push(findId(dataDevices, splitedKey));
+    });
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
           Constants.API_URL.DEVICES.DELETE + `?page=${offset}&limit=${limit}`,
           {
-            device_id: devices,
+            device_id: ids,
             secret: clientSecret,
           }
         );
         setAllDevices(
           response.data?.data.map((d) => {
-            if (devices.includes(d.id)) {
+            if (ids.includes(d.id)) {
               // d["status"] = "Deleting...";
               d["state"] = statusEnum["Deleting..."];
             }
@@ -341,6 +372,8 @@ export default function useDevices() {
           navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
+        setRowSelection({});
+        setIsDeleteDevice(false);
       }
     }, 500);
   };
@@ -362,6 +395,62 @@ export default function useDevices() {
     setDeadletter(null);
   }, [deadletter]);
 
+  const fetchDevices = async ({ id, isPagination }) => {
+    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    try {
+      const { data } = await axiosPrivate.post(
+        `${Constants.API_URL.DEVICES.LIST}${
+          isPagination ? `?page=${offset}&limit=${limit}` : ""
+        }`,
+        {
+          id: id,
+        }
+      );
+      let devices = data.map((item) => ({
+        ...item,
+        status: "",
+        state: 0,
+      }));
+
+      setNewDevices({ parent: id, devices: devices });
+    } catch (error) {
+      loginService.handleMissingInfo(error, "Failed to get devices") &&
+        navigate("/", { replace: true });
+    } finally {
+      output.innerHTML = "";
+    }
+  };
+
+  useEffect(() => {
+    if (newDevices.devices.length === 0) return;
+
+    addSubRows(allDevices, newDevices.parent, newDevices.devices);
+    setNewDevices({ parent: 0, devices: [] });
+  }, [newDevices]);
+
+  const addSubRows = (devs, id, newDevices) => {
+    return devs.map((d) => {
+      if (d.id === id) {
+        d.subRows = newDevices;
+      } else if (d.subRows) {
+        d.subRows = addSubRows(d.subRows, id, newDevices);
+      }
+      return d;
+    });
+  };
+
+  const findId = (devs, keys) => {
+    let id = -1;
+    let index = parseInt(keys[0]);
+    let d = devs[index];
+    if (keys.length === 1) {
+      return d.id;
+    }
+
+    id = findId(d.subRows, keys.slice(1));
+    return id;
+  };
+
   return {
     isAddDevice,
     isUpdateDevice,
@@ -369,6 +458,8 @@ export default function useDevices() {
     dataDevices,
     deviceConfig,
     columns,
+    rowSelection,
+    setRowSelection,
     openAddDevice,
     closeAddDevice,
     openUpdateDevice,

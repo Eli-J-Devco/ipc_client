@@ -23,6 +23,8 @@ export default function Devices() {
     isDeleteDevice,
     dataDevices,
     columns,
+    rowSelection,
+    setRowSelection,
     openAddDevice,
     closeAddDevice,
     deleteDevices,
@@ -31,8 +33,6 @@ export default function Devices() {
   } = useDevices();
 
   const { total, offset, setOffset, setLimit } = useDeviceManagement();
-
-  const [rowSelection, setRowSelection] = useState([]);
   const { name } = useParams();
 
   return (
@@ -62,13 +62,7 @@ export default function Devices() {
               <Button
                 variant="dark"
                 onClick={() => {
-                  let ids = [];
-                  Object.keys(rowSelection).forEach((key) => {
-                    if (rowSelection[key]) ids.push(dataDevices[key].id);
-                  });
-                  deleteDevices(ids);
-                  setRowSelection([]);
-                  setIsDeleteDevice(false);
+                  deleteDevices();
                 }}
               >
                 <Button.Text text="Delete" />
