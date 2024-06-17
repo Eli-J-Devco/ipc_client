@@ -15,6 +15,12 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
   const { allDevices, setDeviceConfig } = useDeviceManagement();
   const [cloneDevices, setCloneDevices] = useState([]);
   const [deviceGroups, setDeviceGroups] = useState(deviceGroup);
+  const [confirmCreateGroup, setConfirmCreateGroup] = useState({
+    show: false,
+    confirm: false,
+    index: null,
+    newGroup: null,
+  });
 
   useEffect(() => {
     if (_.isEmpty(existedComponents)) return;
@@ -26,7 +32,7 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
       setAddingComponents([]);
       setRowSelection([]);
       setCloneDevices(
-        cloneDevices.map((item) => ({ ...item, selected: false }))
+        cloneDevices.map((item) => ({ ...item, selected: false, parent: null }))
       );
       return;
     }
@@ -53,6 +59,7 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
           return {
             ...item,
             selected: false,
+            parent: null,
           };
         }
         return item;
@@ -205,6 +212,10 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
   };
 
   const onCreateOption = (e, index) => {
+    if (addingComponents[index]?.device_type?.type === 0) {
+      LibToast.toast("This device type can not be created here", "error");
+      return;
+    }
     setTimeout(() => {
       if (e === "") return;
 
@@ -249,65 +260,12 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
   };
 
   const onGroupCreateOption = (e, index) => {
-    setTimeout(async () => {
-      if (e === "") return;
-
-      let body = {
-        id_device_type: addingComponents[index]?.device_type?.value,
-        name: e,
-      };
-
-      try {
-        const response = await axiosPrivate.post(
-          Constants.API_URL.DEVICES.CONFIG.ADD_GROUP,
-          body
-        );
-
-        if (response.status === 200) {
-          LibToast.toast("Device group created successfully", "success");
-          setAddingComponents(
-            addingComponents.map((item, idx) => {
-              if (idx === index) {
-                return {
-                  ...item,
-                  device_group: {
-                    label: e,
-                    value: response.data.id,
-                  },
-                };
-              }
-              return item;
-            })
-          );
-          setDeviceConfig((prev) => ({
-            ...prev,
-            device_groups: [
-              ...prev.device_groups,
-              {
-                id: response.data.id,
-                name: e,
-                id_device_type: addingComponents[index]?.device_type?.value,
-                status: 1,
-                type: 1,
-              },
-            ],
-          }));
-          let newDeviceGroups = _.cloneDeep(deviceGroups);
-          newDeviceGroups[0].options.push({
-            label: e,
-            value: response.data.id,
-            id_device_type: addingComponents[index]?.device_type?.value,
-          });
-          setDeviceGroups(newDeviceGroups);
-        }
-      } catch (error) {
-        loginService.handleMissingInfo(
-          error,
-          "Failed to create device group"
-        ) && navigate("/", { replace: true });
-        console.error(error);
-      }
-    }, 100);
+    setConfirmCreateGroup({
+      show: true,
+      confirm: false,
+      index: index,
+      newGroup: e,
+    });
   };
 
   const addComponent = () => {
@@ -324,6 +282,70 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
     }, 100);
   };
 
+  useEffect(() => {
+    if (!confirmCreateGroup.confirm) return;
+
+    const { index, newGroup } = confirmCreateGroup;
+    setTimeout(async () => {
+      if (newGroup === "") return;
+
+      let body = {
+        id_device_type: addingComponents[index]?.device_type?.value,
+        name: newGroup,
+      };
+
+      try {
+        const response = await axiosPrivate.post(
+          Constants.API_URL.DEVICES.CONFIG.ADD_GROUP,
+          body
+        );
+
+        if (response.status === 200) {
+          LibToast.toast("Device group created successfully", "success");
+          setAddingComponents(
+            addingComponents.map((item, idx) => {
+              if (idx === index) {
+                return {
+                  ...item,
+                  device_group: {
+                    label: newGroup,
+                    value: response.data.id,
+                  },
+                };
+              }
+              return item;
+            })
+          );
+          setDeviceConfig((prev) => ({
+            ...prev,
+            device_groups: [
+              ...prev.device_groups,
+              {
+                id: response.data.id,
+                name: newGroup,
+                id_device_type: addingComponents[index]?.device_type?.value,
+                status: 1,
+                type: 1,
+              },
+            ],
+          }));
+          let newDeviceGroups = _.cloneDeep(deviceGroups);
+          newDeviceGroups[0].options.push({
+            label: newGroup,
+            value: response.data.id,
+            id_device_type: addingComponents[index]?.device_type?.value,
+          });
+          setDeviceGroups(newDeviceGroups);
+        }
+      } catch (error) {
+        loginService.handleMissingInfo(
+          error,
+          "Failed to create device group"
+        ) && navigate("/", { replace: true });
+      }
+    }, 100);
+  }, [confirmCreateGroup.confirm]);
+
   return {
     addingComponents,
     setAddingComponents,
@@ -339,5 +361,7 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
     onGroupCreateOption,
     addComponent,
     deviceGroups,
+    confirmCreateGroup,
+    setConfirmCreateGroup,
   };
 }

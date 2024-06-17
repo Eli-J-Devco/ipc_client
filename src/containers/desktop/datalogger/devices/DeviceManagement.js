@@ -119,6 +119,10 @@ export function Device() {
   };
 
   useEffect(() => {
+    setTimeout(setAllDevices([]), 300);
+  }, [offset, limit]);
+
+  useEffect(() => {
     if (allDevices.length > 0) return;
 
     setTimeout(async () => {

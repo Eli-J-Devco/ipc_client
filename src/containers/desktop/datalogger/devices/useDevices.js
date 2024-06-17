@@ -71,30 +71,9 @@ export default function useDevices() {
   const columns = [
     columnsHelper.accessor("toggle", {
       id: "toggle",
-      size: 10,
-      header: ({ table }) => (
-        <div>
-          <Button
-            variant="dark"
-            onClick={() =>
-              table.getIsSomeRowsExpanded()
-                ? table.toggleAllRowsExpanded(false)
-                : table.toggleAllRowsExpanded()
-            }
-          >
-            <Button.Image
-              image={
-                table.getIsAllRowsExpanded() ||
-                table.getIsSomeRowsExpanded() ? (
-                  <CollapseIcon />
-                ) : (
-                  <ExpandIcon />
-                )
-              }
-            />
-          </Button>
-        </div>
-      ),
+      size: 5,
+      maxSize: 5,
+      header: () => <div></div>,
       cell: ({ row }) => (
         <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
           {row.original.children && (
@@ -111,7 +90,7 @@ export default function useDevices() {
                         isPagination: false,
                       });
                     }
-                  }, 500);
+                  }, 100);
               }}
             >
               <Button.Image
@@ -125,6 +104,7 @@ export default function useDevices() {
     columnsHelper.accessor("id_checkbox", {
       id: "id_checkbox",
       size: 10,
+      maxSize: 10,
       header: ({ table }) => (
         <FormInput.Check
           {...{
@@ -161,7 +141,8 @@ export default function useDevices() {
     columnsHelper.accessor("tcp_gateway_ip", {
       id: "tcp_gateway_ip",
       header: "Port",
-      width: 200,
+      size: 200,
+      maxSize: 200,
       cell: ({ row }) => (
         <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
           {row.original.tcp_gateway_ip}@{row.original.tcp_gateway_port}{" "}
@@ -185,6 +166,7 @@ export default function useDevices() {
       id: "name",
       header: "Name and Purpose",
       size: 200,
+      maxSize: 200,
       cell: ({ row }) => (
         <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
           <div>{row.original.name}</div>
@@ -196,6 +178,7 @@ export default function useDevices() {
       id: "driver_type",
       header: "Type",
       size: 200,
+      maxSize: 200,
       cell: ({ row }) => (
         <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
           {row.original.driver_type}
@@ -450,6 +433,10 @@ export default function useDevices() {
     id = findId(d.subRows, keys.slice(1));
     return id;
   };
+
+  useEffect(() => {
+    setRowSelection({});
+  }, [offset, limit]);
 
   return {
     isAddDevice,

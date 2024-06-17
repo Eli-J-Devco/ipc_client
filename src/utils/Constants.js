@@ -95,6 +95,7 @@ const Constants = {
       COMPONENT: {
         GET: "/devices/component/get/",
         LIST: "/devices/component/get/all/",
+        DEFAULT: "/devices/component/",
       },
     },
     POINT: {

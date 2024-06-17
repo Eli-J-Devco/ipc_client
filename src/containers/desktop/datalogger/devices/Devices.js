@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  *********************************************************/
-import React, { useState } from "react";
+import React from "react";
 import styles from "./Devices.module.scss";
 import Table from "../../../../components/table/Table";
 import AddDevice from "./addDevice/AddDevice";

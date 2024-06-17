@@ -77,7 +77,7 @@ export default function AddDevice(props) {
           onClick={() => {
             let deviceTypes = haveComponents.component
               .filter((item) => {
-                if (item.type !== 1) return false;
+                // if (item.type !== 1) return false;
 
                 if (item.sub_type !== null) {
                   return (

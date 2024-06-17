@@ -8,6 +8,7 @@ import LibToast from "../../../../../utils/LibToast";
 import _ from "lodash";
 import useAddComponentsModal from "./useAddComponentsModal";
 import { Tooltip } from "react-tooltip";
+import ModalDefault from "react-bootstrap/Modal";
 
 export function AddComponentsModal({ close, components, setComponents }) {
   const { deviceTypes, templates, existedComponents } = components;
@@ -25,9 +26,57 @@ export function AddComponentsModal({ close, components, setComponents }) {
     onGroupCreateOption,
     addComponent,
     deviceGroups,
+    confirmCreateGroup,
+    setConfirmCreateGroup,
   } = useAddComponentsModal(components.deviceGroups, existedComponents);
   return (
     <>
+      {confirmCreateGroup.show && (
+        <ModalDefault
+          show={confirmCreateGroup.show}
+          style={{ top: "100px", marginTop: "5vh" }}
+          onHide={() =>
+            setConfirmCreateGroup({
+              ...confirmCreateGroup,
+              show: false,
+            })
+          }
+        >
+          <ModalDefault.Header
+            style={{ backgroundColor: "#383434", color: "#fff" }}
+          >
+            Confirm
+          </ModalDefault.Header>
+          <ModalDefault.Body>
+            Are you sure you want to create a new device group?
+          </ModalDefault.Body>
+          <ModalDefault.Footer>
+            <Button
+              variant="white"
+              onClick={() => {
+                setConfirmCreateGroup({
+                  ...confirmCreateGroup,
+                  show: false,
+                });
+              }}
+            >
+              <Button.Text text="Cancel" />
+            </Button>
+            <Button
+              variant="dark"
+              onClick={() => {
+                setConfirmCreateGroup({
+                  ...confirmCreateGroup,
+                  show: false,
+                  confirm: true,
+                });
+              }}
+            >
+              <Button.Text text="Confirm" />
+            </Button>
+          </ModalDefault.Footer>
+        </ModalDefault>
+      )}
       <div className={styles.add_component}>
         <table>
           <thead>
@@ -206,7 +255,7 @@ export function AddComponentsModal({ close, components, setComponents }) {
           variant="dark"
           onClick={() => {
             if (
-              addingComponents.length === 0 ||
+              addingComponents.length > 0 &&
               addingComponents.some((item) => !item.device)
             ) {
               LibToast.toast(

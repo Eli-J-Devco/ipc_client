@@ -1,8 +1,13 @@
 import Button from "../../../../../components/button/Button";
+import ModalDefault from "react-bootstrap/Modal";
 import FormInput from "../../../../../components/formInput/FormInput";
 import Modal from "../../../../../components/modal/Modal";
 import useUpdateDevice from "./useUpdateDevice";
 import DatePicker from "../../../../../components/datePicker/DatePicker";
+import { useState } from "react";
+import { AddComponentsModal } from "../addDevice/AddComponentsModal";
+import Table from "../../../../../components/table/Table";
+import _ from "lodash";
 
 export default function UpdateDevice({ isShow, closeUpdateDevice }) {
   const {
@@ -15,8 +20,19 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
     inverterShutdown,
     setInverterShutdown,
     handleUpdateDevice,
+    haveComponents,
+    device,
+    deviceConfigDropdown,
+    addingComponents,
+    setAddingComponents,
+    columns,
   } = useUpdateDevice();
-
+  const [isOpenAddComponents, setIsOpenAddComponents] = useState(false);
+  const [components, setComponents] = useState({
+    deviceTypes: [],
+    deviceGroups: [],
+    templates: [],
+  });
   return (
     <Modal
       isOpen={isShow}
@@ -27,13 +43,83 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
           <Button variant="white" onClick={closeUpdateDevice}>
             <Button.Text text="Cancel" />
           </Button>
+          {haveComponents && (
+            <Button
+              variant="dark"
+              onClick={() => {
+                let deviceTypes = haveComponents.component
+                  .filter((item) => {
+                    if (item.sub_type !== null) {
+                      return (
+                        item.sub_type === device?.inverter_type ||
+                        item.sub_type === device?.meter_type
+                      );
+                    }
+
+                    return true;
+                  })
+                  .map((item) => ({
+                    label: item.name,
+                    value: item.component,
+                    type: item.type,
+                  }));
+                setIsOpenAddComponents(true);
+                setComponents({
+                  deviceTypes:
+                    deviceTypes.length > 1
+                      ? deviceTypes.reduce((acc, item) => {
+                          let output = [];
+                          if (typeof acc[Symbol.iterator] !== "function")
+                            output.push(acc);
+                          else output = acc;
+
+                          if (
+                            !output.find(
+                              (element) => element.value === item.value
+                            )
+                          ) {
+                            output.push(item);
+                          }
+                          return output;
+                        })
+                      : deviceTypes,
+                  deviceGroups: deviceConfigDropdown.deviceGroup,
+                  templates: deviceConfigDropdown.template,
+                  existedComponents: addingComponents,
+                });
+              }}
+            >
+              <Button.Text text="Update components" />
+            </Button>
+          )}
           <Button variant="dark" type="submit" formId="updateDevice">
             <Button.Text text="Update" />
           </Button>
         </>
       }
-      size="lg"
+      size="xl"
     >
+      {isOpenAddComponents && (
+        <ModalDefault
+          show={isOpenAddComponents}
+          style={{ top: "100px" }}
+          onHide={() => setIsOpenAddComponents(false)}
+          size="lg"
+        >
+          <ModalDefault.Header
+            style={{ backgroundColor: "#383434", color: "#fff" }}
+          >
+            Add Components
+          </ModalDefault.Header>
+          <ModalDefault.Body>
+            <AddComponentsModal
+              close={() => setIsOpenAddComponents(false)}
+              components={components}
+              setComponents={(data) => setAddingComponents(data)}
+            />
+          </ModalDefault.Body>
+        </ModalDefault>
+      )}
       <div className="container">
         <FormInput
           initialValues={initialValues}
@@ -42,7 +128,7 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
           id="updateDevice"
         >
           <div className="row">
-            <div className="col-sm-8 col-md-6 col-lg-4">
+            <div className="col-sm-12 col-md-8">
               <FormInput.Text
                 label="Device name"
                 name="name"
@@ -52,7 +138,7 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                 horizontal
               />
             </div>
-            <div className="col-sm-8 col-md-6 col-lg-4">
+            <div className="col-sm-12 col-md-4">
               <FormInput.Text
                 name="device_type"
                 placeholder="Device type"
@@ -65,10 +151,10 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
             initialValues?.device_type.indexOf("Inverter") !== -1 && (
               <>
                 <div className="row mb-2 mt-2">
-                  <div className="col-sm-8 col-md-6 col-lg-4 mb-2">
+                  <div className="col-sm-6 col-lg-4 col-12">
                     <div>Mode:</div>
                     <div className="row align-items-center">
-                      <div className="col-sm-8 col-md-6 col-lg-5 col-4">
+                      <div className="col-sm-6 col-4">
                         <FormInput.Check
                           label="Manual"
                           name="manual_mode"
@@ -77,7 +163,7 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                           onChange={() => setMode(0)}
                         />
                       </div>
-                      <div className="col-sm-8 col-md-6 col-lg-5 col-4">
+                      <div className="col-sm-6 col-4">
                         <FormInput.Check
                           label="Auto"
                           name="auto_mode"
@@ -88,7 +174,7 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                       </div>
                     </div>
                   </div>
-                  <div className="col-sm-8 col-md-6 col-lg-4 mb-2">
+                  <div className="col-sm-6 col-lg-8 col-12">
                     <FormInput.Switch
                       label="Enable Power Off"
                       name="enable_poweroff"
@@ -123,8 +209,8 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                 initialValues?.driver_type &&
                 initialValues?.device_type.indexOf("Inverter") !== -1 &&
                 initialValues?.driver_type.search(/RS485/g) === -1
-                  ? "col-sm-8 col-md-6 col-lg-4"
-                  : "col-12"
+                  ? "col-sm-12 col-md-6 col-lg-4"
+                  : null
               }
             >
               <FormInput.Text
@@ -132,6 +218,9 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                 name="rtu_bus_address"
                 type="number"
                 required={true}
+                className={
+                  initialValues?.driver_type.search(/RS485/g) !== -1 && "col-4"
+                }
               />
               {initialValues?.driver_type &&
                 initialValues?.driver_type.search(/TCP/g) !== -1 && (
@@ -141,11 +230,19 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                       name="tcp_gateway_port"
                       type="number"
                       required={true}
+                      className={
+                        initialValues?.driver_type.search(/RS485/g) !== -1 &&
+                        "col-4"
+                      }
                     />
                     <FormInput.Text
                       label="MB/TCP Gateway IP-Address"
                       name="tcp_gateway_ip"
                       required={true}
+                      className={
+                        initialValues?.driver_type.search(/RS485/g) !== -1 &&
+                        "col-4"
+                      }
                     />
                   </>
                 )}
@@ -157,7 +254,7 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                     className={
                       initialValues?.driver_type &&
                       initialValues?.driver_type.search(/RS485/g) === -1
-                        ? "col-sm-8 col-md-6 col-lg-4"
+                        ? "col-sm-12 col-md-6 col-lg-4"
                         : "col-6"
                     }
                   >
@@ -184,7 +281,7 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                     className={
                       initialValues?.driver_type &&
                       initialValues?.driver_type.search(/RS485/g) === -1
-                        ? "col-sm-8 col-md-6 col-lg-4"
+                        ? "col-sm-12 col-md-6 col-lg-4"
                         : "col-6"
                     }
                   >
@@ -210,6 +307,23 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                 </>
               )}
           </div>
+          {!_.isEmpty(addingComponents) && (
+            <div className="note mt-3">
+              <div>Components:</div>
+              <Table
+                variant="light"
+                maxHeight="30vh"
+                columns={columns}
+                data={addingComponents.map((item) => ({
+                  id: item.device.value.id,
+                  name: item.device.label,
+                  template: item.template.label,
+                  device_group: item.device_group.label,
+                  device_type: item.device_type.label,
+                }))}
+              />
+            </div>
+          )}
         </FormInput>
       </div>
     </Modal>

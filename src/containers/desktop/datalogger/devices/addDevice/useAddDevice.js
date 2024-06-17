@@ -112,6 +112,7 @@ export default function useAddDevice(closeAddDevice) {
       id: 1,
       slug: "id",
       name: "No.",
+      width: 5,
     },
     {
       id: 2,
