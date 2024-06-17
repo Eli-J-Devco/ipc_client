@@ -9,6 +9,14 @@ import _ from "lodash";
 import useAddComponentsModal from "./useAddComponentsModal";
 import { Tooltip } from "react-tooltip";
 import ModalDefault from "react-bootstrap/Modal";
+import { statusEnum } from "../useDevices";
+
+const allowStatus = [
+  statusEnum.offline,
+  statusEnum.offline,
+  statusEnum.symbolic,
+  statusEnum["Initiating..."],
+];
 
 export function AddComponentsModal({ close, components, setComponents }) {
   const { deviceTypes, templates, existedComponents } = components;
@@ -178,6 +186,8 @@ export function AddComponentsModal({ close, components, setComponents }) {
                           if (item.parent !== null) return false;
 
                           if (item.selected) return false;
+
+                          if (!allowStatus.includes(item.status)) return false;
 
                           if (
                             item.id_template ===

@@ -391,7 +391,9 @@ export default function useAddDevice(closeAddDevice) {
                         ? item.device.value.id
                         : null,
                     name: item.device.label,
-                    id_device_type: item.device_type.value,
+                    id_device_type: item.device_type?.value,
+                    id_template: item.template?.value?.id_template,
+                    id_device_group: item.device_group?.value,
                   };
                 }
                 return null;
@@ -401,12 +403,7 @@ export default function useAddDevice(closeAddDevice) {
       setData(newData);
 
       setInitialValues({ ...initialValues, ...newData });
-      if (
-        initialValues?.device_type?.label.indexOf(
-          Constants.COMMON.SPECIAL_DEVICE_TYPE
-        ) === -1 &&
-        !data?.id_template
-      ) {
+      if (initialValues?.device_type?.type === 0 && !data?.id_template) {
         LibToast.toast("Please select a template", "error");
         return;
       }
@@ -427,9 +424,7 @@ export default function useAddDevice(closeAddDevice) {
         try {
           const response = await axiosPrivate.post(
             Constants.API_URL.DEVICES.ADD + `?page=${offset}&limit=${limit}`,
-            initialValues?.device_type?.label.indexOf(
-              Constants.COMMON.SPECIAL_DEVICE_TYPE
-            ) === -1
+            initialValues?.device_type?.type === 0
               ? data
               : { ...data, id_template: null },
             {

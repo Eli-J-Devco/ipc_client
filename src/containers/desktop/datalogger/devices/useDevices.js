@@ -20,6 +20,16 @@ import LibToast from "../../../../utils/LibToast";
 import { ReactComponent as ExpandIcon } from "../../../../assets/images/chevron-down.svg";
 import { ReactComponent as CollapseIcon } from "../../../../assets/images/chevron-up.svg";
 
+export const statusEnum = {
+  online: 1,
+  offline: 0,
+  "Initiating...": 2,
+  "Deleting...": -1,
+  deleted: -2,
+  failed: -4,
+  symbolic: 3,
+};
+
 export default function useDevices() {
   const { data } = useMQTT();
   const axiosPrivate = useAxiosPrivate();
@@ -58,15 +68,6 @@ export default function useDevices() {
     failed: "bg-danger",
     symbolic: "bg-warning",
   };
-  const statusEnum = {
-    online: 1,
-    offline: 0,
-    "Initiating...": 2,
-    "Deleting...": -1,
-    deleted: -2,
-    failed: -4,
-    symbolic: 3,
-  };
 
   const columns = [
     columnsHelper.accessor("toggle", {
@@ -92,6 +93,11 @@ export default function useDevices() {
                     }
                   }, 100);
               }}
+              disabled={[
+                statusEnum["Deleting..."],
+                statusEnum.deleted,
+                statusEnum["Initiating..."],
+              ].includes(row.original.state)}
             >
               <Button.Image
                 image={row.getIsExpanded() ? <CollapseIcon /> : <ExpandIcon />}
