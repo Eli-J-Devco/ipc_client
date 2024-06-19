@@ -3,16 +3,7 @@ import Table from "../../../../../components/table/Table";
 import styles from "./TemplatesManagement.module.scss";
 import CreateTemplateModal from "./createTemplateModal/CreateTemplateModal";
 import useTemplatesManagement from "./useTemplatesManagement";
-import { ReactComponent as EditIcon } from "../../../../../assets/images/edit.svg";
-import { ReactComponent as DeleteIcon } from "../../../../../assets/images/delete.svg";
 import FormInput from "../../../../../components/formInput/FormInput";
-import { useEffect, useState } from "react";
-import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
-import Constants from "../../../../../utils/Constants";
-import { loginService } from "../../../../../services/loginService";
-import LibToast from "../../../../../utils/LibToast";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import Modal from "../../../../../components/modal/Modal";
 
 function TemplatesManagement() {
@@ -22,71 +13,13 @@ function TemplatesManagement() {
     closeModal,
     template,
     columns,
-    templateList,
-    setTemplateList,
-    handleOnItemEdit,
+    templateGroups,
     fileUpload,
     handleFileUploadChange,
+    deleteTemplate,
+    isConfirmDelete,
+    setIsConfirmDelete,
   } = useTemplatesManagement();
-  const axiosPrivate = useAxiosPrivate();
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [isConfirmDelete, setIsConfirmDelete] = useState({
-    state: false,
-    item: {},
-  });
-
-  useEffect(() => {
-    if (templateList.length > 0) return;
-
-    var output = document.getElementById("progress");
-    output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
-    setTimeout(async () => {
-      try {
-        const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.LIST,
-          {
-            type: 1,
-          }
-        );
-        if (response?.status === 200) {
-          setTemplateList(response?.data);
-        }
-      } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to fetch templates") &&
-          navigate("/", { replace: true });
-      } finally {
-        output.innerHTML = "";
-      }
-    }, 300);
-  }, [templateList]);
-
-  const deleteTemplate = (item) => {
-    var output = document.getElementById("progress");
-    output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
-    setTimeout(async () => {
-      let id = item.id;
-      try {
-        const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.DELETE,
-          { id: id }
-        );
-        if (response?.status === 200) {
-          setTemplateList(templateList.filter((item) => item.id !== id));
-          LibToast.toast(
-            `Tempate ${item?.name} ${t("toastMessage.info.delete")}`,
-            "info"
-          );
-        }
-      } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to delete template") &&
-          navigate("/", { replace: true });
-      } finally {
-        output.innerHTML = "";
-        setIsConfirmDelete({ state: false, item: "" });
-      }
-    }, 300);
-  };
 
   return (
     <>
@@ -118,31 +51,15 @@ function TemplatesManagement() {
       )}
       <div className={styles["template-management"]}>
         <div className="row">
-          <div className="col-12 col-lg-7">
+          <div className="col-12 col-xl-6 col-lg-7 col-md-8">
             <div className={styles.section}>
               <div className={styles.title}>Edit Or Manage Your Templates</div>
 
               <div className={styles.body}>
                 <Table
                   maxHeight="50vh"
-                  columns={columns}
-                  data={templateList}
-                  action={(item) => (
-                    <div className="d-flex flex-wrap justify-content-center">
-                      <Button.Image
-                        image={<EditIcon />}
-                        onClick={() => handleOnItemEdit(item)}
-                        className="mx-2"
-                      />
-                      <Button.Image
-                        image={<DeleteIcon />}
-                        onClick={() =>
-                          setIsConfirmDelete({ state: true, item: item })
-                        }
-                        className="mx-2"
-                      />
-                    </div>
-                  )}
+                  columns={{ columnDefs: columns }}
+                  data={templateGroups}
                 />
               </div>
             </div>
