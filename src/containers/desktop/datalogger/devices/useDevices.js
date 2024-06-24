@@ -28,10 +28,11 @@ export const statusEnum = {
   deleted: -2,
   failed: -4,
   symbolic: 3,
+  reconnecting: -5,
 };
 
 export default function useDevices() {
-  const { data } = useMQTT();
+  const { data, state } = useMQTT();
   const axiosPrivate = useAxiosPrivate();
   const { name } = useParams();
   const {
@@ -67,6 +68,7 @@ export default function useDevices() {
     deleted: "bg-danger",
     failed: "bg-danger",
     symbolic: "bg-warning",
+    reconnecting: "bg-warning",
   };
 
   const columns = [
@@ -258,6 +260,11 @@ export default function useDevices() {
     if (_.isEmpty(allDevices)) return [];
 
     const setDeviceState = (index, d) => {
+      if (state.isReconnecting) {
+        d["state"] = statusEnum.reconnecting;
+        return d;
+      }
+
       if (index !== -1) {
         if (d["state"] !== statusEnum["Deleting..."]) {
           if (d?.device_type?.type === 1) {

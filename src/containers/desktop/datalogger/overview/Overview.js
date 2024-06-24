@@ -142,7 +142,7 @@ function Overview() {
     series: [
       {
         name: "Speed",
-        data: [50],
+        data: [],
         dataLabels: {
           format:
             '<div style="text-align:center">' +
@@ -169,6 +169,7 @@ function Overview() {
     },
   };
 
+  const [isSetup, setIsSetup] = useState(true);
   const [curInformationCPU, setCurInformationCPU] = useState({});
   const [totalCPU, setTotalCPU] = useState(0);
   const [CPU, setCPU] = useState(solidgaugeOptions);
@@ -198,6 +199,9 @@ function Overview() {
         LibToast.toast("Reboot server successfully", "info");
         setIsOpenRebootCFModal(false);
       }
+
+      var output = document.getElementById("progress");
+      if (isSetup) output.innerHTML = "<div><img src='/loading.gif' /></div>";
 
       let CPUPercentage = !_.isEmpty(cpuData.CPUInfo.TotalCPUUsage)
         ? cpuData.CPUInfo.TotalCPUUsage.replace("%", "")
@@ -345,7 +349,12 @@ function Overview() {
         if (!_.isEqual(totalCPU, totalCpu)) setTotalCPU(totalCpu);
         if (!_.isEqual(timeOfRunning, runningTime))
           setTimeOfRunning(runningTime);
-      }, 100);
+
+        if (isSetup) {
+          setIsSetup(false);
+          output.innerHTML = "";
+        }
+      }, 2000);
     }
   }, [cpuData]);
 

@@ -4,7 +4,7 @@
  *
  *********************************************************/
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import mqtt from "mqtt";
 
@@ -28,16 +28,8 @@ const ProjectSetupInformation = () => {
     setRoles,
   } = useProjectSetup();
   const { auth, setAuth } = useAuth();
-  const {
-    client,
-    setClient,
-    isSubscribed,
-    isConnected,
-    setIsConnected,
-    setData,
-    setCPUData,
-    mqttSub,
-  } = useMQTT();
+  const { client, setClient, state, setState, setData, setCPUData, mqttSub } =
+    useMQTT();
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const location = useLocation();
@@ -192,9 +184,13 @@ const ProjectSetupInformation = () => {
   }, [client]);
 
   useEffect(() => {
-    if (client && !isConnected) {
+    if (client && !state.isConnected) {
       client.on("connect", () => {
-        setIsConnected(true);
+        setState({ ...state, isConnected: true });
+      });
+
+      client.on("reconnect", () => {
+        setState({ ...state, isReconnecting: true });
       });
 
       client.on("error", (err) => {
@@ -204,17 +200,21 @@ const ProjectSetupInformation = () => {
   }, [client]);
 
   useEffect(() => {
-    if (isConnected && projectSetup?.serial_number) {
+    if (state.isConnected && projectSetup?.serial_number) {
       mqttSub({ topic: `${projectSetup?.serial_number}/Devices/All`, qos: 0 });
       mqttSub({
         topic: `${projectSetup?.serial_number}/CPU/Information`,
         qos: 0,
       });
     }
-  }, [isConnected, projectSetup?.serial_number]);
+  }, [state.isConnected, projectSetup?.serial_number]);
 
   useEffect(() => {
-    if (isConnected && isSubscribed && projectSetup?.serial_number) {
+    if (
+      state.isConnected &&
+      state.isSubscribed &&
+      projectSetup?.serial_number
+    ) {
       client.on("message", (topic, message) => {
         const payload = { topic, message: message.toString() };
 
@@ -229,7 +229,7 @@ const ProjectSetupInformation = () => {
         }
       });
     }
-  }, [isConnected, isSubscribed, projectSetup?.serial_number]);
+  }, [state, projectSetup?.serial_number]);
 
   /**
    * Redirect to first page on login if user has just logged in and first page on login in project setup is available

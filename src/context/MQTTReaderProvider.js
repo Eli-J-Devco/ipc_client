@@ -17,8 +17,11 @@ const MQTTReader = createContext({});
  */
 export const MQTTProvider = ({ children }) => {
   const [client, setClient] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [state, setState] = useState({
+    isConnected: false,
+    isSubscribed: false,
+    isReconnecting: false,
+  });
   const [deviceData, setDeviceData] = useState([]);
   const [cpuData, setCPUData] = useState([]);
 
@@ -37,7 +40,7 @@ export const MQTTProvider = ({ children }) => {
         if (error) {
           return;
         }
-        setIsSubscribed(true);
+        setState({ ...state, isSubscribed: true });
       });
     }
   };
@@ -47,10 +50,8 @@ export const MQTTProvider = ({ children }) => {
       value={{
         client,
         setClient,
-        isConnected,
-        setIsConnected,
-        isSubscribed,
-        setIsSubscribed,
+        state,
+        setState,
         data: deviceData,
         setData: setDeviceData,
         cpuData,
