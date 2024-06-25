@@ -280,13 +280,10 @@ export default function useDevices() {
         return d;
       }
 
-      if (d["creation_state"] === -1) {
-        d["state"] = statusEnum["Initiating..."];
-        d["status"] = "Initiating...";
-        return d;
-      }
-
       if (index !== -1) {
+        if (d["creation_state"] === -1) {
+          d["creation_state"] = 0;
+        }
         if (d["state"] !== statusEnum["Deleting..."]) {
           if (d?.device_type?.type === 1) {
             d["state"] = statusEnum.symbolic;
@@ -297,6 +294,11 @@ export default function useDevices() {
           }
         }
       } else {
+        if (d["creation_state"] === -1) {
+          d["state"] = statusEnum["Initiating..."];
+          d["status"] = "Initiating...";
+          return d;
+        }
         if (d["state"] === statusEnum["Deleting..."]) {
           d["state"] = statusEnum.deleted;
           d["status"] = statusEnum[d["state"]];
@@ -305,8 +307,6 @@ export default function useDevices() {
           d["status"] = "disconnected";
         }
       }
-      console.log("dataDevices -> index", d["name"], d["state"], d["status"]);
-
       return d;
     };
 
@@ -517,6 +517,7 @@ export default function useDevices() {
       } finally {
         output.innerHTML = "";
         setIsRetry({ ...isRetry, isOpen: false });
+        setRowSelection({});
       }
     }, 500);
   };
