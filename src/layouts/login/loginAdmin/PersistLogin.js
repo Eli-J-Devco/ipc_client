@@ -9,8 +9,6 @@ import { useState, useEffect } from "react";
 
 import useRefreshToken from "../../../hooks/useRefreshToken";
 
-import LibToast from "../../../utils/LibToast";
-import { LoginErrors } from "../../../utils/Errors";
 import { loginService } from "../../../services/loginService";
 
 /**
@@ -30,14 +28,7 @@ const PersistLogin = () => {
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
         await refresh();
       } catch (err) {
-        if (!loginService.handleMissingInfo(err)) {
-          LibToast.toast(LoginErrors(err), "error");
-          // setAuth({
-          //   accessToken: null,
-          //   isAuthenticated: false,
-          // });
-          // clearToken();
-        }
+        loginService.handleMissingInfo(err);
       } finally {
         setIsLoading(false);
         output.innerHTML = "";

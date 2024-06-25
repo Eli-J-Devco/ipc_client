@@ -51,6 +51,12 @@ export default function useDevices() {
   } = useDeviceManagement();
   const navigate = useNavigate();
   const [isAddDevice, setIsAddDevice] = useState(false);
+  const [isRetry, setIsRetry] = useState({
+    isConfirm: false,
+    isOpen: false,
+    canRetry: false,
+    deivce: [],
+  });
   const [isUpdateDevice, setIsUpdateDevice] = useState(false);
   const [isDeleteDevice, setIsDeleteDevice] = useState(false);
   const [newDevices, setNewDevices] = useState({
@@ -68,7 +74,7 @@ export default function useDevices() {
     deleted: "bg-danger",
     failed: "bg-danger",
     symbolic: "bg-warning",
-    reconnecting: "bg-warning",
+    "Reconnecting...": "bg-warning",
   };
 
   const columns = [
@@ -259,32 +265,10 @@ export default function useDevices() {
   const dataDevices = useMemo(() => {
     if (_.isEmpty(allDevices)) return [];
 
-    const setDeviceState = (index, d) => {
-      if (state.isReconnecting) {
-        d["state"] = statusEnum.reconnecting;
-        return d;
-      }
-
-      if (index !== -1) {
-        if (d["state"] !== statusEnum["Deleting..."]) {
-          if (d?.device_type?.type === 1) {
-            d["state"] = statusEnum.symbolic;
-          } else {
-            d["state"] = statusEnum[data[index]["status_device"]];
-          }
-        }
-      } else {
-        if (d["state"] === statusEnum["Deleting..."])
-          d["state"] = statusEnum.deleted;
-        else if (d["state"] !== statusEnum["Initiating..."]) {
-          d["state"] = statusEnum.failed;
-        }
-      }
-
+    const setStatus = (index, d) => {
       switch (d["state"]) {
         case statusEnum.deleted:
           d["status"] = "Deleted";
-          d["state"] = statusEnum.deleted;
           break;
         case statusEnum["Deleting..."]:
           d["status"] = "Deleting...";
@@ -306,10 +290,42 @@ export default function useDevices() {
         case statusEnum.symbolic:
           d["status"] = "symbolic";
           break;
+        case statusEnum.reconnecting:
+          d["status"] = "Reconnecting...";
+          break;
         default:
           break;
       }
       return d;
+    };
+
+    const setDeviceState = (index, d) => {
+      if (state.isReconnecting) {
+        d["state"] = statusEnum.reconnecting;
+        return setStatus(index, { ...d });
+      }
+
+      if (d["creation_state"] === 1) {
+        d["state"] = statusEnum.failed;
+        return setStatus(index, { ...d });
+      }
+
+      if (index !== -1) {
+        if (d["state"] !== statusEnum["Deleting..."]) {
+          if (d?.device_type?.type === 1) {
+            d["state"] = statusEnum.symbolic;
+          } else {
+            d["state"] = statusEnum[data[index]["status_device"]];
+          }
+        }
+      } else {
+        if (d["state"] === statusEnum["Deleting..."])
+          d["state"] = statusEnum.deleted;
+        else if (d["state"] !== statusEnum["Initiating..."]) {
+          d["state"] = statusEnum.failed;
+        }
+      }
+      return setStatus(index, { ...d });
     };
 
     const getDeepestDepth = (devs) => {
@@ -322,11 +338,12 @@ export default function useDevices() {
         return setDeviceState(index, { ...d });
       });
     };
+
     let newData = _.cloneDeep(getDeepestDepth(allDevices));
     newData = newData.filter((d) => d["state"] !== statusEnum.deleted);
 
     return newData;
-  }, [allDevices, data]);
+  }, [allDevices, data, state]);
 
   const deleteDevices = () => {
     let ids = [];
@@ -451,14 +468,86 @@ export default function useDevices() {
     setRowSelection({});
   }, [offset, limit]);
 
+  useEffect(() => {
+    if (Object.keys(rowSelection).length === 0) {
+      setIsRetry({ ...isRetry, canRetry: false });
+      return;
+    }
+
+    const canItemsRetry = (devs, keys) => {
+      let canRetry = false;
+      let canDelete = false;
+
+      let index = parseInt(keys[0]);
+      let d = devs[index];
+      if (keys.length === 1) {
+        if (d["creation_state"] === 1) {
+          canRetry = true;
+        } else {
+          canDelete = true;
+        }
+        return canRetry && canDelete ? -1 : canRetry ? 1 : 0;
+      }
+
+      if (canItemsRetry(d.subRows, keys.slice(1)) !== 1) return -1;
+    };
+
+    let canRetry = 1;
+    Object.keys(rowSelection).forEach((key) => {
+      if (canRetry !== 1) return;
+      let splitedKey = key.split(".");
+      canRetry = canItemsRetry(dataDevices, splitedKey);
+    });
+
+    setIsRetry({ ...isRetry, canRetry: canRetry === 1 });
+  }, [rowSelection]);
+
+  const retryCreateDevice = () => {
+    const data = {
+      is_retry: true,
+      devices: Object.keys(rowSelection).map((key) => {
+        let splitedKey = key.split(".");
+        return findId(dataDevices, splitedKey);
+      }),
+    };
+
+    setTimeout(async () => {
+      try {
+        const response = await axiosPrivate.post(
+          Constants.API_URL.DEVICES.ADD + `?page=${offset}&limit=${limit}`,
+          data
+        );
+        setAllDevices(
+          response.data?.data.map((d) => {
+            d["state"] = 2;
+            return d;
+          })
+        );
+        setTotal(response.data?.total);
+        LibToast.toast(
+          "Devices are being recreated. It would take a few minutes.",
+          "info"
+        );
+      } catch (error) {
+        loginService.handleMissingInfo(error, "Failed to create devices") &&
+          navigate("/", { replace: true });
+      } finally {
+        output.innerHTML = "";
+        setIsRetry({ ...isRetry, isOpen: false });
+      }
+    }, 500);
+  };
+
   return {
     isAddDevice,
+    isRetry,
     isUpdateDevice,
     isDeleteDevice,
     dataDevices,
     deviceConfig,
     columns,
     rowSelection,
+    setIsRetry,
     setRowSelection,
     openAddDevice,
     closeAddDevice,
@@ -467,5 +556,6 @@ export default function useDevices() {
     handleConfigDevice,
     deleteDevices,
     setIsDeleteDevice,
+    retryCreateDevice,
   };
 }

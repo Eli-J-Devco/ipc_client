@@ -24,12 +24,15 @@ export default function Devices() {
     dataDevices,
     columns,
     rowSelection,
+    isRetry,
+    setIsRetry,
     setRowSelection,
     openAddDevice,
     closeAddDevice,
     deleteDevices,
     setIsDeleteDevice,
     closeUpdateDevice,
+    retryCreateDevice,
   } = useDevices();
 
   const { total, offset, setOffset, setLimit } = useDeviceManagement();
@@ -73,6 +76,35 @@ export default function Devices() {
           Are you sure you want to delete the selected devices?
         </Modal>
       )}
+      {isRetry.isOpen && (
+        <Modal
+          title="Create Again"
+          isOpen={isRetry.isOpen}
+          close={() => setIsRetry({ isOpen: false, device: null })}
+          footer={
+            <>
+              <Button
+                variant="white"
+                onClick={() => {
+                  setIsRetry({ isOpen: false, device: null });
+                }}
+              >
+                <Button.Text text="Cancel" />
+              </Button>
+              <Button
+                variant="dark"
+                onClick={() => {
+                  retryCreateDevice();
+                }}
+              >
+                <Button.Text text="Retry" />
+              </Button>
+            </>
+          }
+        >
+          Are you sure you want to retry creating the device?
+        </Modal>
+      )}
       {name ? (
         <ConfigDevice />
       ) : (
@@ -90,6 +122,15 @@ export default function Devices() {
                 }}
               >
                 <Button.Text text="Delete Device" />
+              </Button>
+            )}
+            {isRetry.canRetry && (
+              <Button
+                className="ms-3"
+                variant="dark"
+                onClick={() => setIsRetry({ ...isRetry, isOpen: true })}
+              >
+                <Button.Text text="Retry" />
               </Button>
             )}
           </div>

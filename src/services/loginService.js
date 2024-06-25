@@ -31,7 +31,10 @@ export const loginService = {
       },
     });
     if (!response.data.project_id)
-      throw new AxiosError("Project has not been initialized. Please contact the administrator.", HttpStatusCode.NotFound);
+      throw new AxiosError(
+        "Project has not been initialized. Please contact the administrator.",
+        HttpStatusCode.NotFound
+      );
 
     if (response.data.access_token) {
       const access_token = response.data.access_token;
@@ -66,7 +69,6 @@ export const loginService = {
         "Content-Type": "application/json",
       },
     });
-
   },
 
   /**
@@ -102,6 +104,11 @@ export const loginService = {
 
     if (error?.response?.data?.message) {
       LibToast.toast(error?.response?.data?.message, "error");
+      return false;
+    }
+
+    if (error?.message) {
+      LibToast.toast(error?.message, "error");
       return false;
     }
 
