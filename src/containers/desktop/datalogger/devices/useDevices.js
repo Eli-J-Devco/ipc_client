@@ -29,6 +29,7 @@ export const statusEnum = {
   failed: -4,
   symbolic: 3,
   reconnecting: -5,
+  disconnected: -6,
 };
 
 export default function useDevices() {
@@ -75,6 +76,7 @@ export default function useDevices() {
     failed: "bg-danger",
     symbolic: "bg-warning",
     "Reconnecting...": "bg-warning",
+    disconnected: "bg-secondary",
   };
 
   const columns = [
@@ -265,67 +267,47 @@ export default function useDevices() {
   const dataDevices = useMemo(() => {
     if (_.isEmpty(allDevices)) return [];
 
-    const setStatus = (index, d) => {
-      switch (d["state"]) {
-        case statusEnum.deleted:
-          d["status"] = "Deleted";
-          break;
-        case statusEnum["Deleting..."]:
-          d["status"] = "Deleting...";
-          break;
-        case statusEnum.failed:
-          d["status"] = "failed";
-          break;
-        case statusEnum.online:
-          d["status"] = data[index]["status_device"];
-          d["message"] = data[index]["message"];
-          break;
-        case statusEnum.offline:
-          d["status"] = data[index]["status_device"];
-          d["message"] = data[index]["message"];
-          break;
-        case statusEnum["Initiating..."]:
-          d["status"] = "Initiating...";
-          break;
-        case statusEnum.symbolic:
-          d["status"] = "symbolic";
-          break;
-        case statusEnum.reconnecting:
-          d["status"] = "Reconnecting...";
-          break;
-        default:
-          break;
-      }
-      return d;
-    };
-
     const setDeviceState = (index, d) => {
       if (state.isReconnecting) {
         d["state"] = statusEnum.reconnecting;
-        return setStatus(index, { ...d });
+        d["status"] = "Reconnecting...";
+        return d;
       }
 
       if (d["creation_state"] === 1) {
         d["state"] = statusEnum.failed;
-        return setStatus(index, { ...d });
+        d["status"] = "failed";
+        return d;
+      }
+
+      if (d["creation_state"] === -1) {
+        d["state"] = statusEnum["Initiating..."];
+        d["status"] = "Initiating...";
+        return d;
       }
 
       if (index !== -1) {
         if (d["state"] !== statusEnum["Deleting..."]) {
           if (d?.device_type?.type === 1) {
             d["state"] = statusEnum.symbolic;
+            d["status"] = statusEnum[d["state"]];
           } else {
             d["state"] = statusEnum[data[index]["status_device"]];
+            d["status"] = data[index]["status_device"];
           }
         }
       } else {
-        if (d["state"] === statusEnum["Deleting..."])
+        if (d["state"] === statusEnum["Deleting..."]) {
           d["state"] = statusEnum.deleted;
-        else if (d["state"] !== statusEnum["Initiating..."]) {
-          d["state"] = statusEnum.failed;
+          d["status"] = statusEnum[d["state"]];
+        } else if (d["state"] !== statusEnum["Initiating..."]) {
+          d["state"] = statusEnum.disconnected;
+          d["status"] = "disconnected";
         }
       }
-      return setStatus(index, { ...d });
+      console.log("dataDevices -> index", d["name"], d["state"], d["status"]);
+
+      return d;
     };
 
     const getDeepestDepth = (devs) => {
@@ -421,8 +403,8 @@ export default function useDevices() {
       );
       let devices = data.map((item) => ({
         ...item,
-        status: "",
-        state: 0,
+        status: "Reconnecting...",
+        state: statusEnum.reconnecting,
       }));
 
       setNewDevices({ parent: id, devices: devices });
@@ -519,7 +501,8 @@ export default function useDevices() {
         );
         setAllDevices(
           response.data?.data.map((d) => {
-            d["state"] = 2;
+            d["state"] = statusEnum.reconnecting;
+            d["status"] = "Reconnecting...";
             return d;
           })
         );

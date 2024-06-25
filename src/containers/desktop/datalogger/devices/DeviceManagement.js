@@ -7,6 +7,7 @@ import Constants from "../../../../utils/Constants";
 import _ from "lodash";
 import useMQTT from "../../../../hooks/useMQTT";
 import useProjectSetup from "../../../../hooks/useProjectSetup";
+import { statusEnum } from "./useDevices";
 
 const DeviceManagementContext = createContext();
 
@@ -105,8 +106,8 @@ export function Device() {
       );
       let devices = data?.data.map((item) => ({
         ...item,
-        status: "",
-        state: 0,
+        state: statusEnum.reconnecting,
+        status: "Reconnecting...",
       }));
 
       return { devices, total: data?.total };
@@ -119,6 +120,8 @@ export function Device() {
   };
 
   useEffect(() => {
+    if (allDevices.length === 0) return;
+
     setTimeout(setAllDevices([]), 300);
   }, [offset, limit]);
 
