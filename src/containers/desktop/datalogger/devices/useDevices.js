@@ -351,7 +351,7 @@ export default function useDevices() {
         setAllDevices(
           response.data?.data.map((d) => {
             if (ids.includes(d.id)) {
-              // d["status"] = "Deleting...";
+              d["status"] = "Deleting...";
               d["state"] = statusEnum["Deleting..."];
             }
             return d;
