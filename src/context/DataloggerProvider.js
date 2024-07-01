@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  *********************************************************/
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState } from "react";
 
 export const DataloggerContext = createContext();
 
@@ -14,33 +14,34 @@ export const DataloggerContext = createContext();
  * @returns {object} DataloggerContext.Provider
  */
 export const DataloggerProvider = ({ children }) => {
-    const [projectSetup, setProjectSetup] = useState([]);
-    const [ethernetConfig, setEthernetConfig] = useState([]);
-    const [rs485Config, setRS485Config] = useState([]);
-    const [loggingIntervalConfig, setLoggingIntervalConfig] = useState([]);
-    const [uploadChanelConfig, setUploadChanelConfig] = useState([]);
-    const [screenList, setScreenList] = useState([]);
-    const [roles, setRoles] = useState([]);
+  const [projectSetup, setProjectSetup] = useState([]);
+  const [ethernetConfig, setEthernetConfig] = useState([]);
+  const [rs485Config, setRS485Config] = useState([]);
+  const [loggingIntervalConfig, setLoggingIntervalConfig] = useState([]);
+  const [uploadChanelConfig, setUploadChanelConfig] = useState([]);
+  const [screenList, setScreenList] = useState([]);
+  const [roles, setRoles] = useState([]);
 
-    return (
-        <DataloggerContext.Provider
-            value={{
-                projectSetup,
-                setProjectSetup,
-                ethernetConfig,
-                setEthernetConfig,
-                rs485Config,
-                setRS485Config,
-                loggingIntervalConfig,
-                setLoggingIntervalConfig,
-                uploadChanelConfig,
-                setUploadChanelConfig,
-                screenList,
-                setScreenList,
-                roles,
-                setRoles
-            }}>
-            {children}
-        </DataloggerContext.Provider>
-    );
+  return (
+    <DataloggerContext.Provider
+      value={{
+        projectSetup,
+        setProjectSetup,
+        ethernetConfig,
+        setEthernetConfig,
+        rs485Config,
+        setRS485Config,
+        loggingIntervalConfig,
+        setLoggingIntervalConfig,
+        uploadChanelConfig,
+        setUploadChanelConfig,
+        screenList,
+        setScreenList,
+        roles,
+        setRoles,
+      }}
+    >
+      {children}
+    </DataloggerContext.Provider>
+  );
 };

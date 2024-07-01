@@ -256,7 +256,7 @@ const LoginAdmin = () => {
 
             <div className={styles.email_password}>
               <div className="form-group text-center">
-                <a href="/forgot-password">Forgot email or password?</a>
+                <a href="/forgot-password">Forgot password?</a>
               </div>
             </div>
           </div>

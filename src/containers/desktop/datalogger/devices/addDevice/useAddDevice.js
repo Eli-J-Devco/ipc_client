@@ -45,7 +45,8 @@ export default function useAddDevice(closeAddDevice) {
     tcp_gateway_ip: "",
     tcp_gateway_port: 502,
     rated_power: 0,
-    inverter_type: 1,
+    inverter_type: null,
+    meter_type: null,
     secret: clientSecret,
   });
   const [data, setData] = useState(initialValues);
@@ -185,6 +186,26 @@ export default function useAddDevice(closeAddDevice) {
               : defaultSchema),
           })
         );
+
+        if (initialValues?.device_type?.label.indexOf("Meter") !== -1) {
+          setInitialValues({
+            ...initialValues,
+            meter_type: meterType?.value,
+            meterType: meterType,
+            inverter_type: null,
+            inverterType: null,
+          });
+        }
+
+        if (initialValues?.device_type?.label.indexOf("Inverter") !== -1) {
+          setInitialValues({
+            ...initialValues,
+            inverter_type: 1,
+            inverterType: deviceConfigDropdown?.inverterType[0] || null,
+            meter_type: null,
+            meterType: null,
+          });
+        }
         let haveComponents = deviceTypeComponents?.find((item) => {
           if (
             item.device_type.id === initialValues?.id_device_type &&
@@ -355,9 +376,17 @@ export default function useAddDevice(closeAddDevice) {
           id_template: template?.value?.id_template,
           template: template,
           inverterType:
-            deviceConfigDropdown?.inverterType[
-              initialValues?.inverter_type - 1
-            ],
+            device_type?.label.indexOf("Inverter") !== -1
+              ? deviceConfigDropdown?.inverterType[
+                  initialValues?.inverter_type - 1
+                ]
+              : null,
+          meterType:
+            device_type?.label.indexOf("Meter") !== -1
+              ? meterTypes.find(
+                  (item) => item.value === initialValues?.meter_type
+                )
+              : null,
         });
       }, 100);
   }, [deviceConfigDropdown]);

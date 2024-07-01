@@ -92,7 +92,7 @@ export function Device() {
   const navigate = useNavigate();
   const output = document.getElementById("progress");
   const [feedbackTopic, setFeedbackTopic] = useState("");
-
+  const [retryTime, setRetryTime] = useState(3);
   const fetchDevices = async ({ id, isPagination }) => {
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     try {
@@ -110,12 +110,20 @@ export function Device() {
         status: "Reconnecting...",
       }));
 
+      setRetryTime(3);
+      output.innerHTML = "";
       return { devices, total: data?.total };
     } catch (error) {
+      if (retryTime > 0) {
+        setRetryTime(retryTime - 1);
+        return;
+      }
       loginService.handleMissingInfo(error, "Failed to get devices") &&
         navigate("/", { replace: true });
     } finally {
-      output.innerHTML = "";
+      if (retryTime === 1) {
+        output.innerHTML = "";
+      }
     }
   };
 
@@ -126,19 +134,19 @@ export function Device() {
   }, [offset, limit]);
 
   useEffect(() => {
-    if (allDevices.length > 0) return;
+    if (allDevices.length > 0 || retryTime === 0) return;
 
     setTimeout(async () => {
       try {
         const devices = await fetchDevices({ id: null, isPagination: true });
-        setAllDevices(_.cloneDeep(devices.devices));
-        setTotal(devices.total);
+        setAllDevices(_.cloneDeep(devices?.devices || []));
+        setTotal(devices?.total || 0);
       } catch (error) {
         loginService.handleMissingInfo(error, "Failed to get devices") &&
           navigate("/", { replace: true });
       }
     }, 300);
-  }, [allDevices]);
+  }, [allDevices, retryTime]);
 
   useEffect(() => {
     let isEmpty = true;
