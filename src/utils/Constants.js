@@ -16,9 +16,9 @@ switch (url) {
     serverData = "";
     break;
   default:
-    serverAPI = "http://115.78.133.129:3001";
+    // serverAPI = "http://115.78.133.129:3001";
     // serverAPI = "http://127.0.0.1:3001";
-    // serverAPI = "http://localhost:3001";
+    serverAPI = "http://localhost:3001";
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -170,7 +170,7 @@ const Constants = {
   REGEX_PATTERN: {
     EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
     PASSWORD:
-      /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹])[a-zA-Z0-9~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]{7,}$/,
+      /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹])[a-zA-Z0-9~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]{8,}$/,
   },
 
   SCREEN_MODE: {

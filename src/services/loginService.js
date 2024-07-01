@@ -97,7 +97,7 @@ export const loginService = {
    */
   handleMissingInfo(error, msg = "") {
     if (error?.response?.status === 401) {
-      LibToast.toast(LoginErrors(error, "Please login again!"), "error");
+      LibToast.toast(LoginErrors(error), "error");
       clearToken();
       return true;
     }

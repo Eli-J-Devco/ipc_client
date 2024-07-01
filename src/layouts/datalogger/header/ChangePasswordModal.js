@@ -20,10 +20,15 @@ export default function ChangePasswordModal({
   const navigate = useNavigate();
 
   const validationSchema = Yup.object().shape({
-    oldPassword: Yup.string().required("Old password is required"),
+    oldPassword: Yup.string()
+      .matches(
+        Constants.REGEX_PATTERN.PASSWORD,
+        "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special case character"
+      )
+      .required("Old password is required"),
     password: Yup.string()
       .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        Constants.REGEX_PATTERN.PASSWORD,
         "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special case character"
       )
       .required("New password is required"),
