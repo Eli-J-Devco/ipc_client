@@ -34,7 +34,6 @@ export default function useAddDevice(closeAddDevice) {
   const [initialValues, setInitialValues] = useState({
     num_of_devices: 1,
     inc_mode: 1,
-    mode: 1,
     name: "",
     id_device_type: 0,
     id_device_group: 0,
@@ -74,7 +73,6 @@ export default function useAddDevice(closeAddDevice) {
   };
 
   const normalDeviceSchema = {
-    mode: yup.number().required("Mode is required"),
     id_device_type: yup.number().required("Device type is required"),
     id_communication: yup.number().required("Communication is required"),
     rtu_bus_address: yup
@@ -228,7 +226,7 @@ export default function useAddDevice(closeAddDevice) {
       setInitialValues({
         ...initialValues,
         num_of_devices: 1,
-        mode: 1,
+        inc_mode: 1,
         is_add: false,
       });
     }, 100);

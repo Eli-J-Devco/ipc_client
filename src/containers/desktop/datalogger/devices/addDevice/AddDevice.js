@@ -386,31 +386,6 @@ export default function AddDevice(props) {
               </div>
               {initialValues?.device_type?.label.indexOf("Inverter") !== -1 ? (
                 <div className="mt-3 note">
-                  <div>Inverter mode:</div>
-                  <div className="row">
-                    <div className="col-2">
-                      <FormInput.Check
-                        label="Manual"
-                        name="manual_mode"
-                        checked={initialValues?.mode === 0}
-                        onChange={(e) =>
-                          setInitialValues({ ...initialValues, mode: 0 })
-                        }
-                        type="radio"
-                      />
-                    </div>
-                    <div className="col-2">
-                      <FormInput.Check
-                        label="Auto"
-                        name="auto_mode"
-                        checked={initialValues?.mode === 1}
-                        onChange={(e) =>
-                          setInitialValues({ ...initialValues, mode: 1 })
-                        }
-                        type="radio"
-                      />
-                    </div>
-                  </div>
                   <div className="row">
                     <div className="col-4">
                       <FormInput.Select
