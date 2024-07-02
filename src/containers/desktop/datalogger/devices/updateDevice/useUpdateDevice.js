@@ -25,7 +25,9 @@ export default function useUpdateDevice() {
     device?.enable_poweroff || false
   );
   const [inverterShutdown, setInverterShutdown] = useState(
-    device?.inverter_shutdown ? new Date(device?.inverter_shutdown) : new Date()
+    device?.inverter_shutdown
+      ? new Date(device?.inverter_shutdown)
+      : new Date().setDate(new Date().getDate() + 1)
   );
   const [updating, setUpdating] = useState(false);
   const [haveComponents, setHaveComponents] = useState(false);
@@ -76,20 +78,36 @@ export default function useUpdateDevice() {
           tcp_gateway_ip: yup
             .string()
             .required("Please fill this field")
-            .matches(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/, "Invalid IP Address"),
+            .matches(Constants.REGEX_PATTERN.IP_ADDRESS, "Invalid IP Address"),
         }
       : {}),
     ...(device?.device_type
       ? device?.device_type?.name.indexOf("Inverter") !== -1 && {
-          rated_power: yup.number().required("Please fill this field"),
-          rated_power_custom: yup.number().required("Please fill this field"),
+          rated_power: yup
+            .number()
+            .required("Please fill this field")
+            .min(0, "Must greater than or equal to 0"),
+          rated_power_custom: yup
+            .number()
+            .required("Please fill this field")
+            .min(0, "Must greater than or equal to 0")
+            .max(
+              yup.ref("rated_power"),
+              "Must less than or equal to rated power"
+            ),
           min_watt_in_percent: yup
             .number()
             .required("Please fill this field")
-            .min(0, "Must between 0% and 100%")
-            .max(100, "Must between 0% and 100%"),
-          DC_voltage: yup.number().required("Please fill this field"),
-          DC_current: yup.number().required("Please fill this field"),
+            .min(0, "Must between 0% and 20%")
+            .max(20, "Must between 0% and 20%"),
+          DC_voltage: yup
+            .number()
+            .required("Please fill this field")
+            .min(0, "Must greater than or equal to 0"),
+          DC_current: yup
+            .number()
+            .required("Please fill this field")
+            .min(0, "Must greater than or equal to 0"),
           efficiency: yup
             .number()
             .required("Please fill this field")
@@ -101,6 +119,7 @@ export default function useUpdateDevice() {
   const initialValues = {
     ...device,
     device_type: device?.device_type?.name,
+    template: device?.template?.name,
   };
   const handleUpdateDevice = (values) => {
     if (updating) return;

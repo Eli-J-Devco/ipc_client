@@ -77,7 +77,7 @@ export default function AddDevice(props) {
           onClick={() => {
             let deviceTypes = haveComponents.component
               .filter((item) => {
-                // if (item.type !== 1) return false;
+                if (item.type !== 1) return false;
 
                 if (item.sub_type !== null) {
                   return (
@@ -259,200 +259,222 @@ export default function AddDevice(props) {
                 />
               </div>
             </div>
-            <div className="col-xl-6 col-md-6 col-sm-6">
-              <div className="w-75">
-                <FormInput.CreatableSelect
-                  label="Device Group"
-                  name="device_group"
-                  value={initialValues?.device_group || ""}
-                  option={deviceConfigDropdown?.deviceGroup.map((item) => {
-                    let option = item.options.filter(
-                      (item) =>
-                        item.id_device_type === initialValues.id_device_type
-                    );
-                    return {
-                      label: item.label,
-                      options: option,
-                    };
-                  })}
-                  onChange={(e) => {
-                    let template =
-                      deviceConfigDropdown?.template
-                        .map((item) =>
-                          item.options.filter(
-                            (item) => item.value.id_device_group === e?.value
-                          )
-                        )
-                        .flat() || {};
-                    if (template.length >= 0) {
-                      template = template[0];
-                    }
-                    setInitialValues({
-                      ...initialValues,
-                      device_group: e,
-                      id_device_group: e?.value,
-                      template: template,
-                      id_template: template?.value?.id_template,
-                    });
-                  }}
-                  onCreateOption={(e) => onGroupCreateOption(e)}
-                />
-              </div>
-            </div>
-            {initialValues?.template ? (
+            {initialValues?.device_type ? (
               <div className="col-xl-6 col-md-6 col-sm-6">
                 <div className="w-75">
-                  <FormInput.Select
-                    label="Template Library"
-                    className="template_library"
-                    name="id_template"
-                    value={initialValues?.template}
-                    option={deviceConfigDropdown?.template.map((item) => {
+                  <FormInput.CreatableSelect
+                    label="Device Group"
+                    name="device_group"
+                    value={initialValues?.device_group || ""}
+                    option={deviceConfigDropdown?.deviceGroup.map((item) => {
                       let option = item.options.filter(
                         (item) =>
-                          item.value.id_device_group ===
-                          initialValues.id_device_group
+                          item.id_device_type === initialValues.id_device_type
                       );
                       return {
                         label: item.label,
                         options: option,
                       };
                     })}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      let template =
+                        deviceConfigDropdown?.template
+                          .map((item) =>
+                            item.options.filter(
+                              (item) => item.value.id_device_group === e?.value
+                            )
+                          )
+                          .flat() || {};
+                      if (template.length >= 0) {
+                        template = template[0];
+                      }
                       setInitialValues({
                         ...initialValues,
-                        template: e,
-                        id_template: e?.value?.id_template,
-                      })
-                    }
+                        device_group: e,
+                        id_device_group: e?.value,
+                        template: template,
+                        id_template: template?.value?.id_template,
+                      });
+                    }}
+                    onCreateOption={(e) => onGroupCreateOption(e)}
                   />
                 </div>
               </div>
             ) : (
-              initialValues?.device_type?.type !== 1 && createTemplateBTN
+              ""
+            )}
+            {initialValues?.device_type ? (
+              initialValues?.template ? (
+                <div className="col-xl-6 col-md-6 col-sm-6">
+                  <div className="w-75">
+                    <FormInput.Select
+                      label="Template Library"
+                      className="template_library"
+                      name="id_template"
+                      value={initialValues?.template}
+                      option={deviceConfigDropdown?.template.map((item) => {
+                        let option = item.options.filter(
+                          (item) =>
+                            item.value.id_device_group ===
+                            initialValues.id_device_group
+                        );
+                        return {
+                          label: item.label,
+                          options: option,
+                        };
+                      })}
+                      onChange={(e) =>
+                        setInitialValues({
+                          ...initialValues,
+                          template: e,
+                          id_template: e?.value?.id_template,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              ) : (
+                initialValues?.device_type?.type !== 1 && createTemplateBTN
+              )
+            ) : (
+              ""
             )}
           </div>
 
-          {initialValues?.device_type?.type !== 1 && (
-            <>
-              <div className="col-xl-6 col-md-12">
-                <div>What kind of your device?</div>
-                <div className="d-flex my-2">
-                  <div className="col-xl-4 col-md-4">
-                    <div>
-                      <FormInput.Check
-                        label="Physical"
-                        name="RS485"
-                        checked={protocol.Physical}
-                        onChange={(e) => {
-                          setProtocol({ ...protocol, Physical: 1, Virtual: 0 });
-                        }}
-                      />
+          {initialValues?.device_type
+            ? initialValues?.device_type?.type !== 1 && (
+                <>
+                  <div className="col-xl-6 col-md-12">
+                    <div>What kind of your device?</div>
+                    <div className="d-flex my-2">
+                      <div className="col-xl-4 col-md-4">
+                        <div>
+                          <FormInput.Check
+                            label="Physical"
+                            name="RS485"
+                            checked={protocol.Physical}
+                            onChange={(e) => {
+                              setProtocol({
+                                ...protocol,
+                                Physical: 1,
+                                Virtual: 0,
+                              });
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="col-xl-4 col-md-4">
+                        <div>
+                          <FormInput.Check
+                            label="Virtual"
+                            name="Virtual"
+                            checked={protocol.Virtual}
+                            onChange={(e) => {
+                              setProtocol({
+                                ...protocol,
+                                Physical: 0,
+                                Virtual: 1,
+                              });
+                            }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="col-xl-4 col-md-4">
-                    <div>
-                      <FormInput.Check
-                        label="Virtual"
-                        name="Virtual"
-                        checked={protocol.Virtual}
-                        onChange={(e) => {
-                          setProtocol({ ...protocol, Physical: 0, Virtual: 1 });
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {protocol.Physical === 1 ? (
-                <AddModBusDevice
-                  communication={deviceConfigDropdown?.communicationProtocol}
-                  initialValues={initialValues}
-                  setInitialValues={setInitialValues}
-                />
-              ) : (
-                ""
-              )}
-
-              <div>
-                Auto-detect requires \"Search for Modbus Devices\" be enable in{" "}
-                <u>RS485 Options</u>.
-              </div>
-              <div>
-                To create a Virtual Meter, use the <u>Device Framework</u> to
-                create a template, then add a meter using that template.
-              </div>
-              {initialValues?.device_type?.label.indexOf("Inverter") !== -1 ? (
-                <div className="mt-3 note">
-                  <div className="row">
-                    <div className="col-4">
-                      <FormInput.Select
-                        label="Inverter Type"
-                        name="inverter_type"
-                        value={initialValues?.inverterType}
-                        option={deviceConfigDropdown?.inverterType}
-                        onChange={(e) =>
-                          setInitialValues({
-                            ...initialValues,
-                            inverter_type: e.value,
-                            inverterType: e,
-                          })
-                        }
-                        required={true}
-                      />
-                    </div>
-                    <div className="col-4">
-                      <FormInput.Text
-                        label="Rated Power"
-                        name="rated_power"
-                        placeholder="Enter rated power"
-                        type="number"
-                        required={true}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                initialValues?.device_type?.label.indexOf("Meter") !== -1 && (
-                  <div className="mt-3 note">
-                    <FormInput.Select
-                      label={"Meter Type"}
-                      className="col-4"
-                      name={"meter_type"}
-                      value={meterType}
-                      option={meterTypes}
-                      onChange={(e) => {
-                        setMeterType(e);
-                        setInitialValues({
-                          ...initialValues,
-                          meter_type: e.value,
-                        });
-                      }}
-                      required={true}
+                  {protocol.Physical === 1 ? (
+                    <AddModBusDevice
+                      communication={
+                        deviceConfigDropdown?.communicationProtocol
+                      }
+                      initialValues={initialValues}
+                      setInitialValues={setInitialValues}
                     />
+                  ) : (
+                    ""
+                  )}
+
+                  <div>
+                    Auto-detect requires \"Search for Modbus Devices\" be enable
+                    in <u>RS485 Options</u>.
                   </div>
-                )
-              )}
-              {!_.isEmpty(addingComponents) && (
-                <div className="note mt-3">
-                  <div>Components:</div>
-                  <Table
-                    variant="light"
-                    columns={columns}
-                    data={addingComponents.map((item) => ({
-                      id: item.device.value.id,
-                      name: item.device.label,
-                      template: item.template.label,
-                      device_group: item.device_group.label,
-                      device_type: item.device_type.label,
-                    }))}
-                  />
-                </div>
-              )}
-            </>
-          )}
+                  <div>
+                    To create a Virtual Meter, use the <u>Device Framework</u>{" "}
+                    to create a template, then add a meter using that template.
+                  </div>
+                  {initialValues?.device_type?.label.indexOf("Inverter") !==
+                  -1 ? (
+                    <div className="mt-3 note">
+                      <div className="row">
+                        <div className="col-4">
+                          <FormInput.Select
+                            label="Inverter Type"
+                            name="inverter_type"
+                            value={initialValues?.inverterType}
+                            option={deviceConfigDropdown?.inverterType}
+                            onChange={(e) =>
+                              setInitialValues({
+                                ...initialValues,
+                                inverter_type: e.value,
+                                inverterType: e,
+                              })
+                            }
+                            required={true}
+                          />
+                        </div>
+                        <div className="col-4">
+                          <FormInput.Text
+                            label="Rated Power"
+                            name="rated_power"
+                            placeholder="Enter rated power"
+                            type="number"
+                            required={true}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    initialValues?.device_type?.label.indexOf("Meter") !==
+                      -1 && (
+                      <div className="mt-3 note">
+                        <FormInput.Select
+                          label={"Meter Type"}
+                          className="col-4"
+                          name={"meter_type"}
+                          value={meterType}
+                          option={meterTypes}
+                          onChange={(e) => {
+                            setMeterType(e);
+                            setInitialValues({
+                              ...initialValues,
+                              meter_type: e.value,
+                            });
+                          }}
+                          required={true}
+                        />
+                      </div>
+                    )
+                  )}
+                  {!_.isEmpty(addingComponents) && (
+                    <div className="note mt-3">
+                      <div>Components:</div>
+                      <Table
+                        variant="light"
+                        columns={columns}
+                        data={addingComponents.map((item) => ({
+                          id: item.device.value.id,
+                          name: item.device.label,
+                          template: item.template.label,
+                          device_group: item.device_group.label,
+                          device_type: item.device_type.label,
+                        }))}
+                      />
+                    </div>
+                  )}
+                </>
+              )
+            : ""}
         </div>
       </Modal>
     </FormInput>

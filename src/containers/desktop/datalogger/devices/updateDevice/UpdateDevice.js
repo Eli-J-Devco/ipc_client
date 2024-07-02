@@ -128,7 +128,7 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
           id="updateDevice"
         >
           <div className="row">
-            <div className="col-sm-12 col-md-8">
+            <div className="col-sm-12 col-md-6">
               <FormInput.Text
                 label="Device name"
                 name="name"
@@ -138,10 +138,21 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                 horizontal
               />
             </div>
-            <div className="col-sm-12 col-md-4">
+            <div className="col-sm-6 col-md-3 col-6">
               <FormInput.Text
                 name="device_type"
                 placeholder="Device type"
+                title="Device type"
+                required={true}
+                disabled={true}
+                className="mb-3"
+              />
+            </div>
+            <div className="col-sm-6 col-md-3 col-6">
+              <FormInput.Text
+                name="template"
+                placeholder="Template"
+                title="Template"
                 required={true}
                 disabled={true}
               />
@@ -182,13 +193,14 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                       onChange={() => setEnablePowerOff(!enablePowerOff)}
                     />
                     <DatePicker
+                      className="z-index-1000"
                       label="Poweroff Time"
                       name="inverter_shutdown"
                       required={true}
                       selected={inverterShutdown}
                       onChange={(date) => setInverterShutdown(date)}
                       disabled={!enablePowerOff}
-                      minDate={new Date()}
+                      minDate={new Date().setDate(new Date().getDate() + 1)}
                       maxDate={
                         new Date(
                           new Date().setFullYear(new Date().getFullYear() + 1)

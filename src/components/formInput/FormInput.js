@@ -52,6 +52,7 @@ function Text({
   label,
   placeholder,
   name,
+  title,
   value,
   required,
   isRandom,
@@ -129,6 +130,7 @@ function Text({
             isInvalid={
               validate ? validate.touched[name] && validate.errors[name] : false
             }
+            title={title}
           />
           <Form.Control.Feedback type="invalid">
             {validate ? validate.errors[name] : ""}

@@ -64,7 +64,8 @@ export default function useAddDevice(closeAddDevice) {
   const tcpSchema = {
     tcp_gateway_ip: yup
       .string()
-      .required("MB/TCP Gateway IP-Address is required"),
+      .required("MB/TCP Gateway IP-Address is required")
+      .matches(Constants.REGEX_PATTERN.IP_ADDRESS, "Invalid IP-Address format"),
     tcp_gateway_port: yup
       .number()
       .required("MB/TCP Gateway Port is required")
@@ -345,46 +346,18 @@ export default function useAddDevice(closeAddDevice) {
         let communication = initialValues?.communication
           ? initialValues?.communication
           : deviceConfigDropdown?.communicationProtocol[0] || [];
-        let device_type = initialValues?.device_type
-          ? initialValues?.device_type
-          : deviceConfigDropdown?.deviceType[0] || [];
-        let device_group = initialValues?.device_group
-          ? initialValues?.device_group
-          : deviceConfigDropdown?.deviceGroup.map((item) =>
-              item.options.filter(
-                (item) => item.id_device_type === device_type?.value
-              )
-            )[0][0] || null;
-        let template = initialValues?.template
-          ? initialValues?.template
-          : device_group &&
-            deviceConfigDropdown?.template.map((item) =>
-              item.options.filter(
-                (item) => item.value.id_device_group === device_group[0]?.value
-              )
-            )[0][0];
         setInitialValues({
           ...initialValues,
           id_communication: communication?.value,
           communication: communication,
-          id_device_type: device_type?.value,
-          device_type: device_type,
-          device_group: device_group,
-          id_device_group: device_group?.value,
-          id_template: template?.value?.id_template,
-          template: template,
-          inverterType:
-            device_type?.label.indexOf("Inverter") !== -1
-              ? deviceConfigDropdown?.inverterType[
-                  initialValues?.inverter_type - 1
-                ]
-              : null,
-          meterType:
-            device_type?.label.indexOf("Meter") !== -1
-              ? meterTypes.find(
-                  (item) => item.value === initialValues?.meter_type
-                )
-              : null,
+          id_device_type: null,
+          device_type: null,
+          device_group: null,
+          id_device_group: null,
+          id_template: null,
+          template: null,
+          inverterType: null,
+          meterType: null,
         });
       }, 100);
   }, [deviceConfigDropdown]);
