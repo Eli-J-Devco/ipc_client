@@ -1,8 +1,8 @@
 /********************************************************
-* Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
-* All rights reserved.
-* 
-*********************************************************/
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -19,7 +19,7 @@ import LibToast from "../../../../../utils/LibToast";
 export default function useConfigPoints() {
   const [points, setPoints] = useState([]);
   const [point, setPoint] = useState({});
-  const [template, setTemplate] = useState(null);
+  // const [template, setTemplate] = useState(null);
   const [rowSelection, setRowSelection] = useState([]);
 
   const axiosPrivate = useAxiosPrivate();
@@ -79,7 +79,10 @@ export default function useConfigPoints() {
       size: 200,
       cell: ({ row }) => (
         <FormInput.Text
-          unit={!noUnits.includes(row.original?.unit?.name) && row.original?.unit?.name}
+          unit={
+            !noUnits.includes(row.original?.unit?.name) &&
+            row.original?.unit?.name
+          }
           horizontal
           type="number"
           name={`low_alarm_${row.original?.id}`}
@@ -93,7 +96,10 @@ export default function useConfigPoints() {
       size: 200,
       cell: ({ row }) => (
         <FormInput.Text
-          unit={!noUnits.includes(row.original?.unit?.name) && row.original?.unit?.name}
+          unit={
+            !noUnits.includes(row.original?.unit?.name) &&
+            row.original?.unit?.name
+          }
           horizontal
           type="number"
           name={`high_alarm_${row.original?.id}`}
@@ -112,7 +118,9 @@ export default function useConfigPoints() {
             onClick={() => {
               setTimeout(() => {
                 setPoint(row.original);
-                navigate(`${location.pathname}/${row.original?.id}`, { state: { from: location.pathname } });
+                navigate(`${location.pathname}/${row.original?.id}`, {
+                  state: { from: location.pathname },
+                });
               }, 100);
             }}
           >
@@ -120,8 +128,8 @@ export default function useConfigPoints() {
           </Button>
         </div>
       ),
-    })
-  ]
+    }),
+  ];
 
   const output = document.getElementById("progress");
 
@@ -130,43 +138,63 @@ export default function useConfigPoints() {
       navigate("/datalogger/devices/", { replace: true });
       console.log("No device id found");
       return;
-    };
+    }
 
     if (points.length === 0)
       output.innerHTML = "<div><img src='/loading.gif' /></div>";
 
     setTimeout(async () => {
       try {
-        const response = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG.POINT_MAP, {
-          id: device.id
-        });
-        if (_.isEqual(points, response.data?.points) && template === response.data?.template) return;
+        const response = await axiosPrivate.post(
+          Constants.API_URL.DEVICES.CONFIG.POINT_MAP,
+          {
+            id: device.id,
+          }
+        );
+        if (
+          _.isEqual(points, response.data?.points) &&
+          _.isEqual(device?.template, response.data?.template)
+        )
+          return;
 
         setPoints(response.data?.points);
-        setTemplate(response.data?.template);
-        setInitialValues(response.data?.points.reduce((acc, curr) => {
-          return {
-            ...acc,
-            [`low_alarm_${curr["id"]}`]: curr["low_alarm"],
-            [`high_alarm_${curr["id"]}`]: curr["high_alarm"]
-          }
-        }, {}));
-        setSchema(yup.object().shape({
-          ...response.data?.points.reduce((acc, curr) => {
+        // setTemplate(response.data?.template);
+        setInitialValues(
+          response.data?.points.reduce((acc, curr) => {
             return {
               ...acc,
-              [`low_alarm_${curr["id"]}`]: yup.number().required("Low Alarm is required").min(0, "Low Alarm must be greater than 0"),
-              [`high_alarm_${curr["id"]}`]: yup.number().required("High Alarm is required").min(0, "Low Alarm must be greater than 0"),
-            }
+              [`low_alarm_${curr["id"]}`]: curr["low_alarm"],
+              [`high_alarm_${curr["id"]}`]: curr["high_alarm"],
+            };
           }, {})
-        }));
+        );
+        setSchema(
+          yup.object().shape({
+            ...response.data?.points.reduce((acc, curr) => {
+              return {
+                ...acc,
+                [`low_alarm_${curr["id"]}`]: yup
+                  .number()
+                  .required("Low Alarm is required")
+                  .min(0, "Low Alarm must be greater than 0"),
+                [`high_alarm_${curr["id"]}`]: yup
+                  .number()
+                  .required("High Alarm is required")
+                  .min(0, "Low Alarm must be greater than 0"),
+              };
+            }, {}),
+          })
+        );
       } catch (error) {
-        loginService.handleMissingInfo(error, "Error fetching device configuration.") && navigate("/", { replace: true });
+        loginService.handleMissingInfo(
+          error,
+          "Error fetching device configuration."
+        ) && navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
       }
     }, 300);
-  }, [device])
+  }, [device]);
 
   const handleSave = (data) => {
     if (saving) return;
@@ -176,38 +204,43 @@ export default function useConfigPoints() {
       id_device: device.id,
       values: Object.keys(data).reduce((acc, curr) => {
         const id_point = curr.split("_")[2];
-        if (acc.find(item => item.id_point === parseInt(id_point))) return acc;
+        if (acc.find((item) => item.id_point === parseInt(id_point)))
+          return acc;
 
         return [
           ...acc,
           {
             id_point: parseInt(id_point),
             low_alarm: data[`low_alarm_${id_point}`],
-            high_alarm: data[`high_alarm_${id_point}`]
-          }
-        ]
-      }, [])
-    }
+            high_alarm: data[`high_alarm_${id_point}`],
+          },
+        ];
+      }, []),
+    };
 
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        const response = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG.ALARM, body);
+        const response = await axiosPrivate.post(
+          Constants.API_URL.DEVICES.CONFIG.ALARM,
+          body
+        );
         setPoints(response.data?.points);
         LibToast.toast("Points configured successfully", "info");
       } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to configure points") && navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, "Failed to configure points") &&
+          navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
         setSaving(false);
       }
     }, 300);
-  }
+  };
 
   return {
     points,
     point,
-    template,
+    // template,
     columns,
     rowSelection,
     initialValues,
@@ -215,5 +248,5 @@ export default function useConfigPoints() {
     setRowSelection,
     setPoints,
     handleSave,
-  }
+  };
 }

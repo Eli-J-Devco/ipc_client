@@ -426,9 +426,7 @@ export default function useAddDevice(closeAddDevice) {
         try {
           const response = await axiosPrivate.post(
             Constants.API_URL.DEVICES.ADD + `?page=${offset}&limit=${limit}`,
-            initialValues?.device_type?.type === 0
-              ? data
-              : { ...data, id_template: null },
+            data,
             {
               headers: {
                 "Content-Type": "application/json",

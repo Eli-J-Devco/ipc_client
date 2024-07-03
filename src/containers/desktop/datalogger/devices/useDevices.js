@@ -32,6 +32,23 @@ export const statusEnum = {
   disconnected: -6,
 };
 
+export const statusColor = {
+  online: "bg-success",
+  offline: "bg-danger",
+  "Initiating...": "bg-warning",
+  "Deleting...": "bg-warning",
+  deleted: "bg-danger",
+  failed: "bg-danger",
+  symbolic: "bg-warning",
+  "Reconnecting...": "bg-warning",
+  disconnected: "bg-secondary",
+};
+
+const deviceMode = {
+  0: "Manual",
+  1: "Auto",
+};
+
 export default function useDevices() {
   const { data, state } = useMQTT();
   const axiosPrivate = useAxiosPrivate();
@@ -68,17 +85,6 @@ export default function useDevices() {
   const [rowSelection, setRowSelection] = useState({});
   const output = document.getElementById("progress");
   const columnsHelper = createColumnHelper();
-  const statusColor = {
-    online: "bg-success",
-    offline: "bg-danger",
-    "Initiating...": "bg-warning",
-    "Deleting...": "bg-warning",
-    deleted: "bg-danger",
-    failed: "bg-danger",
-    symbolic: "bg-warning",
-    "Reconnecting...": "bg-warning",
-    disconnected: "bg-secondary",
-  };
 
   const columns = [
     columnsHelper.accessor("toggle", {
@@ -202,6 +208,18 @@ export default function useDevices() {
         </div>
       ),
     }),
+    columnsHelper.accessor("mode", {
+      id: "mode",
+      header: "Mode",
+      size: 100,
+      cell: ({ row }) =>
+        row.original.device_type?.name?.toLowerCase()?.indexOf("inverter") !==
+          -1 && (
+          <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
+            {deviceMode[[row.original.mode]]}
+          </div>
+        ),
+    }),
     columnsHelper.accessor("action", {
       id: "action",
       header: <div className="text-center">Actions</div>,
@@ -214,7 +232,8 @@ export default function useDevices() {
             statusEnum["Deleting..."],
             statusEnum.deleted,
             statusEnum["Initiating..."],
-          ].includes(row.original.state) ? null : (
+          ].includes(row.original.state) ||
+          row.original.device_type.type === 1 ? null : (
             <>
               {row.original?.device_type?.type !== 1 && (
                 <Button.Image
@@ -296,7 +315,7 @@ export default function useDevices() {
   }, [name]);
 
   const dataDevices = useMemo(() => {
-    const setDeviceState = (index, d) => {
+    const setDeviceState = (index, d, msg) => {
       if (state.isReconnecting) {
         d["state"] = statusEnum.reconnecting;
         d["status"] = "Reconnecting...";
@@ -316,7 +335,7 @@ export default function useDevices() {
         if (d["state"] !== statusEnum["Deleting..."]) {
           if (d?.device_type?.type === 1) {
             d["state"] = statusEnum.symbolic;
-            d["status"] = statusEnum[d["state"]];
+            d["status"] = "symbolic";
           } else {
             d["state"] = statusEnum[data[index]["status_device"]];
             d["status"] = data[index]["status_device"];
@@ -336,6 +355,7 @@ export default function useDevices() {
           d["status"] = "disconnected";
         }
       }
+      d["message"] = msg;
       return d;
     };
 
@@ -346,15 +366,20 @@ export default function useDevices() {
         }
 
         const index = data.findIndex((item) => item.id_device === d.id);
-        return setDeviceState(index, d);
+        if (index === -1) {
+          return setDeviceState(index, d);
+        }
+
+        return setDeviceState(index, d, data[index]?.message);
       });
     };
     if (_.isEmpty(allDevices)) return [];
     if (_.isEmpty(data)) return [];
     if (!needRefresh) {
+      let flattenData = allDevices.flat(Infinity);
       data.forEach((d) => {
         if (needRefresh) return;
-        const index = allDevices.findIndex((item) => item.id === d.id_device);
+        const index = flattenData.findIndex((item) => item.id === d.id_device);
         if (index === -1) {
           setNeedRefresh(true);
           return;

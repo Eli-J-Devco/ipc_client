@@ -230,9 +230,9 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                 name="rtu_bus_address"
                 type="number"
                 required={true}
-                className={
+                className={`${
                   initialValues?.driver_type.search(/RS485/g) !== -1 && "col-4"
-                }
+                } mb-2`}
               />
               {initialValues?.driver_type &&
                 initialValues?.driver_type.search(/TCP/g) !== -1 && (
@@ -242,19 +242,19 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                       name="tcp_gateway_port"
                       type="number"
                       required={true}
-                      className={
+                      className={`${
                         initialValues?.driver_type.search(/RS485/g) !== -1 &&
                         "col-4"
-                      }
+                      } mb-2`}
                     />
                     <FormInput.Text
                       label="MB/TCP Gateway IP-Address"
                       name="tcp_gateway_ip"
                       required={true}
-                      className={
+                      className={`${
                         initialValues?.driver_type.search(/RS485/g) !== -1 &&
                         "col-4"
-                      }
+                      } mb-2`}
                     />
                   </>
                 )}
@@ -271,18 +271,21 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                     }
                   >
                     <FormInput.Text
+                      className="mb-2"
                       label="Rated power"
                       name="rated_power"
                       required={true}
                       type="number"
                     />
                     <FormInput.Text
+                      className="mb-2"
                       label="Custom rated power"
                       name="rated_power_custom"
                       required={true}
                       type="number"
                     />
                     <FormInput.Text
+                      className="mb-2"
                       label="Min watt (%)"
                       name="min_watt_in_percent"
                       required={true}
@@ -298,18 +301,21 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
                     }
                   >
                     <FormInput.Text
+                      className="mb-2"
                       label="DC voltage"
                       name="DC_voltage"
                       required={true}
                       type="number"
                     />
                     <FormInput.Text
+                      className="mb-2"
                       label="DC current"
                       name="DC_current"
                       required={true}
                       type="number"
                     />
                     <FormInput.Text
+                      className="mb-2"
                       label="Efficiency"
                       name="efficiency"
                       required={true}
