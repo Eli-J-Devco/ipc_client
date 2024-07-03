@@ -11,11 +11,11 @@ import { Tooltip } from "react-tooltip";
 import ModalDefault from "react-bootstrap/Modal";
 import { statusEnum } from "../useDevices";
 
-const allowStatus = [
-  statusEnum.offline,
-  statusEnum.offline,
-  statusEnum.symbolic,
-  statusEnum["Initiating..."],
+const disabledStatus = [
+  statusEnum.deleted,
+  statusEnum.deleting,
+  statusEnum.failed,
+  statusEnum.disconnected,
 ];
 
 export function AddComponentsModal({ close, components, setComponents }) {
@@ -187,7 +187,8 @@ export function AddComponentsModal({ close, components, setComponents }) {
 
                           if (item.selected) return false;
 
-                          if (!allowStatus.includes(item.status)) return false;
+                          if (disabledStatus.includes(statusEnum[item?.status]))
+                            return false;
 
                           if (
                             item.id_template ===

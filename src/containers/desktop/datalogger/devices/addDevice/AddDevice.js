@@ -215,7 +215,7 @@ export default function AddDevice(props) {
               <div className="w-75">
                 <FormInput.Select
                   label="Device type"
-                  name="id_device_type"
+                  name="device_type"
                   value={initialValues?.device_type}
                   option={deviceConfigDropdown?.deviceType}
                   onChange={(e) => {

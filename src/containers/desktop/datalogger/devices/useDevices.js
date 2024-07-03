@@ -64,6 +64,7 @@ export default function useDevices() {
     parent: 0,
     devices: [],
   });
+  const [needRefresh, setNeedRefresh] = useState(false);
   const [rowSelection, setRowSelection] = useState({});
   const output = document.getElementById("progress");
   const columnsHelper = createColumnHelper();
@@ -258,6 +259,36 @@ export default function useDevices() {
   const openUpdateDevice = () => setIsUpdateDevice(true);
   const closeUpdateDevice = () => setIsUpdateDevice(false);
 
+  const fetchDevices = async ({ id, isPagination }) => {
+    if (!isPagination) {
+      output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    }
+    try {
+      const { data } = await axiosPrivate.post(
+        `${Constants.API_URL.DEVICES.LIST}${
+          isPagination ? `?page=${offset}&limit=${limit}` : ""
+        }`,
+        !isPagination ? { id: id } : {}
+      );
+      if (isPagination) {
+        setTotal(data.total);
+        setAllDevices(data.data);
+        return;
+      }
+      let devices = data.map((item) => ({
+        ...item,
+        status: "Reconnecting...",
+        state: statusEnum.reconnecting,
+      }));
+      setNewDevices({ parent: id, devices: devices });
+    } catch (error) {
+      loginService.handleMissingInfo(error, "Failed to get devices") &&
+        navigate("/", { replace: true });
+    } finally {
+      output.innerHTML = "";
+    }
+  };
+
   useEffect(() => {
     if (!name) {
       setRoutes(routes.slice(0, 2));
@@ -265,8 +296,6 @@ export default function useDevices() {
   }, [name]);
 
   const dataDevices = useMemo(() => {
-    if (_.isEmpty(allDevices)) return [];
-
     const setDeviceState = (index, d) => {
       if (state.isReconnecting) {
         d["state"] = statusEnum.reconnecting;
@@ -317,15 +346,37 @@ export default function useDevices() {
         }
 
         const index = data.findIndex((item) => item.id_device === d.id);
-        return setDeviceState(index, { ...d });
+        return setDeviceState(index, d);
       });
     };
+    if (_.isEmpty(allDevices)) return [];
+    if (_.isEmpty(data)) return [];
+    if (!needRefresh) {
+      data.forEach((d) => {
+        if (needRefresh) return;
+        const index = allDevices.findIndex((item) => item.id === d.id_device);
+        if (index === -1) {
+          setNeedRefresh(true);
+          return;
+        }
+      });
+    }
 
     let newData = _.cloneDeep(getDeepestDepth(allDevices));
-    newData = newData.filter((d) => d["state"] !== statusEnum.deleted);
-
+    newData = newData.filter(
+      (d) => ![statusEnum.deleted, statusEnum.disconnected].includes(d.state)
+    );
     return newData;
   }, [allDevices, data, state]);
+
+  useEffect(() => {
+    if (needRefresh) {
+      setTimeout(async () => {
+        await fetchDevices({ id: null, isPagination: true });
+        setNeedRefresh(false);
+      }, 300);
+    }
+  }, [needRefresh]);
 
   const deleteDevices = () => {
     let ids = [];
@@ -389,32 +440,6 @@ export default function useDevices() {
     );
     setDeadletter(null);
   }, [deadletter]);
-
-  const fetchDevices = async ({ id, isPagination }) => {
-    output.innerHTML = "<div><img src='/loading.gif' /></div>";
-    try {
-      const { data } = await axiosPrivate.post(
-        `${Constants.API_URL.DEVICES.LIST}${
-          isPagination ? `?page=${offset}&limit=${limit}` : ""
-        }`,
-        {
-          id: id,
-        }
-      );
-      let devices = data.map((item) => ({
-        ...item,
-        status: "Reconnecting...",
-        state: statusEnum.reconnecting,
-      }));
-
-      setNewDevices({ parent: id, devices: devices });
-    } catch (error) {
-      loginService.handleMissingInfo(error, "Failed to get devices") &&
-        navigate("/", { replace: true });
-    } finally {
-      output.innerHTML = "";
-    }
-  };
 
   useEffect(() => {
     if (newDevices.devices.length === 0) return;

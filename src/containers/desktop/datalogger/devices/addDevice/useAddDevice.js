@@ -43,7 +43,7 @@ export default function useAddDevice(closeAddDevice) {
     rtu_bus_address: 1,
     tcp_gateway_ip: "",
     tcp_gateway_port: 502,
-    rated_power: 0,
+    rated_power: 1,
     inverter_type: null,
     meter_type: null,
     secret: clientSecret,
@@ -69,7 +69,7 @@ export default function useAddDevice(closeAddDevice) {
     tcp_gateway_port: yup
       .number()
       .required("MB/TCP Gateway Port is required")
-      .min(502, "MB/TCP Gateway Port must be greater than 502")
+      .min(1, "MB/TCP Gateway Port must be greater or equal to 1")
       .max(65535, "MB/TCP Gateway Port must be less than 65536"),
   };
 
@@ -89,7 +89,9 @@ export default function useAddDevice(closeAddDevice) {
       .number()
       .required("Number of devices is required")
       .min(1, "Number of devices must be greater than 0")
-      .max(16, "Number of devices must be less than 16"),
+      .max(100, "Number of devices must be less than 100"),
+    device_type: yup.object().required("Device type is required"),
+    device_group: yup.object().required("Device group is required"),
   };
 
   const [schema, setSchema] = useState(
@@ -177,8 +179,7 @@ export default function useAddDevice(closeAddDevice) {
                         rated_power: yup
                           .number()
                           .required("Rated Power is required")
-                          .min(0, "Rated Power must be greater than 0")
-                          .max(1500, "Rated Power must be less than 1500"),
+                          .min(1, "Rated Power must be greater or equal to 1"),
                       }
                     : {}),
                 }
@@ -350,14 +351,15 @@ export default function useAddDevice(closeAddDevice) {
           ...initialValues,
           id_communication: communication?.value,
           communication: communication,
-          id_device_type: null,
-          device_type: null,
-          device_group: null,
-          id_device_group: null,
-          id_template: null,
-          template: null,
-          inverterType: null,
-          meterType: null,
+          id_device_type: initialValues?.id_device_type,
+          device_type: initialValues?.device_type,
+          device_group: initialValues?.device_group,
+          id_device_group: initialValues?.id_device_grou,
+          id_template: initialValues?.id_template,
+          template: initialValues?.template,
+          inverterType: initialValues?.inverterType,
+          meterType: initialValues?.meterType,
+          rated_power: initialValues?.rated_power,
         });
       }, 100);
   }, [deviceConfigDropdown]);
@@ -500,13 +502,19 @@ export default function useAddDevice(closeAddDevice) {
             ...prev,
             deviceGroup: newDeviceGroups,
           }));
+          setInitialValues({
+            ...initialValues,
+            id_device_group: response.data.id,
+            device_group: { value: response.data.id, label: e },
+            id_template: null,
+            template: null,
+          });
         }
       } catch (error) {
         loginService.handleMissingInfo(
           error,
           "Failed to create device group"
         ) && navigate("/", { replace: true });
-        console.error(error);
       }
     }, 100);
   };
