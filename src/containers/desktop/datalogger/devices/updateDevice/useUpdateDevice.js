@@ -27,7 +27,7 @@ export default function useUpdateDevice() {
   const [inverterShutdown, setInverterShutdown] = useState(
     device?.inverter_shutdown
       ? new Date(device?.inverter_shutdown)
-      : new Date().setDate(new Date().getDate() + 1)
+      : new Date(new Date().setDate(new Date().getDate() + 1))
   );
   const [updating, setUpdating] = useState(false);
   const [haveComponents, setHaveComponents] = useState(false);
@@ -131,7 +131,9 @@ export default function useUpdateDevice() {
         ? {
             mode: mode,
             enable_poweroff: enablePowerOff,
-            inverter_shutdown: inverterShutdown.getDate(),
+            inverter_shutdown: enablePowerOff
+              ? inverterShutdown.toISOString().split("T")[0]
+              : null,
           }
         : {}),
       components: addingComponents.map((item) => {
