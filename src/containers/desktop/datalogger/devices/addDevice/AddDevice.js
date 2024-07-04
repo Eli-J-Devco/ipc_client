@@ -4,7 +4,7 @@
  *
  *********************************************************/
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ModalDefault from "react-bootstrap/Modal";
 import { useNavigate } from "react-router-dom";
 
@@ -70,7 +70,7 @@ export default function AddDevice(props) {
       >
         <Button.Text text="Add Multiple" />
       </Button>
-      {haveComponents && (
+      {!_.isEmpty(haveComponents) && (
         <Button
           variant="dark"
           className="ms-3"
