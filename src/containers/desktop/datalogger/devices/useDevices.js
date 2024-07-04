@@ -468,9 +468,12 @@ export default function useDevices() {
 
   useEffect(() => {
     if (newDevices.devices.length === 0) return;
-
-    addSubRows(allDevices, newDevices.parent, newDevices.devices);
-    setNewDevices({ parent: 0, devices: [] });
+    setTimeout(() => {
+      setAllDevices(
+        addSubRows(allDevices, newDevices.parent, newDevices.devices)
+      );
+      setNewDevices({ parent: 0, devices: [] });
+    }, 300);
   }, [newDevices]);
 
   const addSubRows = (devs, id, newDevices) => {
