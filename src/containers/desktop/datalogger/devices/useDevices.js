@@ -352,6 +352,7 @@ export default function useDevices() {
             d["status"] = data[index]["status_device"];
           }
         }
+        d["mode"] = data[index]["mode"];
       } else {
         if (d["creation_state"] === -1) {
           d["state"] = statusEnum["Initiating..."];
