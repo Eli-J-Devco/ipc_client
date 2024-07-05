@@ -407,9 +407,6 @@ export default function useDevices() {
       (d) => ![statusEnum.deleted, statusEnum.disconnected].includes(d.state)
     );
 
-    if (isUpdateDevice) {
-      setDevice({ ...device, ...newData.find((d) => d.id === device.id) });
-    }
     return newData;
   }, [allDevices, data, state]);
 
