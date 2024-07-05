@@ -92,6 +92,12 @@ export default function AddDevice(props) {
                 label: item.name,
                 value: item.component,
                 type: item.type,
+                quantity: item.quantity
+                  ? item.quantity -
+                    addingComponents.filter((component) => {
+                      return component.device_type.value === item.component;
+                    }).length
+                  : -1,
               }));
             setIsOpenAddComponents(true);
             setComponents({

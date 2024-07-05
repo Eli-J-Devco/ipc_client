@@ -19,7 +19,6 @@ const disabledStatus = [
 ];
 
 export function AddComponentsModal({ close, components, setComponents }) {
-  const { deviceTypes, templates, existedComponents } = components;
   const {
     addingComponents,
     rowSelection,
@@ -36,7 +35,9 @@ export function AddComponentsModal({ close, components, setComponents }) {
     deviceGroups,
     confirmCreateGroup,
     setConfirmCreateGroup,
-  } = useAddComponentsModal(components.deviceGroups, existedComponents);
+    deviceType: deviceTypes,
+    templates,
+  } = useAddComponentsModal(components);
   return (
     <>
       {confirmCreateGroup.show && (
@@ -117,7 +118,9 @@ export function AddComponentsModal({ close, components, setComponents }) {
                   <td>
                     <FormInput.Select
                       name={"device[" + index + "].device_type"}
-                      option={deviceTypes}
+                      option={deviceTypes?.filter(
+                        (t) => t.quantity > 0 || t.quantity === -1
+                      )}
                       required={true}
                       isSearchable={true}
                       value={item.device_type}
@@ -187,7 +190,10 @@ export function AddComponentsModal({ close, components, setComponents }) {
 
                           if (item.selected) return false;
 
-                          if (disabledStatus.includes(statusEnum[item?.status]))
+                          if (
+                            item?.status &&
+                            disabledStatus.includes(statusEnum[item?.status])
+                          )
                             return false;
 
                           if (
@@ -242,7 +248,20 @@ export function AddComponentsModal({ close, components, setComponents }) {
           flexDirection: "column",
         }}
       >
-        <Button className="w-25" variant="white" onClick={addComponent}>
+        <Button
+          className="w-25"
+          variant="white"
+          onClick={() => {
+            if (!deviceTypes?.some((item) => item.quantity > 0)) {
+              LibToast.toast(
+                "This device reaches the limit of components",
+                "error"
+              );
+              return;
+            }
+            addComponent();
+          }}
+        >
           <Button.Image image={<AddIcon />} />
         </Button>
         <Button

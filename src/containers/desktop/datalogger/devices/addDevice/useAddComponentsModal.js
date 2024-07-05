@@ -7,14 +7,18 @@ import Constants from "../../../../../utils/Constants";
 import { loginService } from "../../../../../services/loginService";
 import { useNavigate } from "react-router-dom";
 
-export default function useAddComponentsModal(deviceGroup, existedComponents) {
+export default function useAddComponentsModal(components) {
+  const { deviceTypes, templates, deviceGroups, existedComponents } =
+    components;
+
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const [rowSelection, setRowSelection] = useState([]);
   const [addingComponents, setAddingComponents] = useState([]);
   const { allDevices, setDeviceConfig } = useDeviceManagement();
   const [cloneDevices, setCloneDevices] = useState([]);
-  const [deviceGroups, setDeviceGroups] = useState(deviceGroup);
+  const [deviceType, setDeviceType] = useState(_.cloneDeep(deviceTypes));
+  const [deviceGroup, setDeviceGroup] = useState(_.cloneDeep(deviceGroups));
   const [confirmCreateGroup, setConfirmCreateGroup] = useState({
     show: false,
     confirm: false,
@@ -34,6 +38,7 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
       setCloneDevices(
         cloneDevices.map((item) => ({ ...item, selected: false, parent: null }))
       );
+      setDeviceType(deviceTypes);
       return;
     }
 
@@ -49,13 +54,24 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
       .filter((_, index) => {
         return !selectedComponents.includes(index);
       })
-      .map((item) => item.device?.value?.id);
+      .map((item) => {
+        return item.device?.value?.id;
+      });
+
     setAddingComponents(
       addingComponents.filter((_, index) => !selectedComponents.includes(index))
     );
     setCloneDevices(
       cloneDevices.map((item) => {
         if (item.selected && !removeDevices.includes(item.id)) {
+          console.log("device type", item.device_type);
+          setDeviceType(
+            deviceType.map((d) => ({
+              ...d,
+              quantity:
+                d.value === item.id_device_type ? d.quantity + 1 : d.quantity,
+            }))
+          );
           return {
             ...item,
             selected: false,
@@ -181,6 +197,15 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
       setAddingComponents(
         addingComponents.map((item, idx) => {
           if (idx === index) {
+            setDeviceType(
+              deviceType.map((d) => ({
+                ...d,
+                quantity:
+                  d.value === item.device_type.value && d.quantity > 0
+                    ? d.quantity - 1
+                    : d.quantity,
+              }))
+            );
             return {
               ...item,
               device: e,
@@ -226,6 +251,7 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
             return {
               ...item,
               selected: false,
+              parent: null,
             };
           }
           return item;
@@ -245,6 +271,15 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
       setAddingComponents(
         addingComponents.map((item, idx) => {
           if (idx === index) {
+            setDeviceType(
+              deviceType.map((d) => ({
+                ...d,
+                quantity:
+                  d.value === item.device_type.value && d.quantity > 0
+                    ? d.quantity - 1
+                    : d.quantity,
+              }))
+            );
             return {
               ...item,
               device: {
@@ -329,13 +364,13 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
               },
             ],
           }));
-          let newDeviceGroups = _.cloneDeep(deviceGroups);
+          let newDeviceGroups = _.cloneDeep(deviceGroup);
           newDeviceGroups[0].options.push({
             label: newGroup,
             value: response.data.id,
             id_device_type: addingComponents[index]?.device_type?.value,
           });
-          setDeviceGroups(newDeviceGroups);
+          setDeviceGroup(newDeviceGroups);
         }
       } catch (error) {
         loginService.handleMissingInfo(
@@ -360,8 +395,10 @@ export default function useAddComponentsModal(deviceGroup, existedComponents) {
     onCreateOption,
     onGroupCreateOption,
     addComponent,
-    deviceGroups,
+    deviceGroups: deviceGroup,
     confirmCreateGroup,
     setConfirmCreateGroup,
+    deviceType,
+    templates,
   };
 }

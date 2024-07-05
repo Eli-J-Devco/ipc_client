@@ -197,6 +197,17 @@ export default function useDevices() {
         </div>
       ),
     }),
+    columnsHelper.accessor("device_type", {
+      id: "device_type",
+      header: "Device Type",
+      size: 200,
+      maxSize: 200,
+      cell: ({ row }) => (
+        <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
+          {row.original.device_type?.name}
+        </div>
+      ),
+    }),
     columnsHelper.accessor("driver_type", {
       id: "driver_type",
       header: "Type",

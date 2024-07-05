@@ -102,9 +102,9 @@ export default function ConfigPoints() {
             Device type:
             <span className={styles.detail}>
               {" "}
-              {device?.driver_type} | {device.template.name}{" "}
+              {device?.driver_type} | {device?.template?.name}{" "}
             </span>
-            {device.template?.type === 1 && (
+            {device?.template?.type === 1 && (
               <span
                 className={styles.edit}
                 onClick={() =>
