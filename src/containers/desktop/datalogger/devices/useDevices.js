@@ -56,6 +56,7 @@ export default function useDevices() {
   const {
     routes,
     setRoutes,
+    device,
     setDevice,
     deviceConfig,
     allDevices,
@@ -353,6 +354,8 @@ export default function useDevices() {
           }
         }
         d["mode"] = data[index]["mode"];
+        d["rated_power"] = data[index]["rated_power"];
+        d["rated_power_custom"] = data[index]["rated_power_custom"];
       } else {
         if (d["creation_state"] === -1) {
           d["state"] = statusEnum["Initiating..."];
@@ -403,6 +406,10 @@ export default function useDevices() {
     newData = newData.filter(
       (d) => ![statusEnum.deleted, statusEnum.disconnected].includes(d.state)
     );
+
+    if (isUpdateDevice) {
+      setDevice({ ...device, ...newData.find((d) => d.id === device.id) });
+    }
     return newData;
   }, [allDevices, data, state]);
 

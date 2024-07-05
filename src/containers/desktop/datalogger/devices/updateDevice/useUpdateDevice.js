@@ -302,6 +302,16 @@ export default function useUpdateDevice() {
     });
   }, [deviceConfig]);
 
+  useEffect(() => {
+    setMode(device?.mode || 0);
+    setEnablePowerOff(device?.enable_poweroff || false);
+    setInverterShutdown(
+      device?.inverter_shutdown
+        ? new Date(device?.inverter_shutdown)
+        : new Date(new Date().setDate(new Date().getDate() + 1))
+    );
+  }, [device]);
+
   return {
     initialValues,
     schema,
