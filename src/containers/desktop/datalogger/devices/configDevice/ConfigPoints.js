@@ -33,12 +33,15 @@ export default function ConfigPoints() {
   const { device, setDevice } = useDeviceManagement();
   const [showModal, setShowModal] = useState(false);
   const [action, setAction] = useState(null);
-  const { id } = useParams();
+  const { id_point } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (Object.keys(rowSelection).length === 0) return;
+    if (Object.keys(rowSelection).length === 0) {
+      setAction(null);
+      return;
+    }
 
     let someDisabled = Object.keys(rowSelection).some((key) => {
       return points[parseInt(key)]?.status === false;
@@ -64,9 +67,9 @@ export default function ConfigPoints() {
       setAction("Disable");
       return;
     }
-
-    setAction(null);
   }, [rowSelection]);
+
+  useEffect(() => console.log("device", device), [device]);
 
   return (
     <>
@@ -87,103 +90,112 @@ export default function ConfigPoints() {
           action={action}
         />
       )}
-      <div className={styles.main_config_device}>
-        <div className={styles.detail_device}>
-          <div>
-            Device Address: <span className={styles.detail}>{device?.id}</span>{" "}
-            mapped to real bus-addr{" "}
-            <span className={styles.detail}>{device?.rtu_bus_address}</span> on
-            gateway{" "}
-            <span
-              className={styles.detail}
-            >{`${device?.tcp_gateway_ip}@${device?.tcp_gateway_port}`}</span>
-          </div>
-          <div>
-            Device type:
-            <span className={styles.detail}>
-              {" "}
-              {device?.driver_type} | {device?.template?.name}{" "}
-            </span>
-            {device?.template?.type === 1 && (
+      {device ? (
+        <div className={styles.main_config_device}>
+          <div className={styles.detail_device}>
+            <div>
+              Device Address:{" "}
+              <span className={styles.detail}>{device?.name}</span> mapped to
+              real bus-addr{" "}
+              <span className={styles.detail}>{device?.rtu_bus_address}</span>{" "}
+              on gateway{" "}
               <span
-                className={styles.edit}
-                onClick={() =>
-                  navigate(
-                    `/datalogger/templates/${device.template.id}/points`,
-                    {
-                      state: { from: location.pathname },
-                    }
-                  )
-                }
-              >
-                (edit)
+                className={styles.detail}
+              >{`${device?.tcp_gateway_ip}@${device?.tcp_gateway_port}`}</span>
+            </div>
+            <div>
+              Device type:
+              <span className={styles.detail}>
+                {" "}
+                {device?.driver_type} | {device?.template?.name}{" "}
               </span>
+              {device?.template?.type === 1 && (
+                <span
+                  className={styles.edit}
+                  onClick={() =>
+                    navigate(
+                      `/datalogger/templates/${device.template.id}/points`,
+                      {
+                        state: { from: location.pathname },
+                      }
+                    )
+                  }
+                >
+                  (edit)
+                </span>
+              )}
+            </div>
+            {device?.status && typeof device.status === "string" && (
+              <div>
+                Status:&nbsp;
+                <span
+                  className={
+                    device?.status?.toUpperCase() === "ONLINE" ||
+                    device?.message
+                      ? device?.status?.toUpperCase() === "ONLINE"
+                        ? styles.detail
+                        : "status_error"
+                      : styles.disconnect
+                  }
+                >
+                  {device?.status.toUpperCase() === "ONLINE"
+                    ? device?.status.toUpperCase()
+                    : device?.message
+                    ? device?.message
+                    : "Disconnected"}
+                </span>
+              </div>
             )}
           </div>
-          <div>
-            Status:&nbsp;
-            <span
-              className={
-                device?.status.toUpperCase() === "ONLINE" || device?.message
-                  ? device?.status.toUpperCase() === "ONLINE"
-                    ? styles.detail
-                    : "status_error"
-                  : styles.disconnect
-              }
-            >
-              {device?.status.toUpperCase() === "ONLINE"
-                ? device?.status.toUpperCase()
-                : device?.message
-                ? device?.message
-                : "Disconnected"}
-            </span>
-          </div>
-        </div>
-        {id ? (
-          <ConfigEachPoint point={point} setPoints={setPoints} />
-        ) : (
-          points.length > 0 && (
-            <FormInput
-              initialValues={initialValues}
-              validationSchema={schema}
-              id="configDevice"
-              onSubmit={handleSave}
-            >
-              <Table
-                columns={{ columnDefs: columns }}
-                data={points}
-                maxHeight={"400px"}
-                selectRow={{
-                  enable: false,
-                  rowSelection: rowSelection,
-                  setRowSelection: setRowSelection,
-                }}
-              />
-              <div className="mt-3">
-                <Button variant="dark" type="submit" formId="configDevice">
-                  <Button.Text text="Save" />
-                </Button>
-                {action && (
-                  <Button
-                    variant="dark"
-                    className="ms-3"
-                    onClick={() => setShowModal(true)}
-                  >
-                    <Button.Text text={action} />
+          {id_point ? (
+            <ConfigEachPoint point={point} setPoints={setPoints} />
+          ) : (
+            points.length > 0 && (
+              <FormInput
+                initialValues={initialValues}
+                validationSchema={schema}
+                id="configDevice"
+                onSubmit={handleSave}
+              >
+                <Table
+                  columns={{ columnDefs: columns }}
+                  data={points}
+                  maxHeight={"400px"}
+                  selectRow={{
+                    enable: false,
+                    rowSelection: rowSelection,
+                    setRowSelection: setRowSelection,
+                  }}
+                />
+                <div className="mt-3">
+                  <Button variant="dark" type="submit" formId="configDevice">
+                    <Button.Text text="Save" />
                   </Button>
-                )}
-                <Button
-                  variant="grey"
-                  className="ms-3"
-                  onClick={() => setDevice(null)}
-                >
-                  <Button.Text text="Cancel" />
-                </Button>
-              </div>
-            </FormInput>
-          )
-        )}
-      </div>
+                  {action && (
+                    <Button
+                      variant="dark"
+                      className="ms-3"
+                      onClick={() => setShowModal(true)}
+                    >
+                      <Button.Text text={action} />
+                    </Button>
+                  )}
+                  <Button
+                    variant="grey"
+                    className="ms-3"
+                    onClick={() => {
+                      setDevice(null);
+                      navigate("/datalogger/devices", { replace: true });
+                    }}
+                  >
+                    <Button.Text text="Cancel" />
+                  </Button>
+                </div>
+              </FormInput>
+            )
+          )}
+        </div>
+      ) : null}
     </>
   );
 }

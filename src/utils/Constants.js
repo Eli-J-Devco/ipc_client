@@ -78,7 +78,8 @@ const Constants = {
     },
     DEVICES: {
       LIST: "/devices/get/all/",
-      GET_ONE: "/devices/get/",
+      GET_OTHERS: "/devices/get/",
+      GET: "/devices/get/",
       ADD: "/devices/add/",
       DELETE: "/devices/delete/",
       UPDATE: "/devices/update/",

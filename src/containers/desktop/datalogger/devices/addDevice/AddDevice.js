@@ -435,7 +435,14 @@ export default function AddDevice(props) {
                             name="rated_power"
                             placeholder="Enter rated power"
                             type="number"
+                            value={initialValues?.rated_power}
                             required={true}
+                            onChange={(e) =>
+                              setInitialValues({
+                                ...initialValues,
+                                rated_power: e.target.value,
+                              })
+                            }
                           />
                         </div>
                       </div>

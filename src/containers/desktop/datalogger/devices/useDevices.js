@@ -52,11 +52,7 @@ const deviceMode = {
 export default function useDevices() {
   const { data, state } = useMQTT();
   const axiosPrivate = useAxiosPrivate();
-  const { name } = useParams();
   const {
-    routes,
-    setRoutes,
-    device,
     setDevice,
     deviceConfig,
     allDevices,
@@ -211,7 +207,7 @@ export default function useDevices() {
     }),
     columnsHelper.accessor("driver_type", {
       id: "driver_type",
-      header: "Type",
+      header: "Connect Type",
       size: 200,
       maxSize: 200,
       cell: ({ row }) => (
@@ -268,16 +264,9 @@ export default function useDevices() {
 
   const handleConfigDevice = (item) => {
     setDevice(item);
-    navigate(`/datalogger/devices/${item?.name.trim()}`, {
+    navigate(`/datalogger/devices/${item?.id}`, {
       state: { from: "/datalogger/devices" },
     });
-    setRoutes((prev) => [
-      ...prev,
-      {
-        path: `/datalogger/devices/${item?.name.trim()}`,
-        name: item?.name.trim(),
-      },
-    ]);
   };
 
   const handleUpdateDevice = (device) => {
@@ -319,12 +308,6 @@ export default function useDevices() {
       output.innerHTML = "";
     }
   };
-
-  useEffect(() => {
-    if (!name) {
-      setRoutes(routes.slice(0, 2));
-    }
-  }, [name]);
 
   const dataDevices = useMemo(() => {
     const setDeviceState = (index, d, msg) => {

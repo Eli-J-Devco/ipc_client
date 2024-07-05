@@ -5,7 +5,7 @@
  *********************************************************/
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDeviceManagement } from "../DeviceManagement";
 import Constants from "../../../../../utils/Constants";
 import { loginService } from "../../../../../services/loginService";
@@ -15,6 +15,7 @@ import Button from "../../../../../components/button/Button";
 import * as yup from "yup";
 import _ from "lodash";
 import LibToast from "../../../../../utils/LibToast";
+import useMQTT from "../../../../../hooks/useMQTT";
 
 export default function useConfigPoints() {
   const [points, setPoints] = useState([]);
@@ -23,7 +24,9 @@ export default function useConfigPoints() {
   const [rowSelection, setRowSelection] = useState([]);
 
   const axiosPrivate = useAxiosPrivate();
-  const { device } = useDeviceManagement();
+  const { device, setDevice } = useDeviceManagement();
+  const { data } = useMQTT();
+  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,6 +34,7 @@ export default function useConfigPoints() {
   const [initialValues, setInitialValues] = useState({});
   const [schema, setSchema] = useState({});
   const [saving, setSaving] = useState(false);
+  const [isFetchingPoint, setIsFetchingPoint] = useState(false);
 
   const columnsHelper = createColumnHelper();
   const columns = [
@@ -134,21 +138,54 @@ export default function useConfigPoints() {
   const output = document.getElementById("progress");
 
   useEffect(() => {
-    if (!device?.id) {
+    setTimeout(() => {
+      if (device) {
+        let index = data.findIndex((item) => item.id_device === device.id);
+        if (index !== -1) {
+          setDevice({
+            ...device,
+            status: data[index].status_device,
+            message: data[index].message,
+          });
+        }
+      }
+    }, 300);
+  }, [data]);
+
+  useEffect(() => {
+    if (isFetchingPoint || points.length > 0) return;
+    if (!id) {
       navigate("/datalogger/devices/", { replace: true });
-      console.log("No device id found");
       return;
+    }
+
+    if (!device?.id) {
+      setTimeout(async () => {
+        try {
+          const response = await axiosPrivate.post(
+            Constants.API_URL.DEVICES.GET + `?id=${id}`
+          );
+          setDevice(response.data);
+          return;
+        } catch (error) {
+          loginService.handleMissingInfo(
+            error,
+            "Failed to get device information"
+          ) && navigate("/", { replace: true });
+        }
+      }, 300);
     }
 
     if (points.length === 0)
       output.innerHTML = "<div><img src='/loading.gif' /></div>";
 
+    setIsFetchingPoint(true);
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
           Constants.API_URL.DEVICES.CONFIG.POINT_MAP,
           {
-            id: device.id,
+            id: id,
           }
         );
         if (
@@ -158,7 +195,6 @@ export default function useConfigPoints() {
           return;
 
         setPoints(response.data?.points);
-        // setTemplate(response.data?.template);
         setInitialValues(
           response.data?.points.reduce((acc, curr) => {
             return {
@@ -192,6 +228,7 @@ export default function useConfigPoints() {
         ) && navigate("/", { replace: true });
       } finally {
         output.innerHTML = "";
+        setIsFetchingPoint(false);
       }
     }, 300);
   }, [device]);
@@ -201,7 +238,7 @@ export default function useConfigPoints() {
 
     setSaving(true);
     const body = {
-      id_device: device.id,
+      id_device: id,
       values: Object.keys(data).reduce((acc, curr) => {
         const id_point = curr.split("_")[2];
         if (acc.find((item) => item.id_point === parseInt(id_point)))

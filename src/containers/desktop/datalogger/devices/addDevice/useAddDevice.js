@@ -12,6 +12,12 @@ import LibToast from "../../../../../utils/LibToast";
 import { loginService } from "../../../../../services/loginService";
 import { useDeviceManagement } from "../DeviceManagement";
 import _ from "lodash";
+import {
+  defaultSchema,
+  normalDeviceSchema,
+  ratedPowerSchema,
+  tcpSchema,
+} from "../DeviceValidation";
 
 export default function useAddDevice(closeAddDevice) {
   const {
@@ -60,39 +66,6 @@ export default function useAddDevice(closeAddDevice) {
     { value: 4, label: "Production Meter" },
     { value: 5, label: "Grid Meter" },
   ]);
-
-  const tcpSchema = {
-    tcp_gateway_ip: yup
-      .string()
-      .required("MB/TCP Gateway IP-Address is required")
-      .matches(Constants.REGEX_PATTERN.IP_ADDRESS, "Invalid IP-Address format"),
-    tcp_gateway_port: yup
-      .number()
-      .required("MB/TCP Gateway Port is required")
-      .min(1, "MB/TCP Gateway Port must be greater or equal to 1")
-      .max(65535, "MB/TCP Gateway Port must be less than 65536"),
-  };
-
-  const normalDeviceSchema = {
-    id_device_type: yup.number().required("Device type is required"),
-    id_communication: yup.number().required("Communication is required"),
-    rtu_bus_address: yup
-      .number()
-      .required("RTU Bus Address is required")
-      .min(1, "RTU Bus Address must be greater than 0")
-      .max(255, "RTU Bus Address must be less than 256"),
-  };
-
-  const defaultSchema = {
-    name: yup.string().required("Name is required"),
-    num_of_devices: yup
-      .number()
-      .required("Number of devices is required")
-      .min(1, "Number of devices must be greater than 0")
-      .max(100, "Number of devices must be less than 100"),
-    device_type: yup.object().required("Device type is required"),
-    device_group: yup.object().required("Device group is required"),
-  };
 
   const [schema, setSchema] = useState(
     yup.object().shape({
@@ -175,12 +148,7 @@ export default function useAddDevice(closeAddDevice) {
                     : {}),
                   ...(initialValues?.device_type?.label.indexOf("Inverter") !==
                   -1
-                    ? {
-                        rated_power: yup
-                          .number()
-                          .required("Rated Power is required")
-                          .min(1, "Rated Power must be greater or equal to 1"),
-                      }
+                    ? ratedPowerSchema
                     : {}),
                 }
               : defaultSchema),

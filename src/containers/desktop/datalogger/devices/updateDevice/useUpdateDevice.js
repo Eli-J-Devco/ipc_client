@@ -7,6 +7,7 @@ import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 import { loginService } from "../../../../../services/loginService";
 import _ from "lodash";
+import { inverterSchema, tcpSchema } from "../DeviceValidation";
 
 export default function useUpdateDevice() {
   const axiosPrivate = useAxiosPrivate();
@@ -69,51 +70,10 @@ export default function useUpdateDevice() {
       .min(1, "RTU bus address must be greater than 0")
       .max(255, "RTU bus address must be less than 256"),
     ...(device?.driver_type
-      ? device?.driver_type.search(/RS485/g) === -1 && {
-          tcp_gateway_port: yup
-            .number()
-            .required("Please fill this field")
-            .min(502, "TCP gateway port must be greater than 501")
-            .max(65535, "TCP gateway port must be less than 65536"),
-          tcp_gateway_ip: yup
-            .string()
-            .required("Please fill this field")
-            .matches(Constants.REGEX_PATTERN.IP_ADDRESS, "Invalid IP Address"),
-        }
+      ? device?.driver_type.search(/RS485/g) === -1 && tcpSchema
       : {}),
     ...(device?.device_type
-      ? device?.device_type?.name.indexOf("Inverter") !== -1 && {
-          rated_power: yup
-            .number()
-            .required("Please fill this field")
-            .min(0, "Must greater than or equal to 0"),
-          rated_power_custom: yup
-            .number()
-            .required("Please fill this field")
-            .min(0, "Must greater than or equal to 0")
-            .max(
-              yup.ref("rated_power"),
-              "Must less than or equal to rated power"
-            ),
-          min_watt_in_percent: yup
-            .number()
-            .required("Please fill this field")
-            .min(0, "Must between 0% and 20%")
-            .max(20, "Must between 0% and 20%"),
-          DC_voltage: yup
-            .number()
-            .required("Please fill this field")
-            .min(0, "Must greater than or equal to 0"),
-          DC_current: yup
-            .number()
-            .required("Please fill this field")
-            .min(0, "Must greater than or equal to 0"),
-          efficiency: yup
-            .number()
-            .required("Please fill this field")
-            .min(0, "Must greater than or equal to 0")
-            .max(100, "Must less than or equal to 100"),
-        }
+      ? device?.device_type?.name.indexOf("Inverter") !== -1 && inverterSchema
       : {}),
   });
   const initialValues = {

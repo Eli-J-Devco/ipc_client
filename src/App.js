@@ -169,8 +169,8 @@ export default class App extends Component {
 
                   <Route path="devices" element={<DeviceManagement />}>
                     <Route index element={<Devices />} />
-                    <Route path=":name" element={<ConfigPoints />}>
-                      <Route path=":id" element={<ConfigEachPoint />} />
+                    <Route path=":id" element={<ConfigPoints />}>
+                      <Route path=":id_point" element={<ConfigEachPoint />} />
                     </Route>
                   </Route>
 
