@@ -16,9 +16,7 @@ switch (url) {
     serverData = "";
     break;
   default:
-    serverAPI = "http://115.78.133.129:3001";
-    // serverAPI = "http://127.0.0.1:3001";
-    // serverAPI = "http://localhost:3001";
+    serverAPI = process.env.REACT_APP_API_SERVER;
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -30,11 +28,11 @@ const Constants = {
   SERVER_DATA: serverData,
   API_CONTEXT: "api-server",
   MQTT_CONFIG: {
-    HOST: "115.78.133.129",
-    PORT: 1884,
-    USERNAME: "nextwave",
-    PASSWORD: "123654789",
-    CLIENT_ID: "setup_client",
+    HOST: process.env.REACT_APP_MQTT_URL,
+    PORT: process.env.REACT_APP_MQTT_PORT,
+    USERNAME: process.env.REACT_APP_MQTT_USERNAME,
+    PASSWORD: process.env.REACT_APP_MQTT_PASSWORD,
+    CLIENT_ID: process.env.REACT_APP_MQTT_CLIENT_ID,
   },
   COMMON: {
     PER_PAGE: 10,
