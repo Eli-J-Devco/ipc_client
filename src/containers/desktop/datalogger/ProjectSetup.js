@@ -15,6 +15,7 @@ import useMQTT from "../../../hooks/useMQTT";
 import { loginService } from "../../../services/loginService";
 
 import Constants from "../../../utils/Constants";
+import { ungzip } from "pako";
 
 const ProjectSetupInformation = () => {
   const {
@@ -216,15 +217,29 @@ const ProjectSetupInformation = () => {
       projectSetup?.serial_number
     ) {
       client.on("message", (topic, message) => {
-        const payload = { topic, message: message.toString() };
-
+        const payload = { topic, message };
+        const isUnzip = process.env.REACT_APP_UNZIP === "true";
         if (topic === `${projectSetup?.serial_number}/CPU/Information`) {
-          const cpu = JSON.parse(payload.message);
+          const cpu = JSON.parse(payload.message.toString());
           setCPUData(cpu);
         }
 
         if (topic === `${projectSetup?.serial_number}/Devices/All`) {
-          const devices = JSON.parse(payload.message);
+          if (!isUnzip) {
+            const devices = JSON.parse(payload.message.toString());
+            setData(devices);
+            return;
+          }
+
+          let i = 3;
+          let msg = "";
+          while (i-- > 0) {
+            let decoded = atob(payload.message);
+            let messageArr = Uint8Array.from(decoded, (c) => c.charCodeAt(0));
+            msg = ungzip(messageArr, { to: "string" });
+            break;
+          }
+          const devices = JSON.parse(msg);
           setData(devices);
         }
       });
