@@ -217,30 +217,23 @@ const ProjectSetupInformation = () => {
       projectSetup?.serial_number
     ) {
       client.on("message", (topic, message) => {
-        const payload = { topic, message };
-        const isUnzip = process.env.REACT_APP_UNZIP === "true";
-        if (topic === `${projectSetup?.serial_number}/CPU/Information`) {
-          const cpu = JSON.parse(payload.message.toString());
-          setCPUData(cpu);
-        }
+        try {
+          let decoded = atob(message);
+          let messageArr = Uint8Array.from(decoded, (c) => c.charCodeAt(0));
+          const payload = {
+            topic,
+            message: JSON.parse(ungzip(messageArr, { to: "string" })),
+          };
 
-        if (topic === `${projectSetup?.serial_number}/Devices/All`) {
-          if (!isUnzip) {
-            const devices = JSON.parse(payload.message.toString());
-            setData(devices);
-            return;
+          if (topic === `${projectSetup?.serial_number}/CPU/Information`) {
+            setCPUData(payload.message);
           }
 
-          let i = 3;
-          let msg = "";
-          while (i-- > 0) {
-            let decoded = atob(payload.message);
-            let messageArr = Uint8Array.from(decoded, (c) => c.charCodeAt(0));
-            msg = ungzip(messageArr, { to: "string" });
-            break;
+          if (topic === `${projectSetup?.serial_number}/Devices/All`) {
+            setData(payload.message);
           }
-          const devices = JSON.parse(msg);
-          setData(devices);
+        } catch (error) {
+          console.error("Error parsing message", error);
         }
       });
     }
