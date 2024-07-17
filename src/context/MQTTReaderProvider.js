@@ -30,7 +30,7 @@ export const MQTTProvider = ({ children }) => {
 
     if (!(typeof topic === "string") && _.isEmpty(message)) return;
 
-    client.publish(topic, JSON.stringify(message));
+    client.publish(topic, message);
   };
 
   const mqttSub = (subscription) => {

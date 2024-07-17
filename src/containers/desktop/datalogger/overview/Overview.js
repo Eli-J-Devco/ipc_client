@@ -20,6 +20,7 @@ import Button from "../../../../components/button/Button";
 import Modal from "../../../../components/modal/Modal";
 import useProjectSetup from "../../../../hooks/useProjectSetup";
 import LibToast from "../../../../utils/LibToast";
+import { gzip } from "pako";
 
 // init the module
 highchartsGantt(Highcharts);
@@ -354,15 +355,19 @@ function Overview() {
           setIsSetup(false);
           output.innerHTML = "";
         }
-      }, 2000);
+      }, 1000);
     }
   }, [cpuData]);
 
   useEffect(() => {
     if (isReboot) {
-      publishMessage(`${projectSetup.serial_number}/System`, {
-        cmd: "reboot",
-      });
+      let zippedMsg = gzip(
+        JSON.stringify({
+          cmd: "reboot",
+        })
+      );
+      let encodedMsg = btoa(String.fromCharCode.apply(null, zippedMsg));
+      publishMessage(`${projectSetup.serial_number}/System`, encodedMsg);
     }
   }, [isReboot]);
 
