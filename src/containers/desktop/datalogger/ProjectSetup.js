@@ -202,7 +202,7 @@ const ProjectSetupInformation = () => {
 
   useEffect(() => {
     if (state.isConnected && projectSetup?.serial_number) {
-      mqttSub({ topic: `${projectSetup?.serial_number}/Devices/All`, qos: 0 });
+      mqttSub({ topic: `${projectSetup?.serial_number}/Devices/Full`, qos: 0 });
       mqttSub({
         topic: `${projectSetup?.serial_number}/CPU/Information`,
         qos: 0,
