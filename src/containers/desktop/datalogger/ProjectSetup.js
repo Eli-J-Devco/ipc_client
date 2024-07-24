@@ -229,7 +229,7 @@ const ProjectSetupInformation = () => {
             setCPUData(payload.message);
           }
 
-          if (topic === `${projectSetup?.serial_number}/Devices/All`) {
+          if (topic === `${projectSetup?.serial_number}/Devices/Full`) {
             setData(payload.message);
           }
         } catch (error) {
