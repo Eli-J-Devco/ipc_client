@@ -69,8 +69,6 @@ export default function ConfigPoints() {
     }
   }, [rowSelection]);
 
-  useEffect(() => console.log("device", device), [device]);
-
   return (
     <>
       {showModal && (
