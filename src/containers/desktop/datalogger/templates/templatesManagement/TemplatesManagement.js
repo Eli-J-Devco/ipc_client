@@ -19,6 +19,7 @@ function TemplatesManagement() {
     deleteTemplate,
     isConfirmDelete,
     setIsConfirmDelete,
+    duplicate,
   } = useTemplatesManagement();
 
   return (
@@ -87,6 +88,7 @@ function TemplatesManagement() {
                 isOpen={isModalOpen}
                 close={closeModal}
                 template={template}
+                duplicate={duplicate}
               />
             </div>
 

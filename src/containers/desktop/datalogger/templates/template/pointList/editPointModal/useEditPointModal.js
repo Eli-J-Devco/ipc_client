@@ -12,6 +12,7 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
   const axiosPrivate = useAxiosPrivate();
   const { id } = useTemplate();
   const navigate = useNavigate();
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const [modbusConfig, setModbusConfig] = useState(1);
   const [modbusRegisterType, setModbusRegisterType] = useState(1);
@@ -48,9 +49,16 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
   });
 
   const validationSchema = yup.object({
-    // index: yup.string().required('Required'),
     name: yup.string().required("Required"),
     register: yup.string().required("Required"),
+    control_min: yup
+      .number()
+      .required("This field is required")
+      .min(0, "Must be greater than 0"),
+    control_max: yup
+      .number()
+      .required("This field is required")
+      .min(1, "Must be greater than 0"),
   });
 
   const initialValues = {
@@ -103,7 +111,7 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
       LibToast.toast("Please select a register type", "error");
       return;
     }
-
+    setIsUpdating(true);
     let point = {
       ...values,
       id_template: id,
@@ -188,12 +196,14 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
         loginService.handleMissingInfo(error, "Failed to update point") &&
           navigate("/", { replace: true });
       } finally {
-        output.innerHTML = "";
+        // output.innerHTML = "";
+        setIsUpdating(false);
       }
     }, 500);
   };
 
   return {
+    isUpdating,
     initialValues,
     modbusConfig,
     setModbusConfig,

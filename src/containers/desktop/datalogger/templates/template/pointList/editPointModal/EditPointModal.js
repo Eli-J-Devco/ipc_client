@@ -12,6 +12,7 @@ function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
   const [currentData, setCurrentData] = useState(data);
 
   const {
+    isUpdating,
     initialValues,
     validationSchema,
     modbusConfig,
@@ -119,6 +120,7 @@ function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
               type="submit"
               formId="point-configuration-form"
               className="m-0"
+              disabled={isUpdating}
             >
               <Button.Text text="Save" />
             </Button>
@@ -274,6 +276,20 @@ function EditPointModal({ isOpen, close, data, setPoint, isPointInGroup }) {
                       label: item.name,
                     }))}
                     onChange={(value) => setSelectedTypeFunction(value)}
+                  />
+                </div>
+                <div className="col-3">
+                  <FormInput.Text
+                    label="Control Min:"
+                    name="control_min"
+                    type="number"
+                  />
+                </div>
+                <div className="col-3">
+                  <FormInput.Text
+                    label="Control Max:"
+                    name="control_max"
+                    type="number"
                   />
                 </div>
               </div>

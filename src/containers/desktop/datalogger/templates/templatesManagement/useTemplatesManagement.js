@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTemplates } from "../useTemplates";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -7,6 +7,7 @@ import { ReactComponent as ExpandIcon } from "../../../../../assets/images/chevr
 import { ReactComponent as CollapseIcon } from "../../../../../assets/images/chevron-up.svg";
 import { ReactComponent as EditIcon } from "../../../../../assets/images/edit.svg";
 import { ReactComponent as DeleteIcon } from "../../../../../assets/images/delete.svg";
+import { ReactComponent as DuplicateIcon } from "../../../../../assets/images/duplicate.svg";
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 import { loginService } from "../../../../../services/loginService";
@@ -21,6 +22,7 @@ function useTemplatesManagement() {
     state: false,
     item: {},
   });
+  const [duplicate, setDuplicate] = useState(null);
   const axiosPrivate = useAxiosPrivate();
   const { t } = useTranslation();
   const { templateGroups, setTemplateGroups, setTemplateGroupsByDeviceGroup } =
@@ -81,16 +83,31 @@ function useTemplatesManagement() {
               }
               className="mx-2"
             />
+            <Button.Image
+              image={<DuplicateIcon />}
+              onClick={() => {
+                setDuplicate(row.original);
+              }}
+              className="mx-2"
+            />
           </div>
         ),
     }),
   ];
 
+  useEffect(() => {
+    if (!duplicate) return;
+    openModal("Copy of " + duplicate.name);
+  }, [duplicate]);
+
   const openModal = (value) => {
     setIsModalOpen(true);
     setTemplate(value);
   };
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setDuplicate(null);
+  };
   const handleOnItemEdit = (item) => {
     navigate(`/datalogger/templates/${item.id}/points`, {
       state: { template: item },
@@ -140,6 +157,7 @@ function useTemplatesManagement() {
     isConfirmDelete,
     setIsConfirmDelete,
     deleteTemplate,
+    duplicate,
   };
 }
 

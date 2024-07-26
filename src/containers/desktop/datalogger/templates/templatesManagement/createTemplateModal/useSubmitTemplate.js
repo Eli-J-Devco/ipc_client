@@ -6,16 +6,56 @@ import LibToast from "../../../../../../utils/LibToast";
 import { useTranslation } from "react-i18next";
 import { loginService } from "../../../../../../services/loginService";
 import { useTemplates } from "../../useTemplates";
+import { useEffect, useState } from "react";
 
-function useSubmitTemplate(close, closeGroup) {
+function useSubmitTemplate(close, duplicate) {
   const axiosPrivate = useAxiosPrivate();
   const output = document.getElementById("progress");
-  const { setTemplateGroups, setTemplateGroupsByDeviceGroup } = useTemplates();
 
-  const initialValues = {
-    name: "",
+  const [isAddNewGroup, setIsAddNewGroup] = useState(false);
+  const [groups, setGroups] = useState(null);
+  const {
+    setTemplateGroups,
+    setTemplateGroupsByDeviceGroup,
+    deviceGroups,
+    deviceTypes,
+    setDeviceTypes,
+  } = useTemplates();
+
+  const [initialValues, setInitialValues] = useState({
+    name: duplicate ? `Copy of ${duplicate.name}` : "",
     group: null,
-  };
+  });
+
+  useEffect(() => {
+    if (!deviceGroups) return;
+    if (!duplicate) return;
+
+    if (duplicate && initialValues.group && initialValues.name) return;
+
+    var name = `Copy of ${duplicate.name}`;
+    var group = null;
+    deviceGroups.forEach((type) => {
+      if (!type.options) return;
+
+      if (group) return;
+
+      type.options.forEach((g) => {
+        if (group) return;
+
+        if (g.value === duplicate.id_device_group) {
+          group = g;
+        }
+      });
+    });
+
+    if (!group) return;
+
+    setInitialValues({
+      name,
+      group,
+    });
+  }, [deviceGroups, duplicate, initialValues]);
 
   const validationSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
@@ -48,6 +88,10 @@ function useSubmitTemplate(close, closeGroup) {
   const { t } = useTranslation();
   const handleOnSubmit = (values) => {
     output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
+    if (duplicate) {
+      values = { ...values, id: duplicate.id };
+    }
+
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
@@ -57,6 +101,7 @@ function useSubmitTemplate(close, closeGroup) {
             status: true,
             id_device_group: values.group.value,
             type: 1,
+            ...(duplicate && { id: duplicate.id }),
           }
         );
         if (response?.status === 200) {
@@ -97,7 +142,7 @@ function useSubmitTemplate(close, closeGroup) {
             `Group ${values.name} ${t("toastMessage.info.create")}`,
             "info"
           );
-          closeGroup();
+          onRefresh();
         }
       } catch (error) {
         loginService.handleMissingInfo(error, "Failed to create new group") &&
@@ -108,6 +153,27 @@ function useSubmitTemplate(close, closeGroup) {
     }, 300);
   };
 
+  const onRefresh = () => {
+    setDeviceTypes([]);
+    setIsAddNewGroup(false);
+  };
+
+  useEffect(() => {
+    if (groups) return;
+
+    if (deviceGroups && deviceGroups.length > 0) {
+      setGroups(deviceGroups);
+    }
+  }, [deviceGroups, groups, setGroups]);
+
+  const onClose = () => {
+    close();
+    setInitialValues({
+      name: "",
+      group: null,
+    });
+  };
+
   return {
     handleOnSubmit,
     handleCreateGroup,
@@ -115,6 +181,12 @@ function useSubmitTemplate(close, closeGroup) {
     validationSchema,
     initialCreateGroup,
     validationCreateGroup,
+    onRefresh,
+    isAddNewGroup,
+    setIsAddNewGroup,
+    deviceTypes,
+    groups,
+    onClose,
   };
 }
 
