@@ -71,22 +71,27 @@ export default function useConfigPoints() {
       id: "name",
       header: "Function",
       size: 100,
+      cell: ({ row }) => (
+        <div>
+          <strong>{row.original?.name}</strong>
+          <i>
+            {!noUnits.includes(row.original?.unit?.name) &&
+              ` (${row.original?.unit?.name})`}
+          </i>
+        </div>
+      ),
     }),
-    columnsHelper.accessor("output_values", {
-      id: "output_values",
-      header: "Current Reading",
-      size: 50,
-    }),
+    // columnsHelper.accessor("output_values", {
+    //   id: "output_values",
+    //   header: "Current Reading",
+    //   size: 50,
+    // }),
     columnsHelper.accessor("low_alarm", {
       id: "low_alarm",
       header: "Low Alarm",
-      size: 200,
+      size: 100,
       cell: ({ row }) => (
         <FormInput.Text
-          unit={
-            !noUnits.includes(row.original?.unit?.name) &&
-            row.original?.unit?.name
-          }
           horizontal
           type="number"
           name={`low_alarm_${row.original?.id}`}
@@ -97,16 +102,38 @@ export default function useConfigPoints() {
     columnsHelper.accessor("high_alarm", {
       id: "high_alarm",
       header: "High Alarm",
-      size: 200,
+      size: 100,
       cell: ({ row }) => (
         <FormInput.Text
-          unit={
-            !noUnits.includes(row.original?.unit?.name) &&
-            row.original?.unit?.name
-          }
           horizontal
           type="number"
           name={`high_alarm_${row.original?.id}`}
+          disabled={!row.original?.status}
+        />
+      ),
+    }),
+    columnsHelper.accessor("control_min", {
+      id: "control_min",
+      header: "Control Min",
+      size: 100,
+      cell: ({ row }) => (
+        <FormInput.Text
+          horizontal
+          type="number"
+          name={`control_min_${row.original?.id}`}
+          disabled={!row.original?.status}
+        />
+      ),
+    }),
+    columnsHelper.accessor("control_max", {
+      id: "control_max",
+      header: "Control Max",
+      size: 100,
+      cell: ({ row }) => (
+        <FormInput.Text
+          horizontal
+          type="number"
+          name={`control_max_${row.original?.id}`}
           disabled={!row.original?.status}
         />
       ),
@@ -201,6 +228,8 @@ export default function useConfigPoints() {
               ...acc,
               [`low_alarm_${curr["id"]}`]: curr["low_alarm"],
               [`high_alarm_${curr["id"]}`]: curr["high_alarm"],
+              [`control_min_${curr["id"]}`]: curr["control_min"],
+              [`control_max_${curr["id"]}`]: curr["control_max"],
             };
           }, {})
         );
@@ -216,7 +245,15 @@ export default function useConfigPoints() {
                 [`high_alarm_${curr["id"]}`]: yup
                   .number()
                   .required("High Alarm is required")
-                  .min(0, "Low Alarm must be greater than 0"),
+                  .min(0, "High Alarm must be greater than 0"),
+                [`control_min_${curr["id"]}`]: yup
+                  .number()
+                  .required("Control Min is required")
+                  .min(0, "Control Min must be greater than 0"),
+                [`control_max_${curr["id"]}`]: yup
+                  .number()
+                  .required("Control Max is required")
+                  .min(0, "Control Max must be greater than 0"),
               };
             }, {}),
           })
@@ -250,6 +287,8 @@ export default function useConfigPoints() {
             id_point: parseInt(id_point),
             low_alarm: data[`low_alarm_${id_point}`],
             high_alarm: data[`high_alarm_${id_point}`],
+            control_min: data[`control_min_${id_point}`],
+            control_max: data[`control_max_${id_point}`],
           },
         ];
       }, []),
