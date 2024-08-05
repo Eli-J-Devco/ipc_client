@@ -252,7 +252,11 @@ export function AddComponentsModal({ close, components, setComponents }) {
           className="w-25"
           variant="white"
           onClick={() => {
-            if (!deviceTypes?.some((item) => item.quantity > 0)) {
+            if (
+              !deviceTypes?.some(
+                (item) => item.quantity > 0 || item.quantity === -1
+              )
+            ) {
               LibToast.toast(
                 "This device reaches the limit of components",
                 "error"
