@@ -147,7 +147,7 @@ export default function ConfirmModal({
             />
           </div>
         ) : (
-          <p>Are you sure to disable these points?</p>
+          <p>Are you sure to {action.toLowerCase()} these points?</p>
         )}
       </Modal>
     )
