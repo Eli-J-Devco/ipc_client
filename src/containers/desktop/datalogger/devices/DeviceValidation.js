@@ -49,7 +49,7 @@ export const inverterSchema = {
   rated_power_custom: yup
     .number()
     .required("Please fill this field")
-    .min(0, "Must greater than or equal to 0")
+    .moreThan(0, "Must greater than or equal to 0")
     .max(yup.ref("rated_power"), "Must less than or equal to rated power"),
   min_watt_in_percent: yup
     .number()
