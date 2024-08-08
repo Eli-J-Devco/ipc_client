@@ -88,7 +88,6 @@ export default function useDevices() {
       id: "toggle",
       size: 5,
       maxSize: 5,
-      header: () => <div></div>,
       cell: ({ row }) => (
         <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
           {row.original.children && (
@@ -114,7 +113,13 @@ export default function useDevices() {
               ].includes(row.original.state)}
             >
               <Button.Image
-                image={row.getIsExpanded() ? <CollapseIcon /> : <ExpandIcon />}
+                image={
+                  row.subRows.length !== 0 && row.getIsExpanded() ? (
+                    <CollapseIcon />
+                  ) : (
+                    <ExpandIcon />
+                  )
+                }
               />
             </Button>
           )}
@@ -392,6 +397,12 @@ export default function useDevices() {
 
     return newData;
   }, [allDevices, data, state]);
+
+  useEffect(() => {
+    if (!_.isEmpty(rowSelection)) {
+      setRowSelection({});
+    }
+  }, [allDevices]);
 
   useEffect(() => {
     if (needRefresh) {
