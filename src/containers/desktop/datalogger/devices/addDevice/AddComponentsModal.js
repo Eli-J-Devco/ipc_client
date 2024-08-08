@@ -119,7 +119,11 @@ export function AddComponentsModal({ close, components, setComponents }) {
                     <FormInput.Select
                       name={"device[" + index + "].device_type"}
                       option={deviceTypes?.filter(
-                        (t) => t.quantity > 0 || t.quantity === -1
+                        (t) =>
+                          t.quantity >
+                            addingComponents.filter(
+                              (a) => a.device_type.label === t.label
+                            ).length || t.quantity === -1
                       )}
                       required={true}
                       isSearchable={true}

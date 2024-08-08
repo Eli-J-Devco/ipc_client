@@ -139,81 +139,98 @@ export default function useAddComponentsModal(components) {
 
   const handleDeviceTypeChange = (e, index) => {
     setTimeout(() => {
-      setAddingComponents(
-        addingComponents.map((item, idx) => {
-          if (idx === index) {
-            return {
-              ...item,
-              device_type: e,
-              device_group: "",
-              template: "",
-              device: "",
-            };
-          }
-          return item;
-        })
-      );
+      let selectedDevice = addingComponents[index]?.device;
+      if (selectedDevice) {
+        setCloneDevices(
+          cloneDevices.map((item) => {
+            if (item.id === selectedDevice.value.id) {
+              return {
+                ...item,
+                selected: false,
+              };
+            }
+            return item;
+          })
+        );
+      }
+
+      let addingComponentsClone = _.cloneDeep(addingComponents);
+      addingComponentsClone[index] = {
+        device_type: e,
+        device: "",
+        device_group: "",
+        template: "",
+      };
+      setAddingComponents(addingComponentsClone);
     });
   };
 
   const handleDeviceGroupChange = (e, index) => {
     setTimeout(() => {
-      setAddingComponents(
-        addingComponents.map((item, idx) => {
-          if (idx === index) {
-            return {
-              ...item,
-              device_group: e,
-              template: "",
-              device: "",
-            };
-          }
-          return item;
-        })
-      );
+      let selectedDevice = addingComponents[index]?.device;
+      if (selectedDevice) {
+        setCloneDevices(
+          cloneDevices.map((item) => {
+            if (item.id === selectedDevice.value.id) {
+              return {
+                ...item,
+                selected: false,
+              };
+            }
+            return item;
+          })
+        );
+      }
+
+      let addingComponentsClone = _.cloneDeep(addingComponents);
+      addingComponentsClone[index] = {
+        ...addingComponentsClone[index],
+        device_group: e,
+        device: "",
+        template: "",
+      };
+
+      setAddingComponents(addingComponentsClone);
     }, 100);
   };
 
   const handleTemplateChange = (e, index) => {
     setTimeout(() => {
-      setAddingComponents(
-        addingComponents.map((item, idx) => {
-          if (idx === index) {
-            return {
-              ...item,
-              template: e,
-              device: "",
-            };
-          }
-          return item;
-        })
-      );
+      let selectedDevice = addingComponents[index]?.device;
+      if (selectedDevice) {
+        setCloneDevices(
+          cloneDevices.map((item) => {
+            if (item.id === selectedDevice.value.id) {
+              return {
+                ...item,
+                selected: false,
+              };
+            }
+            return item;
+          })
+        );
+      }
+
+      let addingComponentsClone = _.cloneDeep(addingComponents);
+      addingComponentsClone[index] = {
+        ...addingComponentsClone[index],
+        template: e,
+        device: "",
+      };
+
+      setAddingComponents(addingComponentsClone);
     }, 100);
   };
 
   const handleDeviceChange = (e, index) => {
     setTimeout(() => {
       let resetDevice = addingComponents[index]?.device;
-      setAddingComponents(
-        addingComponents.map((item, idx) => {
-          if (idx === index) {
-            setDeviceType(
-              deviceType.map((d) => ({
-                ...d,
-                quantity:
-                  d.value === item.device_type.value && d.quantity > 0
-                    ? d.quantity - 1
-                    : d.quantity,
-              }))
-            );
-            return {
-              ...item,
-              device: e,
-            };
-          }
-          return item;
-        })
-      );
+      let addingComponentsClone = _.cloneDeep(addingComponents);
+      addingComponentsClone[index] = {
+        ...addingComponentsClone[index],
+        device: e,
+      };
+      setAddingComponents(addingComponentsClone);
 
       setCloneDevices(
         cloneDevices.map((item) => {
