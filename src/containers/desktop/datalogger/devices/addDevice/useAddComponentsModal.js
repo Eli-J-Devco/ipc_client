@@ -64,14 +64,6 @@ export default function useAddComponentsModal(components) {
     setCloneDevices(
       cloneDevices.map((item) => {
         if (item.selected && !removeDevices.includes(item.id)) {
-          console.log("device type", item.device_type);
-          setDeviceType(
-            deviceType.map((d) => ({
-              ...d,
-              quantity:
-                d.value === item.id_device_type ? d.quantity + 1 : d.quantity,
-            }))
-          );
           return {
             ...item,
             selected: false,
@@ -262,9 +254,10 @@ export default function useAddComponentsModal(components) {
       if (e === "") return;
 
       let devices = cloneDevices;
-      if (addingComponents[index]?.device) {
+      let addingComponentsClone = _.cloneDeep(addingComponents);
+      if (addingComponentsClone[index]?.device) {
         devices = devices.map((item) => {
-          if (item.id === addingComponents[index].device.value.id) {
+          if (item.id === addingComponentsClone[index].device.value.id) {
             return {
               ...item,
               selected: false,
@@ -278,36 +271,22 @@ export default function useAddComponentsModal(components) {
       let newItem = {
         id: _.uniqueId("device_"),
         name: e,
-        id_template: addingComponents[index]?.template?.value?.id_template,
-        id_device_type: addingComponents[index]?.device_type?.value,
-        id_device_group: addingComponents[index]?.device_group?.value,
+        id_template: addingComponentsClone[index]?.template?.value?.id_template,
+        id_device_type: addingComponentsClone[index]?.device_type?.value,
+        id_device_group: addingComponentsClone[index]?.device_group?.value,
         selected: true,
         parent: null,
       };
+      addingComponentsClone[index] = {
+        ...addingComponentsClone[index],
+        device: {
+          label: e,
+          value: newItem,
+        },
+      };
       setCloneDevices([...devices, newItem]);
-      setAddingComponents(
-        addingComponents.map((item, idx) => {
-          if (idx === index) {
-            setDeviceType(
-              deviceType.map((d) => ({
-                ...d,
-                quantity:
-                  d.value === item.device_type.value && d.quantity > 0
-                    ? d.quantity - 1
-                    : d.quantity,
-              }))
-            );
-            return {
-              ...item,
-              device: {
-                label: e,
-                value: newItem,
-              },
-            };
-          }
-          return item;
-        })
-      );
+
+      setAddingComponents(addingComponentsClone);
     }, 100);
   };
 
