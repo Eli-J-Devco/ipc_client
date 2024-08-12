@@ -16,10 +16,12 @@ import { loginService } from "../../../services/loginService";
 
 import Constants from "../../../utils/Constants";
 import { ungzip } from "pako";
+import _ from "lodash";
 
 const ProjectSetupInformation = () => {
   const {
     projectSetup,
+    screenList,
     setProjectSetup,
     setEthernetConfig,
     setRS485Config,
@@ -34,7 +36,8 @@ const ProjectSetupInformation = () => {
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/datalogger/quickstart";
+  const from = location.state?.from?.pathname;
+  const defaultScreen = "/datalogger/quickstart";
   const output = document.getElementById("progress");
 
   /**
@@ -244,15 +247,27 @@ const ProjectSetupInformation = () => {
    * @author nhan.tran 2024-03-11
    */
   useEffect(() => {
-    if (projectSetup?.id && auth?.hasJustLoggedIn) {
-      setAuth({ ...auth, hasJustLoggedIn: false });
-      navigate(projectSetup?.first_page_on_login?.path, {
-        replace: true,
-        state: { from: from },
-      });
-    }
-    output.innerHTML = "";
-  }, [from, auth, projectSetup, navigate, setAuth, output]);
+    if (_.isEmpty(projectSetup)) return;
+    if (_.isEmpty(screenList)) return;
+
+    setTimeout(() => {
+      if (projectSetup?.id && auth?.hasJustLoggedIn) {
+        const firstPageOnLogin = screenList.find(
+          (screen) => screen.id === projectSetup.id_first_page_on_login
+        );
+        if (firstPageOnLogin) {
+          navigate(firstPageOnLogin.path, {
+            replace: true,
+            state: { from: from },
+          });
+        } else {
+          navigate(from ? from : defaultScreen, { replace: true });
+        }
+        setAuth({ ...auth, hasJustLoggedIn: false });
+      }
+      output.innerHTML = "";
+    }, 500);
+  }, [from, auth, projectSetup, navigate, setAuth, output, screenList]);
 
   return (
     <div>{projectSetup && !auth?.hasJustLoggedIn ? <Outlet /> : <p></p>}</div>

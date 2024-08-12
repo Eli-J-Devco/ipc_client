@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  *********************************************************/
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import styles from "./LoginAdmin.module.scss";
