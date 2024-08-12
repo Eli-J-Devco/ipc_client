@@ -73,12 +73,12 @@ function Channel() {
       setLoggingInterval(
         uploadChanelConfig?.logging_intervals?.map((interval) => ({
           value: interval.id,
-          label: interval.time,
+          label: interval.name,
         }))
       );
       defaultLoggingInterval.current =
         uploadChanelConfig?.logging_intervals?.filter(
-          (interval) => interval.time === "5 minutes"
+          (interval) => interval.name === "5 minutes"
         );
     }, 100);
 
