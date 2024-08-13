@@ -14,7 +14,8 @@ import useProjectSetup from "../../../../../hooks/useProjectSetup";
 
 function EthernetTwo() {
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/datalogger/ethernet-1";
+  const from =
+    location.state?.from?.pathname || "/datalogger/quickstart/ethernet-1";
   const to = "/datalogger/quickstart/rs485-1";
   const ethernet = useEthernet();
   const { ethernetConfig } = useProjectSetup();
