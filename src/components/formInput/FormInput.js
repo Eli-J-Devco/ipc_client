@@ -174,6 +174,7 @@ const Check = forwardRef(
     {
       className,
       label,
+      id,
       name,
       checked,
       disabled,
@@ -190,7 +191,7 @@ const Check = forwardRef(
       <Form.Check
         ref={ref}
         type={type}
-        id={name}
+        id={id}
         name={name}
         label={label}
         disabled={disabled}
@@ -584,6 +585,7 @@ function Switch({
   inline,
   onChange,
   onBlur,
+  style,
 }) {
   const validate = useContext(FormInputContext);
 
@@ -598,6 +600,7 @@ function Switch({
       className={`${styles["form-check"]} ${className ? className : ""} ${
         styles.switch
       }`}
+      style={style}
       checked={
         validate && checked === undefined ? validate.values[name] : checked
       }

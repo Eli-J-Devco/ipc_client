@@ -93,4 +93,19 @@ Libs.AESDecrypt = function (plainText, secretKey) {
   return CryptoLib.AESDecrypt(plainText, secretKey);
 };
 
+/**
+ * @description: Show/ hide progress bar
+ * @since: 2024-07-13
+ * @param {Boolean} isShow
+ * @author: nhan.tran
+ */
+Libs.progress = function (isShow) {
+  if (isShow) {
+    document.getElementById("progress").innerHTML =
+      "<div><img src='/loading.gif' /></div>";
+  } else {
+    document.getElementById("progress").innerHTML = "";
+  }
+};
+
 export default Libs;

@@ -12,11 +12,15 @@ import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 import useProjectSetup from "../../../../../hooks/useProjectSetup";
 import { loginService } from "../../../../../services/loginService";
 
-import { RButton } from "./../../../../../components/Controls";
-import ReactSelectDropdown from "../../../../../components/ReactSelectDropdown";
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 import _ from "lodash";
+import FormInput from "../../../../../components/formInput/FormInput";
+import useQuickstart from "../useQuickStart";
+import { ReactComponent as BackIcon } from "../../../../../assets/images/back.svg";
+import { ReactComponent as SaveIcon } from "../../../../../assets/images/save.svg";
+import Button from "../../../../../components/button/Button";
+import Libs from "../../../../../utils/Libs";
 
 function Done() {
   const axiosPrivate = useAxiosPrivate();
@@ -26,11 +30,13 @@ function Done() {
   const [link, setLink] = useState([]);
   const existedLink = useRef();
   const { projectSetup, setProjectSetup, screenList } = useProjectSetup();
+  const { back, save } = useQuickstart();
 
   const navigate = useNavigate();
   const location = useLocation();
   const from =
     location.state?.from?.pathname || "/datalogger/quickstart/upload-channels";
+  const to = null;
 
   useEffect(() => {
     /**
@@ -40,8 +46,7 @@ function Done() {
      */
     if (_.isEmpty(projectSetup) || !screenList?.length) return;
 
-    var output = document.getElementById("progress");
-    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    Libs.progress(true);
     setTimeout(() => {
       setLink(
         screenList.map((item) => ({
@@ -60,7 +65,7 @@ function Done() {
         value: { id: existed.id, path: existed.path },
         label: existed.screen_name,
       };
-      output.innerHTML = "";
+      Libs.progress(false);
     }, 100);
   }, [projectSetup, screenList]);
 
@@ -89,10 +94,8 @@ function Done() {
       id_first_page_on_login: selectedDone.value.id,
     };
 
-    const updateFirstPage = async () => {
+    setTimeout(async () => {
       try {
-        var output = document.getElementById("progress");
-        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         const response = await axiosPrivate.post(
           Constants.API_URL.PROJECT.UPDATE_FIRST_PAGE_ON_LOGIN,
           data,
@@ -115,15 +118,12 @@ function Done() {
           navigate(selectedDone?.value?.path, { state: { from: from } });
         }
       } catch (error) {
-        if (!loginService.handleMissingInfo(error))
-          LibToast.toast(t("toastMessage.error.update"), "error");
-        else navigate("/", { replace: true });
+        loginService.handleMissingInfo(error, t("toastMessage.error.update")) &&
+          navigate("/", { replace: true });
       } finally {
-        output.innerHTML = "";
+        Libs.progress(false);
       }
-    };
-
-    updateFirstPage();
+    }, 300);
   };
 
   return (
@@ -138,37 +138,45 @@ function Done() {
             <div className="col-md-3"></div>
             <div className="col-md-6">
               <div className="mb-3">
-                <div className="form_dropdown">
-                  <ReactSelectDropdown
-                    label={t("site.go_to_page")}
-                    className="go_to_page"
-                    inputId="go_to_page"
-                    inputName="go_to_page"
-                    name="go_to_page"
-                    value={selectedDone}
-                    onChange={handleDropdownChange}
-                    optionList={link}
-                  />
-                </div>
+                <FormInput.Select
+                  label={t("site.go_to_page")}
+                  name="go_to_page"
+                  value={selectedDone}
+                  onChange={handleDropdownChange}
+                  option={link}
+                />
               </div>
 
-              <div className="form-footer">
+              <div className={styles["form-footer"]}>
                 <div className="mb-3">
-                  <RButton
-                    className="btn_back"
-                    text="Back"
-                    iClass={true}
-                    iClassType="back"
-                    onClick={() => navigate(from)}
-                  />
+                  {from && (
+                    <Button
+                      variant="dark"
+                      className={`${styles["button"]} me-3`}
+                      onClick={() => back(from)}
+                    >
+                      <Button.Image image={<BackIcon />} />
+                    </Button>
+                  )}
 
-                  <RButton
-                    className="btn_save margin-left15"
-                    text="Save"
-                    iClass={true}
-                    iClassType="save"
+                  <Button
+                    variant="dark"
+                    className={`${styles["button"]} me-3`}
                     onClick={handleSubmit}
-                  />
+                  >
+                    <Button.Image image={<SaveIcon />} className="me-1" />
+                    <Button.Text text={to ? "Save & Next" : "Save"} />
+                  </Button>
+
+                  {to && (
+                    <Button
+                      variant="light"
+                      className={styles["button"]}
+                      onClick={() => save(to)}
+                    >
+                      <Button.Text text="Skip" />
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

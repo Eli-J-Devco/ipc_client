@@ -17,6 +17,12 @@ import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 import useProjectSetup from "../../../../../hooks/useProjectSetup";
 import _ from "lodash";
+import Button from "../../../../../components/button/Button";
+import useQuickstart from "../useQuickStart";
+import { ReactComponent as BackIcon } from "../../../../../assets/images/back.svg";
+import { ReactComponent as SaveIcon } from "../../../../../assets/images/save.svg";
+import FormInput from "../../../../../components/formInput/FormInput";
+import Libs from "../../../../../utils/Libs";
 
 function LoggingRate() {
   const axiosPrivate = useAxiosPrivate();
@@ -34,6 +40,7 @@ function LoggingRate() {
   const from =
     location.state?.from?.pathname || "/datalogger/quickstart/rs485-2";
   const to = "/datalogger/quickstart/upload-channels";
+  const { back, save } = useQuickstart();
 
   useEffect(() => {
     /**
@@ -42,8 +49,7 @@ function LoggingRate() {
      */
     if (_.isEmpty(projectSetup) || _.isEmpty(loggingIntervalConfig)) return;
 
-    var output = document.getElementById("progress");
-    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    Libs.progress(true);
     setTimeout(() => {
       setLoggingRate(
         loggingIntervalConfig.map((item) => ({
@@ -63,7 +69,7 @@ function LoggingRate() {
           (item) => item.id === projectSetup?.id_logging_interval
         )[0]["name"],
       });
-      output.innerHTML = "";
+      Libs.progress(false);
     }, 100);
   }, [projectSetup, loggingIntervalConfig]);
 
@@ -92,17 +98,12 @@ function LoggingRate() {
       id_logging_interval: selectedLoggingRate.value,
     };
 
-    const updateLoggingRate = async () => {
+    Libs.progress(true);
+    setTimeout(async () => {
       try {
-        var output = document.getElementById("progress");
         const response = await axiosPrivate.post(
           Constants.API_URL.PROJECT.UPDATE_LOGGING_RATE,
-          data,
-          {
-            onDownloadProgress: () => {
-              output.innerHTML = "<div><img src='/loading.gif' /></div>";
-            },
-          }
+          data
         );
         if (response.status === 200) {
           LibToast.toast(
@@ -125,11 +126,9 @@ function LoggingRate() {
           "Failed to update logging interval rate"
         ) && navigate("/", { replace: true });
       } finally {
-        output.innerHTML = "";
+        Libs.progress(false);
       }
-    };
-
-    updateLoggingRate();
+    }, 300);
   };
   return (
     <div className={styles.logging_rate}>
@@ -143,43 +142,45 @@ function LoggingRate() {
             <div className="col-md-3"></div>
             <div className="col-md-6">
               <div className="mb-3">
-                <div className="form_dropdown">
-                  <ReactSelectDropdown
-                    label={t("site.logging_interval")}
-                    className="logging_interval"
-                    inputId="logging_interval"
-                    inputName="logging_interval"
-                    name="logging_interval"
-                    value={selectedLoggingRate}
-                    onChange={handleDropdownChange}
-                    optionList={loggingRate}
-                  />
-                </div>
+                <FormInput.Select
+                  label={t("site.logging_interval")}
+                  name="logging_interval"
+                  value={selectedLoggingRate}
+                  onChange={handleDropdownChange}
+                  option={loggingRate}
+                />
               </div>
 
-              <div className="form-footer">
+              <div className={styles["form-footer"]}>
                 <div className="mb-3">
-                  <RButton
-                    className="btn_back"
-                    text="Back"
-                    iClass={true}
-                    iClassType="back"
-                    onClick={() => navigate(from)}
-                  />
+                  {from && (
+                    <Button
+                      variant="dark"
+                      className={`${styles["button"]} me-3`}
+                      onClick={() => back(from)}
+                    >
+                      <Button.Image image={<BackIcon />} />
+                    </Button>
+                  )}
 
-                  <RButton
-                    className="btn_save margin-left15"
-                    text="Save & Next"
-                    iClass={true}
-                    iClassType="save"
+                  <Button
+                    variant="dark"
+                    className={`${styles["button"]} me-3`}
                     onClick={handleSubmit}
-                  />
+                  >
+                    <Button.Image image={<SaveIcon />} className="me-1" />
+                    <Button.Text text={to ? "Save & Next" : "Save"} />
+                  </Button>
 
-                  <RButton
-                    className="btn_skip margin-left15"
-                    text="Skip"
-                    onClick={() => navigate(to)}
-                  />
+                  {to && (
+                    <Button
+                      variant="light"
+                      className={styles["button"]}
+                      onClick={() => save(to)}
+                    >
+                      <Button.Text text="Skip" />
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

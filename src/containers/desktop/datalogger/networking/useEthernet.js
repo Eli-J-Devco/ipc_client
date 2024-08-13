@@ -15,6 +15,8 @@ import Constants from "../../../../utils/Constants";
 import LibToast from "../../../../utils/LibToast";
 import canEdit from "../../../../utils/DisabledStateByIPMode";
 import useProjectSetup from "../../../../hooks/useProjectSetup";
+import Libs from "../../../../utils/Libs";
+import * as Yup from "yup";
 
 export default function useEthernet() {
   const { t } = useTranslation();
@@ -38,6 +40,40 @@ export default function useEthernet() {
   const setDropdownOption = { nic: setNICOptions, mode: setModeOptions };
   const options = { nic: NICOptions, mode: modeOptions };
   const selectedOption = { nic: selectedNIC, mode: modeInfo };
+  const [initialValues, setInitialValues] = useState({
+    name: "",
+    namekey: "",
+    id_type_ethernet: "",
+    ip_address: "",
+    subnet_mask: "",
+    gateway: "",
+    mtu: "",
+    dns1: "",
+    dns2: "",
+    allow_dns: true,
+  });
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Name is required"),
+    id_type_ethernet: Yup.string().required("Type is required"),
+    ip_address: Yup.string()
+      .required("IP Address is required")
+      .matches(Constants.REGEX_PATTERN.IP_ADDRESS, "Invalid IP Address"),
+    subnet_mask: Yup.string()
+      .required("Subnet Mask is required")
+      .matches(Constants.REGEX_PATTERN.IP_ADDRESS, "Invalid Subnet Mask"),
+    gateway: Yup.string()
+      .required("Gateway is required")
+      .matches(Constants.REGEX_PATTERN.IP_ADDRESS, "Invalid Gateway"),
+    mtu: Yup.number().min(1, "MTU must be greater than 0"),
+    dns1: Yup.string().matches(
+      Constants.REGEX_PATTERN.IP_ADDRESS,
+      "Invalid DNS1"
+    ),
+    dns2: Yup.string().matches(
+      Constants.REGEX_PATTERN.IP_ADDRESS,
+      "Invalid DNS2"
+    ),
+  });
 
   const navigate = useNavigate();
 
@@ -83,6 +119,7 @@ export default function useEthernet() {
         `${Constants.API_URL.ETHERNET.ETHERNET_INFO}`,
         { id: id }
       );
+      console.log(ethernetConfig.network, "ethernetConfig.network");
       ethernetConfig.network.forEach((item) => {
         if (item.namekey === ethernet.data.namekey && item.ip_address === "") {
           setIsPlugged(false);
@@ -119,9 +156,7 @@ export default function useEthernet() {
 
       delete ethernet.data.id;
     } catch (error) {
-      if (!loginService.handleMissingInfo(error))
-        LibToast.toast(t("toastMessage.error.fetch"), "error");
-      else navigate("/", { replace: true });
+      loginService.handleMissingInfo(error) && navigate("/", { replace: true });
     } finally {
     }
   };
@@ -138,6 +173,7 @@ export default function useEthernet() {
       return;
     }
 
+    Libs.progress(true);
     /**
      * Update ethernet
      * @author: nhan.tran 2024-03-07
@@ -145,37 +181,23 @@ export default function useEthernet() {
      * @param {Object} data
      * return {Object} response
      */
-    const updateEthernet = async () => {
+    setTimeout(async () => {
       try {
-        var output = document.getElementById("progress");
-        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         const response = await axiosPrivate.post(
           Constants.API_URL.ETHERNET.ETHERNET_UPDATE + id,
-          data,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          data
         );
         if (response.status === 200) {
           LibToast.toast("Ethernet-1 " + t("toastMessage.info.update"), "info");
           to && navigate(to, { replace: true });
         }
       } catch (error) {
-        const msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        } else {
-          if (!msg) LibToast.toast(t("toastMessage.error.update"), "error");
-          else navigate("/", { replace: true });
-        }
+        loginService.handleMissingInfo(error) &&
+          navigate("/", { replace: true });
       } finally {
-        output.innerHTML = "";
+        Libs.progress(false);
       }
-    };
-
-    updateEthernet();
+    }, 300);
   };
 
   /**
@@ -224,5 +246,8 @@ export default function useEthernet() {
     setFrom,
     updateIsAutoDNS,
     setNICInfo,
+    validationSchema,
+    initialValues,
+    setInitialValues,
   };
 }

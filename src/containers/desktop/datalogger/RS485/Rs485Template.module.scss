@@ -1,5 +1,12 @@
 .rs485{
     .form_body{
         margin-top: 30px;
+        .button {
+            height: 3em;
+            svg {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+        }
     }
 }

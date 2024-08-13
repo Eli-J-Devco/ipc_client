@@ -7,10 +7,19 @@
             border-radius: 4px;
             .title{
                 padding: 10px 15px;
+                display: flex;
                 .title_name{
                     padding-right: 10px;
                 }
             }
+        }
+
+    }
+    .button {
+        height: 3em;
+        svg {
+            width: 1.5rem;
+            height: 1.5rem;
         }
     }
 }
