@@ -21,6 +21,7 @@ import Modal from "../../../../components/modal/Modal";
 import useProjectSetup from "../../../../hooks/useProjectSetup";
 import LibToast from "../../../../utils/LibToast";
 import { gzip } from "pako";
+import Libs from "../../../../utils/Libs";
 
 // init the module
 highchartsGantt(Highcharts);
@@ -201,8 +202,7 @@ function Overview() {
         setIsOpenRebootCFModal(false);
       }
 
-      var output = document.getElementById("progress");
-      if (isSetup) output.innerHTML = "<div><img src='/loading.gif' /></div>";
+      if (isSetup) Libs.progress(true);
 
       let CPUPercentage = !_.isEmpty(cpuData.CPUInfo.TotalCPUUsage)
         ? cpuData.CPUInfo.TotalCPUUsage.replace("%", "")
@@ -336,26 +336,21 @@ function Overview() {
           runningTime = diffDays === 1 ? `a day` : `${diffDays} days`;
         }
       }
-      setTimeout(() => {
-        setCurInformationCPU(cpuData);
-        if (!_.isEqual(RAM, RAMSolidgaugeOptions)) setRAM(RAMSolidgaugeOptions);
-        if (!_.isEqual(RAMInfo, ramInfo)) setRAMInfo(ramInfo);
-        if (!_.isEqual(SWAP, SWAPSolidgaugeOptions))
-          setSWAP(SWAPSolidgaugeOptions);
-        if (!_.isEqual(SWAPInfo, swapInfo)) setSWAPInfo(swapInfo);
-        if (!_.isEqual(DISK, DISKSolidgaugeOptions))
-          setDISK(DISKSolidgaugeOptions);
-        if (!_.isEqual(DISKInfo, diskInfo)) setDISKInfo(diskInfo);
-        if (!_.isEqual(CPU, CPUSolidgaugeOptions)) setCPU(CPUSolidgaugeOptions);
-        if (!_.isEqual(totalCPU, totalCpu)) setTotalCPU(totalCpu);
-        if (!_.isEqual(timeOfRunning, runningTime))
-          setTimeOfRunning(runningTime);
+      setCurInformationCPU(cpuData);
+      setRAM(RAMSolidgaugeOptions);
+      setRAMInfo(ramInfo);
+      setSWAP(SWAPSolidgaugeOptions);
+      setSWAPInfo(swapInfo);
+      setDISK(DISKSolidgaugeOptions);
+      setDISKInfo(diskInfo);
+      setCPU(CPUSolidgaugeOptions);
+      setTotalCPU(totalCpu);
+      setTimeOfRunning(runningTime);
 
-        if (isSetup) {
-          setIsSetup(false);
-          output.innerHTML = "";
-        }
-      }, 1000);
+      if (isSetup) {
+        setIsSetup(false);
+        Libs.progress(false);
+      }
     }
   }, [cpuData]);
 
@@ -498,6 +493,7 @@ function Overview() {
                               <HighchartsReact
                                 highcharts={Highcharts}
                                 options={CPU}
+                                immutable={false}
                               />
                             </div>
                           </div>
@@ -512,6 +508,7 @@ function Overview() {
                               <HighchartsReact
                                 highcharts={Highcharts}
                                 options={RAM}
+                                immutable={false}
                               />
                             </div>
                           </div>
@@ -531,6 +528,7 @@ function Overview() {
                               <HighchartsReact
                                 highcharts={Highcharts}
                                 options={DISK}
+                                immutable={false}
                               />
                             </div>
                           </div>
@@ -551,6 +549,7 @@ function Overview() {
                               <HighchartsReact
                                 highcharts={Highcharts}
                                 options={SWAP}
+                                immutable={false}
                               />
                             </div>
                           </div>
@@ -577,7 +576,7 @@ function Overview() {
                           highcharts={Highcharts}
                           options={options}
                           allowChartUpdate={true}
-                          immutable={true}
+                          immutable={false}
                           ref={chartRef}
                         />
                       </div>

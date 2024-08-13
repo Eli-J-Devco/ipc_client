@@ -78,16 +78,16 @@ function Traffic() {
     credits: {
       enabled: false,
     },
-    colors: ["#32CD32", "#52a9ff"],
+    colors: ["#f7b851", "#52a9ff"],
     plotOptions: {
       areaspline: {
-        fillColor: {
-          linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
-          stops: [
-            [0, "#32CD32"],
-            [1, "#32CD3200"],
-          ],
-        },
+        // fillColor: {
+        //   linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+        //   stops: [
+        //     [0, "#32CD32"],
+        //     [1, "#32CD3200"],
+        //   ],
+        // },
         threshold: null,
         marker: {
           lineWidth: 1,
@@ -101,10 +101,24 @@ function Traffic() {
       {
         name: "Upstream",
         data: [],
+        fillColor: {
+          linearGradient: [0, 0, 0, 300],
+          stops: [
+            [0, "#f7b851"],
+            [1, "#f7b8511a"],
+          ],
+        },
       },
       {
         name: "Downstream",
         data: [],
+        fillColor: {
+          linearGradient: [0, 0, 0, 300],
+          stops: [
+            [0, "#52a9ff"],
+            [1, "#52a9ff1a"],
+          ],
+        },
       },
     ],
   });
@@ -198,7 +212,7 @@ function Traffic() {
           highcharts={Highcharts}
           options={optionsTraffic}
           allowChartUpdate={true}
-          immutable={true}
+          immutable={false}
           ref={chartRef}
         />
       </div>
