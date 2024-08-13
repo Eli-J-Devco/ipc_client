@@ -19,6 +19,7 @@ import { useDeviceManagement } from "./DeviceManagement";
 import LibToast from "../../../../utils/LibToast";
 import { ReactComponent as ExpandIcon } from "../../../../assets/images/chevron-down.svg";
 import { ReactComponent as CollapseIcon } from "../../../../assets/images/chevron-up.svg";
+import Libs from "../../../../utils/Libs";
 
 export const statusEnum = {
   online: 1,
@@ -74,6 +75,7 @@ export default function useDevices() {
   });
   const [isUpdateDevice, setIsUpdateDevice] = useState(false);
   const [isDeleteDevice, setIsDeleteDevice] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [newDevices, setNewDevices] = useState({
     parent: 0,
     devices: [],
@@ -413,7 +415,9 @@ export default function useDevices() {
     }
   }, [needRefresh]);
 
-  const deleteDevices = () => {
+  useEffect(() => {
+    if (!isDeleting) return;
+
     let ids = [];
     Object.keys(rowSelection).forEach((key) => {
       let splitedKey = key.split(".");
@@ -424,7 +428,7 @@ export default function useDevices() {
 
       ids.push(findId(dataDevices, splitedKey));
     });
-    output.innerHTML = "<div><img src='/loading.gif' /></div>";
+    Libs.progress(true);
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
@@ -452,12 +456,13 @@ export default function useDevices() {
         loginService.handleMissingInfo(error, "Failed to delete devices") &&
           navigate("/", { replace: true });
       } finally {
-        output.innerHTML = "";
+        Libs.progress(false);
         setRowSelection({});
         setIsDeleteDevice(false);
+        setIsDeleting(false);
       }
     }, 500);
-  };
+  }, [isDeleting]);
 
   useEffect(() => {
     if (!deadletter) return;
@@ -594,6 +599,7 @@ export default function useDevices() {
     deviceConfig,
     columns,
     rowSelection,
+    isDeleting,
     setIsRetry,
     setRowSelection,
     openAddDevice,
@@ -601,8 +607,8 @@ export default function useDevices() {
     openUpdateDevice,
     closeUpdateDevice,
     handleConfigDevice,
-    deleteDevices,
     setIsDeleteDevice,
+    setIsDeleting,
     retryCreateDevice,
   };
 }

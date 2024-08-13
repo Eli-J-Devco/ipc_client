@@ -25,12 +25,13 @@ export default function Devices() {
     columns,
     rowSelection,
     isRetry,
+    isDeleting,
     setIsRetry,
     setRowSelection,
     openAddDevice,
     closeAddDevice,
-    deleteDevices,
     setIsDeleteDevice,
+    setIsDeleting,
     closeUpdateDevice,
     retryCreateDevice,
   } = useDevices();
@@ -65,8 +66,12 @@ export default function Devices() {
               <Button
                 variant="dark"
                 onClick={() => {
-                  deleteDevices();
+                  setTimeout(() => {
+                    if (isDeleting) return;
+                    setIsDeleting(true);
+                  }, 100);
                 }}
+                disabled={isDeleting}
               >
                 <Button.Text text="Delete" />
               </Button>
