@@ -111,7 +111,7 @@ function Rs485Template({
                   <Button
                     variant="dark"
                     className={`${styles["button"]} me-3`}
-                    onClick={() => handleSave(id)}
+                    onClick={() => handleSave(id, to)}
                   >
                     <Button.Image image={<SaveIcon />} className="me-1" />
                     <Button.Text text={to ? "Save & Next" : "Save"} />
