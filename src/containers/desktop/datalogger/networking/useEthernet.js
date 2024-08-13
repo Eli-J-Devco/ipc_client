@@ -119,7 +119,6 @@ export default function useEthernet() {
         `${Constants.API_URL.ETHERNET.ETHERNET_INFO}`,
         { id: id }
       );
-      console.log(ethernetConfig.network, "ethernetConfig.network");
       ethernetConfig.network.forEach((item) => {
         if (item.namekey === ethernet.data.namekey && item.ip_address === "") {
           setIsPlugged(false);
@@ -184,8 +183,8 @@ export default function useEthernet() {
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.ETHERNET.ETHERNET_UPDATE + id,
-          data
+          Constants.API_URL.ETHERNET.ETHERNET_UPDATE,
+          { id: id, ...data }
         );
         if (response.status === 200) {
           LibToast.toast("Ethernet-1 " + t("toastMessage.info.update"), "info");
