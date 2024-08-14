@@ -246,7 +246,7 @@ export function AddComponentsModal({ close, components, setComponents }) {
         style={{
           position: "absolute",
           top: 0,
-          right: -40,
+          right: "-5.5%",
           zIndex: -1,
           display: "flex",
           flexDirection: "column",

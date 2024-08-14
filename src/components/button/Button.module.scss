@@ -14,7 +14,7 @@ $yellow: invert(80%) sepia(17%) saturate(3222%) hue-rotate(1deg) brightness(108%
         background-color: var(--bg-color-grey);
         color: var(--text-color-dark);
 
-        .img, svg {
+        .img {
             filter: $dark;
         }
     }
@@ -28,7 +28,7 @@ $yellow: invert(80%) sepia(17%) saturate(3222%) hue-rotate(1deg) brightness(108%
         background-color: var(--bg-color-light);
         color: var(--text-color-dark);
 
-        .img, svg {
+        .img {
             filter: $dark;
         }
     }
@@ -39,7 +39,7 @@ $yellow: invert(80%) sepia(17%) saturate(3222%) hue-rotate(1deg) brightness(108%
         padding: 9px 19px;
         border: 1px solid var(--bg-color-grey);
 
-        .img, svg {
+        .img {
             filter: $dark;
         }
     }
@@ -48,7 +48,7 @@ $yellow: invert(80%) sepia(17%) saturate(3222%) hue-rotate(1deg) brightness(108%
         background-color: var(--bg-color-yellow);
         color: var(--text-color-dark);
 
-        .img, svg {
+        .img {
             filter: $dark;
         }
 
@@ -56,7 +56,7 @@ $yellow: invert(80%) sepia(17%) saturate(3222%) hue-rotate(1deg) brightness(108%
             background-color: var(--bg-color-dark);
             color: var(--text-color-light);
             
-            .img, svg {
+            .img {
                 filter: $light;
             }
         }
@@ -66,17 +66,17 @@ $yellow: invert(80%) sepia(17%) saturate(3222%) hue-rotate(1deg) brightness(108%
         background-color: var(--bg-color-yellow);
         color: var(--text-color-dark);
         
-        .img, svg {
+        .img {
             filter: $dark;
         }
     }
 
-    .img, svg {
+    .img {
         filter: $light;
     }
 }
 
-.img, svg {
+.img {
     cursor: pointer;
     &:hover {
         filter: $yellow;

@@ -90,6 +90,7 @@ export default function useDevices() {
       id: "toggle",
       size: 5,
       maxSize: 5,
+      header: () => <div></div>,
       cell: ({ row }) => (
         <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
           {row.original.children && (
