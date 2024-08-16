@@ -47,28 +47,16 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
             <Button
               variant="dark"
               onClick={() => {
-                let deviceTypes = haveComponents.component
-                  .filter((item) => {
-                    if (item.sub_type !== null) {
-                      return (
-                        item.sub_type === device?.inverter_type ||
-                        item.sub_type === device?.meter_type
-                      );
-                    }
+                let deviceTypes = haveComponents.component.filter((item) => {
+                  if (item.sub_type !== null) {
+                    return (
+                      item.sub_type === device?.inverter_type ||
+                      item.sub_type === device?.meter_type
+                    );
+                  }
 
-                    return true;
-                  })
-                  .map((item) => ({
-                    label: item.name,
-                    value: item.component,
-                    type: item.type,
-                    quantity: item.quantity
-                      ? item.quantity -
-                        addingComponents.filter((component) => {
-                          return component.device_type.value === item.component;
-                        }).length
-                      : -1,
-                  }));
+                  return true;
+                });
 
                 setIsOpenAddComponents(true);
                 setComponents({
