@@ -18,6 +18,8 @@ import {
   ratedPowerSchema,
   tcpSchema,
 } from "../DeviceValidation";
+import { createColumnHelper } from "@tanstack/react-table";
+import FormInput from "../../../../../components/formInput/FormInput";
 
 export default function useAddDevice(closeAddDevice) {
   const {
@@ -35,6 +37,7 @@ export default function useAddDevice(closeAddDevice) {
   const [isOpenAddComponents, setIsOpenAddComponents] = useState(false);
   const [addingComponents, setAddingComponents] = useState([]);
   const [haveComponents, setHaveComponents] = useState({});
+  const [updatingComponent, setUpdatingComponent] = useState(null);
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [initialValues, setInitialValues] = useState({
@@ -82,34 +85,71 @@ export default function useAddDevice(closeAddDevice) {
       }),
     })
   );
-  const [columns] = useState([
-    {
-      id: 1,
-      slug: "id",
-      name: "No.",
-      width: 5,
-    },
-    {
-      id: 2,
-      slug: "name",
-      name: "Device Name",
-    },
-    {
-      id: 3,
-      slug: "device_type",
-      name: "Device Type",
-    },
-    {
-      id: 4,
-      slug: "device_group",
-      name: "Device Group",
-    },
-    {
-      id: 5,
-      slug: "template",
-      name: "Template",
-    },
-  ]);
+  const columnsHelper = createColumnHelper();
+  const columns = [
+    columnsHelper.accessor("id", {
+      id: "id",
+      size: 50,
+      header: "No.",
+      cell: ({ row }) => {
+        return <div id={row.original.component.id}>{row.original.id}</div>;
+      },
+    }),
+    columnsHelper.accessor("group", {
+      id: "group",
+      size: 100,
+      header: "Device Type Group",
+      cell: ({ row }) => {
+        return <div>{row.original.name}</div>;
+      },
+    }),
+    columnsHelper.accessor("device_type", {
+      id: "device_type",
+      size: 100,
+      header: "Device Type",
+      cell: ({ row }) => {
+        return (
+          <FormInput.Select
+            name="device_type"
+            value={row.original.component}
+            option={_.cloneDeep(haveComponents)
+              ?.component.filter((item) => item.group === row.original.group)
+              .map((item) =>
+                item.components.map((i) => ({
+                  label: i.name,
+                  value: i.id,
+                  image: i.image,
+                  rowId: row.original.component.id,
+                  group: row.original.group,
+                }))
+              )
+              .flat()}
+            onChange={(e) => setUpdatingComponent(e)}
+          />
+        );
+      },
+    }),
+    columnsHelper.accessor("name", {
+      id: "name",
+      size: 100,
+      header: "Component Name",
+      cell: ({ row }) => {
+        return (
+          <FormInput.Text
+            name="component_name"
+            value={row.original.component.component_name}
+            onChange={(e) => {
+              setUpdatingComponent({
+                component_name: e.target.value,
+                rowId: row.original.component.id,
+                group: row.original.group,
+              });
+            }}
+          />
+        );
+      },
+    }),
+  ];
 
   useEffect(() => {
     initialValues?.communication?.label &&
@@ -132,7 +172,7 @@ export default function useAddDevice(closeAddDevice) {
 
   useEffect(() => {
     initialValues?.device_type?.label &&
-      setTimeout(() => {
+      setTimeout(async () => {
         setSchema(
           yup.object().shape({
             ...(initialValues?.device_type?.label.indexOf(
@@ -174,19 +214,134 @@ export default function useAddDevice(closeAddDevice) {
             meterType: null,
           });
         }
-        let haveComponents = deviceTypeComponents?.find((item) => {
-          if (
-            item.device_type.id === initialValues?.id_device_type &&
-            item.component.length > 0
-          ) {
-            return true;
-          }
-          return false;
-        });
-        setHaveComponents(haveComponents);
-        setAddingComponents([]);
+        await fetchImage(initialValues?.device_type?.image);
       }, 100);
   }, [initialValues?.device_type?.label]);
+
+  const fetchImage = async (path, pos = "4", id = null) => {
+    const posMap = {
+      0: "top",
+      1: "left",
+      2: "bottom",
+      3: "right",
+      4: "center",
+    };
+    if (!path) return;
+    const absolutePath = await import("../../../../../assets/images/" + path);
+    const demoContainer = document.querySelector("#demo");
+    if (demoContainer) {
+      const posContainer = demoContainer.querySelector(
+        `#${posMap[parseInt(pos)]}`
+      );
+      if (posContainer) {
+        const componentId = `id="component_${id}"`;
+        posContainer.innerHTML = `<img ${componentId} src="${absolutePath.default}" alt=""/>`;
+
+        if (pos !== "4") {
+          const connectLine = await import(
+            "../../../../../assets/images/connect-line.svg"
+          );
+          const lineId = `id="line_${id}"`;
+          posContainer.innerHTML += `<img ${lineId} src="${connectLine.default}" alt=""/>`;
+        }
+      }
+    }
+  };
+
+  const clearDemoImage = () => {
+    const demoContainer = document.querySelector("#demo");
+    if (demoContainer) {
+      demoContainer.querySelector("#top").innerHTML = "";
+      demoContainer.querySelector("#bottom").innerHTML = "";
+      demoContainer.querySelector("#center").innerHTML = "";
+      demoContainer.querySelector("#left").innerHTML = "";
+      demoContainer.querySelector("#right").innerHTML = "";
+    }
+  };
+
+  const updateAddingComponent = (deviceType = null) => {
+    const id_device_type = deviceType?.value || initialValues?.id_device_type;
+    let haveComponents = deviceTypeComponents?.find((item) => {
+      if (item.device_type.id === id_device_type && item.component.length > 0) {
+        return true;
+      }
+      return false;
+    });
+    var newAddingComponents = [];
+    if (!_.isEmpty(haveComponents)) {
+      newAddingComponents = haveComponents.component
+        .filter((item) => item.type === 1 && !item.require)
+        .map((item) => {
+          const quantity = item.quantity || 1;
+          const components = [];
+          for (let i = 0; i < quantity; i++) {
+            components.push({
+              value: item.components[0].id,
+              label: item.components[0].name,
+              image: item.components[0].image,
+              plug_point: item.plug_point[i],
+              id: Math.random().toString(36).slice(2, 9),
+            });
+          }
+          return {
+            ...item,
+            components: components,
+          };
+        });
+    }
+
+    setTimeout(() => {
+      setAddingComponents(newAddingComponents);
+      setHaveComponents(haveComponents);
+      newAddingComponents.forEach(async (item) => {
+        if (item.components) {
+          for (let i = 0; i < item.components.length; i++) {
+            await fetchImage(
+              item.components[i].image,
+              item.components[i].plug_point,
+              item.components[i].id
+            );
+          }
+        }
+      });
+    }, 100);
+  };
+
+  useEffect(() => {
+    if (_.isEmpty(updatingComponent)) return;
+
+    const e = updatingComponent;
+    if (!_.isEmpty(e.image)) {
+      const component = document.getElementById(`component_${e.rowId}`);
+      const newImage = import(`../../../../../assets/images/${e.image}`);
+      newImage.then((image) => {
+        component.src = image.default;
+      });
+    }
+    const updateAddingComponents = _.cloneDeep(addingComponents).map((item) => {
+      if (item.group === e.group) {
+        const newComponents = item.components.map((i) => {
+          if (i.id === e.rowId) {
+            return {
+              ...i,
+              ...e,
+            };
+          }
+          return i;
+        });
+        return {
+          ...item,
+          components: newComponents,
+        };
+      }
+      return item;
+    });
+
+    setTimeout(() => {
+      setAddingComponents(updateAddingComponents);
+      setUpdatingComponent(null);
+    }, 100);
+  }, [updatingComponent]);
 
   const openAddMultipleDevice = () => setIsAddMultipleDevice(true);
   const closeAddMultipleDevice = () => {
@@ -216,6 +371,7 @@ export default function useAddDevice(closeAddDevice) {
                 value: item.id,
                 label: item.name,
                 type: item.type,
+                image: item.image,
               })),
             deviceGroup: [
               {
@@ -344,6 +500,7 @@ export default function useAddDevice(closeAddDevice) {
   };
 
   const handleSave = (data) => {
+    console.log(addingComponents);
     setTimeout(() => {
       let newData = {
         ...data,
@@ -351,25 +508,21 @@ export default function useAddDevice(closeAddDevice) {
           tcp_gateway_ip: "",
           tcp_gateway_port: null,
         }),
-        components:
-          addingComponents.length > 0
-            ? addingComponents.map((item) => {
-                if (item.device) {
-                  return {
-                    id:
-                      typeof item.device.value.id === "number"
-                        ? item.device.value.id
-                        : null,
-                    name: item.device.label,
-                    id_device_type: item.device_type?.value,
-                    id_template: item.template?.value?.id_template,
-                    id_device_group: item.device_group?.value,
-                  };
-                }
-                return null;
+        components: !_.isEmpty(addingComponents)
+          ? addingComponents
+              .map((item) => {
+                const components = item.components.map((i) => ({
+                  id: null,
+                  name: i.component_name,
+                  id_device_type: i.value,
+                  group: item.group,
+                }));
+                return components;
               })
-            : [],
+              .flat()
+          : [],
       };
+      console.log(newData);
       setData(newData);
 
       setInitialValues({ ...initialValues, ...newData });
@@ -509,5 +662,8 @@ export default function useAddDevice(closeAddDevice) {
     columns,
     haveComponents,
     onGroupCreateOption,
+    clearDemoImage,
+    fetchImage,
+    updateAddingComponent,
   };
 }

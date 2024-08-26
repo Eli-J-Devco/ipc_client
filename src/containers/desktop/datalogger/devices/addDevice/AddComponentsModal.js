@@ -37,6 +37,9 @@ export function AddComponentsModal({ close, components, setComponents }) {
     setConfirmCreateGroup,
     deviceType: deviceTypes,
     templates,
+    device,
+    mppts,
+    handleMpptChange,
   } = useAddComponentsModal(components);
   return (
     <>
@@ -95,6 +98,8 @@ export function AddComponentsModal({ close, components, setComponents }) {
               <th>Device Group</th>
               <th>Template</th>
               <th>Device</th>
+              {device.device_type.name.toLowerCase().indexOf("inverter") !==
+                -1 && <th>MPPT</th>}
             </tr>
           </thead>
           <tbody>
@@ -196,7 +201,7 @@ export function AddComponentsModal({ close, components, setComponents }) {
 
                           if (
                             item?.status &&
-                            disabledStatus.includes(statusEnum[item?.status])
+                            disabledStatus.indexOf(statusEnum[item?.status])
                           )
                             return false;
 
@@ -235,6 +240,28 @@ export function AddComponentsModal({ close, components, setComponents }) {
                       onCreateOption={(e) => onCreateOption(e, index)}
                     />
                   </td>
+                  {device.device_type.name
+                    .toLowerCase()
+                    .includes("inverter") !== -1 && (
+                    <td>
+                      <FormInput.Select
+                        name={"device[" + index + "].mppt"}
+                        option={mppts.filter((item) => {
+                          const selectedMppts = addingComponents.map(
+                            (component) => {
+                              return component.mppt?.value;
+                            }
+                          );
+
+                          return !selectedMppts.includes(item.value);
+                        })}
+                        required={true}
+                        isSearchable={true}
+                        value={item.mppt}
+                        onChange={(e) => handleMpptChange(e, index)}
+                      />
+                    </td>
+                  )}
                 </tr>
               );
             })}

@@ -184,7 +184,15 @@ export function Device() {
             template: template.data,
             communication: communication.data,
           });
-          setDeviceTypeComponents(deviceTypeComponents.data);
+          setDeviceTypeComponents(
+            deviceTypeComponents.data.map((item) => ({
+              ...item,
+              component: item.component.map((component) => ({
+                ...component,
+                plug_point: component.plug_point.split(","),
+              })),
+            }))
+          );
         } catch (error) {
           loginService.handleMissingInfo(
             error,

@@ -31,11 +31,84 @@
                 td {
                     padding: 0.5rem;
                     border-bottom: 1px solid var(--bg-color-grey);
-                    width: 23.75%;
+                    width: 20%;
                     &:first-child {
                         width: 5%;
                     }
                 }
+            }
+        }
+    }
+
+}
+
+.component{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .demo{
+        background-color: #f0f0f0;
+        padding: 1em 0.5rem;
+        min-height: 20rem;
+        height: 100%;
+        display: grid;
+        grid-template-columns: 33.3333% 33.3333% 33.3333%;
+        gap: 0;
+
+        .top, .bottom {
+            grid-column-start: 1;
+            grid-column-end: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            &.bottom{
+                flex-direction: column-reverse;
+                justify-content: flex-start;
+            }
+
+            &.top{
+                justify-content: flex-end;
+            }
+        }
+
+        .left{
+            grid-column-start: 1;
+            grid-column-end: 2;
+            grid-row-start: 2;
+            grid-row-end: 3;
+            direction: rtl;
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: flex-end;
+            align-items: center;
+            transform: rotate(90deg);
+        }
+        .right{
+            grid-column-start: 3;
+            grid-column-end: 4;
+            grid-row-start: 2;
+            grid-row-end: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            transform: rotate(90deg);
+        }
+
+        .center{
+            grid-column-start: 2;
+            grid-column-end: 3;
+            grid-row-start: 2;
+            grid-row-end: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            img{
+                width: 100%;
+                height: 100%;
             }
         }
     }

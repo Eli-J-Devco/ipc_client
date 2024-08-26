@@ -531,26 +531,28 @@ export default function useDevices() {
 
       let index = parseInt(keys[0]);
       let d = devs[index];
-      if (keys.length === 1) {
-        if (d["creation_state"] === 1) {
-          canRetry = true;
-        } else {
-          canDelete = true;
-        }
-        return canRetry && canDelete ? -1 : canRetry ? 1 : 0;
+      if (d["creation_state"] === 1) {
+        canRetry = true;
+      } else {
+        canDelete = true;
       }
 
-      if (canItemsRetry(d.subRows, keys.slice(1)) !== 1) return -1;
+      if (keys.length === 1) {
+        return canRetry && canDelete ? -1 : canRetry ? 1 : 0;
+      }
+      const children = keys.slice(1);
+      console.log(children);
+      return canItemsRetry(d.subRows, children) === 1 || canRetry;
     };
 
-    let canRetry = 1;
+    let canRetry = false;
     Object.keys(rowSelection).forEach((key) => {
-      if (canRetry !== 1) return;
+      if (canRetry) return;
       let splitedKey = key.split(".");
       canRetry = canItemsRetry(dataDevices, splitedKey);
     });
 
-    setIsRetry({ ...isRetry, canRetry: canRetry === 1 });
+    setIsRetry({ ...isRetry, canRetry: canRetry });
   }, [rowSelection]);
 
   const retryCreateDevice = () => {

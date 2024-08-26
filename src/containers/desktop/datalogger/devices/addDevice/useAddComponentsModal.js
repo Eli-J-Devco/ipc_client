@@ -10,12 +10,11 @@ import { useNavigate } from "react-router-dom";
 export default function useAddComponentsModal(components) {
   const { deviceTypes, templates, deviceGroups, existedComponents } =
     components;
-
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const [rowSelection, setRowSelection] = useState([]);
   const [addingComponents, setAddingComponents] = useState([]);
-  const { allDevices, setDeviceConfig } = useDeviceManagement();
+  const { allDevices, setDeviceConfig, device } = useDeviceManagement();
   const [cloneDevices, setCloneDevices] = useState([]);
   const [deviceType, setDeviceType] = useState(_.cloneDeep(deviceTypes));
   const [deviceGroup, setDeviceGroup] = useState(_.cloneDeep(deviceGroups));
@@ -25,6 +24,7 @@ export default function useAddComponentsModal(components) {
     index: null,
     newGroup: null,
   });
+  const [mppts, setMppts] = useState([]);
 
   useEffect(() => {
     if (_.isEmpty(existedComponents)) return;
@@ -128,6 +128,35 @@ export default function useAddComponentsModal(components) {
       ])
     );
   }, [cloneDevices, allDevices]);
+
+  useEffect(() => {
+    if (_.isEmpty(device?.template)) return;
+
+    if (device.device_type.name.toLowerCase().indexOf("inverter") === -1)
+      return;
+
+    setTimeout(async () => {
+      try {
+        const response = await axiosPrivate.post(
+          Constants.API_URL.POINT_MPPT.GET +
+            "?template_id=" +
+            device.template.id
+        );
+
+        if (response.status === 200) {
+          setMppts(
+            response.data.map((item) => ({
+              label: item.name,
+              value: item.id,
+            }))
+          );
+        }
+      } catch (error) {
+        loginService.handleMissingInfo(error, "Failed to get template mppts") &&
+          navigate("/", { replace: true });
+      }
+    }, 300);
+  }, [device]);
 
   const handleDeviceTypeChange = (e, index) => {
     setTimeout(() => {
@@ -242,6 +271,17 @@ export default function useAddComponentsModal(components) {
           return item;
         })
       );
+    }, 100);
+  };
+
+  const handleMpptChange = (e, index) => {
+    setTimeout(() => {
+      let addingComponentsClone = _.cloneDeep(addingComponents);
+      addingComponentsClone[index] = {
+        ...addingComponentsClone[index],
+        mppt: e,
+      };
+      setAddingComponents(addingComponentsClone);
     }, 100);
   };
 
@@ -396,5 +436,8 @@ export default function useAddComponentsModal(components) {
     setConfirmCreateGroup,
     deviceType,
     templates,
+    device,
+    mppts,
+    handleMpptChange,
   };
 }

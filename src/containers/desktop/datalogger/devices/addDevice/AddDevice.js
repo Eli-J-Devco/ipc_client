@@ -18,6 +18,7 @@ import FormInput from "../../../../../components/formInput/FormInput";
 import { AddComponentsModal } from "./AddComponentsModal";
 import _ from "lodash";
 import Table from "../../../../../components/table/Table";
+import styles from "./AddDevice.module.scss";
 
 export default function AddDevice(props) {
   const navigate = useNavigate();
@@ -43,6 +44,9 @@ export default function AddDevice(props) {
     columns,
     haveComponents,
     onGroupCreateOption,
+    clearDemoImage,
+    fetchImage,
+    updateAddingComponent,
   } = useAddDevice(closeAddDevice);
   const [protocol, setProtocol] = useState({
     Physical: 1,
@@ -70,62 +74,6 @@ export default function AddDevice(props) {
       >
         <Button.Text text="Add Multiple" />
       </Button>
-      {!_.isEmpty(haveComponents) && (
-        <Button
-          variant="dark"
-          className="ms-3"
-          onClick={() => {
-            let deviceTypes = haveComponents.component
-              .filter((item) => {
-                if (item.type !== 1) return false;
-
-                if (item.sub_type !== null) {
-                  return (
-                    item.sub_type === initialValues?.inverter_type?.value ||
-                    item.sub_type === meterType?.value
-                  );
-                }
-
-                return true;
-              })
-              .map((item) => ({
-                label: item.name,
-                value: item.component,
-                type: item.type,
-                quantity: item.quantity
-                  ? item.quantity -
-                    addingComponents.filter((component) => {
-                      return component.device_type.value === item.component;
-                    }).length
-                  : -1,
-              }));
-            setIsOpenAddComponents(true);
-            setComponents({
-              deviceTypes:
-                deviceTypes.length > 1
-                  ? deviceTypes.reduce((acc, item) => {
-                      let output = [];
-                      if (typeof acc[Symbol.iterator] !== "function")
-                        output.push(acc);
-                      else output = acc;
-
-                      if (
-                        !output.find((element) => element.value === item.value)
-                      ) {
-                        output.push(item);
-                      }
-                      return output;
-                    })
-                  : deviceTypes,
-              deviceGroups: deviceConfigDropdown.deviceGroup,
-              templates: deviceConfigDropdown.template,
-              existedComponents: addingComponents,
-            });
-          }}
-        >
-          <Button.Text text="Add components" />
-        </Button>
-      )}
       <Button variant="grey" className="ms-3" onClick={() => closeAddDevice()}>
         <Button.Text text="Cancel" />
       </Button>
@@ -159,11 +107,11 @@ export default function AddDevice(props) {
         <div>
           <ModalDefault
             show={isAddMultipleDevice}
-            style={{ top: "100px" }}
+            s={{ top: "100px" }}
             onHide={() => closeAddMultipleDevice()}
           >
             <ModalDefault.Header
-              style={{ backgroundColor: "#383434", color: "#fff" }}
+              s={{ backgroundColor: "#383434", color: "#fff" }}
             >
               Add Multiple Device
             </ModalDefault.Header>
@@ -179,28 +127,6 @@ export default function AddDevice(props) {
               />
             </ModalDefault.Body>
           </ModalDefault>
-
-          {isOpenAddComponents && (
-            <ModalDefault
-              show={isOpenAddComponents}
-              style={{ top: "100px" }}
-              onHide={() => setIsOpenAddComponents(false)}
-              size="lg"
-            >
-              <ModalDefault.Header
-                style={{ backgroundColor: "#383434", color: "#fff" }}
-              >
-                Add Components
-              </ModalDefault.Header>
-              <ModalDefault.Body>
-                <AddComponentsModal
-                  close={() => setIsOpenAddComponents(false)}
-                  components={components}
-                  setComponents={(data) => setAddingComponents(data)}
-                />
-              </ModalDefault.Body>
-            </ModalDefault>
-          )}
 
           <div className="col-xl-6 col-md-12">
             <FormInput.Text
@@ -252,15 +178,19 @@ export default function AddDevice(props) {
                       template = template[0];
                     }
 
-                    setInitialValues({
-                      ...initialValues,
-                      device_type: e,
-                      id_device_type: e.value,
-                      device_group: device_group,
-                      id_device_group: device_group?.value,
-                      template: template,
-                      id_template: template?.value?.id_template,
-                    });
+                    setTimeout(() => {
+                      clearDemoImage();
+                      setInitialValues({
+                        ...initialValues,
+                        device_type: e,
+                        id_device_type: e.value,
+                        device_group: device_group,
+                        id_device_group: device_group?.value,
+                        template: template,
+                        id_template: template?.value?.id_template,
+                      });
+                      updateAddingComponent(e);
+                    }, 100);
                   }}
                 />
               </div>
@@ -294,13 +224,19 @@ export default function AddDevice(props) {
                       if (template.length >= 0) {
                         template = template[0];
                       }
-                      setInitialValues({
-                        ...initialValues,
-                        device_group: e,
-                        id_device_group: e?.value,
-                        template: template,
-                        id_template: template?.value?.id_template,
-                      });
+
+                      setTimeout(async () => {
+                        clearDemoImage();
+                        await fetchImage(initialValues?.device_type?.image);
+                        updateAddingComponent();
+                        setInitialValues({
+                          ...initialValues,
+                          device_group: e,
+                          id_device_group: e?.value,
+                          template: template,
+                          id_template: template?.value?.id_template,
+                        });
+                      }, 100);
                     }}
                     onCreateOption={(e) => onGroupCreateOption(e)}
                   />
@@ -329,13 +265,18 @@ export default function AddDevice(props) {
                           options: option,
                         };
                       })}
-                      onChange={(e) =>
-                        setInitialValues({
-                          ...initialValues,
-                          template: e,
-                          id_template: e?.value?.id_template,
-                        })
-                      }
+                      onChange={(e) => {
+                        setTimeout(async () => {
+                          clearDemoImage();
+                          await fetchImage(initialValues?.device_type?.image);
+                          updateAddingComponent();
+                          setInitialValues({
+                            ...initialValues,
+                            template: e,
+                            id_template: e?.value?.id_template,
+                          });
+                        }, 100);
+                      }}
                     />
                   </div>
                 </div>
@@ -469,22 +410,69 @@ export default function AddDevice(props) {
                       </div>
                     )
                   )}
-                  {!_.isEmpty(addingComponents) && (
-                    <div className="note mt-3">
-                      <div>Components:</div>
-                      <Table
-                        variant="light"
-                        columns={columns}
-                        data={addingComponents.map((item) => ({
-                          id: item.device.value.id,
-                          name: item.device.label,
-                          template: item.template.label,
-                          device_group: item.device_group.label,
-                          device_type: item.device_type.label,
-                        }))}
-                      />
+
+                  <div
+                    className="mt-3"
+                    style={
+                      _.isEmpty(addingComponents) ? { display: "none" } : {}
+                    }
+                  >
+                    <h5>Require Components</h5>
+                    <div className={`mt-2 ${styles["component"]}`}>
+                      {_.isEmpty(addingComponents) ? (
+                        ""
+                      ) : (
+                        <div className="col-6">
+                          <div className="me-3">
+                            <Table
+                              columns={{ columnDefs: columns }}
+                              data={addingComponents
+                                .map((item) => {
+                                  const defaultInfo = {
+                                    name: item.name,
+                                    type: item.type,
+                                    quantity: item.quantity,
+                                    group: item.group,
+                                  };
+                                  const output = item.components.map(
+                                    (component) => {
+                                      return {
+                                        ...defaultInfo,
+                                        component,
+                                      };
+                                    }
+                                  );
+                                  return output;
+                                })
+                                .flat()
+                                .map((item, index) => ({
+                                  ...item,
+                                  id: index,
+                                }))}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      <div className="col-6">
+                        <div id="demo" className={`ms-3 ${styles["demo"]}`}>
+                          <div id="top" className={`${styles["top"]}`}></div>
+                          <div id="left" className={`${styles["left"]}`}></div>
+                          <div
+                            id="center"
+                            className={`${styles["center"]}`}
+                          ></div>
+                          <div
+                            id="bottom"
+                            className={`${styles["bottom"]}`}
+                          ></div>
+                          <div
+                            id="right"
+                            className={`${styles["right"]}`}
+                          ></div>
+                        </div>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </>
               )
             : ""}
