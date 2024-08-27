@@ -500,7 +500,6 @@ export default function useAddDevice(closeAddDevice) {
   };
 
   const handleSave = (data) => {
-    console.log(addingComponents);
     setTimeout(() => {
       let newData = {
         ...data,
@@ -522,7 +521,6 @@ export default function useAddDevice(closeAddDevice) {
               .flat()
           : [],
       };
-      console.log(newData);
       setData(newData);
 
       setInitialValues({ ...initialValues, ...newData });
