@@ -268,7 +268,7 @@ function Overview() {
 
       //CPU
       let totalCpu = !_.isEmpty(cpuData.CPUInfo)
-        ? cpuData.CPUInfo.Totalcores
+        ? cpuData.CPUInfo.TotalCores
         : 0;
       let CPUseries = [
         {
