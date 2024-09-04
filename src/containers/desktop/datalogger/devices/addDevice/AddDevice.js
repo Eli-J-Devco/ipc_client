@@ -4,7 +4,7 @@
  *
  *********************************************************/
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ModalDefault from "react-bootstrap/Modal";
 import { useNavigate } from "react-router-dom";
 
@@ -15,10 +15,8 @@ import Modal from "../../../../../components/modal/Modal";
 import Button from "../../../../../components/button/Button";
 import AddMultipleDevice from "./AddMultipleDevice";
 import FormInput from "../../../../../components/formInput/FormInput";
-import { AddComponentsModal } from "./AddComponentsModal";
-import _ from "lodash";
-import Table from "../../../../../components/table/Table";
-import styles from "./AddDevice.module.scss";
+import { AddComponents } from "./AddComponents";
+import DeviceUtils from "../DeviceUtils";
 
 export default function AddDevice(props) {
   const navigate = useNavigate();
@@ -27,8 +25,6 @@ export default function AddDevice(props) {
   const {
     isAddMultipleDevice,
     setIsOpenAddMultipleDevice,
-    isOpenAddComponents,
-    setIsOpenAddComponents,
     addingComponents,
     setAddingComponents,
     meterType,
@@ -41,21 +37,14 @@ export default function AddDevice(props) {
     handleSave,
     handleAddMultipleDevice,
     deviceConfigDropdown,
-    columns,
     haveComponents,
+    setHaveComponents,
     onGroupCreateOption,
-    clearDemoImage,
-    fetchImage,
     updateAddingComponent,
   } = useAddDevice(closeAddDevice);
   const [protocol, setProtocol] = useState({
     Physical: 1,
     Virtual: 0,
-  });
-  const [components, setComponents] = useState({
-    deviceTypes: [],
-    deviceGroups: [],
-    templates: [],
   });
 
   const footer = (
@@ -179,7 +168,7 @@ export default function AddDevice(props) {
                     }
 
                     setTimeout(() => {
-                      clearDemoImage();
+                      DeviceUtils.clearDemoImage();
                       setInitialValues({
                         ...initialValues,
                         device_type: e,
@@ -226,8 +215,10 @@ export default function AddDevice(props) {
                       }
 
                       setTimeout(async () => {
-                        clearDemoImage();
-                        await fetchImage(initialValues?.device_type?.image);
+                        DeviceUtils.clearDemoImage();
+                        await DeviceUtils.fetchImage(
+                          initialValues?.device_type?.image
+                        );
                         updateAddingComponent();
                         setInitialValues({
                           ...initialValues,
@@ -267,8 +258,10 @@ export default function AddDevice(props) {
                       })}
                       onChange={(e) => {
                         setTimeout(async () => {
-                          clearDemoImage();
-                          await fetchImage(initialValues?.device_type?.image);
+                          DeviceUtils.clearDemoImage();
+                          await DeviceUtils.fetchImage(
+                            initialValues?.device_type?.image
+                          );
                           updateAddingComponent();
                           setInitialValues({
                             ...initialValues,
@@ -411,7 +404,7 @@ export default function AddDevice(props) {
                     )
                   )}
 
-                  <div
+                  {/* <div
                     className="mt-3"
                     style={
                       _.isEmpty(addingComponents) ? { display: "none" } : {}
@@ -472,7 +465,12 @@ export default function AddDevice(props) {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
+                  <AddComponents
+                    haveComponents={haveComponents}
+                    addingComponents={addingComponents}
+                    setAddingComponents={setAddingComponents}
+                  />
                 </>
               )
             : ""}

@@ -8,6 +8,8 @@ import LibToast from "../../../../../utils/LibToast";
 import { loginService } from "../../../../../services/loginService";
 import _ from "lodash";
 import { inverterSchema, tcpSchema } from "../DeviceValidation";
+import DeviceUtils from "../DeviceUtils";
+import Libs from "../../../../../utils/Libs";
 
 export default function useUpdateDevice() {
   const axiosPrivate = useAxiosPrivate();
@@ -34,6 +36,7 @@ export default function useUpdateDevice() {
   const [haveComponents, setHaveComponents] = useState(false);
   const [deviceConfigDropdown, setDeviceConfigDropdown] = useState([]);
   const [addingComponents, setAddingComponents] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
   const [columns] = useState([
     {
       id: 1,
@@ -136,18 +139,19 @@ export default function useUpdateDevice() {
 
     if (!deviceTypeComponents) return;
 
-    setHaveComponents(
-      deviceTypeComponents?.find((item) => {
-        if (
-          item.device_type.id === device?.id_device_type &&
-          item.component.length > 0
-        ) {
-          return true;
-        }
-        return false;
-      })
-    );
+    const components = deviceTypeComponents?.find((item) => {
+      if (
+        item.device_type.id === device?.id_device_type &&
+        item.component.length > 0
+      ) {
+        return true;
+      }
+      return false;
+    });
 
+    if (_.isEmpty(components)) return;
+
+    Libs.progress(true);
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
@@ -156,39 +160,68 @@ export default function useUpdateDevice() {
         );
         setAddingComponents(
           response.data.map((item) => ({
-            device: {
-              value: {
-                id: item?.id,
-              },
-              label: item?.name,
-            },
-            device_group: {
-              value: item?.device_group?.id,
-              label: item?.device_group?.name,
-              id_device_type: item?.device_type?.id,
-            },
-            template: item?.device_type?.type === 0 && {
-              value: {
-                id_template: item?.template_library?.id,
-                id_device_group: item?.device_group?.id,
-              },
-              label: item?.template_library?.name,
-            },
-            device_type: {
-              value: item?.device_type?.id,
-              label: item?.device_type?.name,
-              type: item?.device_type?.type,
-            },
+            ...item,
+            components: item.components.map((component) => ({
+              ...component,
+              component_name: component.name,
+              label: component.device_type_name,
+              value: component.id_device_type,
+            })),
           }))
         );
+        setHaveComponents(components);
       } catch (error) {
         loginService.handleMissingInfo(
           error,
           "Failed to get device components"
         ) && navigate("/", { replace: true });
+      } finally {
+        Libs.progress(false);
       }
     }, 300);
   }, [device]);
+
+  useEffect(() => {
+    if (_.isEmpty(haveComponents)) return;
+
+    if (_.isEmpty(addingComponents)) return;
+
+    if (isFetching) return;
+
+    DeviceUtils.clearDemoImage();
+    setIsFetching(true);
+    setTimeout(async () => {
+      await DeviceUtils.fetchImage(haveComponents.device_type.image);
+      const posCount = {
+        0: 0,
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+      };
+      for (let i = 0; i < addingComponents.length; i++) {
+        const item = addingComponents[i];
+        for (let j = 0; j < item.components.length; j++) {
+          const component = item.components[j];
+          if (!component.image) continue;
+          if (!component.component_name) continue;
+
+          await DeviceUtils.fetchImage(
+            component.image,
+            component.plug_point,
+            component.id
+          );
+          posCount[component.plug_point]++;
+        }
+      }
+      Object.keys(posCount).forEach((key) => {
+        if (posCount[key] > 1) {
+          DeviceUtils.addExtension(key);
+        }
+      });
+      setIsFetching(false);
+    }, 300);
+  }, [addingComponents, haveComponents]);
 
   useEffect(() => {
     if (_.isEmpty(deviceConfig) || !_.isEmpty(deviceConfigDropdown)) return;

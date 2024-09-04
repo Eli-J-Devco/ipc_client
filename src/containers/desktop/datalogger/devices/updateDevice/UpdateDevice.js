@@ -5,7 +5,7 @@ import Modal from "../../../../../components/modal/Modal";
 import useUpdateDevice from "./useUpdateDevice";
 import DatePicker from "../../../../../components/datePicker/DatePicker";
 import { useState } from "react";
-import { AddComponentsModal } from "../addDevice/AddComponentsModal";
+import { AddComponents } from "../addDevice/AddComponents";
 import Table from "../../../../../components/table/Table";
 import _ from "lodash";
 
@@ -25,7 +25,6 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
     deviceConfigDropdown,
     addingComponents,
     setAddingComponents,
-    columns,
   } = useUpdateDevice();
   const [isOpenAddComponents, setIsOpenAddComponents] = useState(false);
   const [components, setComponents] = useState({
@@ -101,27 +100,6 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
       }
       size="xl"
     >
-      {isOpenAddComponents && (
-        <ModalDefault
-          show={isOpenAddComponents}
-          style={{ top: "100px" }}
-          onHide={() => setIsOpenAddComponents(false)}
-          size="lg"
-        >
-          <ModalDefault.Header
-            style={{ backgroundColor: "#383434", color: "#fff" }}
-          >
-            Add Components
-          </ModalDefault.Header>
-          <ModalDefault.Body>
-            <AddComponentsModal
-              close={() => setIsOpenAddComponents(false)}
-              components={components}
-              setComponents={(data) => setAddingComponents(data)}
-            />
-          </ModalDefault.Body>
-        </ModalDefault>
-      )}
       <div className="container">
         <FormInput
           initialValues={initialValues}
@@ -328,21 +306,12 @@ export default function UpdateDevice({ isShow, closeUpdateDevice }) {
               )}
           </div>
           {!_.isEmpty(addingComponents) && (
-            <div className="note mt-3">
-              <div>Components:</div>
-              <Table
-                variant="light"
-                maxHeight="30vh"
-                columns={columns}
-                data={addingComponents.map((item) => ({
-                  id: item.device.value.id,
-                  name: item.device.label,
-                  template: item.template.label,
-                  device_group: item.device_group.label,
-                  device_type: item.device_type.label,
-                }))}
-              />
-            </div>
+            <AddComponents
+              haveComponents={haveComponents}
+              addingComponents={addingComponents}
+              setAddingComponents={setAddingComponents}
+              isUpdateDevice={true}
+            />
           )}
         </FormInput>
       </div>

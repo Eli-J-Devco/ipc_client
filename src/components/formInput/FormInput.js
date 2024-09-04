@@ -1,6 +1,7 @@
 import Form from "react-bootstrap/Form";
 import ReactSelect from "react-select";
 import CreatableSelect from "react-select/creatable";
+import AsyncSelect from "react-select/async";
 import useValidate from "./useValidate";
 import {
   createContext,
@@ -508,6 +509,146 @@ function CreatableDropdown({
   );
 }
 FormInput.CreatableSelect = CreatableDropdown;
+
+function AsyncDropdown({
+  className,
+  labelClassName = "",
+  inputClassName = "",
+  label,
+  name,
+  required,
+  groupOption,
+  option,
+  horizontal,
+  closeMenuOnSelect,
+  hideSelectedOptions,
+  isClearable,
+  isDisabled,
+  isMulti,
+  isSearchable,
+  onChange,
+  onBlur,
+  value,
+  placeholder,
+  onCreateOption,
+  loadOptions,
+}) {
+  const validate = useContext(FormInputContext);
+  const customStyles = {
+    indicatorSeparator: (baseStyles, state) => ({
+      ...baseStyles,
+      display: "none",
+    }),
+    dropdownIndicator: (baseStyles, state) => ({
+      ...baseStyles,
+      paddingTop: "0px",
+      paddingBottom: "0px",
+    }),
+    clearIndicator: (baseStyles, state) => ({
+      ...baseStyles,
+      padding: "0px",
+    }),
+    valueContainer: (baseStyles, state) => ({
+      ...baseStyles,
+      padding: "0px 8px",
+    }),
+    control: (baseStyles, state) => ({
+      ...baseStyles,
+      borderColor: state.isFocused
+        ? "var(--bg-color-dark)"
+        : validate && validate.touched[name] && validate.errors[name]
+        ? "var(--bs-form-invalid-border-color)"
+        : "hsl(0, 0%, 80%)",
+      boxShadow: state.isFocused ? "0 0 0 0.25rem rgba(56, 52, 52, 0.25)" : "",
+      "&:hover": {
+        borderColor: state.isFocused
+          ? "var(--bg-color-dark)"
+          : validate && validate.touched[name] && validate.errors[name]
+          ? "var(--bs-form-invalid-border-color)"
+          : "hsl(0, 0%, 70%)",
+      },
+      minHeight: 31,
+    }),
+  };
+
+  const formatGroupLabel = (data) => (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <span>{data.label}</span>
+      <span
+        style={{
+          backgroundColor: "var(--bs-primary)",
+          borderRadius: "2em",
+          color: "white",
+          display: "flex",
+          justifyContent: "center",
+          padding: "0 8px",
+          fontSize: "0.8em",
+          marginRight: 5,
+        }}
+      >
+        {data.options.length}
+      </span>
+    </div>
+  );
+  return (
+    <div
+      className={`${styles["form-select"]} ${className ? className : ""} ${
+        horizontal ? styles.horizontal : ""
+      }`}
+    >
+      {label && (
+        <label className={labelClassName}>
+          {label}
+          {required ? <span className="required">*</span> : ""}
+        </label>
+      )}
+
+      <AsyncSelect
+        name={name}
+        className={`${styles.select} ${inputClassName}`}
+        options={option}
+        captureMenuScroll={true}
+        styles={customStyles}
+        closeMenuOnSelect={closeMenuOnSelect}
+        hideSelectedOptions={hideSelectedOptions}
+        isClearable={isClearable}
+        isDisabled={isDisabled}
+        isMulti={isMulti}
+        isSearchable={isSearchable}
+        maxMenuHeight={200}
+        menuPosition={"fixed"}
+        value={validate && value === undefined ? validate.values[name] : value}
+        onChange={
+          validate && onChange === undefined
+            ? (selected) => validate.setFieldValue(name, selected)
+            : onChange
+        }
+        onBlur={
+          validate && onBlur === undefined
+            ? (e) => validate.setFieldTouched(name, true)
+            : onBlur
+        }
+        placeholder={placeholder}
+        formatGroupLabel={groupOption ? formatGroupLabel : undefined}
+        onCreateOption={onCreateOption ? onCreateOption : undefined}
+        loadOptions={loadOptions ? loadOptions : undefined}
+      />
+
+      {validate && validate.touched[name] && validate.errors[name] ? (
+        <div className={styles.errors}>{validate.errors[name]}</div>
+      ) : (
+        ""
+      )}
+    </div>
+  );
+}
+FormInput.AsyncSelect = AsyncDropdown;
 
 function File({
   className,

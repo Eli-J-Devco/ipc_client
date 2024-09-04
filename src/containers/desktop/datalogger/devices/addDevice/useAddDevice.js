@@ -18,8 +18,7 @@ import {
   ratedPowerSchema,
   tcpSchema,
 } from "../DeviceValidation";
-import { createColumnHelper } from "@tanstack/react-table";
-import FormInput from "../../../../../components/formInput/FormInput";
+import DeviceUtils from "../DeviceUtils";
 
 export default function useAddDevice(closeAddDevice) {
   const {
@@ -37,7 +36,7 @@ export default function useAddDevice(closeAddDevice) {
   const [isOpenAddComponents, setIsOpenAddComponents] = useState(false);
   const [addingComponents, setAddingComponents] = useState([]);
   const [haveComponents, setHaveComponents] = useState({});
-  const [updatingComponent, setUpdatingComponent] = useState(null);
+  const [numOfMppt, setNumOfMppt] = useState(1);
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [initialValues, setInitialValues] = useState({
@@ -85,71 +84,6 @@ export default function useAddDevice(closeAddDevice) {
       }),
     })
   );
-  const columnsHelper = createColumnHelper();
-  const columns = [
-    columnsHelper.accessor("id", {
-      id: "id",
-      size: 50,
-      header: "No.",
-      cell: ({ row }) => {
-        return <div id={row.original.component.id}>{row.original.id}</div>;
-      },
-    }),
-    columnsHelper.accessor("group", {
-      id: "group",
-      size: 100,
-      header: "Device Type Group",
-      cell: ({ row }) => {
-        return <div>{row.original.name}</div>;
-      },
-    }),
-    columnsHelper.accessor("device_type", {
-      id: "device_type",
-      size: 100,
-      header: "Device Type",
-      cell: ({ row }) => {
-        return (
-          <FormInput.Select
-            name="device_type"
-            value={row.original.component}
-            option={_.cloneDeep(haveComponents)
-              ?.component.filter((item) => item.group === row.original.group)
-              .map((item) =>
-                item.components.map((i) => ({
-                  label: i.name,
-                  value: i.id,
-                  image: i.image,
-                  rowId: row.original.component.id,
-                  group: row.original.group,
-                }))
-              )
-              .flat()}
-            onChange={(e) => setUpdatingComponent(e)}
-          />
-        );
-      },
-    }),
-    columnsHelper.accessor("name", {
-      id: "name",
-      size: 100,
-      header: "Component Name",
-      cell: ({ row }) => {
-        return (
-          <FormInput.Text
-            name="component_name"
-            value={row.original.component.component_name}
-            onChange={(e) => {
-              setUpdatingComponent({
-                component_name: e.target.value,
-                rowId: row.original.component.id,
-                group: row.original.group,
-              });
-            }}
-          />
-        );
-      },
-    }),
-  ];
 
   useEffect(() => {
     initialValues?.communication?.label &&
@@ -214,52 +148,32 @@ export default function useAddDevice(closeAddDevice) {
             meterType: null,
           });
         }
-        await fetchImage(initialValues?.device_type?.image);
+        await DeviceUtils.fetchImage(initialValues?.device_type?.image);
       }, 100);
   }, [initialValues?.device_type?.label]);
 
-  const fetchImage = async (path, pos = "4", id = null) => {
-    const posMap = {
-      0: "top",
-      1: "left",
-      2: "bottom",
-      3: "right",
-      4: "center",
-    };
-    if (!path) return;
-    const absolutePath = await import("../../../../../assets/images/" + path);
-    const demoContainer = document.querySelector("#demo");
-    if (demoContainer) {
-      const posContainer = demoContainer.querySelector(
-        `#${posMap[parseInt(pos)]}`
-      );
-      if (posContainer) {
-        const componentId = `id="component_${id}"`;
-        posContainer.innerHTML = `<img ${componentId} src="${absolutePath.default}" alt=""/>`;
+  useEffect(() => {
+    if (!initialValues?.template?.value?.id_template) {
+      return;
+    }
 
-        if (pos !== "4") {
-          const connectLine = await import(
-            "../../../../../assets/images/connect-line.svg"
-          );
-          const lineId = `id="line_${id}"`;
-          posContainer.innerHTML += `<img ${lineId} src="${connectLine.default}" alt=""/>`;
-        }
+    setTimeout(async () => {
+      try {
+        const response = await axiosPrivate.post(
+          Constants.API_URL.POINT_MPPT.GET +
+            `?template_id=${initialValues?.template?.value?.id_template}`
+        );
+
+        setNumOfMppt(response.data.length || 1);
+      } catch (error) {
+        loginService.handleMissingInfo(error, "Failed to get number of MPPT") &&
+          navigate("/", { replace: true });
       }
-    }
-  };
-
-  const clearDemoImage = () => {
-    const demoContainer = document.querySelector("#demo");
-    if (demoContainer) {
-      demoContainer.querySelector("#top").innerHTML = "";
-      demoContainer.querySelector("#bottom").innerHTML = "";
-      demoContainer.querySelector("#center").innerHTML = "";
-      demoContainer.querySelector("#left").innerHTML = "";
-      demoContainer.querySelector("#right").innerHTML = "";
-    }
-  };
+    }, 100);
+  }, [initialValues?.template?.value?.id_template]);
 
   const updateAddingComponent = (deviceType = null) => {
+    console.log("deviceType", deviceType);
     const id_device_type = deviceType?.value || initialValues?.id_device_type;
     let haveComponents = deviceTypeComponents?.find((item) => {
       if (item.device_type.id === id_device_type && item.component.length > 0) {
@@ -270,9 +184,9 @@ export default function useAddDevice(closeAddDevice) {
     var newAddingComponents = [];
     if (!_.isEmpty(haveComponents)) {
       newAddingComponents = haveComponents.component
-        .filter((item) => item.type === 1 && !item.require)
+        .filter((item) => item.type === 1 && item.require)
         .map((item) => {
-          const quantity = item.quantity || 1;
+          const quantity = item.quantity || 0;
           const components = [];
           for (let i = 0; i < quantity; i++) {
             components.push({
@@ -296,7 +210,7 @@ export default function useAddDevice(closeAddDevice) {
       newAddingComponents.forEach(async (item) => {
         if (item.components) {
           for (let i = 0; i < item.components.length; i++) {
-            await fetchImage(
+            await DeviceUtils.fetchImage(
               item.components[i].image,
               item.components[i].plug_point,
               item.components[i].id
@@ -306,42 +220,6 @@ export default function useAddDevice(closeAddDevice) {
       });
     }, 100);
   };
-
-  useEffect(() => {
-    if (_.isEmpty(updatingComponent)) return;
-
-    const e = updatingComponent;
-    if (!_.isEmpty(e.image)) {
-      const component = document.getElementById(`component_${e.rowId}`);
-      const newImage = import(`../../../../../assets/images/${e.image}`);
-      newImage.then((image) => {
-        component.src = image.default;
-      });
-    }
-    const updateAddingComponents = _.cloneDeep(addingComponents).map((item) => {
-      if (item.group === e.group) {
-        const newComponents = item.components.map((i) => {
-          if (i.id === e.rowId) {
-            return {
-              ...i,
-              ...e,
-            };
-          }
-          return i;
-        });
-        return {
-          ...item,
-          components: newComponents,
-        };
-      }
-      return item;
-    });
-
-    setTimeout(() => {
-      setAddingComponents(updateAddingComponents);
-      setUpdatingComponent(null);
-    }, 100);
-  }, [updatingComponent]);
 
   const openAddMultipleDevice = () => setIsAddMultipleDevice(true);
   const closeAddMultipleDevice = () => {
@@ -515,6 +393,8 @@ export default function useAddDevice(closeAddDevice) {
                   name: i.component_name,
                   id_device_type: i.value,
                   group: item.group,
+                  plug_point: i.plug_point,
+                  ...(parseInt(i.plug_point) === 2 && { quantity: numOfMppt }),
                 }));
                 return components;
               })
@@ -657,11 +537,9 @@ export default function useAddDevice(closeAddDevice) {
     handleSave,
     handleAddMultipleDevice,
     deviceConfigDropdown,
-    columns,
     haveComponents,
     onGroupCreateOption,
-    clearDemoImage,
-    fetchImage,
     updateAddingComponent,
+    setHaveComponents,
   };
 }
