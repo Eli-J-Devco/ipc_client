@@ -4,7 +4,7 @@
  *
  *********************************************************/
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../utils/Constants";
 import { loginService } from "../../../../services/loginService";
@@ -31,6 +31,7 @@ export const statusEnum = {
   symbolic: 3,
   reconnecting: -5,
   disconnected: -6,
+  unknown: -7,
 };
 
 export const statusColor = {
@@ -43,6 +44,7 @@ export const statusColor = {
   symbolic: "bg-warning",
   "Reconnecting...": "bg-warning",
   disconnected: "bg-secondary",
+  unknown: "bg-secondary",
 };
 
 const deviceMode = {
@@ -347,6 +349,11 @@ export default function useDevices() {
         d["mode"] = data[index]["mode"];
         d["rated_power"] = data[index]["rated_power"];
         d["rated_power_custom"] = data[index]["rated_power_custom"];
+        if (d["state"] === undefined) {
+          d["state"] = statusEnum.unknown;
+          d["status"] = "unknown";
+          return d;
+        }
       } else {
         if (d["creation_state"] === -1) {
           d["state"] = statusEnum["Initiating..."];
