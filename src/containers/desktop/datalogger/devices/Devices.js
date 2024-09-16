@@ -129,7 +129,7 @@ export default function Devices() {
                 <Button.Text text="Delete Device" />
               </Button>
             )}
-            {isRetry.canRetry && (
+            {isRetry.canRetry ? (
               <Button
                 className="ms-3"
                 variant="dark"
@@ -137,7 +137,7 @@ export default function Devices() {
               >
                 <Button.Text text="Retry" />
               </Button>
-            )}
+            ) : null}
           </div>
           <Table
             columns={{ columnDefs: columns }}

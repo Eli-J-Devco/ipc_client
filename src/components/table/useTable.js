@@ -45,7 +45,7 @@ function useTable({
             },
           }))
         : columns?.columnDefs || columns || [],
-    []
+    [columns, slugProps]
   );
 
   const table = useReactTable({

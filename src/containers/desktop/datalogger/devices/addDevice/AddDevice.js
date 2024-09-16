@@ -38,7 +38,6 @@ export default function AddDevice(props) {
     handleAddMultipleDevice,
     deviceConfigDropdown,
     haveComponents,
-    setHaveComponents,
     onGroupCreateOption,
     updateAddingComponent,
   } = useAddDevice(closeAddDevice);
@@ -167,8 +166,8 @@ export default function AddDevice(props) {
                       template = template[0];
                     }
 
+                    DeviceUtils.clearDemoImage();
                     setTimeout(() => {
-                      DeviceUtils.clearDemoImage();
                       setInitialValues({
                         ...initialValues,
                         device_type: e,
@@ -178,7 +177,7 @@ export default function AddDevice(props) {
                         template: template,
                         id_template: template?.value?.id_template,
                       });
-                      updateAddingComponent(e);
+                      updateAddingComponent(e, template?.value?.id_template);
                     }, 100);
                   }}
                 />
@@ -214,12 +213,15 @@ export default function AddDevice(props) {
                         template = template[0];
                       }
 
+                      DeviceUtils.clearDemoImage();
                       setTimeout(async () => {
-                        DeviceUtils.clearDemoImage();
                         await DeviceUtils.fetchImage(
                           initialValues?.device_type?.image
                         );
-                        updateAddingComponent();
+                        updateAddingComponent(
+                          initialValues?.device_type,
+                          template?.value?.id_template
+                        );
                         setInitialValues({
                           ...initialValues,
                           device_group: e,
@@ -262,7 +264,10 @@ export default function AddDevice(props) {
                           await DeviceUtils.fetchImage(
                             initialValues?.device_type?.image
                           );
-                          updateAddingComponent();
+                          updateAddingComponent(
+                            initialValues?.device_type,
+                            e?.value?.id_template
+                          );
                           setInitialValues({
                             ...initialValues,
                             template: e,

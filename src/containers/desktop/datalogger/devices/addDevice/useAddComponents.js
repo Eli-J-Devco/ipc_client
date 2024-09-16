@@ -1,18 +1,21 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import _ from "lodash";
 import FormInput from "../../../../../components/formInput/FormInput";
 import { createColumnHelper } from "@tanstack/react-table";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../../utils/Constants";
+import LibToast from "../../../../../utils/LibToast";
+import { useDeviceManagement } from "../DeviceManagement";
 
 export default function useAddComponents(
   haveComponents,
   addingComponents,
   setAddingComponents,
-  isUpdateDevice
+  isUpdateDevice = false
 ) {
   const axiosPrivate = useAxiosPrivate();
   const [updatingComponent, setUpdatingComponent] = useState({});
+  const [isFull, setIsFull] = useState(false);
   const posOptions = [
     {
       label: "Top",
@@ -31,7 +34,7 @@ export default function useAddComponents(
       value: "3",
     },
   ];
-
+  const { device, serviceUtils } = useDeviceManagement();
   const [dataTable, setDataTable] = useState([]);
 
   const columnsHelper = createColumnHelper();
@@ -49,42 +52,35 @@ export default function useAddComponents(
       size: 200,
       header: "Device Type Group",
       cell: ({ row }) => {
-        const options =
-          row.original.component.plug_point !== ""
-            ? haveComponents.component
-                .filter((item) =>
-                  item.plug_point.includes(
-                    JSON.stringify(row.original.component.plug_point)
-                  )
-                )
-                .map((item) => ({
+        const options = !row.original.component.plug_point
+          ? haveComponents.component
+              .filter(
+                (item) => item.plug_point === row.original.component.plug_point
+              )
+              .map((item) => ({
+                label: item.name,
+                value: item.group,
+              }))
+          : haveComponents.component
+              .filter((item) => {
+                const numOfAddedGroup = addingComponents.find(
+                  (addedItem) => addedItem.group === item.group
+                )?.components?.length;
+                return numOfAddedGroup < item.quantity || !item.quantity;
+              })
+              .map((item) => {
+                return {
                   label: item.name,
                   value: item.group,
-                }))
-            : haveComponents.component
-                .filter((item) => {
-                  const numOfAddedGroup = addingComponents.find(
-                    (addedItem) => addedItem.group === item.group
-                  ).components.length;
-                  return numOfAddedGroup < item.quantity || !item.quantity;
-                })
-                .map((item) => {
-                  return {
-                    label: item.name,
-                    value: item.group,
-                    plug_point: item.plug_point,
-                  };
-                });
-        return isUpdateDevice ? (
+                  plug_point: item.plug_point,
+                };
+              });
+        return (
           <FormInput.Select
             name="group"
             value={{ label: row.original.name, value: row.original.group }}
             option={options}
-            isDisabled={
-              (options.length === 1 &&
-                row.original.component.plug_point !== "") ||
-              row.original.require
-            }
+            isDisabled={options.length <= 1}
             onChange={(e) => {
               setUpdatingComponent({
                 plug_point: e.plug_point,
@@ -93,8 +89,6 @@ export default function useAddComponents(
               });
             }}
           />
-        ) : (
-          <div>{row.original.name}</div>
         );
       },
     }),
@@ -103,18 +97,21 @@ export default function useAddComponents(
       size: 300,
       header: "Device Type",
       cell: ({ row }) => {
-        const options = _.cloneDeep(haveComponents)
-          ?.component.filter((item) => item.group === row.original.group)
-          .map((item) =>
-            item.components.map((i) => ({
-              label: i.name,
-              value: i.id,
-              image: i.image,
-              rowId: row.original.component.id,
-              group: row.original.group,
-            }))
-          )
-          .flat();
+        const options =
+          !_.isEmpty(haveComponents) &&
+          _.cloneDeep(haveComponents)
+            ?.component.filter((item) => item.group === row.original.group)
+            .map((item) =>
+              item.components.map((i) => ({
+                label: i.name,
+                value: i.id,
+                image: i.image,
+                rowId: row.original.component.id,
+                group: row.original.group,
+                plug_point: row.original.plug_point,
+              }))
+            )
+            .flat();
         return (
           <FormInput.Select
             name="device_type"
@@ -147,7 +144,12 @@ export default function useAddComponents(
           <FormInput.AsyncSelect
             name="component_name"
             value={{
-              label: row.original.component.component_name,
+              label: `${
+                typeof row.original.component.id === "number" &&
+                row.original.component.component_name.split("|").length === 1
+                  ? row.original.component.id + " | "
+                  : ""
+              }${row.original.component.component_name || ""}`,
               value: row.original.component.id,
             }}
             option={[]}
@@ -165,51 +167,56 @@ export default function useAddComponents(
                 rowId: row.original.component.id,
                 group: row.original.group,
                 id: e.value,
+                plug_point: row.original.plug_point,
               });
             }}
+            placeholder="Search component"
           />
         );
       },
     }),
-    ...(isUpdateDevice
-      ? [
-          columnsHelper.accessor("plug_point", {
-            id: "plug_point",
-            size: 200,
-            header: "Position",
-            cell: ({ row }) => {
-              const acceptablePlugPoint = posOptions.filter((item) =>
-                haveComponents.component
-                  .filter((item) => item.group === row.original.group)
-                  .map((item) => item.plug_point)
-                  .flat()
-                  .includes(item.value)
-              );
-              return (
-                <FormInput.Select
-                  name="plug_point"
-                  value={posOptions.find(
-                    (item) =>
-                      parseInt(item.value) ===
-                      parseInt(row.original.component.plug_point)
-                  )}
-                  option={acceptablePlugPoint}
-                  onChange={(e) => {
-                    setUpdatingComponent({
-                      plug_point: e.value,
-                      rowId: row.original.component.id,
-                      group: row.original.group,
-                    });
-                  }}
-                  isDisabled={
-                    row.original.require || acceptablePlugPoint.length === 1
-                  }
-                />
-              );
-            },
-          }),
-        ]
-      : []),
+    columnsHelper.accessor("plug_point", {
+      id: "plug_point",
+      size: 200,
+      header: "Position",
+      cell: ({ row }) => {
+        const acceptablePlugPoint =
+          isUpdateDevice &&
+          posOptions.filter((item) =>
+            haveComponents.component
+              .filter((item) => item.group === row.original.group)
+              .map((item) => item.plug_point)
+              .flat()
+              .includes(parseInt(item.value))
+          );
+        return isUpdateDevice ? (
+          <FormInput.Select
+            name="plug_point"
+            value={posOptions.find(
+              (item) =>
+                parseInt(item.value) ===
+                parseInt(row.original.component.plug_point)
+            )}
+            option={acceptablePlugPoint}
+            onChange={(e) => {
+              setUpdatingComponent({
+                plug_point: e.value,
+                rowId: row.original.component.id,
+                group: row.original.group,
+              });
+            }}
+            isDisabled={
+              row.original.require || acceptablePlugPoint.length === 1
+            }
+          />
+        ) : (
+          <div>
+            {posOptions.find((item) => item.value === row.original.plug_point)
+              ?.label || ""}
+          </div>
+        );
+      },
+    }),
   ];
 
   useEffect(() => {
@@ -223,8 +230,27 @@ export default function useAddComponents(
         component.src = image.default;
       });
     }
-    const updateAddingComponents = _.cloneDeep(addingComponents).map((item) => {
-      if (item.group === e.group) {
+    const isExistComponent = addingComponents.find((item) =>
+      item.components.find((i) => i.id === e.rowId)
+    );
+
+    var updateAddingComponents = addingComponents;
+    if (!_.isEmpty(isExistComponent)) {
+      if (isExistComponent.group !== e.group) {
+        updateAddingComponents = addingComponents.map((item) => {
+          if (item.group === isExistComponent.group) {
+            return {
+              ...item,
+              components: item.components.filter((i) => i.id !== e.rowId),
+            };
+          }
+
+          return item;
+        });
+      }
+    }
+    updateAddingComponents = updateAddingComponents.map((item) => {
+      if (item.group === e.group && item.plug_point === e.plug_point) {
         const isNewComponent = item.components.find((i) => i.id === e.rowId);
         if (!isNewComponent) {
           const newComponent = dataTable.find(
@@ -236,8 +262,9 @@ export default function useAddComponents(
               ...item.components,
               {
                 ...e,
-                ...newComponent,
-                ...(e.plug_point && { plug_point: e.plug_point[0] }),
+                rowId: null,
+                id: Math.random().toString(36).slice(2, 9),
+                ...(_.isEmpty(isExistComponent) && newComponent),
               },
             ],
           };
@@ -266,6 +293,10 @@ export default function useAddComponents(
   }, [updatingComponent]);
 
   const addNewComponent = () => {
+    if (isFull) {
+      LibToast.toast("All components are added", "error");
+      return;
+    }
     setTimeout(() => {
       setDataTable([
         ...dataTable,
@@ -295,12 +326,13 @@ export default function useAddComponents(
             ...item,
           };
           delete defaultInfo.components;
-          const output = item.components.map((component) => {
-            return {
-              ...defaultInfo,
-              component,
-            };
-          });
+          const output =
+            item.components.map((component) => {
+              return {
+                ...defaultInfo,
+                component,
+              };
+            }) || [];
           return output;
         })
         .flat()
@@ -309,7 +341,17 @@ export default function useAddComponents(
           id: index,
         }))
     );
-  }, [addingComponents]);
+
+    const isFull =
+      haveComponents.component.filter((item) => {
+        const numOfAddedGroup = addingComponents
+          .filter((addedItem) => addedItem.plug_point === item.plug_point)
+          .map((item) => item.components)
+          .flat().length;
+        return numOfAddedGroup < item.quantity;
+      }).length < 1;
+    setIsFull(isFull);
+  }, [addingComponents, haveComponents]);
 
   const [searchValue, setSearchValue] = useState("");
   const searchDevices = ({ callback, searchText, idDeviceType }) => {
@@ -324,10 +366,14 @@ export default function useAddComponents(
             .flat()
             .filter((item) => typeof item.id === "number")
             .map((item) => item.id),
+          parent: device.id,
         }
       );
       callback(
-        response.data.map((item) => ({ label: item.name, value: item.id }))
+        response.data.map((item) => ({
+          label: item.id + " | " + item.name,
+          value: item.id,
+        }))
       );
     }, 100);
   };

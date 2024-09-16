@@ -23,7 +23,7 @@ export function AddComponents({
       style={_.isEmpty(addingComponents) ? { display: "none" } : {}}
     >
       <div className="d-flex align-items-center">
-        <h5>Require Components</h5>
+        <h5>{isUpdateDevice ? "Components" : "Require Components"}</h5>
         {isUpdateDevice && (
           <Button
             variant={"light"}

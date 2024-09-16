@@ -30,13 +30,13 @@ export default function useAddDevice(closeAddDevice) {
     clientSecret,
     deviceConfig,
     setDeviceConfig,
+    serviceUtils,
   } = useDeviceManagement();
   const [isAddMultipleDevice, setIsAddMultipleDevice] = useState(false);
   const [isOpenAddMultipleDevice, setIsOpenAddMultipleDevice] = useState(false);
   const [isOpenAddComponents, setIsOpenAddComponents] = useState(false);
   const [addingComponents, setAddingComponents] = useState([]);
   const [haveComponents, setHaveComponents] = useState({});
-  const [numOfMppt, setNumOfMppt] = useState(1);
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [initialValues, setInitialValues] = useState({
@@ -152,59 +152,55 @@ export default function useAddDevice(closeAddDevice) {
       }, 100);
   }, [initialValues?.device_type?.label]);
 
-  useEffect(() => {
-    if (!initialValues?.template?.value?.id_template) {
-      return;
-    }
-
-    setTimeout(async () => {
-      try {
-        const response = await axiosPrivate.post(
-          Constants.API_URL.POINT_MPPT.GET +
-            `?template_id=${initialValues?.template?.value?.id_template}`
-        );
-
-        setNumOfMppt(response.data.length || 1);
-      } catch (error) {
-        loginService.handleMissingInfo(error, "Failed to get number of MPPT") &&
-          navigate("/", { replace: true });
-      }
-    }, 100);
-  }, [initialValues?.template?.value?.id_template]);
-
-  const updateAddingComponent = (deviceType = null) => {
-    console.log("deviceType", deviceType);
-    const id_device_type = deviceType?.value || initialValues?.id_device_type;
+  const updateAddingComponent = (deviceType = null, id_template = null) => {
+    const id_device_type =
+      deviceType?.value ||
+      deviceType?.id_device_type ||
+      initialValues?.id_device_type;
     let haveComponents = deviceTypeComponents?.find((item) => {
       if (item.device_type.id === id_device_type && item.component.length > 0) {
         return true;
       }
       return false;
     });
-    var newAddingComponents = [];
-    if (!_.isEmpty(haveComponents)) {
-      newAddingComponents = haveComponents.component
-        .filter((item) => item.type === 1 && item.require)
-        .map((item) => {
-          const quantity = item.quantity || 0;
+    const newAddingComponents = [];
+    const plugPointCount = {
+      0: 0,
+      1: 0,
+      2: 0,
+      3: 0,
+    };
+
+    setTimeout(async () => {
+      if (!_.isEmpty(haveComponents)) {
+        const requiredComponents = haveComponents.component.filter(
+          (item) => item.type === 1 && item.require
+        );
+        for (const item of requiredComponents) {
+          const addition =
+            typeof item.addition === "number" &&
+            (await serviceUtils.getAdditionCount(item.addition, {
+              id_template,
+            }));
+          const quantity = item.quantity || addition.count || 0;
           const components = [];
           for (let i = 0; i < quantity; i++) {
             components.push({
               value: item.components[0].id,
               label: item.components[0].name,
               image: item.components[0].image,
-              plug_point: item.plug_point[i],
+              plug_point: item.plug_point,
               id: Math.random().toString(36).slice(2, 9),
             });
+            plugPointCount[item.plug_point]++;
           }
-          return {
+          newAddingComponents.push({
             ...item,
+            quantity: quantity,
             components: components,
-          };
-        });
-    }
-
-    setTimeout(() => {
+          });
+        }
+      }
       setAddingComponents(newAddingComponents);
       setHaveComponents(haveComponents);
       newAddingComponents.forEach(async (item) => {
@@ -216,6 +212,11 @@ export default function useAddDevice(closeAddDevice) {
               item.components[i].id
             );
           }
+        }
+      });
+      Object.keys(plugPointCount).forEach((key) => {
+        if (plugPointCount[key] > 1) {
+          DeviceUtils.addExtension(key);
         }
       });
     }, 100);
@@ -394,7 +395,7 @@ export default function useAddDevice(closeAddDevice) {
                   id_device_type: i.value,
                   group: item.group,
                   plug_point: i.plug_point,
-                  ...(parseInt(i.plug_point) === 2 && { quantity: numOfMppt }),
+                  quantity: item.quantity,
                 }));
                 return components;
               })

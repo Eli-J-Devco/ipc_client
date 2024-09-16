@@ -17,22 +17,60 @@ DeviceUtils.fetchImage = async (path, pos = "4", id = null) => {
       `#${posMap[parseInt(pos)]}-container`
     );
     if (posContainer) {
-      const componentId = `id="component_${id}"`;
-      if (pos !== "4") {
-        const elementContainer = document.createElement("div");
-        elementContainer.classList.add(styles["item"]);
-        elementContainer.innerHTML = `<img ${componentId} src="${absolutePath.default}" alt=""/>`;
-        const connectLine = await import(
-          "../../../../assets/images/connect-line.svg"
-        );
-        const lineId = `id="line_${id}"`;
-        elementContainer.innerHTML += `<img class=${styles["line"]} ${lineId} src="${connectLine.default}" alt=""/>`;
-        posContainer.appendChild(elementContainer);
-        return;
-      }
-      posContainer.innerHTML = `<img ${componentId} src="${absolutePath.default}" alt=""/>`;
+      await DeviceUtils.addImage(absolutePath, pos, posContainer, id);
     }
   }
+};
+
+DeviceUtils.addImage = async (
+  path,
+  pos,
+  posContainer,
+  id = null,
+  topOfParent = false
+) => {
+  const componentId = `id="component_${id}"`;
+  if (pos !== "4") {
+    const elementContainer = document.createElement("div");
+    elementContainer.classList.add(styles["item"]);
+    elementContainer.innerHTML = `<img ${componentId} src="${path.default}" alt=""/>`;
+    const connectLine = await import(
+      "../../../../assets/images/connect-line.svg"
+    );
+    const lineId = `id="line_${id}"`;
+    elementContainer.innerHTML += `<img class=${styles["line"]} ${lineId} src="${connectLine.default}" alt=""/>`;
+
+    if (topOfParent) {
+      posContainer.insertBefore(elementContainer, posContainer.firstChild);
+    } else {
+      posContainer.appendChild(elementContainer);
+    }
+  } else {
+    posContainer.innerHTML = `<img ${componentId} src="${path.default}" alt=""/>`;
+  }
+  posContainer.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+    inline: "center",
+  });
+};
+
+DeviceUtils.expandContainer = async (path, pos = "4", id = null) => {
+  const posContainer = document.querySelector(`#${posMap[pos]}-container`);
+  if (!posContainer) return;
+
+  const absolutePath = await import("../../../../assets/images/" + path);
+  var container = posContainer.querySelector(`.${styles["item-container"]}`);
+  if (!container) {
+    container = document.createElement("div");
+    container.classList.add(styles["item-container"]);
+    posContainer.firstElementChild.insertBefore(
+      container,
+      posContainer.firstElementChild.firstChild
+    );
+  }
+
+  await DeviceUtils.addImage(absolutePath, pos, container, id, true);
 };
 
 DeviceUtils.addExtension = (pos) => {
@@ -42,6 +80,13 @@ DeviceUtils.addExtension = (pos) => {
   posContainer
     .querySelector(`#${posMap[pos]}-container`)
     .setAttribute("style", `border-top: 5px solid #fff`);
+};
+
+DeviceUtils.createExtension = () => {
+  const extension = document.createElement("div");
+  extension.id = "extension";
+  extension.classList.add(styles["extension"]);
+  return extension;
 };
 
 DeviceUtils.clearDemoImage = () => {

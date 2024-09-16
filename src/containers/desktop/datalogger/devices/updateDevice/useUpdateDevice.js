@@ -22,6 +22,7 @@ export default function useUpdateDevice() {
     setTotal,
     deviceTypeComponents,
     deviceConfig,
+    serviceUtils,
   } = useDeviceManagement();
   const [mode, setMode] = useState(device?.mode || 0);
   const [enablePowerOff, setEnablePowerOff] = useState(
@@ -139,7 +140,7 @@ export default function useUpdateDevice() {
 
     if (!deviceTypeComponents) return;
 
-    const components = deviceTypeComponents?.find((item) => {
+    const components = _.cloneDeep(deviceTypeComponents)?.find((item) => {
       if (
         item.device_type.id === device?.id_device_type &&
         item.component.length > 0
@@ -150,25 +151,47 @@ export default function useUpdateDevice() {
     });
 
     if (_.isEmpty(components)) return;
-
     Libs.progress(true);
     setTimeout(async () => {
       try {
+        components.component = components.component.filter(
+          (item) =>
+            typeof item.sub_type !== "number" ||
+            item.sub_type === device.inverter_type ||
+            item.sub_type === device.meter_type
+        );
+        for (const component of components.component) {
+          if (typeof component.addition === "number") {
+            const addition = await serviceUtils.getAdditionCount(
+              component.addition,
+              { id_template: device.template.id }
+            );
+            component.quantity = addition.count;
+            component.addition = addition.addition;
+          }
+        }
+
         const response = await axiosPrivate.post(
           Constants.API_URL.DEVICES.COMPONENT.DEFAULT +
             `?device_id=${device?.id}`
         );
-        setAddingComponents(
-          response.data.map((item) => ({
-            ...item,
-            components: item.components.map((component) => ({
-              ...component,
-              component_name: component.name,
-              label: component.device_type_name,
-              value: component.id_device_type,
-            })),
-          }))
-        );
+        const addingComponents = [];
+        for (let item of response.data) {
+          const components = item.components;
+          for (let component of components) {
+            if (typeof component.input_map === "number") {
+              const inputMapName = await serviceUtils.getInputMapDetail(
+                component.input_map
+              );
+              component.input_map_value = inputMapName;
+            }
+            component.component_name = component.name;
+            component.label = component.device_type_name;
+            component.value = component.id_device_type;
+          }
+          addingComponents.push(item);
+        }
+        setAddingComponents(addingComponents);
         setHaveComponents(components);
       } catch (error) {
         loginService.handleMissingInfo(
@@ -199,8 +222,11 @@ export default function useUpdateDevice() {
         3: 0,
         4: 0,
       };
-      for (let i = 0; i < addingComponents.length; i++) {
-        const item = addingComponents[i];
+      const requiredComponents = addingComponents.filter(
+        (item) => item.require
+      );
+      for (let i = 0; i < requiredComponents.length; i++) {
+        const item = requiredComponents[i];
         for (let j = 0; j < item.components.length; j++) {
           const component = item.components[j];
           if (!component.image) continue;
@@ -214,8 +240,43 @@ export default function useUpdateDevice() {
           posCount[component.plug_point]++;
         }
       }
+      const optionalComponents = addingComponents.filter(
+        (item) => !item.require
+      );
+      for (let i = 0; i < optionalComponents.length; i++) {
+        const item = optionalComponents[i];
+        for (let j = 0; j < item.components.length; j++) {
+          const component = item.components[j];
+          if (!component.image) continue;
+          if (!component.component_name) continue;
+          if (
+            typeof haveComponents.device_type.plug_point_count[
+              component.plug_point
+            ] === "number" &&
+            posCount[component.plug_point] + 1 >
+              haveComponents.device_type.plug_point_count[component.plug_point]
+          ) {
+            await DeviceUtils.expandContainer(
+              component.image,
+              component.plug_point,
+              component.id
+            );
+          } else {
+            await DeviceUtils.fetchImage(
+              component.image,
+              component.plug_point,
+              component.id
+            );
+          }
+          posCount[component.plug_point]++;
+        }
+      }
       Object.keys(posCount).forEach((key) => {
-        if (posCount[key] > 1) {
+        if (
+          haveComponents.device_type.plug_point_count[key] > 1 ||
+          (!haveComponents.device_type.plug_point_count[key] &&
+            posCount[key] > 1)
+        ) {
           DeviceUtils.addExtension(key);
         }
       });

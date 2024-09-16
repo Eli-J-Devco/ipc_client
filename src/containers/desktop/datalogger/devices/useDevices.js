@@ -4,7 +4,7 @@
  *
  *********************************************************/
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../utils/Constants";
 import { loginService } from "../../../../services/loginService";
@@ -31,6 +31,7 @@ export const statusEnum = {
   symbolic: 3,
   reconnecting: -5,
   disconnected: -6,
+  undefined: -7,
 };
 
 export const statusColor = {
@@ -43,6 +44,7 @@ export const statusColor = {
   symbolic: "bg-warning",
   "Reconnecting...": "bg-warning",
   disconnected: "bg-secondary",
+  undefined: "bg-secondary",
 };
 
 const deviceMode = {
@@ -64,6 +66,8 @@ export default function useDevices() {
     clientSecret,
     deadletter,
     setDeadletter,
+    isEmpty,
+    setOffset,
   } = useDeviceManagement();
   const navigate = useNavigate();
   const [isAddDevice, setIsAddDevice] = useState(false);
@@ -82,7 +86,6 @@ export default function useDevices() {
   });
   const [needRefresh, setNeedRefresh] = useState(false);
   const [rowSelection, setRowSelection] = useState({});
-  const output = document.getElementById("progress");
   const columnsHelper = createColumnHelper();
 
   const columns = [
@@ -289,7 +292,7 @@ export default function useDevices() {
 
   const fetchDevices = async ({ id, isPagination }) => {
     if (!isPagination) {
-      output.innerHTML = "<div><img src='/loading.gif' /></div>";
+      Libs.progress(true);
     }
     try {
       const { data } = await axiosPrivate.post(
@@ -313,15 +316,25 @@ export default function useDevices() {
       loginService.handleMissingInfo(error, "Failed to get devices") &&
         navigate("/", { replace: true });
     } finally {
-      output.innerHTML = "";
+      Libs.progress(false);
     }
   };
 
   const dataDevices = useMemo(() => {
+    if (isEmpty && offset !== 0) {
+      setOffset(offset > 0 ? offset - 1 : 0);
+      return [];
+    }
     const setDeviceState = (index, d, msg) => {
       if (state.isReconnecting) {
         d["state"] = statusEnum.reconnecting;
         d["status"] = "Reconnecting...";
+        return d;
+      }
+
+      if (d["state"] === null) {
+        d["state"] = statusEnum.undefined;
+        d["status"] = "undefined";
         return d;
       }
 
@@ -399,7 +412,7 @@ export default function useDevices() {
     );
 
     return newData;
-  }, [allDevices, data, state]);
+  }, [allDevices, data, state, isEmpty]);
 
   useEffect(() => {
     if (!_.isEmpty(rowSelection)) {
@@ -541,7 +554,6 @@ export default function useDevices() {
         return canRetry && canDelete ? -1 : canRetry ? 1 : 0;
       }
       const children = keys.slice(1);
-      console.log(children);
       return canItemsRetry(d.subRows, children) === 1 || canRetry;
     };
 
@@ -586,9 +598,9 @@ export default function useDevices() {
         loginService.handleMissingInfo(error, "Failed to create devices") &&
           navigate("/", { replace: true });
       } finally {
-        output.innerHTML = "";
         setIsRetry({ ...isRetry, isOpen: false });
         setRowSelection({});
+        Libs.progress(false);
       }
     }, 500);
   };

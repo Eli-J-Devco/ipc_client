@@ -27,6 +27,7 @@ export const DeviceManagementProvider = ({ children }) => {
     },
   ]);
   const [allDevices, setAllDevices] = useState([]);
+  const [isEmpty, setIsEmpty] = useState(false);
   const [device, setDevice] = useState(null);
   const [deviceConfig, setDeviceConfig] = useState({
     device_types: [],
@@ -38,8 +39,40 @@ export const DeviceManagementProvider = ({ children }) => {
   const [limit, setLimit] = useState(20);
   const [total, setTotal] = useState(0);
   const [deviceTypeComponents, setDeviceTypeComponents] = useState([]);
+  const [connectionTypes, setConnectionTypes] = useState([]);
   const [clientSecret, setClientSecret] = useState("");
   const [deadletter, setDeadletter] = useState("");
+  const serviceUtils = {};
+  const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
+
+  serviceUtils.getAdditionCount = async (id, props) => {
+    try {
+      const response = await axiosPrivate.post(
+        Constants.API_URL.DEVICES.COMPONENT.ADDITION,
+        { id, ...props }
+      );
+
+      return response.data;
+    } catch (error) {
+      loginService.handleMissingInfo(error, "Failed to get number of MPPT") &&
+        navigate("/", { replace: true });
+    }
+  };
+
+  serviceUtils.getInputMapDetail = async (id) => {
+    if (!id) return;
+    try {
+      const response = await axiosPrivate.post(
+        Constants.API_URL.DEVICES.INPUT.GET + "?input_map_id=" + id
+      );
+
+      return response.data.name;
+    } catch (error) {
+      loginService.handleMissingInfo(error, "Failed to get MPPT details") &&
+        navigate("/", { replace: true });
+    }
+  };
 
   return (
     <DeviceManagementContext.Provider
@@ -64,6 +97,11 @@ export const DeviceManagementProvider = ({ children }) => {
         setClientSecret,
         deadletter,
         setDeadletter,
+        serviceUtils,
+        isEmpty,
+        setIsEmpty,
+        connectionTypes,
+        setConnectionTypes,
       }}
     >
       {children}
@@ -85,6 +123,9 @@ export function Device() {
     clientSecret,
     setClientSecret,
     setDeadletter,
+    isEmpty,
+    setIsEmpty,
+    setConnectionTypes,
   } = useDeviceManagement();
   const { client, isConnected, isSubscribed, mqttSub } = useMQTT();
   const { projectSetup } = useProjectSetup();
@@ -134,13 +175,15 @@ export function Device() {
   }, [offset, limit]);
 
   useEffect(() => {
-    if (allDevices.length > 0 || retryTime === 0) return;
+    if (allDevices.length > 0 || retryTime === 0 || isEmpty) return;
 
     setTimeout(async () => {
       try {
         const devices = await fetchDevices({ id: null, isPagination: true });
-        setAllDevices(_.cloneDeep(devices?.devices || []));
+        const allDevices = devices?.devices || [];
+        setAllDevices(allDevices);
         setTotal(devices?.total || 0);
+        setIsEmpty(allDevices.length === 0);
       } catch (error) {
         loginService.handleMissingInfo(error, "Failed to get devices") &&
           navigate("/", { replace: true });
@@ -177,6 +220,9 @@ export function Device() {
           var deviceTypeComponents = await axiosPrivate.post(
             Constants.API_URL.DEVICES.COMPONENT.LIST
           );
+          var connectionTypes = await axiosPrivate.post(
+            Constants.API_URL.DEVICES.CONNECTION.GET
+          );
 
           setDeviceConfig({
             device_types: device_type.data,
@@ -184,15 +230,8 @@ export function Device() {
             template: template.data,
             communication: communication.data,
           });
-          setDeviceTypeComponents(
-            deviceTypeComponents.data.map((item) => ({
-              ...item,
-              component: item.component.map((component) => ({
-                ...component,
-                plug_point: component.plug_point.split(","),
-              })),
-            }))
-          );
+          setDeviceTypeComponents(deviceTypeComponents.data);
+          setConnectionTypes(connectionTypes.data);
         } catch (error) {
           loginService.handleMissingInfo(
             error,

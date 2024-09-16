@@ -522,16 +522,19 @@ function AsyncDropdown({
   horizontal,
   closeMenuOnSelect,
   hideSelectedOptions,
+  controlShouldRenderValue,
   isClearable,
   isDisabled,
   isMulti,
   isSearchable,
+  menuIsOpen,
   onChange,
   onBlur,
   value,
   placeholder,
   onCreateOption,
   loadOptions,
+  dropdownIndicator,
 }) {
   const validate = useContext(FormInputContext);
   const customStyles = {
@@ -616,6 +619,7 @@ function AsyncDropdown({
         captureMenuScroll={true}
         styles={customStyles}
         closeMenuOnSelect={closeMenuOnSelect}
+        controlShouldRenderValue={controlShouldRenderValue}
         hideSelectedOptions={hideSelectedOptions}
         isClearable={isClearable}
         isDisabled={isDisabled}
@@ -623,6 +627,9 @@ function AsyncDropdown({
         isSearchable={isSearchable}
         maxMenuHeight={200}
         menuPosition={"fixed"}
+        components={
+          dropdownIndicator ? { DropdownIndicator: dropdownIndicator } : {}
+        }
         value={validate && value === undefined ? validate.values[name] : value}
         onChange={
           validate && onChange === undefined
@@ -638,6 +645,7 @@ function AsyncDropdown({
         formatGroupLabel={groupOption ? formatGroupLabel : undefined}
         onCreateOption={onCreateOption ? onCreateOption : undefined}
         loadOptions={loadOptions ? loadOptions : undefined}
+        menuIsOpen={menuIsOpen ? menuIsOpen : undefined}
       />
 
       {validate && validate.touched[name] && validate.errors[name] ? (
