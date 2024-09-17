@@ -96,10 +96,8 @@ function useTable({
   }, [total, limit, pageSize, setLimit, table]);
 
   useEffect(() => {
-    console.log("pageIndex", pageIndex);
     if (currentPageIndex !== undefined) {
       setTimeout(() => {
-        console.log("currentPageIndex", currentPageIndex);
         table.setPageIndex(currentPageIndex);
         setCurrentPageIndex(undefined);
       }, 100);
