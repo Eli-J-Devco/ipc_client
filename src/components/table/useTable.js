@@ -12,10 +12,7 @@ function useTable({
   columns,
   data,
   statusFilter,
-  total,
-  offset,
-  setLimit,
-  setOffset,
+  pagination,
   rowSelection,
   setRowSelection,
   slugProps,
@@ -27,6 +24,15 @@ function useTable({
   const [isDropDownsShow, setIsDropDownsShow] = useState(false);
   const dropDownsRef = useClickAway(() => setIsDropDownsShow(false));
   const [pageCount, setPageCount] = useState(-1);
+  const {
+    total,
+    offset,
+    limit,
+    setLimit,
+    setOffset,
+    currentPageIndex,
+    setCurrentPageIndex,
+  } = pagination || {};
 
   const columnDef = useMemo(
     () =>
@@ -80,26 +86,35 @@ function useTable({
 
   useEffect(() => {
     setTimeout(() => {
-      table.setPageSize(Constants.DEFAULT_PAGE_SIZE);
-      table.setPageIndex(0);
-      if (setLimit) setLimit(Constants.DEFAULT_PAGE_SIZE);
+      if (pageSize !== limit) {
+        table.setPageSize(limit ? limit : Constants.DEFAULT_PAGE_SIZE);
+        return;
+      }
+      if (!limit && setLimit) setLimit(Constants.DEFAULT_PAGE_SIZE);
+      setPageCount(Math.ceil(total / pageSize));
     }, 100);
-  }, []);
+  }, [total, limit, pageSize, setLimit, table]);
 
   useEffect(() => {
-    table.setPageIndex(offset / pageSize);
-  }, [offset, pageSize, table]);
-
-  useEffect(() => {
-    total &&
+    if (currentPageIndex !== undefined) {
       setTimeout(() => {
-        setPageCount(Math.ceil(total / pageSize));
+        table.setPageIndex(currentPageIndex);
+        setCurrentPageIndex(undefined);
       }, 100);
-  }, [total, pageSize]);
+      return;
+    }
 
-  useEffect(() => {
-    if (setOffset) setOffset(pageIndex * pageSize);
-  }, [pageIndex, pageSize]);
+    setTimeout(() => {
+      if (setOffset) setOffset(pageIndex * pageSize);
+    }, 100);
+  }, [
+    pageIndex,
+    pageSize,
+    setOffset,
+    table,
+    currentPageIndex,
+    setCurrentPageIndex,
+  ]);
 
   useEffect(() => {
     if (statusFilter !== undefined) {
@@ -110,10 +125,10 @@ function useTable({
 
   useEffect(() => {
     table.toggleAllRowsExpanded(false);
-  }, [offset]);
+  }, [offset, limit, table]);
 
   const handleOnChangePageSize = (e) => {
-    const pageSize = Number(e.target.value);
+    const pageSize = Number(e.value);
     table.setPageSize(pageSize);
     table.setPageIndex(0);
     setOffset(0);

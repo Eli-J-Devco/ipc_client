@@ -3,8 +3,8 @@
  * All rights reserved.
  *
  *********************************************************/
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../utils/Constants";
 import { loginService } from "../../../../services/loginService";
@@ -31,7 +31,7 @@ export const statusEnum = {
   symbolic: 3,
   reconnecting: -5,
   disconnected: -6,
-  undefined: -7,
+  unknown: -7,
 };
 
 export const statusColor = {
@@ -44,7 +44,7 @@ export const statusColor = {
   symbolic: "bg-warning",
   "Reconnecting...": "bg-warning",
   disconnected: "bg-secondary",
-  undefined: "bg-secondary",
+  unknown: "bg-secondary",
 };
 
 const deviceMode = {
@@ -321,10 +321,10 @@ export default function useDevices() {
   };
 
   const dataDevices = useMemo(() => {
-    if (isEmpty && offset !== 0) {
-      setOffset(offset > 0 ? offset - 1 : 0);
-      return [];
-    }
+    // if (isEmpty && offset - limit > 0) {
+    //   setOffset(offset - limit);
+    //   return [];
+    // }
     const setDeviceState = (index, d, msg) => {
       if (state.isReconnecting) {
         d["state"] = statusEnum.reconnecting;
@@ -360,6 +360,11 @@ export default function useDevices() {
         d["mode"] = data[index]["mode"];
         d["rated_power"] = data[index]["rated_power"];
         d["rated_power_custom"] = data[index]["rated_power_custom"];
+        if (d["state"] === undefined) {
+          d["state"] = statusEnum.unknown;
+          d["status"] = "unknown";
+          return d;
+        }
       } else {
         if (d["creation_state"] === -1) {
           d["state"] = statusEnum["Initiating..."];
@@ -412,7 +417,7 @@ export default function useDevices() {
     );
 
     return newData;
-  }, [allDevices, data, state, isEmpty]);
+  }, [allDevices, data, state, isEmpty, offset, limit, needRefresh, setOffset]);
 
   useEffect(() => {
     if (!_.isEmpty(rowSelection)) {
