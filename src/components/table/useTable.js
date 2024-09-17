@@ -91,24 +91,15 @@ function useTable({
         return;
       }
       if (!limit && setLimit) setLimit(Constants.DEFAULT_PAGE_SIZE);
+      setPageCount(Math.ceil(total / pageSize));
     }, 100);
-  }, [limit, pageSize, setLimit, table]);
-
-  // useEffect(() => {
-  //   table.setPageIndex(offset / pageSize);
-  //   console.log("offset", offset);
-  // }, [offset, pageSize, table]);
+  }, [total, limit, pageSize, setLimit, table]);
 
   useEffect(() => {
-    total &&
-      setTimeout(() => {
-        setPageCount(Math.ceil(total / pageSize));
-      }, 100);
-  }, [total, pageSize]);
-
-  useEffect(() => {
+    console.log("pageIndex", pageIndex);
     if (currentPageIndex !== undefined) {
       setTimeout(() => {
+        console.log("currentPageIndex", currentPageIndex);
         table.setPageIndex(currentPageIndex);
         setCurrentPageIndex(undefined);
       }, 100);
@@ -139,7 +130,7 @@ function useTable({
   }, [offset, limit, table]);
 
   const handleOnChangePageSize = (e) => {
-    const pageSize = Number(e.target.value);
+    const pageSize = Number(e.value);
     table.setPageSize(pageSize);
     table.setPageIndex(0);
     setOffset(0);

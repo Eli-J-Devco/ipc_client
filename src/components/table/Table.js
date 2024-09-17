@@ -7,6 +7,7 @@ import DropDowns from "./dropDowns/DropDowns";
 import Header from "./headers/Header";
 import Pagination from "./pagination/Pagination";
 import Constants from "../../utils/Constants";
+import FormInput from "../formInput/FormInput";
 
 /**
  * Table component
@@ -187,7 +188,7 @@ function Table({
           <div className={styles.center}>
             {pagination?.enable && table.getPageCount() > 0 && (
               <>
-                <select
+                {/* <select
                   className={`${styles["page-count"]} ${
                     variant ? styles[variant] : ""
                   }`}
@@ -199,8 +200,33 @@ function Table({
                       {pageSize} items/page
                     </option>
                   ))}
-                </select>
-
+                </select> */}
+                <span
+                  className={`${styles["page-count"]} ${
+                    variant ? styles[variant] : ""
+                  }`}
+                >
+                  <FormInput.Select
+                    option={[
+                      ...Constants.PAGE_SIZES.filter(
+                        (size) => size <= pagination.total
+                      ).map((pageSize) => ({
+                        value: pageSize,
+                        label: pageSize,
+                      })),
+                      {
+                        value: pagination.total,
+                        label: pagination.total,
+                      },
+                    ]}
+                    value={{
+                      label: table.getState().pagination.pageSize,
+                      value: table.getState().pagination.pageSize,
+                    }}
+                    onChange={handleOnChangePageSize}
+                  />
+                  of {pagination.total} items
+                </span>
                 <Pagination controls={table} variant={variant} />
               </>
             )}

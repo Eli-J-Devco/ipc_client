@@ -529,7 +529,6 @@ export default function useDevices() {
   };
 
   useEffect(() => {
-    console.log("offset", offset);
     setRowSelection({});
   }, [offset, limit]);
 
