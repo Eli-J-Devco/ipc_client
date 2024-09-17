@@ -27,6 +27,7 @@ export const DeviceManagementProvider = ({ children }) => {
     },
   ]);
   const [allDevices, setAllDevices] = useState([]);
+  const [isEmpty, setIsEmpty] = useState(false);
   const [device, setDevice] = useState(null);
   const [deviceConfig, setDeviceConfig] = useState({
     device_types: [],
@@ -37,6 +38,7 @@ export const DeviceManagementProvider = ({ children }) => {
   const [offset, setOffset] = useState(0);
   const [limit, setLimit] = useState(20);
   const [total, setTotal] = useState(0);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [deviceTypeComponents, setDeviceTypeComponents] = useState([]);
   const [clientSecret, setClientSecret] = useState("");
   const [deadletter, setDeadletter] = useState("");
@@ -64,6 +66,10 @@ export const DeviceManagementProvider = ({ children }) => {
         setClientSecret,
         deadletter,
         setDeadletter,
+        isEmpty,
+        setIsEmpty,
+        currentPageIndex,
+        setCurrentPageIndex,
       }}
     >
       {children}
@@ -76,7 +82,6 @@ export function Device() {
     routes,
     deviceConfig,
     setDeviceConfig,
-    allDevices,
     setAllDevices,
     offset,
     limit,
@@ -85,6 +90,10 @@ export function Device() {
     clientSecret,
     setClientSecret,
     setDeadletter,
+    isEmpty,
+    setIsEmpty,
+    device,
+    setCurrentPageIndex,
   } = useDeviceManagement();
   const { client, isConnected, isSubscribed, mqttSub } = useMQTT();
   const { projectSetup } = useProjectSetup();
@@ -93,6 +102,7 @@ export function Device() {
   const output = document.getElementById("progress");
   const [feedbackTopic, setFeedbackTopic] = useState("");
   const [retryTime, setRetryTime] = useState(3);
+  const [isFetching, setIsFetching] = useState(false);
   const fetchDevices = async ({ id, isPagination }) => {
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     try {
@@ -128,25 +138,21 @@ export function Device() {
   };
 
   useEffect(() => {
-    if (allDevices.length === 0) return;
-
-    setTimeout(setAllDevices([]), 300);
-  }, [offset, limit]);
-
-  useEffect(() => {
-    if (allDevices.length > 0 || retryTime === 0) return;
-
+    if (isFetching || retryTime === 0 || isEmpty) return;
+    setIsFetching(true);
     setTimeout(async () => {
       try {
         const devices = await fetchDevices({ id: null, isPagination: true });
         setAllDevices(_.cloneDeep(devices?.devices || []));
         setTotal(devices?.total || 0);
+        setIsEmpty(devices?.devices?.length === 0);
+        setIsFetching(false);
       } catch (error) {
         loginService.handleMissingInfo(error, "Failed to get devices") &&
           navigate("/", { replace: true });
       }
     }, 300);
-  }, [allDevices, retryTime]);
+  }, [retryTime, isEmpty, offset, limit]);
 
   useEffect(() => {
     let isEmpty = true;
@@ -233,6 +239,10 @@ export function Device() {
       });
     }
   }, [isConnected, isSubscribed, projectSetup?.serial_number, feedbackTopic]);
+
+  useEffect(() => {
+    setCurrentPageIndex(offset / limit);
+  }, [device]);
 
   return (
     <div className="main">

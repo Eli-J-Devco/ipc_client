@@ -36,7 +36,15 @@ export default function Devices() {
     retryCreateDevice,
   } = useDevices();
 
-  const { total, offset, setOffset, setLimit } = useDeviceManagement();
+  const {
+    total,
+    limit,
+    offset,
+    setOffset,
+    setLimit,
+    currentPageIndex,
+    setCurrentPageIndex,
+  } = useDeviceManagement();
   const { name } = useParams();
 
   return (
@@ -152,8 +160,11 @@ export default function Devices() {
               enable: true,
               total: total,
               offset: offset,
+              limit: limit,
               setLimit: setLimit,
               setOffset: setOffset,
+              currentPageIndex: currentPageIndex,
+              setCurrentPageIndex: setCurrentPageIndex,
             }}
           />
         </div>

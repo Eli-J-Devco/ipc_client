@@ -3,8 +3,8 @@
  * All rights reserved.
  *
  *********************************************************/
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../utils/Constants";
 import { loginService } from "../../../../services/loginService";
@@ -66,6 +66,8 @@ export default function useDevices() {
     clientSecret,
     deadletter,
     setDeadletter,
+    isEmpty,
+    setOffset,
   } = useDeviceManagement();
   const navigate = useNavigate();
   const [isAddDevice, setIsAddDevice] = useState(false);
@@ -320,6 +322,10 @@ export default function useDevices() {
   };
 
   const dataDevices = useMemo(() => {
+    // if (isEmpty && offset - limit > 0) {
+    //   setOffset(offset - limit);
+    //   return [];
+    // }
     const setDeviceState = (index, d, msg) => {
       if (state.isReconnecting) {
         d["state"] = statusEnum.reconnecting;
@@ -406,7 +412,7 @@ export default function useDevices() {
     );
 
     return newData;
-  }, [allDevices, data, state]);
+  }, [allDevices, data, state, isEmpty, offset, limit, needRefresh, setOffset]);
 
   useEffect(() => {
     if (!_.isEmpty(rowSelection)) {
@@ -523,6 +529,7 @@ export default function useDevices() {
   };
 
   useEffect(() => {
+    console.log("offset", offset);
     setRowSelection({});
   }, [offset, limit]);
 
