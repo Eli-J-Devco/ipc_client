@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  *********************************************************/
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import styles from "./LoginAdmin.module.scss";
@@ -30,12 +30,12 @@ const LoginAdmin = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/datalogger/quickstart";
+  const to = "/datalogger/quickstart";
 
-  const initialValues = {
+  const [initialValues, setInitialValues] = useState({
     email: "",
     password: "",
-  };
+  });
 
   const schema = yup.object().shape({
     email: yup
@@ -85,7 +85,7 @@ const LoginAdmin = () => {
           t("toastMessage.info.loginSuccess") + " " + userName,
           "info"
         );
-        navigate(from, { replace: true });
+        navigate(to, { replace: true });
       } catch (error) {
         loginService.handleMissingInfo(error, "Failed to login");
       } finally {
@@ -105,11 +105,22 @@ const LoginAdmin = () => {
     const persist = localStorage.getItem("persist");
     const project_id = getToken("project_id");
     if (auth?.isAuthenticated && persist && project_id) {
-      navigate(from, { replace: true });
+      navigate(to, { replace: true });
     } else {
       clearToken();
     }
   }, []);
+
+  useEffect(() => {
+    const { from, email, new_password } = location.state || {
+      from: { pathname: "/login" },
+      email: "",
+      new_password: "",
+    };
+    if (email && new_password && from === "/forgot-password") {
+      setInitialValues({ email, password: new_password });
+    }
+  }, [location]);
 
   return (
     <div className={styles.main_login}>
