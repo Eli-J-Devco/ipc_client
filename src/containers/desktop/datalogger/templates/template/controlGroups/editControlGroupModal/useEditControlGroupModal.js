@@ -121,7 +121,7 @@ function useEditControlGroupModal(data, close, refresh, isEdit) {
       header: ({ table }) => (
         <div>
           <Button
-            variant="dark"
+            variant="transparent"
             onClick={() =>
               table.getIsSomeRowsExpanded()
                 ? table.toggleAllRowsExpanded(false)

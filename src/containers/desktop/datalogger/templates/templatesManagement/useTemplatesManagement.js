@@ -40,7 +40,7 @@ function useTemplatesManagement() {
         <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
           {row.getCanExpand() && (
             <Button
-              variant="dark"
+              variant="transparent"
               onClick={() => {
                 row.toggleExpanded();
               }}

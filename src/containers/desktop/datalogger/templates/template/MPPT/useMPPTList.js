@@ -344,7 +344,7 @@ function useMPPTList() {
       header: ({ table }) => (
         <div>
           <Button
-            variant="dark"
+            variant="transparent"
             onClick={() =>
               table.getIsSomeRowsExpanded()
                 ? table.toggleAllRowsExpanded(false)

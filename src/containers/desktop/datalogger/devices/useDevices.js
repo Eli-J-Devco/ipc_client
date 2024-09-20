@@ -98,7 +98,7 @@ export default function useDevices() {
         <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
           {row.original.children && (
             <Button
-              variant="dark"
+              variant="transparent"
               onClick={() => {
                 row.toggleExpanded();
                 !row.getIsExpanded() &&
