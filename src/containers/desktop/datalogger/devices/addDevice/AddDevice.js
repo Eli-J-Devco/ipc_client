@@ -99,7 +99,7 @@ export default function AddDevice(props) {
             onHide={() => closeAddMultipleDevice()}
           >
             <ModalDefault.Header
-              s={{ backgroundColor: "#383434", color: "#fff" }}
+              style={{ backgroundColor: "#383434", color: "#fff" }}
             >
               Add Multiple Device
             </ModalDefault.Header>

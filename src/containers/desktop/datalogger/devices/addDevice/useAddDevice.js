@@ -178,7 +178,7 @@ export default function useAddDevice(closeAddDevice) {
         );
         for (const item of requiredComponents) {
           const addition =
-            typeof item.addition === "number" &&
+            typeof item.addition === "string" &&
             (await serviceUtils.getAdditionCount(item.addition, {
               id_template,
             }));
@@ -186,9 +186,9 @@ export default function useAddDevice(closeAddDevice) {
           const components = [];
           for (let i = 0; i < quantity; i++) {
             components.push({
+              ...item.components[0],
               value: item.components[0].id,
               label: item.components[0].name,
-              image: item.components[0].image,
               plug_point: item.plug_point,
               id: Math.random().toString(36).slice(2, 9),
             });
@@ -396,6 +396,8 @@ export default function useAddDevice(closeAddDevice) {
                   group: item.group,
                   plug_point: i.plug_point,
                   quantity: item.quantity,
+                  addition: item.addition,
+                  id_connection_type: i.connection.id,
                 }));
                 return components;
               })

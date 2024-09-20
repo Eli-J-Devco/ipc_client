@@ -47,11 +47,11 @@ export const DeviceManagementProvider = ({ children }) => {
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
 
-  serviceUtils.getAdditionCount = async (id, props) => {
+  serviceUtils.getAdditionCount = async (table, props) => {
     try {
       const response = await axiosPrivate.post(
         Constants.API_URL.DEVICES.COMPONENT.ADDITION,
-        { id, ...props }
+        { table, ...props }
       );
 
       return response.data;

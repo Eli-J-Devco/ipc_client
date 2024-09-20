@@ -251,8 +251,7 @@ export default function useDevices() {
             statusEnum["Deleting..."],
             statusEnum.deleted,
             statusEnum["Initiating..."],
-          ].includes(row.original.state) ||
-          row.original?.device_type?.type === 1 ? null : (
+          ].includes(row.original.state) ? null : (
             <>
               {row.original?.device_type?.type !== 1 && (
                 <Button.Image

@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  *********************************************************/
-import React from "react";
+import React, { useMemo } from "react";
 import styles from "./Devices.module.scss";
 import Table from "../../../../components/table/Table";
 import AddDevice from "./addDevice/AddDevice";
@@ -46,16 +46,18 @@ export default function Devices() {
     setCurrentPageIndex,
   } = useDeviceManagement();
   const { name } = useParams();
-
+  const addDeviceLayout = useMemo(
+    () => <AddDevice closeAddDevice={closeAddDevice} />,
+    []
+  );
+  const updateDeviceLayout = useMemo(
+    () => <UpdateDevice closeUpdateDevice={closeUpdateDevice} />,
+    []
+  );
   return (
     <div className={`main ${styles.main_devices}`}>
-      {isAddDevice && <AddDevice closeAddDevice={closeAddDevice} />}
-      {isUpdateDevice && (
-        <UpdateDevice
-          isShow={isUpdateDevice}
-          closeUpdateDevice={closeUpdateDevice}
-        />
-      )}
+      {isAddDevice ? addDeviceLayout : null}
+      {isUpdateDevice ? updateDeviceLayout : null}
       {isDeleteDevice && (
         <Modal
           title="Delete Devices"
@@ -137,7 +139,7 @@ export default function Devices() {
                 <Button.Text text="Delete Device" />
               </Button>
             )}
-            {isRetry.canRetry ? (
+            {isRetry.canRetry && (
               <Button
                 className="ms-3"
                 variant="dark"
@@ -145,7 +147,7 @@ export default function Devices() {
               >
                 <Button.Text text="Retry" />
               </Button>
-            ) : null}
+            )}
           </div>
           <Table
             columns={{ columnDefs: columns }}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import _ from "lodash";
+import _, { debounce } from "lodash";
 import FormInput from "../../../../../components/formInput/FormInput";
 import { createColumnHelper } from "@tanstack/react-table";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
@@ -34,7 +34,7 @@ export default function useAddComponents(
       value: "3",
     },
   ];
-  const { device, serviceUtils } = useDeviceManagement();
+  const { device, serviceUtils, connectionTypes } = useDeviceManagement();
   const [dataTable, setDataTable] = useState([]);
 
   const columnsHelper = createColumnHelper();
@@ -52,35 +52,37 @@ export default function useAddComponents(
       size: 200,
       header: "Device Type Group",
       cell: ({ row }) => {
-        const options = !row.original.component.plug_point
-          ? haveComponents.component
-              .filter(
-                (item) => item.plug_point === row.original.component.plug_point
-              )
-              .map((item) => ({
-                label: item.name,
-                value: item.group,
-              }))
-          : haveComponents.component
-              .filter((item) => {
-                const numOfAddedGroup = addingComponents.find(
-                  (addedItem) => addedItem.group === item.group
-                )?.components?.length;
-                return numOfAddedGroup < item.quantity || !item.quantity;
-              })
-              .map((item) => {
-                return {
-                  label: item.name,
-                  value: item.group,
-                  plug_point: item.plug_point,
-                };
-              });
+        const options = haveComponents.component
+          .filter((item) => {
+            const numOfAddedGroup = addingComponents.find(
+              (addedItem) =>
+                addedItem.group === item.group &&
+                addedItem.plug_point === item.plug_point
+            )?.components?.length;
+            return numOfAddedGroup < item.quantity || !item.quantity;
+          })
+          .map((item) => {
+            return {
+              label: item.name,
+              value: item.group,
+              plug_point: item.plug_point,
+            };
+          })
+          .reduce((acc, val) => {
+            if (
+              val.plug_point === row.original.plug_point ||
+              !row.original.plug_point
+            ) {
+              acc.push(val);
+            }
+            return acc;
+          }, []);
         return (
           <FormInput.Select
             name="group"
             value={{ label: row.original.name, value: row.original.group }}
             option={options}
-            isDisabled={options.length <= 1}
+            isDisabled={options.length < 1}
             onChange={(e) => {
               setUpdatingComponent({
                 plug_point: e.plug_point,
@@ -111,7 +113,13 @@ export default function useAddComponents(
                 plug_point: row.original.plug_point,
               }))
             )
-            .flat();
+            .flat()
+            .reduce((acc, val) => {
+              if (!acc.find((item) => item.value === val.value)) {
+                acc.push(val);
+              }
+              return acc;
+            }, []);
         return (
           <FormInput.Select
             name="device_type"
@@ -171,6 +179,7 @@ export default function useAddComponents(
               });
             }}
             placeholder="Search component"
+            defaultOptions
           />
         );
       },
@@ -211,17 +220,88 @@ export default function useAddComponents(
           />
         ) : (
           <div>
-            {posOptions.find((item) => item.value === row.original.plug_point)
-              ?.label || ""}
+            {posOptions.find(
+              (item) =>
+                parseInt(item.value) ===
+                parseInt(row.original.component.plug_point)
+            )?.label || ""}
           </div>
         );
       },
     }),
+    ...(haveComponents.isHaveAddition
+      ? [
+          columnsHelper.accessor("connection_type", {
+            id: "connection_type",
+            size: 200,
+            header: "Connection Type",
+            cell: ({ row }) => {
+              const connection = row.original.component.connection;
+              return (
+                <FormInput.Select
+                  name="connection_type"
+                  value={
+                    connection
+                      ? {
+                          label: `${connection.name} ${
+                            connection.description
+                              ? "- " + connection.description
+                              : ""
+                          }`,
+                          value: connection.id,
+                        }
+                      : {}
+                  }
+                  option={connectionTypes.map((item) => ({
+                    label: `${item.name} ${
+                      item.description ? "- " + item.description : ""
+                    }`,
+                    value: item.id,
+                  }))}
+                  onChange={(e) => {
+                    setUpdatingComponent({
+                      connection: {
+                        id: e.value,
+                        name: e.label.split(" ")[0],
+                        description: e.label.split(" - ")[1],
+                      },
+                      rowId: row.original.component.id,
+                      group: row.original.group,
+                      plug_point: row.original.plug_point,
+                    });
+                  }}
+                  isDisabled={true}
+                />
+              );
+            },
+          }),
+          columnsHelper.accessor("mapping", {
+            id: "mapping",
+            size: 200,
+            header: "Connection Mapping",
+            cell: ({ row }) => {
+              return (
+                <FormInput.Text
+                  name="mapping"
+                  value={row.original.component.mapping || ""}
+                  onChange={(e) => {
+                    setUpdatingComponent({
+                      mapping: e.target.value,
+                      rowId: row.original.component.id,
+                      group: row.original.group,
+                      plug_point: row.original.plug_point,
+                    });
+                  }}
+                />
+              );
+            },
+          }),
+        ]
+      : []),
   ];
 
   useEffect(() => {
     if (_.isEmpty(updatingComponent)) return;
-
     const e = updatingComponent;
     if (!_.isEmpty(e.image) && !isUpdateDevice) {
       const component = document.getElementById(`component_${e.rowId}`);
@@ -348,49 +428,43 @@ export default function useAddComponents(
           .filter((addedItem) => addedItem.plug_point === item.plug_point)
           .map((item) => item.components)
           .flat().length;
-        return numOfAddedGroup < item.quantity;
+        return numOfAddedGroup < item.quantity || !item.quantity;
       }).length < 1;
     setIsFull(isFull);
   }, [addingComponents, haveComponents]);
 
-  const [searchValue, setSearchValue] = useState("");
-  const searchDevices = ({ callback, searchText, idDeviceType }) => {
-    setTimeout(async () => {
-      const response = await axiosPrivate.post(
-        Constants.API_URL.DEVICES.COMPONENT.SEARCH,
-        {
-          name: searchText,
-          id_device_type: idDeviceType,
-          exclude: addingComponents
-            .map((item) => item.components)
-            .flat()
-            .filter((item) => typeof item.id === "number")
-            .map((item) => item.id),
-          parent: device.id,
-        }
-      );
-      callback(
-        response.data.map((item) => ({
-          label: item.id + " | " + item.name,
-          value: item.id,
-        }))
-      );
-    }, 100);
+  const searchDevices = ({ callback, searchText, id_device_type }) => {
+    axiosPrivate
+      .post(Constants.API_URL.DEVICES.COMPONENT.SEARCH, {
+        name: searchText,
+        exclude: addingComponents
+          .map((item) => item.components)
+          .flat()
+          .filter((item) => typeof item.id === "number")
+          .map((item) => item.id),
+        id_device_type,
+        parent: device.id,
+      })
+      .then((response) => {
+        callback(
+          response.data.map((item) => ({
+            label: item.id + " | " + item.name,
+            value: item.id,
+            image: item.image,
+          }))
+        );
+      })
+      .catch((error) => {
+        LibToast.toast("Failed to search devices", "error");
+      });
   };
 
-  const searchDevicesCallback = (searchText, callback, idDeviceType) => {
-    setSearchValue({ callback, searchText, idDeviceType });
-  };
-
-  useEffect(() => {
-    if (!searchValue) return;
-
-    const timeout = setTimeout(() => {
-      searchDevices(searchValue);
-    }, 1000);
-
-    return () => clearTimeout(timeout);
-  }, [searchValue]);
+  const searchDevicesCallback = debounce(
+    (searchText, callback, id_device_type) => {
+      searchDevices({ callback, searchText, id_device_type });
+    },
+    3000
+  );
 
   return {
     columns,

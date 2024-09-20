@@ -34,38 +34,10 @@ export default function useUpdateDevice() {
       : new Date(new Date().setDate(new Date().getDate() + 1))
   );
   const [updating, setUpdating] = useState(false);
-  const [haveComponents, setHaveComponents] = useState(false);
+  const [haveComponents, setHaveComponents] = useState({});
   const [deviceConfigDropdown, setDeviceConfigDropdown] = useState([]);
   const [addingComponents, setAddingComponents] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
-  const [columns] = useState([
-    {
-      id: 1,
-      slug: "id",
-      name: "No.",
-      width: 5,
-    },
-    {
-      id: 2,
-      slug: "name",
-      name: "Device Name",
-    },
-    {
-      id: 3,
-      slug: "device_type",
-      name: "Device Type",
-    },
-    {
-      id: 4,
-      slug: "device_group",
-      name: "Device Group",
-    },
-    {
-      id: 5,
-      slug: "template",
-      name: "Template",
-    },
-  ]);
   const schema = yup.object().shape({
     name: yup.string().required("Please fill this field"),
     rtu_bus_address: yup
@@ -100,18 +72,23 @@ export default function useUpdateDevice() {
               : null,
           }
         : {}),
-      components: addingComponents.map((item) => {
-        return {
-          id:
-            typeof item.device?.value?.id === "number"
-              ? item.device?.value?.id
-              : null,
-          name: item.device?.label,
-          id_device_group: item.device_group?.value,
-          id_template: item.template?.value?.id_template,
-          id_device_type: item.device_type?.value,
-        };
-      }),
+      components: !_.isEmpty(addingComponents)
+        ? addingComponents
+            .map((item) => {
+              const components = item.components.map((i) => ({
+                id: i.id,
+                name: i.component_name,
+                id_device_type: i.value,
+                group: item.group,
+                plug_point: i.plug_point,
+                quantity: item.quantity,
+                addition: item.addition,
+                id_connection_type: i?.connection?.id,
+              }));
+              return components;
+            })
+            .flat()
+        : [],
     };
 
     var output = document.getElementById("progress");
@@ -139,10 +116,9 @@ export default function useUpdateDevice() {
     if (!device?.id_device_type) return;
 
     if (!deviceTypeComponents) return;
-
     const components = _.cloneDeep(deviceTypeComponents)?.find((item) => {
       if (
-        item.device_type.id === device?.id_device_type &&
+        item.device_type.group === device?.device_type.group &&
         item.component.length > 0
       ) {
         return true;
@@ -160,17 +136,17 @@ export default function useUpdateDevice() {
             item.sub_type === device.inverter_type ||
             item.sub_type === device.meter_type
         );
-        for (const component of components.component) {
-          if (typeof component.addition === "number") {
-            const addition = await serviceUtils.getAdditionCount(
-              component.addition,
-              { id_template: device.template.id }
-            );
-            component.quantity = addition.count;
-            component.addition = addition.addition;
-          }
-        }
-
+        // for (const component of components.component) {
+        //   if (typeof component.addition === "number") {
+        //     const addition = await serviceUtils.getAdditionCount(
+        //       component.addition,
+        //       { id_template: device.template.id }
+        //     );
+        //     component.quantity = addition.count;
+        //     component.addition = addition.addition;
+        //   }
+        // }
+        var isHaveAddition = components.component.some((item) => item.addition);
         const response = await axiosPrivate.post(
           Constants.API_URL.DEVICES.COMPONENT.DEFAULT +
             `?device_id=${device?.id}`
@@ -179,12 +155,12 @@ export default function useUpdateDevice() {
         for (let item of response.data) {
           const components = item.components;
           for (let component of components) {
-            if (typeof component.input_map === "number") {
-              const inputMapName = await serviceUtils.getInputMapDetail(
-                component.input_map
-              );
-              component.input_map_value = inputMapName;
-            }
+            // if (typeof component.input_map === "number") {
+            //   const inputMapName = await serviceUtils.getInputMapDetail(
+            //     component.input_map
+            //   );
+            //   component.input_map_value = inputMapName;
+            // }
             component.component_name = component.name;
             component.label = component.device_type_name;
             component.value = component.id_device_type;
@@ -192,7 +168,7 @@ export default function useUpdateDevice() {
           addingComponents.push(item);
         }
         setAddingComponents(addingComponents);
-        setHaveComponents(components);
+        setHaveComponents({ ...components, isHaveAddition });
       } catch (error) {
         loginService.handleMissingInfo(
           error,
@@ -210,7 +186,6 @@ export default function useUpdateDevice() {
     if (_.isEmpty(addingComponents)) return;
 
     if (isFetching) return;
-
     DeviceUtils.clearDemoImage();
     setIsFetching(true);
     setTimeout(async () => {
@@ -250,6 +225,7 @@ export default function useUpdateDevice() {
           if (!component.image) continue;
           if (!component.component_name) continue;
           if (
+            haveComponents.device_type.plug_point_count &&
             typeof haveComponents.device_type.plug_point_count[
               component.plug_point
             ] === "number" &&
@@ -271,15 +247,23 @@ export default function useUpdateDevice() {
           posCount[component.plug_point]++;
         }
       }
-      Object.keys(posCount).forEach((key) => {
-        if (
-          haveComponents.device_type.plug_point_count[key] > 1 ||
-          (!haveComponents.device_type.plug_point_count[key] &&
-            posCount[key] > 1)
-        ) {
-          DeviceUtils.addExtension(key);
-        }
-      });
+      if (!haveComponents.device_type.plug_point_count) {
+        Object.keys(posCount).forEach((key) => {
+          if (posCount[key] > 1) {
+            DeviceUtils.addExtension(key);
+          }
+        });
+      } else {
+        Object.keys(posCount).forEach((key) => {
+          if (
+            haveComponents.device_type.plug_point_count[key] > 1 ||
+            (!haveComponents.device_type.plug_point_count[key] &&
+              posCount[key] > 1)
+          ) {
+            DeviceUtils.addExtension(key);
+          }
+        });
+      }
       setIsFetching(false);
     }, 300);
   }, [addingComponents, haveComponents]);
@@ -377,10 +361,8 @@ export default function useUpdateDevice() {
     setInverterShutdown,
     handleUpdateDevice,
     haveComponents,
-    device,
-    deviceConfigDropdown,
     addingComponents,
     setAddingComponents,
-    columns,
+    device,
   };
 }
