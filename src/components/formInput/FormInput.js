@@ -70,6 +70,9 @@ function Text({
   onBlur,
   onClick,
   unit,
+  inputMode,
+  pattern,
+  onKeyDown,
 }) {
   const validate = useContext(FormInputContext);
   const [showPassword, setShowPassword] = useState(isShow);
@@ -132,6 +135,9 @@ function Text({
               validate ? validate.touched[name] && validate.errors[name] : false
             }
             title={title}
+            inputMode={inputMode}
+            pattern={pattern}
+            onKeyDown={onKeyDown}
           />
           <Form.Control.Feedback type="invalid">
             {validate ? validate.errors[name] : ""}

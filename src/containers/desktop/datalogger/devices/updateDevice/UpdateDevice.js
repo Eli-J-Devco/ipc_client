@@ -157,6 +157,10 @@ export default function UpdateDevice({ closeUpdateDevice }) {
                       initialValues?.driver_type?.search(/RS485/g) !== -1 &&
                       "col-4"
                     } mb-2`}
+                    onKeyDown={(evt) =>
+                      ["e", "E", "+", "-"].includes(evt.key) &&
+                      evt.preventDefault()
+                    }
                   />
                   {initialValues?.driver_type &&
                     initialValues?.driver_type?.search(/TCP/g) !== -1 && (
@@ -170,6 +174,10 @@ export default function UpdateDevice({ closeUpdateDevice }) {
                             initialValues?.driver_type?.search(/RS485/g) !==
                               -1 && "col-4"
                           } mb-2`}
+                          onKeyDown={(evt) =>
+                            ["e", "E", "+", "-"].includes(evt.key) &&
+                            evt.preventDefault()
+                          }
                         />
                         <FormInput.Text
                           label="MB/TCP Gateway IP-Address"

@@ -50,6 +50,9 @@ export const AddModBusDevice = ({
               })
             }
             placeholder="1"
+            onKeyDown={(evt) =>
+              ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
+            }
           />
         </div>
         {initialValues?.communication?.label &&
@@ -69,6 +72,9 @@ export const AddModBusDevice = ({
                   })
                 }
                 placeholder="502"
+                onKeyDown={(evt) =>
+                  ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
+                }
               />
             </div>
             <div className="col-xl-12 col-md-12">

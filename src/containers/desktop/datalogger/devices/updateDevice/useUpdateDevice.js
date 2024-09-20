@@ -22,7 +22,6 @@ export default function useUpdateDevice() {
     setTotal,
     deviceTypeComponents,
     deviceConfig,
-    serviceUtils,
   } = useDeviceManagement();
   const [mode, setMode] = useState(device?.mode || 0);
   const [enablePowerOff, setEnablePowerOff] = useState(
@@ -58,8 +57,59 @@ export default function useUpdateDevice() {
     template: device?.template?.name,
   };
   const handleUpdateDevice = (values) => {
+    if (
+      _.isEqual(
+        {
+          ...initialValues,
+          ...values,
+          ...(device?.device_type &&
+          device?.device_type?.name.indexOf("Inverter") !== -1
+            ? {
+                mode: mode,
+                enable_poweroff: enablePowerOff,
+                inverter_shutdown: enablePowerOff
+                  ? inverterShutdown.toISOString().split("T")[0]
+                  : null,
+              }
+            : {}),
+        },
+        {
+          ...initialValues,
+          ...(device?.device_type &&
+          device?.device_type?.name.indexOf("Inverter") !== -1
+            ? {
+                mode: device?.mode,
+                enable_poweroff: device?.enable_poweroff,
+                inverter_shutdown: device?.inverter_shutdown
+                  ? new Date(device?.inverter_shutdown)
+                  : new Date(new Date().setDate(new Date().getDate() + 1)),
+              }
+            : {}),
+        }
+      )
+    ) {
+      LibToast.toast("Nothing to update", "info");
+      return;
+    }
     if (updating) return;
     setUpdating(true);
+    const requireInitial = [
+      "name",
+      "rtu_bus_address",
+      "tcp_gateway_ip",
+      "tcp_gateway_port",
+    ];
+    const changeKeys = [];
+    for (const key in values) {
+      if (values[key] !== initialValues[key]) {
+        changeKeys.push(key);
+      }
+    }
+    const update_type = requireInitial.some(
+      (item) => changeKeys.indexOf(item) !== -1
+    )
+      ? 0
+      : 1;
     const body = {
       ...values,
       ...(device?.device_type &&
@@ -89,6 +139,7 @@ export default function useUpdateDevice() {
             })
             .flat()
         : [],
+      update_type,
     };
 
     var output = document.getElementById("progress");
@@ -155,12 +206,6 @@ export default function useUpdateDevice() {
         for (let item of response.data) {
           const components = item.components;
           for (let component of components) {
-            // if (typeof component.input_map === "number") {
-            //   const inputMapName = await serviceUtils.getInputMapDetail(
-            //     component.input_map
-            //   );
-            //   component.input_map_value = inputMapName;
-            // }
             component.component_name = component.name;
             component.label = component.device_type_name;
             component.value = component.id_device_type;

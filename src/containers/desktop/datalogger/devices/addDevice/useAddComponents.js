@@ -77,6 +77,7 @@ export default function useAddComponents(
             }
             return acc;
           }, []);
+        console.log(options, row.original.plug_point);
         return (
           <FormInput.Select
             name="group"
@@ -236,7 +237,8 @@ export default function useAddComponents(
             size: 200,
             header: "Connection Type",
             cell: ({ row }) => {
-              const connection = row.original.component.connection;
+              const connection =
+                row.original.component?.connection?.connection_type;
               return (
                 <FormInput.Select
                   name="connection_type"
@@ -280,10 +282,14 @@ export default function useAddComponents(
             size: 200,
             header: "Connection Mapping",
             cell: ({ row }) => {
+              const connection = row.original.component?.connection;
               return (
-                <FormInput.Text
+                <FormInput.Select
                   name="mapping"
-                  value={row.original.component.mapping || ""}
+                  value={{
+                    label: connection.connection_name,
+                    value: connection.connect_device_id,
+                  }}
                   onChange={(e) => {
                     setUpdatingComponent({
                       mapping: e.target.value,
@@ -292,6 +298,7 @@ export default function useAddComponents(
                       plug_point: row.original.plug_point,
                     });
                   }}
+                  isDisabled={!row.original.addition}
                 />
               );
             },
