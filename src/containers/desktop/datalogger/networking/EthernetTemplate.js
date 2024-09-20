@@ -11,6 +11,8 @@ import FormInput from "../../../../components/formInput/FormInput";
 import Button from "../../../../components/button/Button";
 import { ReactComponent as BackIcon } from "../../../../assets/images/back.svg";
 import { ReactComponent as SaveIcon } from "../../../../assets/images/save.svg";
+import { useEffect } from "react";
+import { cloneDeep, isEqual } from "lodash";
 
 function EthernetTemplate({ ...data }) {
   const { t } = useTranslation();
