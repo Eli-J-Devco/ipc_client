@@ -286,10 +286,14 @@ export default function useAddComponents(
               return (
                 <FormInput.Select
                   name="mapping"
-                  value={{
-                    label: connection.connection_name,
-                    value: connection.connect_device_id,
-                  }}
+                  value={
+                    connection
+                      ? {
+                          label: connection.connection_name,
+                          value: connection.connect_device_id,
+                        }
+                      : {}
+                  }
                   onChange={(e) => {
                     setUpdatingComponent({
                       mapping: e.target.value,
