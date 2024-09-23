@@ -77,7 +77,6 @@ export default function useAddComponents(
             }
             return acc;
           }, []);
-        console.log(options, row.original.plug_point);
         return (
           <FormInput.Select
             name="group"
