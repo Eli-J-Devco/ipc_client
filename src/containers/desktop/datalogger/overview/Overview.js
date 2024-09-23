@@ -37,7 +37,7 @@ accessibility(Highcharts);
 function Overview() {
   const chartRef = useRef();
   const { projectSetup } = useProjectSetup();
-  const { cpuData, publishMessage } = useMQTT();
+  const { state, cpuData, publishMessage } = useMQTT();
   const [traffic, setTraffic] = useState(1);
   const [options] = useState({
     chart: {
@@ -193,8 +193,11 @@ function Overview() {
   const [timeOfRunning, setTimeOfRunning] = useState("");
   const [isReboot, setIsReboot] = useState(false);
   const [isOpenRebootCFModal, setIsOpenRebootCFModal] = useState(false);
-
   useEffect(() => {
+    if (!state.isConnected) {
+      return;
+    }
+
     if (!_.isEmpty(cpuData) && !_.isEqual(cpuData, curInformationCPU)) {
       if (isReboot) {
         setIsReboot(false);
@@ -393,7 +396,7 @@ function Overview() {
                 </div>
               )
             }
-            onClose={() => {
+            close={() => {
               !isReboot && setIsOpenRebootCFModal(false);
             }}
           >
@@ -471,11 +474,20 @@ function Overview() {
                 {!_.isEmpty(cpuData) && (
                   <Button
                     className="ms-5"
-                    variant="dark"
+                    variant={state.isConnected ? "dark" : "white"}
                     onClick={() => setIsOpenRebootCFModal(!isOpenRebootCFModal)}
                   >
-                    <Button.Image className="p-0" image={<RefreshIcon />} />
-                    <Button.Text text="Reboot server" />
+                    {state.isConnected ? (
+                      <>
+                        <Button.Image className="p-0" image={<RefreshIcon />} />
+                        <Button.Text text="Reboot server" />
+                      </>
+                    ) : (
+                      <Button.Image
+                        className={styles.loading}
+                        image={<img src="/loading.gif" alt="" />}
+                      />
+                    )}
                   </Button>
                 )}
               </div>
