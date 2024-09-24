@@ -97,11 +97,7 @@ function useTable({
         return;
       }
 
-      maxPageSize = Math.min(
-        maxPageSize,
-        pageSize,
-        Constants.DEFAULT_PAGE_SIZE
-      );
+      maxPageSize = Math.min(maxPageSize, pageSize);
       if (!limit && setLimit) setLimit(maxPageSize);
       if (maxPageSize !== pageSize) table.setPageSize(maxPageSize);
       setPageCount(Math.ceil(total / maxPageSize));
