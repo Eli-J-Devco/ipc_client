@@ -318,10 +318,8 @@ export function Device() {
             topic,
             ...JSON.parse(ungzip(messageArr, { to: "string" })),
           };
-          console.log("payload", payload);
           if (payload?.metadata?.code === clientSecret) {
             var msg = payload.message?.data;
-            console.log("msg", msg);
             if (!msg) {
               msg = payload.message?.type?.split("/");
               msg = `An unexpected error occured while ${msg[msg.length - 1]}`;
