@@ -4,7 +4,7 @@
  *
  *********************************************************/
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import Constants from "../../../../utils/Constants";
 import { loginService } from "../../../../services/loginService";
@@ -68,6 +68,7 @@ export default function useDevices() {
     setDeadletter,
     isEmpty,
     setOffset,
+    fetchDevices,
   } = useDeviceManagement();
   const navigate = useNavigate();
   const [isAddDevice, setIsAddDevice] = useState(false);
@@ -101,16 +102,27 @@ export default function useDevices() {
               variant="transparent"
               onClick={() => {
                 row.toggleExpanded();
-                !row.getIsExpanded() &&
-                  row.subRows.length === 0 &&
+                if (!row.getIsExpanded() && row.subRows.length === 0) {
                   setTimeout(async () => {
-                    if (row.getIsExpanded()) {
-                      await fetchDevices({
+                    try {
+                      const response = await fetchDevices({
                         id: row.original.id,
                         isPagination: false,
                       });
+                      if (!response) {
+                        return;
+                      }
+                      const { devices } = response;
+                      setNewDevices({ parent: row.original.id, devices });
+                    } catch (error) {
+                      loginService.handleMissingInfo(
+                        error,
+                        "Failed to fetch devices"
+                      ) && navigate("/", { replace: true });
+                    } finally {
                     }
                   }, 100);
+                }
               }}
               disabled={[
                 statusEnum["Deleting..."],
@@ -289,36 +301,6 @@ export default function useDevices() {
   const openUpdateDevice = () => setIsUpdateDevice(true);
   const closeUpdateDevice = () => setIsUpdateDevice(false);
 
-  const fetchDevices = async ({ id, isPagination }) => {
-    if (!isPagination) {
-      Libs.progress(true);
-    }
-    try {
-      const { data } = await axiosPrivate.post(
-        `${Constants.API_URL.DEVICES.LIST}${
-          isPagination ? `?page=${offset}&limit=${limit}` : ""
-        }`,
-        !isPagination ? { id: id } : {}
-      );
-      if (isPagination) {
-        setTotal(data.total);
-        setAllDevices(data.data);
-        return;
-      }
-      let devices = data.map((item) => ({
-        ...item,
-        status: "Reconnecting...",
-        state: statusEnum.reconnecting,
-      }));
-      setNewDevices({ parent: id, devices: devices });
-    } catch (error) {
-      loginService.handleMissingInfo(error, "Failed to get devices") &&
-        navigate("/", { replace: true });
-    } finally {
-      Libs.progress(false);
-    }
-  };
-
   const dataDevices = useMemo(() => {
     // if (isEmpty && offset - limit > 0) {
     //   setOffset(offset - limit);
@@ -427,7 +409,16 @@ export default function useDevices() {
   useEffect(() => {
     if (needRefresh) {
       setTimeout(async () => {
-        await fetchDevices({ id: null, isPagination: true });
+        const response = await fetchDevices({
+          id: null,
+          isPagination: true,
+        });
+        if (!response) {
+          return;
+        }
+
+        setAllDevices(response?.devices);
+        setTotal(response?.total);
         setNeedRefresh(false);
       }, 300);
     }
@@ -490,7 +481,6 @@ export default function useDevices() {
     setAllDevices(
       allDevices.map((item) => {
         if (deadletter.devices.includes(item.id)) {
-          // item["status"] = "Add failed";
           item["state"] = statusEnum.failed;
         }
         return item;

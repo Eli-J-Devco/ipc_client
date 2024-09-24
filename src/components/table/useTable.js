@@ -85,13 +85,26 @@ function useTable({
   const { pageIndex, pageSize } = table.getState().pagination;
 
   useEffect(() => {
+    var maxPageSize = total;
     setTimeout(() => {
-      if (pageSize !== limit) {
-        table.setPageSize(limit ? limit : Constants.DEFAULT_PAGE_SIZE);
+      if (pageSize !== limit && setLimit) {
+        maxPageSize = Math.min(
+          maxPageSize,
+          limit ? limit : Constants.DEFAULT_PAGE_SIZE
+        );
+        table.setPageSize(maxPageSize);
+        setLimit(maxPageSize);
         return;
       }
-      if (!limit && setLimit) setLimit(Constants.DEFAULT_PAGE_SIZE);
-      setPageCount(Math.ceil(total / pageSize));
+
+      maxPageSize = Math.min(
+        maxPageSize,
+        pageSize,
+        Constants.DEFAULT_PAGE_SIZE
+      );
+      if (!limit && setLimit) setLimit(maxPageSize);
+      if (maxPageSize !== pageSize) table.setPageSize(maxPageSize);
+      setPageCount(Math.ceil(total / maxPageSize));
     }, 100);
   }, [total, limit, pageSize, setLimit, table]);
 

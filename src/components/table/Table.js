@@ -218,7 +218,15 @@ function Table({
                         value: pagination.total,
                         label: pagination.total,
                       },
-                    ]}
+                    ].reduce((acc, curr) => {
+                      if (
+                        acc.findIndex((item) => item.value === curr.value) ===
+                        -1
+                      ) {
+                        acc.push(curr);
+                      }
+                      return acc;
+                    }, [])}
                     value={{
                       label: table.getState().pagination.pageSize,
                       value: table.getState().pagination.pageSize,

@@ -316,11 +316,8 @@ function Overview() {
       DISKSolidgaugeOptions.series = DISKseries;
 
       let runningTime = "";
-      if (
-        !_.isEmpty(cpuData.BootTime) &&
-        !_.isEmpty(cpuData.BootTime.BootTime)
-      ) {
-        let bootTime = moment(cpuData.BootTime.BootTime);
+      if (!_.isEmpty(cpuData.BootTime)) {
+        let bootTime = moment(cpuData.BootTime);
         let diffDays = parseInt(moment().diff(bootTime, "days"));
         let diffHours = parseInt(moment().diff(bootTime, "hours"));
         let diffMinutes = parseInt(moment().diff(bootTime, "minutes"));
