@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import Constants from "../../../../utils/Constants";
+import { isEmpty } from "lodash";
 
 export const tcpSchema = {
   tcp_gateway_ip: yup
@@ -15,8 +16,7 @@ export const tcpSchema = {
 };
 
 export const normalDeviceSchema = {
-  id_device_type: yup.number().required("Device type is required"),
-  id_communication: yup.number().required("Communication is required"),
+  communication: yup.object().required("Communication is required"),
   rtu_bus_address: yup
     .number()
     .integer("RTU Bus Address must be an integer")
@@ -69,4 +69,25 @@ export const inverterSchema = {
     .required("Please fill this field")
     .min(0, "Must greater than or equal to 0")
     .max(100, "Must less than or equal to 100"),
+};
+
+export const createSchema = (schema, config) => {
+  const { type: validationType, validations = [] } = config;
+  let validator = yup[validationType]();
+  validations.forEach((validation) => {
+    const { type, params, depends_on } = validation;
+    if (!validator[type]) {
+      throw new Error(`Validation type ${type} is not supported`);
+    }
+
+    if (!isEmpty(depends_on)) {
+      const { name, params } = depends_on;
+      validator = validator[type](yup.ref(name), params);
+      return;
+    }
+
+    validator = validator[type](...params);
+  });
+  schema[config.name] = validator;
+  return schema;
 };

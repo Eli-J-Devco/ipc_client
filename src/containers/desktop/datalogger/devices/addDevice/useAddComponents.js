@@ -34,7 +34,7 @@ export default function useAddComponents(
       value: "3",
     },
   ];
-  const { device, serviceUtils, connectionTypes } = useDeviceManagement();
+  const { device, connectionTypes } = useDeviceManagement();
   const [dataTable, setDataTable] = useState([]);
 
   const columnsHelper = createColumnHelper();
@@ -229,7 +229,7 @@ export default function useAddComponents(
         );
       },
     }),
-    ...(haveComponents.isHaveAddition
+    ...(haveComponents?.isHaveAddition
       ? [
           columnsHelper.accessor("connection_type", {
             id: "connection_type",

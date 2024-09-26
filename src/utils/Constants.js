@@ -40,7 +40,6 @@ const Constants = {
     LIMIT_ALERT: 20,
     TOKEN: "nwm-access-token",
     ACCESS_PARAM: "access-param",
-    SPECIAL_DEVICE_TYPE: "Circuit Breaker",
     MPPT_CONFIG_INFORMATION: 277,
   },
 
@@ -82,6 +81,7 @@ const Constants = {
       DELETE: "/devices/delete/",
       UPDATE: "/devices/update/",
       CONFIG: {
+        ALL: "/devices/config/",
         TYPE: "/devices/config/type/get/",
         GROUP: "/devices/config/group/get/",
         ADD_GROUP: "/devices/config/group/add/",

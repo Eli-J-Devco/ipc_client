@@ -32,9 +32,10 @@ export const DeviceManagementProvider = ({ children }) => {
   const [isEmpty, setIsEmpty] = useState(false);
   const [device, setDevice] = useState(null);
   const [deviceConfig, setDeviceConfig] = useState({
+    device_type_groups: [],
     device_types: [],
     device_groups: [],
-    template: [],
+    templates: [],
     communication: [],
   });
   const [offset, setOffset] = useState(0);
@@ -243,12 +244,6 @@ export function Device() {
     isEmpty &&
       setTimeout(async () => {
         try {
-          var device_type = await axiosPrivate.post(
-            Constants.API_URL.DEVICES.CONFIG.TYPE
-          );
-          var device_group = await axiosPrivate.post(
-            Constants.API_URL.DEVICES.CONFIG.GROUP
-          );
           var template = await axiosPrivate.post(
             Constants.API_URL.TEMPLATE.LIST,
             {}
@@ -260,18 +255,22 @@ export function Device() {
           var deviceTypeComponents = await axiosPrivate.post(
             Constants.API_URL.DEVICES.COMPONENT.LIST
           );
-          var connectionTypes = await axiosPrivate.post(
-            Constants.API_URL.DEVICES.CONNECTION.GET
+          var response = await axiosPrivate.post(
+            Constants.API_URL.DEVICES.CONFIG.ALL
           );
 
+          if (!response) throw new Error("Failed to get device configuration");
+          var { device_type_groups, device_types, device_groups, connections } =
+            response.data;
           setDeviceConfig({
-            device_types: device_type.data,
-            device_groups: device_group.data,
-            template: template.data,
+            device_type_groups,
+            device_types,
+            device_groups,
+            templates: template.data,
             communication: communication.data,
           });
           setDeviceTypeComponents(deviceTypeComponents.data);
-          setConnectionTypes(connectionTypes.data);
+          setConnectionTypes(connections);
         } catch (error) {
           loginService.handleMissingInfo(
             error,

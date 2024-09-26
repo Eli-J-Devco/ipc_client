@@ -174,7 +174,11 @@ export default function useAddDevice(closeAddDevice) {
     setTimeout(async () => {
       if (!_.isEmpty(haveComponents)) {
         const requiredComponents = haveComponents.component.filter(
-          (item) => item.type === 1 && item.require
+          (item) =>
+            item.type === 1 &&
+            item.require &&
+            (item.sub_type === initialValues?.meter_type ||
+              item.sub_type === initialValues?.inverter_type)
         );
         for (const item of requiredComponents) {
           const addition =

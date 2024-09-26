@@ -70,9 +70,8 @@ function Text({
   onBlur,
   onClick,
   unit,
-  inputMode,
-  pattern,
   onKeyDown,
+  ...rest
 }) {
   const validate = useContext(FormInputContext);
   const [showPassword, setShowPassword] = useState(isShow);
@@ -135,9 +134,14 @@ function Text({
               validate ? validate.touched[name] && validate.errors[name] : false
             }
             title={title}
-            inputMode={inputMode}
-            pattern={pattern}
-            onKeyDown={onKeyDown}
+            onKeyDown={
+              type === "number"
+                ? (evt) =>
+                    ["e", "E", "+", "-"].includes(evt.key) &&
+                    evt.preventDefault()
+                : onKeyDown
+            }
+            {...rest}
           />
           <Form.Control.Feedback type="invalid">
             {validate ? validate.errors[name] : ""}
@@ -774,27 +778,27 @@ function Switch({
 FormInput.Switch = Switch;
 
 export const FormInputEnum = {
-  Text: {
+  text: {
     component: (props) => <FormInput.Text {...props} />,
     type: "Text",
   },
-  Check: {
+  check: {
     component: (props) => <FormInput.Check {...props} />,
     type: "Check",
   },
-  Select: {
+  select: {
     component: (props) => <FormInput.Select {...props} />,
     type: "Select",
   },
-  CreatableSelect: {
+  creatableSelect: {
     component: (props) => <FormInput.CreatableSelect {...props} />,
     type: "CreatableSelect",
   },
-  File: {
+  file: {
     component: (props) => <FormInput.File {...props} />,
     type: "File",
   },
-  Switch: {
+  switch: {
     component: (props) => <FormInput.Switch {...props} />,
     type: "Switch",
   },
