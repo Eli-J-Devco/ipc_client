@@ -22,6 +22,7 @@ export default function useUpdateDevice() {
     setTotal,
     deviceTypeComponents,
     deviceConfig,
+    serviceUtils,
   } = useDeviceManagement();
   const [mode, setMode] = useState(device?.mode || 0);
   const [enablePowerOff, setEnablePowerOff] = useState(
@@ -299,6 +300,7 @@ export default function useUpdateDevice() {
           }
         });
       } else {
+        haveComponents.device_type.current_count = posCount;
         Object.keys(posCount).forEach((key) => {
           if (
             haveComponents.device_type.plug_point_count[key] > 1 ||

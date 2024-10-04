@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next";
 import { loginService } from "../../../../../../services/loginService";
 import { useTemplates } from "../../useTemplates";
 import { useEffect, useState } from "react";
+import Libs from "../../../../../../utils/Libs";
+import { isEmpty, isEqual } from "lodash";
 
 function useSubmitTemplate(close, duplicate) {
   const axiosPrivate = useAxiosPrivate();
@@ -127,7 +129,7 @@ function useSubmitTemplate(close, duplicate) {
   };
 
   const handleCreateGroup = (values) => {
-    output.innerHTML = "<div><img src='/loading.gif' alt='loading' /></div>";
+    Libs.progress(true);
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
@@ -148,7 +150,7 @@ function useSubmitTemplate(close, duplicate) {
         loginService.handleMissingInfo(error, "Failed to create new group") &&
           navigate("/", { replace: true });
       } finally {
-        output.innerHTML = "";
+        Libs.progress(false);
       }
     }, 300);
   };
@@ -159,9 +161,9 @@ function useSubmitTemplate(close, duplicate) {
   };
 
   useEffect(() => {
-    if (groups) return;
+    if (isEmpty(deviceGroups)) return;
 
-    if (deviceGroups && deviceGroups.length > 0) {
+    if (!isEqual(deviceGroups, groups)) {
       setGroups(deviceGroups);
     }
   }, [deviceGroups, groups, setGroups]);

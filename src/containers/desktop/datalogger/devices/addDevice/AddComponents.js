@@ -1,9 +1,10 @@
 import styles from "./AddDevice.module.scss";
-import _ from "lodash";
-import useAddComponents from "./useAddComponents";
+import _, { isEmpty } from "lodash";
+import useAddComponents, { posOptions } from "./useAddComponents";
 import Table from "../../../../../components/table/Table";
-import { ReactComponent as AddIcon } from "../../../../../assets/images/add.svg";
+import { ReactComponent as EditIcon } from "../../../../../assets/images/edit.svg";
 import Button from "../../../../../components/button/Button";
+import { ListAvailableComponent } from "./ListAvailableComponent";
 
 export function AddComponents({
   haveComponents,
@@ -11,7 +12,13 @@ export function AddComponents({
   setAddingComponents,
   isUpdateDevice,
 }) {
-  const { columns, addNewComponent, dataTable } = useAddComponents(
+  const {
+    columns,
+    addNewComponent,
+    dataTable,
+    isOpenSelectComponent,
+    setIsOpenSelectComponent,
+  } = useAddComponents(
     haveComponents,
     addingComponents,
     setAddingComponents,
@@ -22,15 +29,31 @@ export function AddComponents({
       className="mt-3"
       style={_.isEmpty(addingComponents) ? { display: "none" } : {}}
     >
+      {isOpenSelectComponent && (
+        <ListAvailableComponent
+          onClose={() => setIsOpenSelectComponent(false)}
+          plugPoints={
+            !isEmpty(haveComponents?.device_type?.plug_point_count)
+              ? Object.keys(haveComponents?.device_type?.plug_point_count)
+                  .filter(
+                    (key) =>
+                      haveComponents?.device_type?.plug_point_count[key] !== 0
+                  )
+                  .map((key) => posOptions.find((item) => item.value === key))
+              : []
+          }
+        />
+      )}
+
       <div className="d-flex align-items-center">
         <h5>{isUpdateDevice ? "Components" : "Require Components"}</h5>
         {isUpdateDevice && (
           <Button
             variant={"light"}
             className={styles["add-btn"]}
-            onClick={addNewComponent}
+            onClick={() => setIsOpenSelectComponent(true)}
           >
-            <Button.Image image={<AddIcon />} />
+            <Button.Image image={<EditIcon />} />
           </Button>
         )}
       </div>

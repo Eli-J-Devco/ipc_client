@@ -7,7 +7,7 @@ export default function AdditionInformation({
 }) {
   return (
     !isEmpty(additionInformationFields) && (
-      <div className="note row mt-3">
+      <div className="note row mt-3 ms-0">
         {additionInformationFields.map((field, index) => {
           const fieldComponent = field.component;
           const fieldProps = { ...field };
@@ -17,12 +17,12 @@ export default function AdditionInformation({
               <fieldComponent.component
                 {...fieldProps}
                 value={additionInformation?.[field.name]}
-                onChange={(e) =>
+                onChange={(e) => {
                   setAdditionInformation({
                     ...additionInformation,
                     [field.name]: e.target.value,
-                  })
-                }
+                  });
+                }}
               />
             </div>
           );

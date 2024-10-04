@@ -7,6 +7,25 @@ import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 import { useDeviceManagement } from "../DeviceManagement";
 
+export const posOptions = [
+  {
+    label: "Top",
+    value: "0",
+  },
+  {
+    label: "Left",
+    value: "1",
+  },
+  {
+    label: "Bottom",
+    value: "2",
+  },
+  {
+    label: "Right",
+    value: "3",
+  },
+];
+
 export default function useAddComponents(
   haveComponents,
   addingComponents,
@@ -16,24 +35,7 @@ export default function useAddComponents(
   const axiosPrivate = useAxiosPrivate();
   const [updatingComponent, setUpdatingComponent] = useState({});
   const [isFull, setIsFull] = useState(false);
-  const posOptions = [
-    {
-      label: "Top",
-      value: "0",
-    },
-    {
-      label: "Left",
-      value: "1",
-    },
-    {
-      label: "Bottom",
-      value: "2",
-    },
-    {
-      label: "Right",
-      value: "3",
-    },
-  ];
+  const [isOpenSelectComponent, setIsOpenSelectComponent] = useState(false);
   const { device, connectionTypes } = useDeviceManagement();
   const [dataTable, setDataTable] = useState([]);
 
@@ -47,56 +49,9 @@ export default function useAddComponents(
         return <div id={row.original.component.id}>{row.original.id}</div>;
       },
     }),
-    columnsHelper.accessor("group", {
-      id: "group",
-      size: 200,
-      header: "Device Type Group",
-      cell: ({ row }) => {
-        const options = haveComponents.component
-          .filter((item) => {
-            const numOfAddedGroup = addingComponents.find(
-              (addedItem) =>
-                addedItem.group === item.group &&
-                addedItem.plug_point === item.plug_point
-            )?.components?.length;
-            return numOfAddedGroup < item.quantity || !item.quantity;
-          })
-          .map((item) => {
-            return {
-              label: item.name,
-              value: item.group,
-              plug_point: item.plug_point,
-            };
-          })
-          .reduce((acc, val) => {
-            if (
-              val.plug_point === row.original.plug_point ||
-              !row.original.plug_point
-            ) {
-              acc.push(val);
-            }
-            return acc;
-          }, []);
-        return (
-          <FormInput.Select
-            name="group"
-            value={{ label: row.original.name, value: row.original.group }}
-            option={options}
-            isDisabled={options.length < 1}
-            onChange={(e) => {
-              setUpdatingComponent({
-                plug_point: e.plug_point,
-                group: e.value,
-                rowId: row.original.component.id,
-              });
-            }}
-          />
-        );
-      },
-    }),
     columnsHelper.accessor("device_type", {
       id: "device_type",
-      size: 300,
+      size: 250,
       header: "Device Type",
       cell: ({ row }) => {
         const options =
@@ -133,7 +88,7 @@ export default function useAddComponents(
     }),
     columnsHelper.accessor("name", {
       id: "name",
-      size: 200,
+      size: 250,
       header: "Component Name",
       cell: ({ row }) => {
         return !isUpdateDevice ? (
@@ -186,7 +141,7 @@ export default function useAddComponents(
     }),
     columnsHelper.accessor("plug_point", {
       id: "plug_point",
-      size: 200,
+      size: 150,
       header: "Position",
       cell: ({ row }) => {
         const acceptablePlugPoint =
@@ -233,7 +188,7 @@ export default function useAddComponents(
       ? [
           columnsHelper.accessor("connection_type", {
             id: "connection_type",
-            size: 200,
+            size: 150,
             header: "Connection Type",
             cell: ({ row }) => {
               const connection =
@@ -278,7 +233,7 @@ export default function useAddComponents(
           }),
           columnsHelper.accessor("mapping", {
             id: "mapping",
-            size: 200,
+            size: 50,
             header: "Connection Mapping",
             cell: ({ row }) => {
               const connection = row.original.component?.connection;
@@ -480,5 +435,8 @@ export default function useAddComponents(
     columns,
     addNewComponent,
     dataTable,
+    isOpenSelectComponent,
+    setIsOpenSelectComponent,
+    posOptions,
   };
 }

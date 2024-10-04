@@ -3,18 +3,24 @@ import FormInput from "../../../../../components/formInput/FormInput";
 import { useDeviceManagement } from "../DeviceManagement";
 import Button from "../../../../../components/button/Button";
 import { useNavigate } from "react-router-dom";
-import { isEmpty } from "lodash";
+import { cloneDeep, isEmpty, isEqual } from "lodash";
 import DeviceUtils from "../DeviceUtils";
+import { loginService } from "../../../../../services/loginService";
+import Constants from "../../../../../utils/Constants";
+import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
+import LibToast from "../../../../../utils/LibToast";
 
 export default function GeneralInformation({
   generalInformation,
   setGeneralInformation,
   updateAddingComponent,
 }) {
+  const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
-  const { deviceConfig } = useDeviceManagement();
+  const { deviceConfig, setDeviceConfig } = useDeviceManagement();
   const { device_type_groups, device_types, device_groups, templates } =
     deviceConfig;
+
   const optionTemplate = [
     {
       label: "Built-in",
@@ -25,6 +31,7 @@ export default function GeneralInformation({
       options: [],
     },
   ];
+
   const deviceTypeGroupOptions = useMemo(() => {
     return device_type_groups.map((item) => ({
       label: item.name,
@@ -42,6 +49,7 @@ export default function GeneralInformation({
         label: item.name,
         value: item.id,
         image: item.image,
+        type: item.type ? 1 : 0,
       }));
   }, [device_types, generalInformation?.device_type_group]);
 
@@ -60,7 +68,7 @@ export default function GeneralInformation({
           acc[item.type].options.push(item);
           return acc;
         },
-        [...optionTemplate]
+        [...cloneDeep(optionTemplate)]
       );
   }, [device_groups, generalInformation?.device_type]);
 
@@ -80,7 +88,7 @@ export default function GeneralInformation({
           acc[item.type].options.push(item);
           return acc;
         },
-        [...optionTemplate]
+        [...cloneDeep(optionTemplate)]
       );
   }, [templates, generalInformation?.device_group]);
 
@@ -94,6 +102,51 @@ export default function GeneralInformation({
     </Button>
   );
 
+  const onGroupCreateOption = (e) => {
+    setTimeout(async () => {
+      if (e === "") return;
+
+      let body = {
+        id_device_type: generalInformation?.device_type?.value,
+        name: e,
+      };
+
+      try {
+        const response = await axiosPrivate.post(
+          Constants.API_URL.DEVICES.CONFIG.ADD_GROUP,
+          body
+        );
+
+        if (response.status === 200) {
+          setDeviceConfig((prev) => ({
+            ...prev,
+            device_groups: [
+              ...prev.device_groups,
+              {
+                id: response.data.id,
+                name: e,
+                id_device_type: generalInformation?.device_type?.value,
+                status: 1,
+                type: 1,
+              },
+            ],
+          }));
+          setGeneralInformation({
+            ...generalInformation,
+            device_group: { value: response.data.id, label: e },
+            template: null,
+          });
+          LibToast.toast("Device group created successfully", "success");
+        }
+      } catch (error) {
+        loginService.handleMissingInfo(
+          error,
+          "Failed to create device group"
+        ) && navigate("/", { replace: true });
+      }
+    }, 100);
+  };
+
   return (
     <>
       <div className="col-xl-6 col-md-12">
@@ -103,6 +156,13 @@ export default function GeneralInformation({
           placeholder="Device name"
           className="mb-3"
           required={true}
+          value={generalInformation?.name}
+          onChange={(e) =>
+            setGeneralInformation({
+              ...generalInformation,
+              name: e.target.value,
+            })
+          }
         />
       </div>
 
@@ -115,6 +175,7 @@ export default function GeneralInformation({
               value={generalInformation?.device_type_group}
               option={deviceTypeGroupOptions}
               onChange={(e) => {
+                if (isEqual(e, generalInformation?.device_type_group)) return;
                 DeviceUtils.clearDemoImage();
                 setGeneralInformation({
                   ...generalInformation,
@@ -136,6 +197,7 @@ export default function GeneralInformation({
                 option={deviceTypeOptions}
                 value={generalInformation?.device_type}
                 onChange={(e) => {
+                  if (isEqual(e, generalInformation?.device_type)) return;
                   DeviceUtils.clearDemoImage();
                   setGeneralInformation({
                     ...generalInformation,
@@ -162,6 +224,7 @@ export default function GeneralInformation({
                 option={deviceGroupOptions}
                 value={generalInformation?.device_group}
                 onChange={(e) => {
+                  if (isEqual(e, generalInformation?.device_group)) return;
                   DeviceUtils.clearDemoImage();
 
                   setGeneralInformation({
@@ -170,6 +233,7 @@ export default function GeneralInformation({
                     template: null,
                   });
                 }}
+                onCreateOption={onGroupCreateOption}
               />
             </div>
           </div>
@@ -189,6 +253,7 @@ export default function GeneralInformation({
                 option={templateLibraryOptions}
                 value={generalInformation?.template}
                 onChange={(e) => {
+                  if (isEqual(e, generalInformation?.template)) return;
                   DeviceUtils.clearDemoImage();
                   setGeneralInformation({
                     ...generalInformation,

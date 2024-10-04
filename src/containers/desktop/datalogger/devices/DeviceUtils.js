@@ -1,3 +1,4 @@
+import Libs from "../../../../utils/Libs";
 import styles from "./addDevice/AddDevice.module.scss";
 const DeviceUtils = {};
 
@@ -10,6 +11,7 @@ const posMap = {
 };
 DeviceUtils.fetchImage = async (path, pos = "4", id = null) => {
   if (!path) return;
+  Libs.progress(true);
   const absolutePath = await import("../../../../assets/images/" + path);
   const demoContainer = document.querySelector("#demo");
   if (demoContainer) {
@@ -20,6 +22,7 @@ DeviceUtils.fetchImage = async (path, pos = "4", id = null) => {
       await DeviceUtils.addImage(absolutePath, pos, posContainer, id);
     }
   }
+  Libs.progress(false);
 };
 
 DeviceUtils.addImage = async (

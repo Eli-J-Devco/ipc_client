@@ -75,7 +75,6 @@ function Text({
 }) {
   const validate = useContext(FormInputContext);
   const [showPassword, setShowPassword] = useState(isShow);
-
   return (
     <Form.Group
       controlId={name}
@@ -179,6 +178,158 @@ function Text({
   );
 }
 FormInput.Text = Text;
+
+function Range({
+  className,
+  label,
+  name,
+  min,
+  max,
+  step,
+  value1,
+  onChange1,
+  disabled,
+  onBlur,
+  isMulti,
+  value2,
+  onChange2,
+  isAllowInputRange,
+  minValue,
+  onMinValueChange,
+  maxValue,
+  onMaxValueChange,
+  horizontal,
+}) {
+  const validate = useContext(FormInputContext);
+  return (
+    <Form.Group
+      controlId={name}
+      className={`${styles["form-range"]} ${className ? className : ""} ${
+        horizontal ? styles.horizontal : ""
+      }`}
+    >
+      <Form.Label>{label}</Form.Label>
+      <div className={`${isMulti && styles["multi"]}`}>
+        <Form.Control
+          type="range"
+          name={isMulti ? name + "_from" : name}
+          min={min}
+          max={max}
+          step={step}
+          value={
+            (validate && value1 === undefined
+              ? validate.values[isMulti ? name + "_from" : name]
+              : value1) || min
+          }
+          disabled={disabled}
+          onChange={
+            validate && onChange1 === undefined
+              ? validate.handleChange
+              : onChange1
+          }
+          onBlur={
+            validate && onBlur === undefined ? validate.handleBlur : onBlur
+          }
+        />
+        {isMulti && (
+          <>
+            <Form.Control
+              type="range"
+              name={name + "_to"}
+              min={min}
+              max={max}
+              step={step}
+              value={
+                (validate && value2 === undefined
+                  ? validate.values[name + "_to"]
+                  : value2) || max
+              }
+              disabled={disabled}
+              onChange={
+                validate && onChange2 === undefined
+                  ? validate.handleChange
+                  : onChange2
+              }
+              onBlur={
+                validate && onBlur === undefined ? validate.handleBlur : onBlur
+              }
+            />
+            <div
+              className={`d-flex justify-content-between ${styles["current-value"]}`}
+            >
+              {isAllowInputRange ? (
+                <>
+                  <Form.Control
+                    type="number"
+                    value={
+                      minValue
+                        ? minValue
+                        : Math.min(
+                            value1
+                              ? value1
+                              : validate.values[name + "_from"] || min,
+                            value2
+                              ? value2
+                              : validate.values[name + "_to"] || max
+                          )
+                    }
+                    min={min}
+                    max={maxValue ? maxValue : validate.values[name + "_to"]}
+                    onChange={
+                      validate && onMinValueChange === undefined
+                        ? validate.handleChange
+                        : onMinValueChange
+                    }
+                    name={name + "_from"}
+                  />
+                  <Form.Control
+                    type="number"
+                    value={
+                      maxValue
+                        ? maxValue
+                        : Math.max(
+                            value1
+                              ? value1
+                              : validate.values[name + "_from"] || min,
+                            value2
+                              ? value2
+                              : validate.values[name + "_to"] || max
+                          )
+                    }
+                    min={minValue ? minValue : validate.values[name + "_from"]}
+                    max={max}
+                    onChange={
+                      validate && onMaxValueChange === undefined
+                        ? validate.handleChange
+                        : onMaxValueChange
+                    }
+                    name={name + "_to"}
+                  />
+                </>
+              ) : (
+                <>
+                  <Form.Label>
+                    {Math.min(
+                      value1 ? value1 : validate.values[name + "_from"] || min,
+                      value2 ? value2 : validate.values[name + "_to"] || max
+                    )}
+                  </Form.Label>
+                  <Form.Label>
+                    {Math.max(
+                      value1 ? value1 : validate.values[name + "_from"] || min,
+                      value2 ? value2 : validate.values[name + "_to"] || max
+                    )}
+                  </Form.Label>
+                </>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    </Form.Group>
+  );
+}
+FormInput.Range = Range;
 
 const Check = forwardRef(
   (
@@ -801,6 +952,10 @@ export const FormInputEnum = {
   switch: {
     component: (props) => <FormInput.Switch {...props} />,
     type: "Switch",
+  },
+  range: {
+    component: (props) => <FormInput.Range {...props} />,
+    type: "Range",
   },
 };
 

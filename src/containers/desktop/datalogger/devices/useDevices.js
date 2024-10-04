@@ -69,6 +69,7 @@ export default function useDevices() {
     isEmpty,
     setOffset,
     fetchDevices,
+    deviceTypeComponents,
   } = useDeviceManagement();
   const navigate = useNavigate();
   const [isAddDevice, setIsAddDevice] = useState(false);
@@ -296,16 +297,15 @@ export default function useDevices() {
     openUpdateDevice();
   };
 
-  const openAddDevice = () => setIsAddDevice(true);
+  const openAddDevice = () => {
+    if (_.isEmpty(deviceConfig) || _.isEmpty(deviceTypeComponents)) return;
+    setIsAddDevice(true);
+  };
   const closeAddDevice = () => setIsAddDevice(false);
   const openUpdateDevice = () => setIsUpdateDevice(true);
   const closeUpdateDevice = () => setIsUpdateDevice(false);
 
   const dataDevices = useMemo(() => {
-    // if (isEmpty && offset - limit > 0) {
-    //   setOffset(offset - limit);
-    //   return [];
-    // }
     const setDeviceState = (index, d, msg) => {
       if (state.isReconnecting) {
         d["state"] = statusEnum.reconnecting;

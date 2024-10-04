@@ -27,14 +27,10 @@ export const normalDeviceSchema = {
 
 export const defaultSchema = {
   name: yup.string().required("Name is required"),
-  num_of_devices: yup
-    .number()
-    .integer("Number of devices must be an integer")
-    .required("Number of devices is required")
-    .min(1, "Number of devices must be greater than 0")
-    .max(100, "Number of devices must be less than 100"),
+  device_type_group: yup.object().required("Device type group is required"),
   device_type: yup.object().required("Device type is required"),
   device_group: yup.object().required("Device group is required"),
+  template: yup.object().required("Template is required"),
 };
 
 export const ratedPowerSchema = {

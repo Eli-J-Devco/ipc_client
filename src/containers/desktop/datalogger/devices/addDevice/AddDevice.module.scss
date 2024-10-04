@@ -1,7 +1,11 @@
 .add-btn{
     border-radius: 100%;
     margin-left: 1rem;
-    padding: 4px;
+    padding: .5em;
+
+    svg {
+        width: 1rem;
+    }
 }
 
 .component{

@@ -15,7 +15,6 @@ import { useParams } from "react-router-dom";
 import Modal from "../../../../components/modal/Modal";
 import UpdateDevice from "./updateDevice/UpdateDevice";
 import { useDeviceManagement } from "./DeviceManagement";
-import NewAddDevice from "./addDevice/NewAddDevice";
 
 export default function Devices() {
   const {
@@ -48,7 +47,7 @@ export default function Devices() {
   } = useDeviceManagement();
   const { name } = useParams();
   const addDeviceLayout = useMemo(
-    () => <NewAddDevice closeAddDevice={closeAddDevice} />,
+    () => <AddDevice closeAddDevice={closeAddDevice} />,
     []
   );
   const updateDeviceLayout = useMemo(
