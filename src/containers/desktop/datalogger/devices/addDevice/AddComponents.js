@@ -42,6 +42,17 @@ export function AddComponents({
                   .map((key) => posOptions.find((item) => item.value === key))
               : []
           }
+          existingComponents={dataTable}
+          deviceTypes={haveComponents?.component
+            ?.map((item) => item.components)
+            .flat()
+            .map((item) => item.id)
+            .reduce((acc, curr) => {
+              if (acc.findIndex((item) => item === curr) === -1) {
+                acc.push(curr);
+              }
+              return acc;
+            }, [])}
         />
       )}
 

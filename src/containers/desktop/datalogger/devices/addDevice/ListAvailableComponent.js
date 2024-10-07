@@ -4,8 +4,12 @@ import FormInput from "../../../../../components/formInput/FormInput";
 import useListAvailableComponent from "./useListAvailableComponent";
 import Table from "../../../../../components/table/Table";
 import Button from "../../../../../components/button/Button";
-import { isEmpty } from "lodash";
-export function ListAvailableComponent({ onClose, plugPoints }) {
+export function ListAvailableComponent({
+  onClose,
+  plugPoints,
+  existingComponents,
+  deviceTypes,
+}) {
   const {
     columns,
     searchParams,
@@ -14,7 +18,12 @@ export function ListAvailableComponent({ onClose, plugPoints }) {
     communicationOptions,
     validationSchemas,
     onSubmit,
-  } = useListAvailableComponent();
+    dataTable,
+    rowSelection,
+    setRowSelection,
+    pagination,
+    setPagination,
+  } = useListAvailableComponent({ existingComponents, deviceTypes });
   return (
     <FormInput
       initialValues={searchParams}
@@ -131,7 +140,27 @@ export function ListAvailableComponent({ onClose, plugPoints }) {
             />
           </div>
           <div className="col-8">
-            <Table columns={{ columnDefs: columns }} data={[]} />
+            <Table
+              columns={{ columnDefs: columns }}
+              data={dataTable}
+              selectRow={{ rowSelection, setRowSelection, enable: false }}
+              pagination={{
+                enable: true,
+                total: pagination.total,
+                setLimit: (limit) => {
+                  setPagination({
+                    ...pagination,
+                    limit,
+                  });
+                },
+                setOffset: (offset) => {
+                  setPagination({
+                    ...pagination,
+                    offset,
+                  });
+                },
+              }}
+            />
           </div>
         </div>
       </Modal>

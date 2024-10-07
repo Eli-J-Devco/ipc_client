@@ -1,12 +1,14 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import FormInput from "../../../../../components/formInput/FormInput";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import * as yup from "yup";
-import { tcpSchema } from "../DeviceValidation";
 import Constants from "../../../../../utils/Constants";
 import { useDeviceManagement } from "../DeviceManagement";
 
-export default function useListAvailableComponent() {
+export default function useListAvailableComponent({
+  existingComponents,
+  deviceTypes,
+}) {
   const columnsHelper = createColumnHelper();
   const columns = [
     columnsHelper.accessor("id_checkbox", {
@@ -25,6 +27,9 @@ export default function useListAvailableComponent() {
         />
       ),
       cell: ({ row }) => {
+        if (row.original.is_checked) {
+          row.toggleSelected(true);
+        }
         return (
           <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
             <FormInput.Check
@@ -87,9 +92,15 @@ export default function useListAvailableComponent() {
         "Must be greater than or equal to TCP Port From"
       ),
   });
+  const [rowSelection, setRowSelection] = useState({});
+  const [pagination, setPagination] = useState({
+    offset: 0,
+    limit: 10,
+    total: 0,
+  });
 
   const { deviceConfig } = useDeviceManagement();
-  const { communication } = deviceConfig;
+  const { communication, device_types } = deviceConfig;
   const communicationOptions = useMemo(() => {
     return communication.map((item) => ({
       label: item.name,
@@ -97,7 +108,14 @@ export default function useListAvailableComponent() {
     }));
   }, [communication]);
 
-  const deviceTypeOptions = useMemo(() => {}, []);
+  const deviceTypeOptions = useMemo(() => {
+    return device_types
+      .filter((item) => deviceTypes.includes(item.id))
+      .map((item) => ({
+        label: item.name,
+        value: item.id,
+      }));
+  }, [device_types, deviceTypes]);
   const [searchParams, setSearchParams] = useState({
     name: "",
     device_type: null,
@@ -112,6 +130,23 @@ export default function useListAvailableComponent() {
   const onSubmit = (data) => {
     console.log(data);
   };
+
+  const dataTable = useMemo(() => {
+    return existingComponents
+      .map((item) => item.component)
+      .flat()
+      .map((item) => {
+        return {
+          id: item.id,
+          tcp_gateway_ip: item.tcp_gateway_ip,
+          tcp_gateway_port: item.tcp_gateway_port,
+          rtu_bus_address: item.rtu_bus_address,
+          name: item.name,
+          is_checked: true,
+        };
+      });
+  }, [existingComponents]);
+
   return {
     columns,
     validationSchemas,
@@ -120,5 +155,10 @@ export default function useListAvailableComponent() {
     deviceTypeOptions,
     communicationOptions,
     onSubmit,
+    dataTable,
+    rowSelection,
+    setRowSelection,
+    pagination,
+    setPagination,
   };
 }
