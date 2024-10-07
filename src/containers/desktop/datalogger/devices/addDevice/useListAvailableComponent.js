@@ -1,14 +1,19 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import FormInput from "../../../../../components/formInput/FormInput";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as yup from "yup";
 import Constants from "../../../../../utils/Constants";
 import { useDeviceManagement } from "../DeviceManagement";
+import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
+import { isEmpty } from "lodash";
+import Libs from "../../../../../utils/Libs";
+import LibToast from "../../../../../utils/LibToast";
 
 export default function useListAvailableComponent({
   existingComponents,
   deviceTypes,
 }) {
+  const axiosPrivate = useAxiosPrivate();
   const columnsHelper = createColumnHelper();
   const columns = [
     columnsHelper.accessor("id_checkbox", {
@@ -27,9 +32,6 @@ export default function useListAvailableComponent({
         />
       ),
       cell: ({ row }) => {
-        if (row.original.is_checked) {
-          row.toggleSelected(true);
-        }
         return (
           <div style={{ paddingLeft: `${row.depth * 1.2}rem` }}>
             <FormInput.Check
@@ -99,8 +101,10 @@ export default function useListAvailableComponent({
     total: 0,
   });
 
-  const { deviceConfig } = useDeviceManagement();
+  const { deviceConfig, device } = useDeviceManagement();
   const { communication, device_types } = deviceConfig;
+  const [availableDevices, setAvailableDevices] = useState([]);
+
   const communicationOptions = useMemo(() => {
     return communication.map((item) => ({
       label: item.name,
@@ -116,6 +120,36 @@ export default function useListAvailableComponent({
         value: item.id,
       }));
   }, [device_types, deviceTypes]);
+
+  useEffect(() => {
+    if (deviceTypes.length === 0) {
+      return;
+    }
+
+    setTimeout(async () => {
+      try {
+        const res = await axiosPrivate.post(
+          Constants.API_URL.DEVICES.COMPONENT.SEARCH +
+            `?page=${pagination.offset}&limit=${pagination.limit}`,
+          {
+            id_device_type: deviceTypes,
+            parent: device.id,
+            exclude: existingComponents.map((item) => item.component.id),
+          }
+        );
+        if (!isEmpty(res.data)) {
+          setAvailableDevices(res.data);
+        }
+      } catch (e) {
+        Libs.progress(false);
+        LibToast.toast(
+          e.message || "An error occurred while fetching data",
+          "error"
+        );
+      }
+    }, 1000);
+  }, [deviceTypes]);
+
   const [searchParams, setSearchParams] = useState({
     name: "",
     device_type: null,
@@ -132,20 +166,32 @@ export default function useListAvailableComponent({
   };
 
   const dataTable = useMemo(() => {
-    return existingComponents
-      .map((item) => item.component)
-      .flat()
-      .map((item) => {
-        return {
-          id: item.id,
-          tcp_gateway_ip: item.tcp_gateway_ip,
-          tcp_gateway_port: item.tcp_gateway_port,
-          rtu_bus_address: item.rtu_bus_address,
-          name: item.name,
-          is_checked: true,
-        };
-      });
-  }, [existingComponents]);
+    if (isEmpty(existingComponents) || isEmpty(availableDevices)) {
+      Libs.progress(true);
+      return [];
+    }
+
+    Libs.progress(false);
+    return [
+      ...existingComponents
+        .map((item) => item.component)
+        .flat()
+        .map((item, index) => {
+          setRowSelection((prev) => ({
+            ...prev,
+            [index]: true,
+          }));
+          return {
+            id: item.id,
+            tcp_gateway_ip: item.tcp_gateway_ip,
+            tcp_gateway_port: item.tcp_gateway_port,
+            rtu_bus_address: item.rtu_bus_address,
+            name: item.name,
+          };
+        }),
+      ...availableDevices,
+    ];
+  }, [existingComponents, availableDevices]);
 
   return {
     columns,

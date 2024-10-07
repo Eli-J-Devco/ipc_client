@@ -29,6 +29,7 @@ export function ListAvailableComponent({
       initialValues={searchParams}
       validationSchema={validationSchemas}
       onSubmit={onSubmit}
+      id="a"
     >
       <Modal
         className="h-75"
@@ -49,7 +50,7 @@ export function ListAvailableComponent({
               <div className="col-2">
                 <FilterIcon />
               </div>
-              <Button className="col-4">
+              <Button className="col-4" type="submit" formId="a">
                 <Button.Text text="Apply" />
               </Button>
             </div>
@@ -144,22 +145,22 @@ export function ListAvailableComponent({
               columns={{ columnDefs: columns }}
               data={dataTable}
               selectRow={{ rowSelection, setRowSelection, enable: false }}
-              pagination={{
-                enable: true,
-                total: pagination.total,
-                setLimit: (limit) => {
-                  setPagination({
-                    ...pagination,
-                    limit,
-                  });
-                },
-                setOffset: (offset) => {
-                  setPagination({
-                    ...pagination,
-                    offset,
-                  });
-                },
-              }}
+              // pagination={{
+              //   enable: true,
+              //   total: pagination.total,
+              //   setLimit: (limit) => {
+              //     setPagination({
+              //       ...pagination,
+              //       limit,
+              //     });
+              //   },
+              //   setOffset: (offset) => {
+              //     setPagination({
+              //       ...pagination,
+              //       offset,
+              //     });
+              //   },
+              // }}
             />
           </div>
         </div>

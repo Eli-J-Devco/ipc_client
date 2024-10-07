@@ -259,15 +259,15 @@ export default function UpdateDevice({ closeUpdateDevice }) {
               </div>
             </>
           )}
-          {!_.isEmpty(addingComponents) && (
-            <AddComponents
-              haveComponents={haveComponents}
-              addingComponents={addingComponents}
-              setAddingComponents={setAddingComponents}
-              isUpdateDevice={true}
-            />
-          )}
         </FormInput>
+        {!_.isEmpty(addingComponents) && (
+          <AddComponents
+            haveComponents={haveComponents}
+            addingComponents={addingComponents}
+            setAddingComponents={setAddingComponents}
+            isUpdateDevice={true}
+          />
+        )}
       </div>
     </Modal>
   );
