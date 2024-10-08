@@ -66,7 +66,6 @@ function Table({
     columns,
     data,
     statusFilter: pagination?.statusFilter,
-    total: pagination?.total,
     pagination,
     rowSelection: selectRow?.rowSelection,
     setRowSelection: selectRow?.setRowSelection,
@@ -233,7 +232,7 @@ function Table({
                     }}
                     onChange={handleOnChangePageSize}
                   />
-                  of {pagination.total} items
+                  of {pagination?.total} items
                 </span>
                 <Pagination controls={table} variant={variant} />
               </>

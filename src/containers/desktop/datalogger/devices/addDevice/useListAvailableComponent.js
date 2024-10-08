@@ -76,30 +76,31 @@ export default function useListAvailableComponent({
   const validationSchemas = yup.object().shape({
     ip_address: yup
       .string()
-      .matches(Constants.REGEX_PATTERN.IP_ADDRESS, "Invalid IP-Address format"),
-    rtu_bus_address_from: yup.number().min(1).max(255),
-    rtu_bus_address_to: yup
-      .number()
-      .min(1)
-      .max(
-        yup.ref("rtu_bus_address_from"),
-        "Must be greater than or equal to Bus Address From"
+      .matches(
+        Constants.REGEX_PATTERN.IP_ADDRESS_WITH_WILDCARD,
+        "Invalid IP-Address format"
       ),
-    tcp_port_from: yup.number().min(1).max(65535),
-    tcp_port_to: yup
-      .number()
-      .min(1)
-      .max(
-        yup.ref("tcp_port_from"),
-        "Must be greater than or equal to TCP Port From"
-      ),
+    // rtu_bus_address_from: yup.number().min(1).max(255),
+    // rtu_bus_address_to: yup
+    //   .number()
+    //   .min(1)
+    //   .max(
+    //     yup.ref("rtu_bus_address_from"),
+    //     "Must be greater than or equal to Bus Address From"
+    //   ),
+    // tcp_gateway_port_from: yup.number().min(1).max(65535),
+    // tcp_gateway_port_to: yup
+    //   .number()
+    //   .min(1)
+    //   .max(
+    //     yup.ref("tcp_gateway_port_from"),
+    //     "Must be greater than or equal to TCP Port From"
+    //   ),
   });
   const [rowSelection, setRowSelection] = useState({});
-  const [pagination, setPagination] = useState({
-    offset: 0,
-    limit: 10,
-    total: 0,
-  });
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const [limit, setLimit] = useState(Constants.DEFAULT_PAGE_SIZE);
 
   const { deviceConfig, device } = useDeviceManagement();
   const { communication, device_types } = deviceConfig;
@@ -130,7 +131,7 @@ export default function useListAvailableComponent({
       try {
         const res = await axiosPrivate.post(
           Constants.API_URL.DEVICES.COMPONENT.SEARCH +
-            `?page=${pagination.offset}&limit=${pagination.limit}`,
+            `?page=${offset}&limit=${limit}`,
           {
             id_device_type: deviceTypes,
             parent: device.id,
@@ -157,16 +158,68 @@ export default function useListAvailableComponent({
     ip_address: "",
     rtu_bus_address_from: 1,
     rtu_bus_address_to: 255,
-    tcp_port_from: 1,
-    tcp_port_to: 65535,
+    tcp_gateway_port_from: 1,
+    tcp_gateway_port_to: 65535,
   });
 
   const onSubmit = (data) => {
-    console.log(data);
+    Libs.progress(true);
+    let body = {
+      ...searchParams,
+      ...data,
+      ...(!isEmpty(data.device_type)
+        ? {
+            id_device_type: data.device_type.map((item) => item.value),
+          }
+        : {
+            id_device_type: deviceTypes,
+          }),
+      ...(!isEmpty(data.communication)
+        ? {
+            id_communication: data.communication.map((item) => item.value),
+          }
+        : {}),
+      rtu_bus_address: {
+        range_from: Math.min(
+          data.rtu_bus_address_from,
+          data.rtu_bus_address_to
+        ),
+        range_to: Math.max(data.rtu_bus_address_from, data.rtu_bus_address_to),
+      },
+      tcp_gateway_port: {
+        range_from: Math.min(
+          data.tcp_gateway_port_from,
+          data.tcp_gateway_port_to
+        ),
+        range_to: Math.max(
+          data.tcp_gateway_port_from,
+          data.tcp_gateway_port_to
+        ),
+      },
+    };
+
+    setTimeout(async () => {
+      try {
+        const res = await axiosPrivate.post(
+          Constants.API_URL.DEVICES.COMPONENT.SEARCH +
+            `?page=${offset}&limit=${limit}`,
+          body
+        );
+        setAvailableDevices(res.data);
+      } catch (e) {
+        Libs.progress(false);
+        LibToast.toast(
+          e.message || "An error occurred while fetching data",
+          "error"
+        );
+      } finally {
+        Libs.progress(false);
+      }
+    }, 1000);
   };
 
   const dataTable = useMemo(() => {
-    if (isEmpty(existingComponents) || isEmpty(availableDevices)) {
+    if (isEmpty(existingComponents)) {
       Libs.progress(true);
       return [];
     }
@@ -204,7 +257,11 @@ export default function useListAvailableComponent({
     dataTable,
     rowSelection,
     setRowSelection,
-    pagination,
-    setPagination,
+    total,
+    setTotal,
+    offset,
+    setOffset,
+    limit,
+    setLimit,
   };
 }

@@ -21,15 +21,18 @@ export function ListAvailableComponent({
     dataTable,
     rowSelection,
     setRowSelection,
-    pagination,
-    setPagination,
+    total,
+    offset,
+    limit,
+    setLimit,
+    setOffset,
   } = useListAvailableComponent({ existingComponents, deviceTypes });
   return (
     <FormInput
       initialValues={searchParams}
       validationSchema={validationSchemas}
       onSubmit={onSubmit}
-      id="a"
+      id="filterComponentForm"
     >
       <Modal
         className="h-75"
@@ -50,7 +53,11 @@ export function ListAvailableComponent({
               <div className="col-2">
                 <FilterIcon />
               </div>
-              <Button className="col-4" type="submit" formId="a">
+              <Button
+                className="col-4"
+                type="submit"
+                formId="filterComponentForm"
+              >
                 <Button.Text text="Apply" />
               </Button>
             </div>
@@ -88,6 +95,9 @@ export function ListAvailableComponent({
                   device_type: e,
                 });
               }}
+              isClearable={true}
+              isMulti={true}
+              isSearchable={true}
             />
             <FormInput.Select
               className={"mt-3"}
@@ -102,6 +112,8 @@ export function ListAvailableComponent({
                 });
               }}
               isClearable={true}
+              isMulti={true}
+              isSearchable={true}
             />
             <FormInput.Text
               className={"mt-3"}
@@ -131,7 +143,7 @@ export function ListAvailableComponent({
             <FormInput.Range
               label={"TCP Port"}
               className="position-relative mt-3"
-              name="tcp_port"
+              name="tcp_gateway_port"
               placeholder="Enter  to search"
               horizontal
               min={1}
@@ -145,22 +157,14 @@ export function ListAvailableComponent({
               columns={{ columnDefs: columns }}
               data={dataTable}
               selectRow={{ rowSelection, setRowSelection, enable: false }}
-              // pagination={{
-              //   enable: true,
-              //   total: pagination.total,
-              //   setLimit: (limit) => {
-              //     setPagination({
-              //       ...pagination,
-              //       limit,
-              //     });
-              //   },
-              //   setOffset: (offset) => {
-              //     setPagination({
-              //       ...pagination,
-              //       offset,
-              //     });
-              //   },
-              // }}
+              pagination={{
+                enable: true,
+                total: 10,
+                offset: offset,
+                limit: limit,
+                setLimit: setLimit,
+                setOffset: setOffset,
+              }}
             />
           </div>
         </div>
