@@ -5,7 +5,6 @@
 *********************************************************/
 import React, { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
@@ -19,7 +18,6 @@ import LibToast from '../../../../../utils/LibToast';
 
 
 export default function RolesModal(props) {
-  const { t } = useTranslation();
   const { closeRolesModal, action, role, setNeedRefresh } = props;
   const methods = useForm({ mode: "onChange" });
   const axiosPrivate = useAxiosPrivate();
@@ -47,27 +45,18 @@ export default function RolesModal(props) {
     output.innerHTML = "<div><img src='/loading.gif' /></div>";
     setTimeout(async () => {
       try {
-        let url = action?.text === "Add" ? Constants.API_URL.USERS.ADD_ROLE : Constants.API_URL.USERS.UPDATE_ROLE;
+        let url = action?.text === "Add" ? Constants.API_URL.ROLE.ADD : Constants.API_URL.ROLE.UPDATE;
         data = action?.text === "Add" ? data : { ...data, id: role?.id };
         const response = await axiosPrivate.post(url, data, { headers: { "Content-Type": "application/json" } });
         if (response?.status === 200) {
-          LibToast.toast(`${action?.text} succesfully`, "info");
+          LibToast.toast(response?.data?.message, "info");
           setNeedRefresh(true);
+          closeRolesModal(false);
         }
       } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        }
-        else {
-          if (msg)
-            LibToast.toast(t('toastMessage.error.update'), "error");
-          else
-            navigate("/")
-        }
+        loginService.handleMissingInfo(error, `Failed to ${action?.text?.toLowerCase()} role`) && navigate('/', { replace: true });
       }
       finally {
-        closeRolesModal(false);
         output.innerHTML = "";
       }
     }, 500);

@@ -31,7 +31,10 @@ export const loginService = {
       },
     });
     if (!response.data.project_id)
-      throw new AxiosError("Project has not been initialized. Please contact the administrator.", HttpStatusCode.NotFound);
+      throw new AxiosError(
+        "Project has not been initialized. Please contact the administrator.",
+        HttpStatusCode.NotFound
+      );
 
     if (response.data.access_token) {
       const access_token = response.data.access_token;
@@ -66,7 +69,6 @@ export const loginService = {
         "Content-Type": "application/json",
       },
     });
-
   },
 
   /**
@@ -93,19 +95,24 @@ export const loginService = {
    * @param {error} error
    * @return Boolean
    */
-  handleMissingInfo(error) {
-    if (error?.response?.data?.message) {
-      return error?.response?.data?.message;
-    }
-
-    if (error?.config?.signal?.reason?.message)
-      LibToast.toast(LoginErrors("", error?.config?.signal?.reason?.message), "error");
-
+  handleMissingInfo(error, msg = "") {
     if (error?.response?.status === 401) {
-      LibToast.toast(LoginErrors(error, "Please login again!"), "error");
+      LibToast.toast(LoginErrors(error), "error");
       clearToken();
       return true;
     }
+
+    if (error?.response?.data?.message) {
+      LibToast.toast(error?.response?.data?.message, "error");
+      return false;
+    }
+
+    if (error?.message) {
+      LibToast.toast(error?.message, "error");
+      return false;
+    }
+
+    LibToast.toast(msg || "Something went wrong", "error");
     return false;
   },
 };

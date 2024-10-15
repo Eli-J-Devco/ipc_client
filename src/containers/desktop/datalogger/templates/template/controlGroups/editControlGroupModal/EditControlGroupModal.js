@@ -2,34 +2,34 @@ import { useEffect, useState } from "react";
 import Button from "../../../../../../../components/button/Button";
 import FormInput from "../../../../../../../components/formInput/FormInput";
 import Modal from "../../../../../../../components/modal/Modal";
-import { useTemplate } from "../../useTemplate";
-import styles from "./EditControlGroupModal.module.scss";
 import useEditControlGroupModal from "./useEditControlGroupModal";
-import _ from "lodash";
 import Table from "../../../../../../../components/table/Table";
 
-function EditControlGroupModal({ isOpen, close, data, setPoint, isEdit }) {
-  const [currentData, setCurrentData] = useState(data);
-  const [isClone, setIsClone] = useState(false);
+function EditControlGroupModal({ isOpen, close, data, refreshData, isEdit }) {
+  const [currentData] = useState(data);
 
   const {
     initialValues,
     validationSchema,
     onSubmit,
     pointList,
-    columns,
-    rowSelection,
+    pointColumns,
+    pointSelection,
+    setPointSelection,
+    groupSelection,
+    setGroupSelection,
     defaultAttributes,
     selectedAttributes,
     setSelectedAttributes,
-    setRowSelection,
-  } = useEditControlGroupModal(
-    currentData,
-    close,
-    setPoint,
-    setCurrentData,
-    isEdit
-  );
+    isClone,
+    setIsClone,
+    refreshTable,
+    kindOfClone,
+    selectedKindOfClone,
+    setSelectedKindOfClone,
+    formatGroupList,
+    groupColumns,
+  } = useEditControlGroupModal(currentData, close, refreshData, isEdit);
 
   return (
     <Modal
@@ -84,55 +84,87 @@ function EditControlGroupModal({ isOpen, close, data, setPoint, isEdit }) {
             {!isEdit && (
               <>
                 <div>
-                  Do you want to add existed points to this control group?
+                  Do you want to clone from an existed group or add existed?
                 </div>
-                <div>
+                <div className="ms-1 row">
                   <FormInput.Check
-                    className="d-inline-block me-3"
+                    className="mb-3 col-sm-2"
                     label="Yes"
-                    name="is_clone"
-                    type="radio"
                     checked={isClone}
-                    onChange={() => setIsClone(!isClone)}
+                    onChange={(value) => setIsClone(value)}
+                    type="radio"
                   />
                   <FormInput.Check
-                    className="d-inline-block me-3"
+                    className="mb-3 col-sm-2"
                     label="No"
-                    name="not_clone"
-                    type="radio"
                     checked={!isClone}
-                    onChange={() => setIsClone(!isClone)}
+                    onChange={(value) => setIsClone(!value)}
+                    type="radio"
                   />
                 </div>
+                <>
+                  {isClone && (
+                    <FormInput.Select
+                      className="mb-3"
+                      inputClassName="z-3"
+                      label="Clone from an existed group or add existed points to this group?"
+                      name="is_clone"
+                      required
+                      option={kindOfClone}
+                      value={selectedKindOfClone}
+                      onChange={(value) => setSelectedKindOfClone(value)}
+                      isSearchable={false}
+                    />
+                  )}
+                </>
               </>
             )}
           </div>
         </FormInput>
-        {isClone && (
-          <div className="mt-3">
-            <h5>Existed points</h5>
-            <div className="note">
-              The number of points can be selected due to the attributes:
-              <ul>
-                <li>0: Unlimited</li>
-                <li>1: 2 points</li>
-                <li>2: 3 points</li>
-              </ul>
+        {isClone ? (
+          selectedKindOfClone.value === 1 ? (
+            <div className="mt-3">
+              <h5>Existed points</h5>
+              <div className="note">
+                The number of points can be selected due to the attributes:
+                <ul>
+                  <li>0: Unlimited</li>
+                  <li>1: 2 points</li>
+                  <li>2: 3 points</li>
+                </ul>
+              </div>
+              {!refreshTable && (
+                <Table
+                  className="mt-3"
+                  visible
+                  maxHeight="40vh"
+                  columns={{ columnDefs: pointColumns }}
+                  data={pointList}
+                  selectRow={{
+                    enable: false,
+                    rowSelection: pointSelection,
+                    setRowSelection: setPointSelection,
+                  }}
+                />
+              )}
             </div>
-            <Table
-              className="mt-3"
-              visible
-              maxHeight="calc(100vh - 550px)"
-              columns={{ columnDefs: columns }}
-              data={pointList}
-              selectRow={{
-                enable: false,
-                rowSelection: rowSelection,
-                setRowSelection: setRowSelection,
-              }}
-            />
-          </div>
-        )}
+          ) : (
+            !refreshTable && (
+              <Table
+                className="mt-3"
+                visible
+                maxHeight="40vh"
+                columns={{ columnDefs: groupColumns }}
+                data={formatGroupList}
+                selectRow={{
+                  enable: false,
+                  rowSelection: groupSelection,
+                  setRowSelection: setGroupSelection,
+                }}
+              />
+            )
+          )
+        ) : null}
       </div>
     </Modal>
   );

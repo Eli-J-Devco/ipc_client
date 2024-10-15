@@ -12,58 +12,85 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
   const axiosPrivate = useAxiosPrivate();
   const { id } = useTemplate();
   const navigate = useNavigate();
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const [modbusConfig, setModbusConfig] = useState(1);
   const [modbusRegisterType, setModbusRegisterType] = useState(1);
   const [selectedUnit, setSelectedUnit] = useState({
     value: data?.type_units?.id,
-    label: data?.type_units?.namekey,
+    label: data?.type_units?.name,
   });
   const [selectedDataType, setSelectedDataType] = useState({
     value: data?.type_datatype?.id,
-    label: data?.type_datatype?.namekey,
+    label: data?.type_datatype?.name,
   });
   const [selectedByteOrder, setSelectedByteOrder] = useState({
     value: data?.type_byteorder?.id,
-    label: data?.type_byteorder?.namekey,
+    label: data?.type_byteorder?.name,
   });
   const [selectedPointListType, setSelectedPointListType] = useState({
     value: data?.type_point_list?.id,
-    label: data?.type_point_list?.namekey,
+    label: data?.type_point_list?.name,
   });
   const [selectedControlGroup, setSelectedControlGroup] = useState({
     value: data?.type_control?.id,
-    label: data?.type_control?.namekey,
+    label: data?.type_control?.name,
+  });
+  const [selectedTypeFunction, setSelectedTypeFunction] = useState({
+    value: data?.type_function?.id,
+    label: data?.type_function?.name,
+  });
+  const [selectedControlInputType, setSelectedControlInputType] = useState({
+    value: data?.type_control_input?.id,
+    label:
+      data?.type_control_input?.id === 0
+        ? "Not Control"
+        : data?.type_control_input?.name,
   });
 
   const validationSchema = yup.object({
-    // index: yup.string().required('Required'),
     name: yup.string().required("Required"),
     register: yup.string().required("Required"),
+    control_min: yup
+      .number()
+      .required("This field is required")
+      .min(0, "Must be greater than 0"),
+    control_max: yup
+      .number()
+      .required("This field is required")
+      .min(1, "Must be greater than 0"),
   });
 
   const initialValues = {
     ...data,
     index: `pt${data?.index}`,
-    unit: { value: data?.type_units?.id, label: data?.type_units?.namekey },
-    class: data?.type_class?.namekey,
+    unit: { value: data?.type_units?.id, label: data?.type_units?.name },
+    class: data?.type_class?.name,
     data_type: {
       value: data?.type_datatype?.id,
-      label: data?.type_datatype?.namekey,
+      label: data?.type_datatype?.name,
     },
     byte_order: {
       value: data?.type_byteorder?.id,
-      label: data?.type_byteorder?.namekey,
+      label: data?.type_byteorder?.name,
     },
     type_point_list: {
       value: data?.type_point_list?.id,
-      label: data?.type_point_list?.namekey,
+      label: data?.type_point_list?.name,
     },
     type_control: {
       value: data?.type_control?.id,
-      label: data?.type_control?.namekey,
+      label: data?.type_control?.name,
     },
-    register: data?.register || 40000,
+    type_function: {
+      value: data?.type_function?.id,
+      label: data?.type_function?.name,
+    },
+    type_control_input: {
+      value: data?.type_control_input?.id,
+      label: data?.type_control_input?.name,
+    },
+    register: data?.register || 1,
     slope: data?.slope || 0,
     offset: data?.offset || 0,
     invalidvalueenabled: data?.invalidvalueenabled,
@@ -84,7 +111,7 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
       LibToast.toast("Please select a register type", "error");
       return;
     }
-
+    setIsUpdating(true);
     let point = {
       ...values,
       id_template: id,
@@ -94,33 +121,47 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
       id_type_units: selectedUnit.value,
       id_type_datatype: selectedDataType.value,
       id_type_byteorder: selectedByteOrder.value,
+      id_type_function: selectedTypeFunction.value,
       id_pointtype: modbusConfig.id,
       id_point_list_type: selectedPointListType.value,
       id_control_group: selectedControlGroup.value,
       data_type: selectedDataType.label,
       byte_order: selectedByteOrder.label,
-      class: modbusRegisterType?.namekey,
+      control_type_input: selectedControlInputType.value,
+      class: modbusRegisterType?.name,
       type_point: modbusConfig,
       type_class: modbusRegisterType,
       type_units: selectedUnit.value
-        ? { id: selectedUnit.value, namekey: selectedUnit.label }
+        ? { id: selectedUnit.value, name: selectedUnit.label }
         : null,
       type_datatype: selectedDataType.value
-        ? { id: selectedDataType.value, namekey: selectedDataType.label }
+        ? { id: selectedDataType.value, name: selectedDataType.label }
         : null,
       type_byteorder: selectedByteOrder.value
-        ? { id: selectedByteOrder.value, namekey: selectedByteOrder.label }
+        ? { id: selectedByteOrder.value, name: selectedByteOrder.label }
         : null,
       type_point_list: selectedPointListType.value
         ? {
             id: selectedPointListType.value,
-            namekey: selectedPointListType.label,
+            name: selectedPointListType.label,
           }
         : null,
       type_control: selectedControlGroup.value
         ? {
             id: selectedControlGroup.value,
-            namekey: selectedControlGroup.label,
+            name: selectedControlGroup.label,
+          }
+        : null,
+      type_function: selectedTypeFunction.value
+        ? {
+            id: selectedTypeFunction.value,
+            name: selectedTypeFunction.label,
+          }
+        : null,
+      type_control_input: selectedControlInputType.value
+        ? {
+            id: selectedControlInputType.value,
+            name: selectedControlInputType.label,
           }
         : null,
     };
@@ -130,7 +171,7 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
     setTimeout(async () => {
       try {
         const response = await axiosPrivate.post(
-          Constants.API_URL.TEMPLATE.POINT.UPDATE,
+          Constants.API_URL.POINT.UPDATE,
           {
             ...point,
           },
@@ -152,22 +193,17 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
           LibToast.toast("Point updated successfully", "info");
         }
       } catch (error) {
-        console.error("Failed to update point", error);
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        } else if (!msg) {
-          LibToast.toast("Failed to update point", "error");
-        } else {
-          navigate("/");
-        }
+        loginService.handleMissingInfo(error, "Failed to update point") &&
+          navigate("/", { replace: true });
       } finally {
-        output.innerHTML = "";
+        // output.innerHTML = "";
+        setIsUpdating(false);
       }
     }, 500);
   };
 
   return {
+    isUpdating,
     initialValues,
     modbusConfig,
     setModbusConfig,
@@ -184,6 +220,10 @@ function useEditPointModal(data, close, setPoint, setCurrentData) {
     setSelectedPointListType,
     selectedControlGroup,
     setSelectedControlGroup,
+    selectedTypeFunction,
+    setSelectedTypeFunction,
+    selectedControlInputType,
+    setSelectedControlInputType,
     onSubmit,
   };
 }

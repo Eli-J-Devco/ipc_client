@@ -8,11 +8,7 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import useRefreshToken from "../../../hooks/useRefreshToken";
-import useAuth from "../../../hooks/useAuth";
 
-import LibToast from "../../../utils/LibToast";
-import { LoginErrors } from "../../../utils/Errors";
-import { clearToken } from "../../../utils/Token";
 import { loginService } from "../../../services/loginService";
 
 /**
@@ -22,7 +18,6 @@ import { loginService } from "../../../services/loginService";
  */
 const PersistLogin = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { setAuth } = useAuth();
   const refresh = useRefreshToken();
   const persist = window.localStorage.getItem("persist");
 
@@ -33,14 +28,7 @@ const PersistLogin = () => {
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
         await refresh();
       } catch (err) {
-        if (!loginService.handleMissingInfo(err)) {
-          LibToast.toast(LoginErrors(err), "error");
-          // setAuth({
-          //   accessToken: null,
-          //   isAuthenticated: false,
-          // });
-          // clearToken();
-        }
+        loginService.handleMissingInfo(err);
       } finally {
         setIsLoading(false);
         output.innerHTML = "";

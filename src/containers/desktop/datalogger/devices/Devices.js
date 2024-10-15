@@ -1,153 +1,176 @@
 /********************************************************
-* Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
-* All rights reserved.
-* 
-*********************************************************/
-import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import styles from './Devices.module.scss';
-import Table from '../../../../components/table/Table';
-import AddDevice from './addDevice/AddDevice';
-import { ReactComponent as EditIcon } from "../../../../assets/images/edit.svg";
-import { ReactComponent as DeleteIcon } from "../../../../assets/images/delete.svg";
-import { ReactComponent as ViewIcon } from "../../../../assets/images/eye_view.svg";
-import { ReactComponent as ExportIcon } from "../../../../assets/images/export.svg";
-import { ReactComponent as AddIcon } from "../../../../assets/images/add.svg";
-import Button from '../../../../components/button/Button';
-import useDevices from './useDevices';
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import ConfigDevice from './configDevice/ConfigDevice';
-import Constants from "../../../../utils/Constants";
-import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
-import _ from "lodash";
-import { loginService } from "../../../../services/loginService";
-import LibToast from "../../../../utils/LibToast";
-import { TreeProvider } from "../../../../components/treeView/useTree";
+ * Copyright 2020-2021 NEXT WAVE ENERGY MONITORING INC.
+ * All rights reserved.
+ *
+ *********************************************************/
+import React, { useMemo } from "react";
+import styles from "./Devices.module.scss";
+import Table from "../../../../components/table/Table";
+import AddDevice from "./addDevice/AddDevice";
+
+import Button from "../../../../components/button/Button";
+import useDevices from "./useDevices";
+import ConfigDevice from "./configDevice/ConfigPoints";
+import { useParams } from "react-router-dom";
+import Modal from "../../../../components/modal/Modal";
+import UpdateDevice from "./updateDevice/UpdateDevice";
+import { useDeviceManagement } from "./DeviceManagement";
 
 export default function Devices() {
-  const { t } = useTranslation();
-  const axiosPrivate = useAxiosPrivate();
-  const navigate = useNavigate();
-  const { isAddDevice, openAddDevice, closeAddDevice, handleConfigDevice } = useDevices();
-  const { id } = useParams();
-  const [dataDevices, setdataDevices] = useState([]);
-  const [deviceConfig, setDeviceConfig] = useState([]);
-  const [device, setDevice] = useState([]);
+  const {
+    isAddDevice,
+    isUpdateDevice,
+    isDeleteDevice,
+    dataDevices,
+    columns,
+    rowSelection,
+    isRetry,
+    isDeleting,
+    setIsRetry,
+    setRowSelection,
+    openAddDevice,
+    closeAddDevice,
+    setIsDeleteDevice,
+    setIsDeleting,
+    closeUpdateDevice,
+    retryCreateDevice,
+  } = useDevices();
 
-  useEffect(() => {
-    // if (!isAddDevice) return;
-
-    var output = document.getElementById("progress");
-    output.innerHTML = "<div><img src='/loading.gif' /></div>";
-    setTimeout(async () => {
-      try {
-        const { data } = await axiosPrivate.post(Constants.API_URL.DEVICES.LIST);
-        setdataDevices(data);
-        const { data: deviceConfig } = await axiosPrivate.post(Constants.API_URL.DEVICES.CONFIG);
-        setDeviceConfig(deviceConfig);
-      } catch (error) {
-        let msg = loginService.handleMissingInfo(error);
-        if (typeof msg === "string") {
-          LibToast.toast(msg, "error");
-        }
-        else {
-          if (!loginService.handleMissingInfo(error))
-            LibToast.toast(t("toastMessage.error.fetch"), "error");
-          else
-            navigate("/");
-        }
-      } finally {
-        output.innerHTML = "";
-      }
-    }, 1000);
-
-  }, [navigate, t, axiosPrivate]);
-
-  const columns = [
-    { id: 1, slug: "id", name: "Serial Number", width: 100 },
-    { id: 2, slug: "tcp_gateway_ip", name: "Port", width: 200 },
-    { id: 3, slug: "status", name: "Status", width: 100 },
-    { id: 4, slug: "name", name: "Name and Purpose", width: 200 },
-    { id: 5, slug: "driver_type", name: "Type", width: 200 },
-    { id: 6, slug: "actions", name: <div className="text-center">Actions</div>, width: 150 }
-  ]
-
-  useEffect(() => {
-    if (_.isEmpty(dataDevices) || !id) return;
-    setTimeout(() => {
-      setDevice(dataDevices.filter((d) => d.id === parseInt(id))[0])
-    }, 100);
-  }, [dataDevices, id]);
-
+  const {
+    total,
+    limit,
+    offset,
+    setOffset,
+    setLimit,
+    currentPageIndex,
+    setCurrentPageIndex,
+  } = useDeviceManagement();
+  const { name } = useParams();
+  const addDeviceLayout = useMemo(
+    () => <AddDevice closeAddDevice={closeAddDevice} />,
+    []
+  );
+  const updateDeviceLayout = useMemo(
+    () => <UpdateDevice closeUpdateDevice={closeUpdateDevice} />,
+    []
+  );
   return (
     <div className={`main ${styles.main_devices}`}>
-      {isAddDevice &&
-        <TreeProvider>
-          <AddDevice closeAddDevice={closeAddDevice} deviceConfig={deviceConfig} />
-        </TreeProvider>
-      }
-      <div className={styles.header_devices}>
-        <div className='row'>
-          <div className='col-xl-6 col-lg-6 col-md-6 col-6'>
-            <div className={styles.title}>
-              Dashboard &gt; Devices {id ? `> ${id} ${device?.name}` : ''}
-            </div>
+      {isAddDevice ? addDeviceLayout : null}
+      {isUpdateDevice ? updateDeviceLayout : null}
+      {isDeleteDevice && (
+        <Modal
+          title="Delete Devices"
+          isOpen={isDeleteDevice}
+          close={() => setIsDeleteDevice(false)}
+          footer={
+            <>
+              <Button
+                variant="white"
+                onClick={() => {
+                  setIsDeleteDevice(false);
+                }}
+              >
+                <Button.Text text="Cancel" />
+              </Button>
+              <Button
+                variant="dark"
+                onClick={() => {
+                  setTimeout(() => {
+                    if (isDeleting) return;
+                    setIsDeleting(true);
+                  }, 100);
+                }}
+                disabled={isDeleting}
+              >
+                <Button.Text text="Delete" />
+              </Button>
+            </>
+          }
+        >
+          Are you sure you want to delete the selected devices?
+        </Modal>
+      )}
+      {isRetry.isOpen && (
+        <Modal
+          title="Create Again"
+          isOpen={isRetry.isOpen}
+          close={() => setIsRetry({ isOpen: false, device: null })}
+          footer={
+            <>
+              <Button
+                variant="white"
+                onClick={() => {
+                  setIsRetry({ isOpen: false, device: null });
+                }}
+              >
+                <Button.Text text="Cancel" />
+              </Button>
+              <Button
+                variant="dark"
+                onClick={() => {
+                  retryCreateDevice();
+                }}
+              >
+                <Button.Text text="Retry" />
+              </Button>
+            </>
+          }
+        >
+          Are you sure you want to retry creating the device?
+        </Modal>
+      )}
+      {name ? (
+        <ConfigDevice />
+      ) : (
+        <div>
+          <div className="mb-2">
+            <Button variant="dark" onClick={openAddDevice}>
+              <Button.Text text="Add Device" />
+            </Button>
+            {Object.keys(rowSelection).length > 0 && (
+              <Button
+                className="ms-3"
+                variant="dark"
+                onClick={() => {
+                  setIsDeleteDevice(true);
+                }}
+              >
+                <Button.Text text="Delete Device" />
+              </Button>
+            )}
+            {isRetry.canRetry ? (
+              <Button
+                className="ms-3"
+                variant="dark"
+                onClick={() => setIsRetry({ ...isRetry, isOpen: true })}
+              >
+                <Button.Text text="Retry" />
+              </Button>
+            ) : null}
           </div>
-          <div className='col-xl-6 col-lg-6 col-md-6 col-6'>
-            <div className={styles.button}>
-              {/* <div className={styles.export}>
-                <ExportIcon />
-                <span>Export XML</span>
-              </div>
-
-              <div className={styles.export}>
-                <ExportIcon />
-                <span>Export CSV</span>
-              </div> */}
-
-              {id ? <div className={styles.export}>
-                <span>Configure</span>
-              </div>
-                : <div className={styles.add} onClick={() => openAddDevice()}>
-                  <AddIcon />
-                </div>}
-            </div>
-          </div>
-        </div>
-      </div>
-      {
-        id ? <ConfigDevice device={device} />
-          : <Table columns={columns} data={dataDevices}
-            status={item => (
-              <p>{item.status === true ? <span>Ok</span> : <span className="status_error">Error</span>}</p>
-            )}
-            tcp_gateway_ip={item => (
-              <p>{item.driver_type === "RS485" ? item.driver_type : `${item.tcp_gateway_ip}:${item.tcp_gateway_port}`} @<strong>{item.rtu_bus_address}</strong></p>
-            )}
-            actions={item => (
-              <div className="d-flex flex-wrap justify-content-center">
-                <Button.Image
-                  image={<ViewIcon />}
-                  onClick={() => handleConfigDevice(item)}
-                  className="mx-2"
-                />
-                <Button.Image
-                  image={<EditIcon />}
-                  onClick={() => handleConfigDevice(item)}
-                  className="mx-2"
-                />
-                <Button.Image
-                  image={<DeleteIcon />}
-                  onClick={() => handleConfigDevice(item)}
-                  className="mx-2"
-                />
-              </div>
-            )}
+          <Table
+            columns={{ columnDefs: columns }}
+            data={dataDevices}
+            selectRow={{
+              enable: false,
+              rowSelection: rowSelection,
+              setRowSelection: setRowSelection,
+            }}
+            control={true}
+            pagination={{
+              enable: true,
+              total: total,
+              offset: offset,
+              limit: limit,
+              setLimit: setLimit,
+              setOffset: setOffset,
+              currentPageIndex: currentPageIndex,
+              setCurrentPageIndex: setCurrentPageIndex,
+            }}
           />
-      }
-
-      <div className={styles.pagging_devices}>
-      </div>
+        </div>
+      )}
     </div>
   );
-};
+}

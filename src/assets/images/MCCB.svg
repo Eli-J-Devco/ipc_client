@@ -1,0 +1,17 @@
+<svg width="512" height="781" viewBox="0 0 512 781" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="7.5" y="57.5" width="497" height="667.667" rx="12.5" stroke="black" stroke-width="15"/>
+<rect x="92.834" y="7.5" width="326.333" height="49" stroke="black" stroke-width="15"/>
+<rect x="7.5" y="-7.5" width="326.333" height="49" transform="matrix(1 0 0 -1 85.334 766)" stroke="black" stroke-width="15"/>
+<rect x="86.5" y="447.833" width="44.7333" height="113" transform="rotate(-90 86.5 447.833)" stroke="black" stroke-width="15"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M121.732 321H162.132V395.6H177.132V321V306H162.132H121.732H106.732V321V395.6H121.732V321ZM121.732 455.333H106.732V461.667V476.667H121.732H162.132H177.132V461.667V455.333H162.132V461.667H121.732V455.333Z" fill="black"/>
+<rect x="312.635" y="447.833" width="44.7333" height="113" transform="rotate(-90 312.635 447.833)" stroke="black" stroke-width="15"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M347.867 321H388.267V395.6H403.267V321V306H388.267H347.867H332.867V321V395.6H347.867V321ZM347.867 455.333H332.867V461.667V476.667H347.867H388.267H403.267V461.667V455.333H388.267V461.667H347.867V455.333Z" fill="black"/>
+<circle cx="143" cy="576.8" r="39.4333" stroke="black" stroke-width="15"/>
+<line y1="-5" x2="85.3333" y2="-5" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 166.807 607.34)" stroke="black" stroke-width="10"/>
+<circle cx="143" cy="205.933" r="39.4333" stroke="black" stroke-width="15"/>
+<line y1="-5" x2="85.3333" y2="-5" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 166.807 236.473)" stroke="black" stroke-width="10"/>
+<circle cx="369.4" cy="576.8" r="39.4333" stroke="black" stroke-width="15"/>
+<line y1="-5" x2="85.3333" y2="-5" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 393.207 607.34)" stroke="black" stroke-width="10"/>
+<circle cx="369.4" cy="205.933" r="39.4333" stroke="black" stroke-width="15"/>
+<line y1="-5" x2="85.3333" y2="-5" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 393.207 236.473)" stroke="black" stroke-width="10"/>
+</svg>

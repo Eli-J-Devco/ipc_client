@@ -1,67 +1,112 @@
-import { Tooltip } from "react-tooltip";
-import { RTextForm } from "../../../../../components/Controls";
-import ReactSelectDropdown from "../../../../../components/ReactSelectDropdown";
-import { useFormContext } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import Button from "../../../../../components/button/Button";
+import FormInput from "../../../../../components/formInput/FormInput";
+import Modal from "../../../../../components/modal/Modal";
+import * as yup from "yup";
+const AddMultipleDevice = ({
+  addMultipleDeviceInformation,
+  setAddMultipleDeviceInformation,
+  closeAddMultipleDevice,
+  deviceType,
+  comunicationType,
+  onSubmit,
+}) => {
+  const addMode = useMemo(
+    () => [
+      ...(comunicationType.indexOf("Com") === -1
+        ? [
+            {
+              value: 1,
+              label: "Network address",
+            },
+          ]
+        : []),
+      { value: 2, label: "Bus address" },
+    ],
+    [comunicationType]
+  );
+  const schema = yup.object().shape({
+    num_of_devices: yup
+      .number()
+      .integer("Number of devices must be an integer")
+      .required("Number of devices is required")
+      .min(1, "Number of devices must be greater than 0")
+      .max(100, "Number of devices must be less than 100"),
+    inc_mode: yup.object().required("Increase Mode is required"),
+  });
 
-const AddMultipleDevice = ({ handleSave, closeAddMultipleDevice }) => {
-    const { setValue } = useFormContext();
-    const [addMode, setAddMode] = useState();
-    const [selectedAddMode, setSelectedAddMode] = useState({ value: 1, label: "Network address" });
-
-    useEffect(() => {
-        setAddMode([{ value: 1, label: "Network address" }, { value: 2, label: "Bus address" }]);
-        setValue("in_mode", selectedAddMode?.value);
-
-    }, []);
-    return (
-        <div className='my-3'>
-            <div className='col-md-6'>
-                <RTextForm
-                    label="How many to add?"
-                    inputClass="form-control"
-                    inputId="add_count"
-                    inputName="add_count"
-                    name="add_count"
-                    valueAsNumber={true}
-                    type="number"
-                    required={{ value: true, message: "Please enter a number" }}
-                    pattern={{ value: /^\d+$/, message: "Invalid number" }}
-                    min={{ value: 2, message: "Number must be greater than 1" }}
-                    max={{ value: 20, message: "Number must be less than 20" }}
-                    info="2-20"
-                />
-                <Tooltip id="my-tooltip" />
-            </div>
-
-            <div className='col-md-6 form_dropdown'>
-                <ReactSelectDropdown
-                    label="When adding, increment"
-                    className="in_mode"
-                    inputId="in_mode"
-                    inputName="in_mode"
-                    name="in_mode"
-                    value={selectedAddMode}
-                    onChange={(e) => {
-                        setTimeout(() => {
-                            setSelectedAddMode(e);
-                            setValue("in_mode", e.value);
-                        }, 100);
-                    }}
-                    optionList={addMode}
-                />
-            </div>
-
-            <div className='mt-5 mb-2'>
-                <Button variant="dark" onClick={() => handleSave()}>
-                    <Button.Text text="Add" />
-                </Button>
-                <Button variant="grey" className="ms-3" onClick={() => closeAddMultipleDevice()}>
-                    <Button.Text text="Cancel" />
-                </Button>
-            </div>
+  return (
+    <Modal
+      isOpen={true}
+      close={closeAddMultipleDevice}
+      title="Add Multiple Device"
+      size="md"
+      footer={
+        <div className="mt-3 mb-2">
+          <Button variant="dark" type="submit" formId="addMultiple">
+            <Button.Text text="Add" />
+          </Button>
+          <Button
+            variant="grey"
+            className="ms-3"
+            onClick={() => closeAddMultipleDevice()}
+          >
+            <Button.Text text="Cancel" />
+          </Button>
         </div>
-    );
+      }
+    >
+      <FormInput
+        id="addMultiple"
+        initialValues={addMultipleDeviceInformation}
+        validationSchema={schema}
+        onSubmit={onSubmit}
+      >
+        <div className="m-3">
+          <FormInput.Text
+            label="Number of devices"
+            className="num_of_devices"
+            inputId="num_of_devices"
+            inputName="num_of_devices"
+            name="num_of_devices"
+            placeholder="Enter number of devices"
+            required={true}
+            type="number"
+            value={addMultipleDeviceInformation?.num_of_devices}
+            onChange={(e) => {
+              setTimeout(() => {
+                setAddMultipleDeviceInformation({
+                  ...addMultipleDeviceInformation,
+                  num_of_devices: e,
+                });
+              }, 100);
+            }}
+          />
+
+          {deviceType === 0 && (
+            <FormInput.Select
+              label="Increase Mode"
+              className="inc_mode"
+              inputId="inc_mode"
+              inputName="inc_mode"
+              name="inc_mode"
+              option={addMode}
+              value={addMultipleDeviceInformation.inc_mode}
+              onChange={(e) => {
+                setTimeout(() => {
+                  setAddMultipleDeviceInformation({
+                    ...addMultipleDeviceInformation,
+                    inc_mode: e,
+                  });
+                }, 100);
+              }}
+              required={true}
+              isSearchable={false}
+            />
+          )}
+        </div>
+      </FormInput>
+    </Modal>
+  );
 };
 export default AddMultipleDevice;

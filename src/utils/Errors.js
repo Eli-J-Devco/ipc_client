@@ -18,7 +18,7 @@ const LogoutErrorsList = {
 const GeneralErrorsList = {
   Ethernet: {
     409: "Duplicate network interface card detected. Please check your network settings.",
-  }
+  },
 };
 
 /**
@@ -31,8 +31,8 @@ export const LoginErrors = (err, msg = null) => {
   if (msg) {
     return msg;
   }
-  if (!err?.response?.status && err?.message) {
-    return err?.message;
+  if (err?.response?.data?.message) {
+    return err?.response?.data?.message;
   }
 
   if (!err?.response) {

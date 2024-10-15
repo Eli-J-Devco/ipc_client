@@ -16,8 +16,7 @@ switch (url) {
     serverData = "";
     break;
   default:
-    serverAPI = "http://115.78.133.129:3001";
-    // serverAPI = "http://127.0.0.1:3001";
+    serverAPI = process.env.REACT_APP_API_SERVER;
     serverData = "http://localhost:3015/uploads";
     break;
 }
@@ -28,108 +27,157 @@ const Constants = {
   API_HOST: serverAPI,
   SERVER_DATA: serverData,
   API_CONTEXT: "api-server",
+  MQTT_CONFIG: {
+    HOST: process.env.REACT_APP_MQTT_URL,
+    PORT: process.env.REACT_APP_MQTT_PORT,
+    USERNAME: process.env.REACT_APP_MQTT_USERNAME,
+    PASSWORD: process.env.REACT_APP_MQTT_PASSWORD,
+    CLIENT_ID: process.env.REACT_APP_MQTT_CLIENT_ID,
+  },
   COMMON: {
     PER_PAGE: 10,
     LIMIT: 30,
     LIMIT_ALERT: 20,
     TOKEN: "nwm-access-token",
     ACCESS_PARAM: "access-param",
+    MPPT_CONFIG_INFORMATION: 277,
   },
 
   API_URL: {
     AUTH: {
-      LOGIN: "/login/",
-      REFRESH: "/refresh_token/",
-      LOGOUT: "/logout/",
-    },
-    SITE: {
-      SITE_INFO: "/site_information/?id=",
-      SITE_UPDATE: "/site_information/update/?id=",
+      LOGIN: "/authentication/login/",
+      REFRESH: "/authentication/refresh/",
+      FORGOT_PASSWORD: "/authentication/forgot/",
+      LOGOUT: "/authentication/logout/",
     },
     ETHERNET: {
-      ETHERNET_INFO: "/ethernet/?id=",
-      ETHERNET_UPDATE: "/ethernet/update/?id=",
+      ETHERNET_INFO: "/ethernet/get/",
+      ETHERNET_UPDATE: "/ethernet/update/",
       IFCONFIG: "/ethernet/ifconfig/",
     },
     RS485: {
-      RS485_INFO: "/rs485/?id=",
-      RS485_UPDATE: "/rs485/update/?id=",
+      GET: "/rs485/get/",
+      UPDATE: "/rs485/update/",
+      CONFIG: "/rs485/config/",
+      SERIAL_PORT: "/rs485/serial_ports/",
     },
     PROJECT: {
-      PROJECT_INFO: "/project/",
-      LOGGING_RATE: "/project/logging_interval/",
-      UPDATE_LOGGING_RATE: "/project/update_logging_rate/",
-      UPDATE_FIRST_PAGE: "/project/update_first_page_login/",
+      PROJECT_INFO: "/project_setup/",
+      PROJECT_UPDATE: "/project_setup/update/",
+      LOGGING_RATE: "/project_setup/logging_interval/get/",
+      UPDATE_LOGGING_RATE: "/project_setup/logging_interval/update/",
+      FIRST_PAGE_ON_LOGIN: "/project_setup/first_page_on_login/get/",
+      UPDATE_FIRST_PAGE_ON_LOGIN: "/project_setup/first_page_on_login/update/",
+      REMOTE_ACCESS: "/project_setup/remote_access/get/",
+      UPDATE_REMOTE_ACCESS: "/project_setup/remote_access/update/",
+      UPDATE_SEARCH_RTU: "/project_setup/update_search_rtu/",
+      SCREENS: "/project_setup/screen/get/",
     },
     DEVICES: {
-      LIST: "/device_list/all/",
-      GET_ONE: "/device_list/?id=",
-      CONFIG: "/device_list/config/",
-      CREATE: "/device_list/create_multiple/",
+      LIST: "/devices/get/all/",
+      GET_OTHERS: "/devices/get/",
+      GET: "/devices/get/",
+      ADD: "/devices/add/",
+      DELETE: "/devices/delete/",
+      UPDATE: "/devices/update/",
+      CONFIG: {
+        ALL: "/devices/config/",
+        TYPE: "/devices/config/type/get/",
+        GROUP: "/devices/config/group/get/",
+        ADD_GROUP: "/devices/config/group/add/",
+        POINT_MAP: "/device_point/",
+        POINT_ACTION: "/device_point/action/",
+        ALARM: "/device_point/alarm/",
+        UNITS: "/device_point/config/unit/",
+        CONFIG_POINT: "/device_point/config/point/",
+      },
+      COMPONENT: {
+        GET: "/devices/component/get/",
+        LIST: "/devices/component/get/all/",
+        DEFAULT: "/devices/component/",
+        SEARCH: "/devices/component/search/",
+        ADDITION: "/devices/component/addition/",
+      },
+      CONNECTION: {
+        GET: "/devices/connection/",
+      },
     },
-    DEVICE_GROUP: {
-      LIST: "/device_group/get_all/",
-      GET_ONE: "/device_group/get_each/",
-      CREATE: "/device_group/create/",
-      UPDATE: "/device_group/edit_each/",
-      DELETE: "/device_group/delete_group/",
-      GET_TYPE: "/device_group/get_type/",
+    POINT: {
+      LIST: "/point/get/",
+      ADD: "/point/add/",
+      UPDATE: "/point/update/",
+      DELETE: "/point/delete/",
+    },
+    POINT_MPPT: {
+      ADD: "/point_mppt/add/",
+      ADD_STRING: "/point_mppt/add/string/",
+      ADD_PANEL: "/point_mppt/add/panel/",
+      DELETE: "/point_mppt/delete/",
+      GET: "/point_mppt/get/",
+    },
+    POINT_CONTROL: {
+      ADD_EXIST: "/point_control/add/exist/",
+      ADD_NEW: "/point_control/add/new/",
+      REMOVE: "/point_control/remove/",
+      DELETE: "/point_control/delete/",
+      GROUP: {
+        ADD: "/point_control/group/add/",
+        UPDATE: "/point_control/group/update/",
+        DELETE: "/point_control/group/delete/",
+        LIST: "/point_control/get/",
+      },
+    },
+    REGISTER: {
+      LIST: "/register_block/get/",
+      ADD: "/register_block/add/",
+      UPDATE: "/register_block/update/",
+      DELETE: "/register_block/delete/",
     },
     TEMPLATE: {
-      CREATE: "/template/create/",
+      LIST: "/template/get/",
+      ADD: "/template/add/",
+      UPDATE: "/template/update/",
       DELETE: "/template/delete/",
-      UPDATE: "/template/edit/",
-      LIST: "/template/get/all/",
-      LIST_BY_TYPE: "/template/get/all/type/",
-      GET_ONE: "/template/get/",
-      CONFIG: "/template/config/",
-      GET_MPTT: "/template/mppt/get/template/",
-      POINT: {
-        UPDATE: "/template/point/edit/",
-        UPDATE_ALL: "/template/point/edit/all/",
-        DELETE: "/template/point/delete_multiple/",
-        DELETE_MPPT: "/template/mppt/delete_multiple/",
-        ADD_MPPT: "/template/mppt/create/",
-        ADD_POINT: "/template/point/create/",
-        ADD_CHILDREN: "/template/mppt/create/children/",
-      },
-      REGISTER: {
-        CREATE: "/template/register/create/",
-        DELETE: "/template/register/delete_multiple/",
-        UPDATE: "/template/register/edit_multiple/",
-      },
-      CONTROL_GROUP: {
-        CREATE: "/template/control_group/create/",
-        UPDATE: "/template/control_group/edit/",
-        DELETE: "/template/control_group/delete/",
+      CONFIG: {
+        GET: "/template/config/get/",
+        CONTROL_GROUPS: "/template/config/control_group/",
       },
     },
     UPLOAD_CHANNEL: {
-      ALL_CHANNELS: "/upload_channel/all_channel/",
-      UPDATE_CHANNEL: "/upload_channel/update/",
-      CONFIG_CHANNEL: "/upload_channel/config/",
+      GET: "/upload_channel/get/",
+      UPDATE: "/upload_channel/update/",
+      CONFIG: "/upload_channel/config/",
+    },
+    ROLE: {
+      GET_ONE: "/role/get/",
+      LIST: "/role/get/all/",
+      ADD: "/role/add/",
+      UPDATE: "/role/update/",
+      DELETE: "/role/delete/",
+      ACTIVATE: "/role/activate/",
+      DEACTIVATE: "/role/deactivate/",
+      PERMISSION: "/role/permission/get/",
+      UPDATE_PERMISSION: "/role/permission/update/",
     },
     USERS: {
-      LIST: "/users/all_user/",
-      GET_ONE: "/users/only_user",
-      UPDATE: "/users/update_user/",
-      DELETE: "/users/delete/user/",
-      ADD: "/users/create_user/",
-      CHANGE_PASSWORD: "/users/change_password/",
-      RESET_PASSWORD: "/users/reset_password/",
-      ALL_ROLE: "/users/all_role",
-      ROLE_SCREEN: "/users/get/role_screen/",
-      UPDATE_ROLE: "/users/update/role/",
-      DELETE_ROLE: "/users/delete/role/",
-      ADD_ROLE: "/users/create/role/",
-      UPDATE_ROLE_SCREEN: "/users/update/role_screen/",
+      LIST: "/user/get/all/",
+      GET_ONE: "/user/get/",
+      ADD: "/user/add/",
+      UPDATE: "/user/update/",
+      DELETE: "/user/delete/",
+      ACTIVATE: "/user/activate/",
+      DEACTIVATE: "/user/deactivate/",
+      CHANGE_PASSWORD: "/user/password/update/",
+      RESET_PASSWORD: "/user/password/reset/",
     },
   },
 
   REGEX_PATTERN: {
     EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
     PASSWORD:
-      /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹])[a-zA-Z0-9~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]{7,}$/,
+      /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹])[a-zA-Z0-9~`!@#$%^&*()--+={}[\]|\\:;"'<>,.?/_₹]{8,}$/,
+    IP_ADDRESS: /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/g,
+    IP_ADDRESS_WITH_WILDCARD: /^((\d+\.){3}\d+|(\d+\.){1,3}\*)$/,
   },
 
   SCREEN_MODE: {
@@ -137,6 +185,7 @@ const Constants = {
     ADD: 1,
     EDIT: 2,
   },
+
   AUTH_MODE: {
     VIEW: 0,
     NEW: 1,
@@ -150,6 +199,7 @@ const Constants = {
     SET: 9,
     FULL: 511,
   },
+
   AUTH_DATA_KEY: {
     VIEW: "view",
     NEW: "new",
@@ -162,13 +212,15 @@ const Constants = {
     APPROVAL: "approval",
     FULL: "auths",
   },
+
   TEMPLATE_TYPE: {
     BUILT_IN: 0,
     CUSTOM: 1,
   },
+
   PAGE_SIZES: [5, 10, 20, 50, 100],
-  DEFAULT_PAGE_SIZE: 5,
-  TOAST_AUTO_CLOSE: 1000,
+  DEFAULT_PAGE_SIZE: 20,
+  TOAST_AUTO_CLOSE: 3000,
   TIME_UNIT: {
     TYPE: {
       short: "short",

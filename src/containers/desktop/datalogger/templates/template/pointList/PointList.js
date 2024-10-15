@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "../../../../../../components/button/Button";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import Table from "../../../../../../components/table/Table";
@@ -163,7 +163,7 @@ function PointList() {
             visible
             resizable
             draggable
-            maxHeight="calc(100vh - 400px)"
+            maxHeight="60vh"
             columns={{ columnDefs: columns }}
             data={pointList}
             selectRow={{

@@ -36,23 +36,23 @@ export class RowAdapter {
     id_config_information = 0,
     config = "",
     type_units = {
-      namekey: "",
+      name: "",
     },
     type_class = {
-      namekey: "",
+      name: "",
     },
-    register = "",
+    register_value = "",
     type_datatype = {
-      namekey: "",
+      name: "",
     },
     type_byteorder = {
-      namekey: "",
+      name: "",
     },
     type_point_list = {
-      namekey: "",
+      name: "",
     },
     type_control = {
-      namekey: "",
+      name: "",
     },
     slope = undefined,
     offset = undefined,
@@ -77,11 +77,11 @@ export class RowAdapter {
     this.namekey = namekey;
     this.id_config_information = id_config_information;
     this.config = config;
-    this.unit = type_units?.namekey;
-    this.class = type_class?.namekey;
-    this.register = register;
-    this.data_type = type_datatype?.namekey;
-    this.byte_order = type_byteorder?.namekey;
+    this.unit = type_units?.name;
+    this.class = type_class?.name;
+    this.register = register_value;
+    this.data_type = type_datatype?.name;
+    this.byte_order = type_byteorder?.name;
     this.slope = slope;
     this.offset = offset;
     this.multreg = multreg;
@@ -145,42 +145,27 @@ export class RowAdapter {
   }
 }
 
-export const resortIndex = (rows, type = POINT_CONFIG.MPPT) => {
+export const resortIndex = (rows) => {
   let index = 0;
   let updateSelectedPoints = rows?.map((point) => {
-    if (!_.isEqual(type, POINT_CONFIG.CONTROL_GROUP)) {
-      point.index = index++;
-    }
+    point.index = index++;
 
-    if (
-      !_.isEqual(type, POINT_CONFIG.MPPT) &&
-      !_.isEqual(type, POINT_CONFIG.CONTROL_GROUP)
-    ) {
-      return point;
-    }
-
-    let subRows = point?.subRows?.map((string) => {
-      string.index = index++;
-
-      if (!_.isEqual(type, POINT_CONFIG.MPPT)) {
+    if (point?.subRows && point?.subRows.length > 0) {
+      point.subRows = point.subRows.map((string) => {
+        string.index = index++;
+        if (string?.subRows && string?.subRows.length > 0) {
+          string.subRows = string.subRows.map((panel) => {
+            return {
+              ...panel,
+              index: index++,
+            };
+          });
+        }
         return string;
-      }
-
-      let subRows = string?.subRows?.map((panel) => {
-        return {
-          ...panel,
-          index: index++,
-        };
       });
-      return {
-        ...string,
-        subRows: subRows || [],
-      };
-    });
-    return {
-      ...point,
-      subRows: subRows || [],
-    };
+    }
+
+    return point;
   });
 
   return updateSelectedPoints;
@@ -238,6 +223,5 @@ export const reverseFormatData = (data, type = POINT_CONFIG.MPPT) => {
       });
     });
   });
-  console.log("selectedPoints", selectedPoints);
   return selectedPoints;
 };

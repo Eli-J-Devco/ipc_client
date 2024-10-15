@@ -19,6 +19,7 @@ import { AuthProvider } from "./context/AuthProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { DataloggerProvider } from "./context/DataloggerProvider";
+import { MQTTProvider } from "./context/MQTTReaderProvider";
 
 const resources = {
   en: { translation: en },
@@ -40,11 +41,13 @@ root.render(
       <I18nextProvider i18n={i18next}>
         <DndProvider backend={HTML5Backend}>
           <AuthProvider>
-            <DataloggerProvider>
-              <App />
-              <div id="progress"></div>
-              <ToastContainer />
-            </DataloggerProvider>
+            <MQTTProvider>
+              <DataloggerProvider>
+                <App />
+                <div id="progress"></div>
+                <ToastContainer />
+              </DataloggerProvider>
+            </MQTTProvider>
           </AuthProvider>
         </DndProvider>
       </I18nextProvider>

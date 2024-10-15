@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "../../../../../../components/button/Button";
 import Table from "../../../../../../components/table/Table";
-import EditMPPTModal from "./editMPPTModal/EditMPPTModal";
+import EditPointModal from "../pointList/editPointModal/EditPointModal";
 import useMPPTList from "./useMPPTList";
 import Modal from "../../../../../../components/modal/Modal";
 import FormInput from "../../../../../../components/formInput/FormInput";
@@ -85,13 +85,13 @@ function MPPTList() {
                 <>
                   <FormInput.Text
                     label="Number of String per MPPT"
-                    name="num_of_string"
+                    name="num_of_strings"
                     type="number"
                     required={true}
                   />
                   <FormInput.Text
                     label="Number of Panel per String"
-                    name="num_of_panel"
+                    name="num_of_panels"
                     type="number"
                     required={true}
                   />
@@ -193,7 +193,7 @@ function MPPTList() {
                               isHidden={
                                 isClone &&
                                 key === POINT_CONFIG.STRING.name &&
-                                field.name === "num_of_panel"
+                                field.name === "num_of_panels"
                               }
                             />
                           ) : (
@@ -230,7 +230,7 @@ function MPPTList() {
             visible
             resizable
             draggable
-            maxHeight="calc(100vh - 400px)"
+            maxHeight="60vh"
             columns={{ columnDefs: columns }}
             data={pointList}
             selectRow={{
@@ -241,7 +241,7 @@ function MPPTList() {
           />
 
           {isModalOpen && (
-            <EditMPPTModal
+            <EditPointModal
               isOpen={isModalOpen}
               close={closeModal}
               data={point}
