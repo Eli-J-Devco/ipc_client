@@ -102,6 +102,10 @@ const Constants = {
         GET: "/devices/connection/",
       },
     },
+    SYNC_DATA: {
+      LIST: "/sync_data/get/all/",
+      GET: "/sync_data/get/",
+    },
     POINT: {
       LIST: "/point/get/",
       ADD: "/point/add/",
