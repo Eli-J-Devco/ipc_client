@@ -82,7 +82,7 @@ function Table({
           style={{ minWidth: table.getTotalSize() ? table.getTotalSize() : 0 }}
         >
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup) => ( 
               <tr key={headerGroup?.id} className={styles["header-row"]}>
                 {headerGroup.headers.map((header) => {
                   return (
