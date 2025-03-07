@@ -51,6 +51,29 @@ export const formatTimeUnit = (time, timeUnit, format, needConvert, from, to) =>
     return `${time} ${timeUnits[needConvert ? to : timeUnit][format]}`;
 };
 
+export const formatDate = (datetime) => {
+    return  datetime.getFullYear() + "-" +
+        ("0" + (datetime.getMonth()+1)).slice(-2) + "-" +
+        ("0" + datetime.getDate()).slice(-2);
+};
+
+export const formatDatetime = (datetime) => {
+    return  datetime.getFullYear() + "-" +
+        ("0" + (datetime.getMonth()+1)).slice(-2) + "-" +
+        ("0" + datetime.getDate()).slice(-2) + " " +
+        ("0" + datetime.getHours()).slice(-2) + ":" +
+        ("0" + datetime.getMinutes()).slice(-2) + ":" +
+        ("0" + datetime.getSeconds()).slice(-2);
+};
+
+export const formatUTCDatetime = (datetime) => {
+    return  datetime.getUTCFullYear() + "-" +
+        ("0" + (datetime.getUTCMonth()+1)).slice(-2) + "-" +
+        ("0" + datetime.getUTCDate()).slice(-2) + " " +
+        ("0" + datetime.getUTCHours()).slice(-2) + ":" +
+        ("0" + datetime.getUTCMinutes()).slice(-2) + ":" +
+        ("0" + datetime.getUTCSeconds()).slice(-2);
+};
 
 export const generateRandomPassword = () => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;

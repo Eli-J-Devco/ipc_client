@@ -112,9 +112,11 @@ function useTable({
       }, 100);
       return;
     }
-
+    
     setTimeout(() => {
-      if (setOffset) setOffset(pageIndex * pageSize);
+      if (setOffset) {
+        setOffset(pageIndex * pageSize);
+      }
     }, 100);
   }, [
     pageIndex,
