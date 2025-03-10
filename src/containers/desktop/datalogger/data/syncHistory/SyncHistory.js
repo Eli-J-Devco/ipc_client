@@ -54,6 +54,7 @@ function SyncHistory() {
                     <FormInput.Select
                         placeholder="Choose inverter"
                         option={inverterOptions}
+                        value={selectedInverterOption}
                         onChange={handleOnInverterOptionChange}
                         className={styles["w-300"]}
                         isMulti={true}
