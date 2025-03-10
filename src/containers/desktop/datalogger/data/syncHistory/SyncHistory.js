@@ -16,9 +16,10 @@ function SyncHistory() {
         currentPageIndex, setCurrentPageIndex, 
         inverterOptions, 
         uploadChannelOptions,
-        handleOnInverterOptionChange,
-        handleOnUploadChannelOptionChange,
         selectedInverterOption,
+        handleOnInverterOptionChange,
+        selectedUploadChannelOption,
+        handleOnUploadChannelOptionChange,
         startDate, 
         handleOnStartDateChange,
         endDate, 
@@ -62,6 +63,7 @@ function SyncHistory() {
                     <FormInput.Select 
                         placeholder="Choose channel"
                         option={uploadChannelOptions}
+                        value={selectedUploadChannelOption}
                         className={styles["w-200"]}
                         onChange={handleOnUploadChannelOptionChange}
                         isMulti={true} />

@@ -172,6 +172,7 @@ function useSyncHistory() {
         }
         fetchData()
     }, [selectedInverterOption])
+   
     useEffect(() => {
         const fetchData = async () => {
             let device_ids
@@ -179,10 +180,9 @@ function useSyncHistory() {
                 device_ids = selectedUploadChannelOption.map(item => item.devices)
                 device_ids = device_ids.flat()
                 const inverterOption = device_ids.map(item => ({ label: `${item.name} - (${item.id})`, value: item.id }))
-                setSelectedInverterOption(inverterOption)
-                console.log(inverterOption)
-                setInverterOptions(inverterOption)
                 device_ids = device_ids.map(item => item.id)
+                setSelectedInverterOption(inverterOption)
+                setInverterOptions(inverterOption)
             } else {
                 device_ids = null
                 const { data } = await axiosPrivate.post(
@@ -404,9 +404,10 @@ function useSyncHistory() {
         currentPageIndex, setCurrentPageIndex,
         inverterOptions,
         uploadChannelOptions,
-        handleOnInverterOptionChange,
-        handleOnUploadChannelOptionChange,
         selectedInverterOption,
+        handleOnInverterOptionChange,
+        selectedUploadChannelOption,
+        handleOnUploadChannelOptionChange,
         startDate, 
         handleOnStartDateChange,
         endDate,
