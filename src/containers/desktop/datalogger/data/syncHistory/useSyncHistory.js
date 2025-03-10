@@ -172,17 +172,37 @@ function useSyncHistory() {
         }
         fetchData()
     }, [selectedInverterOption])
+   
     useEffect(() => {
         const fetchData = async () => {
             let device_ids
-            if (selectedUploadChannelOption) {
+            if (selectedUploadChannelOption && selectedUploadChannelOption.length) {
                 device_ids = selectedUploadChannelOption.map(item => item.devices)
                 device_ids = device_ids.flat()
                 const inverterOption = device_ids.map(item => ({ label: `${item.name} - (${item.id})`, value: item.id }))
-                setSelectedInverterOption(inverterOption)
                 device_ids = device_ids.map(item => item.id)
+                setSelectedInverterOption(inverterOption)
+                setInverterOptions(inverterOption)
             } else {
                 device_ids = null
+                const { data } = await axiosPrivate.post(
+                    Constants.API_URL.DEVICES.LIST,
+                    { id: null }
+                )
+                let options = [...new Set(data.map(item => ({name: item.name, id: item.id})))]
+                
+                options = options.sort(compareName)
+                options = options.map(option => {
+                    return {
+                        label: `${option.name} - (${option.id})`,
+                        value: option.id
+                    }
+                })
+                options.unshift({
+                    label: "All",
+                    value: null
+                })
+                setInverterOptions(options)
             }
         }
         fetchData()
@@ -216,7 +236,7 @@ function useSyncHistory() {
                     start.setHours(0, 0, 0)
                     var end = endDate;
                     end.setHours(23, 59, 59)
-                    console.log(`Get Data from ${formatDatetime(start)} to ${formatDatetime(end)}`)
+                    
                     let device_ids
                     if (selectedInverterOption) {
                         device_ids = selectedInverterOption.map(item => item.value)
@@ -226,6 +246,8 @@ function useSyncHistory() {
                     } else {
                         device_ids = null
                     }
+
+                    console.log(`Get Data of ${device_ids} from ${formatDatetime(start)} to ${formatDatetime(end)}`)
                     if (currentPageIndex) {
                         var { data } = await axiosPrivate.post(
                             `${Constants.API_URL.SYNC_DATA.LIST}?page=${currentPageIndex}&limit=${limit}`,
@@ -264,17 +286,14 @@ function useSyncHistory() {
         setEndDate(value);
     }
 
-    const handleToday = () => {
-        setStartDate(new Date())
-        setEndDate(new Date())
-    }
-
-    const handleOnSearch = async () => {
-        var start = startDate;
+    const handleToday = async () => {
+        var start = new Date();
         start.setHours(0, 0, 0)
+        setStartDate(start)
         start = formatUTCDatetime(start)
-        var end = endDate;
+        var end = new Date();
         end.setHours(23, 59, 59)
+        setEndDate(end)
         end = formatUTCDatetime(end)
 
         let device_ids
@@ -303,7 +322,43 @@ function useSyncHistory() {
         setHistory(Formateddata)
         setCurrentPageIndex(1)
         setLimit(Constants.DEFAULT_PAGE_SIZE)
+    }
 
+    const handleOnSearch = async () => {
+        var start = startDate;
+        start.setHours(0, 0, 0)
+        start = formatUTCDatetime(start)
+        var end = endDate;
+        end.setHours(23, 59, 59)
+        end = formatUTCDatetime(end)
+
+        let device_ids
+        if (selectedInverterOption) {
+            device_ids = selectedInverterOption.map(item => item.value)
+            if (device_ids.indexOf(null) >= 0) {
+                device_ids = null
+            }
+        } else {
+            device_ids = null
+        }
+        var { data } = await axiosPrivate.post(
+            `${Constants.API_URL.SYNC_DATA.LIST}?page=1&limit=${Constants.DEFAULT_PAGE_SIZE}`,
+            { 
+                device_ids,
+                start_date: start,
+                end_date: end
+            }
+        
+)
+
+        const Formateddata = data.data.map(item => {
+            var date = new Date(item.id+"Z")
+            return { ...item, id: formatDatetime(date)}
+        })
+        setTotal(data.total)
+        setHistory(Formateddata)
+        setCurrentPageIndex(1)
+        setLimit(Constants.DEFAULT_PAGE_SIZE)
     }
 
     const handleOnDelete = () => {
@@ -313,7 +368,7 @@ function useSyncHistory() {
         setIsOpen(false)
     }
 
-    const handleOnSubmitDelete = () => {
+    const handleOnSubmitDelete = async () => {
         let device_ids
         if (selectedInverterOption) {
             device_ids = selectedInverterOption.map(item => item.value)
@@ -324,11 +379,21 @@ function useSyncHistory() {
             device_ids = null
         }
         var start = startDate;
-        start.setHours(0, 0, 0)
+        start.setHours(0, 0, 0, 0)
         var end = endDate;
-        end.setHours(23, 59, 59)
+        end.setHours(23, 59, 59, 999)
         console.log(`Delete Logs of ${device_ids ? device_ids : "All"} from ${formatUTCDatetime(start)} to ${formatUTCDatetime(end)}`)
         setIsOpen(false)
+
+        var { data } = await axiosPrivate.post(
+            Constants.API_URL.SYNC_DATA.DELETE,
+            { 
+                device_ids,
+                start_date: start,
+                end_date: end
+            }
+        )
+        console.log(data)
     }
 
     return {
@@ -339,9 +404,10 @@ function useSyncHistory() {
         currentPageIndex, setCurrentPageIndex,
         inverterOptions,
         uploadChannelOptions,
-        handleOnInverterOptionChange,
-        handleOnUploadChannelOptionChange,
         selectedInverterOption,
+        handleOnInverterOptionChange,
+        selectedUploadChannelOption,
+        handleOnUploadChannelOptionChange,
         startDate, 
         handleOnStartDateChange,
         endDate,
