@@ -264,9 +264,43 @@ function useSyncHistory() {
         setEndDate(value);
     }
 
-    const handleToday = () => {
-        setStartDate(new Date())
-        setEndDate(new Date())
+    const handleToday = async () => {
+        var start = new Date();
+        start.setHours(0, 0, 0)
+        setStartDate(start)
+        start = formatUTCDatetime(start)
+        var end = new Date();
+        end.setHours(23, 59, 59)
+        setEndDate(end)
+        end = formatUTCDatetime(end)
+
+        let device_ids
+        if (selectedInverterOption) {
+            device_ids = selectedInverterOption.map(item => item.value)
+            if (device_ids.indexOf(null) >= 0) {
+                device_ids = null
+            }
+        } else {
+            device_ids = null
+        }
+        var { data } = await axiosPrivate.post(
+            `${Constants.API_URL.SYNC_DATA.LIST}?page=1&limit=${Constants.DEFAULT_PAGE_SIZE}`,
+            { 
+                device_ids,
+                start_date: start,
+                end_date: end
+            }
+        
+)
+
+        const Formateddata = data.data.map(item => {
+            var date = new Date(item.id+"Z")
+            return { ...item, id: formatDatetime(date)}
+        })
+        setTotal(data.total)
+        setHistory(Formateddata)
+        setCurrentPageIndex(1)
+        setLimit(Constants.DEFAULT_PAGE_SIZE)
     }
 
     const handleOnSearch = async () => {
@@ -293,7 +327,8 @@ function useSyncHistory() {
                 start_date: start,
                 end_date: end
             }
-        )
+        
+)
 
         const Formateddata = data.data.map(item => {
             var date = new Date(item.id+"Z")
@@ -303,7 +338,6 @@ function useSyncHistory() {
         setHistory(Formateddata)
         setCurrentPageIndex(1)
         setLimit(Constants.DEFAULT_PAGE_SIZE)
-
     }
 
     const handleOnDelete = () => {
@@ -313,7 +347,7 @@ function useSyncHistory() {
         setIsOpen(false)
     }
 
-    const handleOnSubmitDelete = () => {
+    const handleOnSubmitDelete = async () => {
         let device_ids
         if (selectedInverterOption) {
             device_ids = selectedInverterOption.map(item => item.value)
@@ -324,11 +358,21 @@ function useSyncHistory() {
             device_ids = null
         }
         var start = startDate;
-        start.setHours(0, 0, 0)
+        start.setHours(0, 0, 0, 0)
         var end = endDate;
-        end.setHours(23, 59, 59)
+        end.setHours(23, 59, 59, 999)
         console.log(`Delete Logs of ${device_ids ? device_ids : "All"} from ${formatUTCDatetime(start)} to ${formatUTCDatetime(end)}`)
         setIsOpen(false)
+
+        var { data } = await axiosPrivate.post(
+            Constants.API_URL.SYNC_DATA.DELETE,
+            { 
+                device_ids,
+                start_date: start,
+                end_date: end
+            }
+        )
+        console.log(data)
     }
 
     return {

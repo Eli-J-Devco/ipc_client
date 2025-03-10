@@ -106,6 +106,7 @@ const Constants = {
       LIST: "/sync_data/get/all/",
       GET: "/sync_data/get/",
       DATE_RANGE: "/sync_data/date_range/",
+      DELETE: "/sync_data/delete/",
     },
     POINT: {
       LIST: "/point/get/",
