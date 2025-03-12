@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Constants from "../../../../../utils/Constants";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate.js";
 import { formatDatetime, formatUTCDatetime } from "../../../../../utils/Utils.js"
+import _ from "lodash"
 
 function compareName( a, b ) {
     if ( a.name < b.name ){
@@ -105,18 +106,33 @@ function useSyncHistory() {
             width: 150
         }
     ];
-    // Upload Channel List
+    // Upload Channel anh Device List
     useEffect(() => {
         async function fetchData() {
             try {
                 const { data } = await axiosPrivate.post(
                     Constants.API_URL.UPLOAD_CHANNEL.GET
                 );
+                
                 let options = data.map(item => {
-                    if (item.enable) return { label: item.name, value: item.id, devices: item.devices }
+                    if (item.enable) return { label: item.name, value: item.id }
+                }).filter(item => !!item)
+                options.unshift({
+                    label: "All",
+                    value: null
                 })
-                options = options.filter(item => !!item)
                 setUploadChannelOptions(options)
+
+                options = data.map(item => {
+                    if (item.enable) return item.devices
+                }).filter(item => !!item)
+                options = [...new Set(options.flat().map(JSON.stringify))].map(JSON.parse).sort(compareName)
+                options = options.map(item => ({ label: `${item.name} - (${item.id})`, value: item.id }))
+                options.unshift({
+                    label: "All",
+                    value: null
+                })
+                setInverterOptions(options)
             } catch (e) {
                 console.error(e);
             }
@@ -125,43 +141,82 @@ function useSyncHistory() {
         
     }, [])
     // Device List
-    useEffect(() => {
-        const fetchData = async () => {
-            const { data } = await axiosPrivate.post(
-                Constants.API_URL.DEVICES.LIST,
-                { id: null }
-            )
-            let options = [...new Set(data.map(item => ({name: item.name, id: item.id})))]
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         const { data } = await axiosPrivate.post(
+    //             Constants.API_URL.DEVICES.LIST,
+    //             { id: null }
+    //         )
+    //         let options = [...new Set(data.map(item => ({name: item.name, id: item.id})))]
             
-            options = options.sort(compareName)
-            options = options.map(option => {
-                return {
-                    label: `${option.name} - (${option.id})`,
-                    value: option.id
-                }
-            })
-            options.unshift({
-                label: "All",
-                value: null
-            })
-            setInverterOptions(options)
-        }
-        fetchData()
-    }, [])
+    //         options = options.sort(compareName)
+    //         options = options.map(option => {
+    //             return {
+    //                 label: `${option.name} - (${option.id})`,
+    //                 value: option.id
+    //             }
+    //         })
+    //         options.unshift({
+    //             label: "All",
+    //             value: null
+    //         })
+    //         setInverterOptions(options)
+    //     }
+    //     fetchData()
+    // }, [])
     useEffect(() => {
         const fetchData = async () => {
             let device_ids
             if (selectedInverterOption) {
                 device_ids = selectedInverterOption.map(item => item.value)
-                if (device_ids.indexOf(null) >= 0) {
+                // let newSelectedUploadChannelOption = []
+                // console.log("uploadChannelOptions", uploadChannelOptions)
+                // uploadChannelOptions.forEach(item => {
+                //     const device_id_list = item.devices.map(item => item.id)
+                //     console.log("device_id_list", device_id_list)
+                //     const checker = device_id_list.every(id => device_ids.indexOf(id) !== -1)
+                //     console.log("checker", checker)
+                //     if (checker) {
+                //         newSelectedUploadChannelOption.push(item)
+                //     }
+                // })
+                
+                // console.log("newSelectedUploadChannelOption", newSelectedUploadChannelOption)
+                // if (!_.isEqual(selectedUploadChannelOption, newSelectedUploadChannelOption))
+                //     setSelectedUploadChannelOption(newSelectedUploadChannelOption)
+                if (device_ids.indexOf(null) > -1) {
                     device_ids = null
+                }
+                if (selectedInverterOption.length > 1 && selectedInverterOption.some(item => item.value === null)) {
+                    setSelectedInverterOption([{
+                        label: "All",
+                        value: null
+                    }])
                 }
             } else {
                 device_ids = null
             }
+            let channel_ids
+            if (selectedUploadChannelOption) {
+                channel_ids = selectedUploadChannelOption.map(item => item.value)
+                if (channel_ids.indexOf(null) > -1) {
+                    channel_ids = null
+                }
+                if (selectedUploadChannelOption.length > 1 && selectedUploadChannelOption.some(item => item.value === null)) {
+                    setSelectedUploadChannelOption([{
+                        label: "All",
+                        value: null
+                    }])
+                }
+            } else {
+                channel_ids = null
+            }
             var { data } = await axiosPrivate.post(
                 Constants.API_URL.SYNC_DATA.DATE_RANGE,
-                { device_ids }
+                { 
+                    device_ids, 
+                    channel_ids 
+                }
             )
             if (data.start_date && data.end_date) {
                 const start_date = new Date(data.start_date+"Z")
@@ -171,42 +226,44 @@ function useSyncHistory() {
             }
         }
         fetchData()
-    }, [selectedInverterOption])
+    }, [selectedInverterOption, selectedUploadChannelOption])
    
-    useEffect(() => {
-        const fetchData = async () => {
-            let device_ids
-            if (selectedUploadChannelOption && selectedUploadChannelOption.length) {
-                device_ids = selectedUploadChannelOption.map(item => item.devices)
-                device_ids = device_ids.flat()
-                const inverterOption = device_ids.map(item => ({ label: `${item.name} - (${item.id})`, value: item.id }))
-                device_ids = device_ids.map(item => item.id)
-                setSelectedInverterOption(inverterOption)
-                setInverterOptions(inverterOption)
-            } else {
-                device_ids = null
-                const { data } = await axiosPrivate.post(
-                    Constants.API_URL.DEVICES.LIST,
-                    { id: null }
-                )
-                let options = [...new Set(data.map(item => ({name: item.name, id: item.id})))]
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         let device_ids
+    //         if (selectedUploadChannelOption && selectedUploadChannelOption.length) {
+    //             device_ids = selectedUploadChannelOption.map(item => item.devices)
+    //             device_ids = device_ids.flat()
+    //             const inverterOption = device_ids.map(item => ({ label: `${item.name} - (${item.id})`, value: item.id }))
+    //             device_ids = device_ids.map(item => item.id)
+    //             setSelectedInverterOption(inverterOption)
+    //             // setInverterOptions(inverterOption)
+    //         } else {
+    //             device_ids = null
+    //             const { data } = await axiosPrivate.post(
+    //                 Constants.API_URL.DEVICES.LIST,
+    //                 { id: null }
+    //             )
+    //             let options = [...new Set(data.map(item => ({name: item.name, id: item.id})))]
                 
-                options = options.sort(compareName)
-                options = options.map(option => {
-                    return {
-                        label: `${option.name} - (${option.id})`,
-                        value: option.id
-                    }
-                })
-                options.unshift({
-                    label: "All",
-                    value: null
-                })
-                setInverterOptions(options)
-            }
-        }
-        fetchData()
-    }, [selectedUploadChannelOption])
+    //             options = options.sort(compareName)
+    //             options = options.map(option => {
+    //                 return {
+    //                     label: `${option.name} - (${option.id})`,
+    //                     value: option.id
+    //                 }
+    //             })
+    //             options.unshift({
+    //                 label: "All",
+    //                 value: null
+    //             })
+    //             setInverterOptions(options)
+    //         }
+    //     }
+    //     fetchData()
+    // }, [selectedUploadChannelOption])
+
+
     // Sync Data List
     useEffect(() => {
         const fetchData = async () => {
@@ -233,9 +290,9 @@ function useSyncHistory() {
             try {
                 if (startDate && endDate) {
                     var start = startDate;
-                    start.setHours(0, 0, 0)
+                    start.setHours(0, 0, 0, 0)
                     var end = endDate;
-                    end.setHours(23, 59, 59)
+                    end.setHours(23, 59, 59, 999)
                     
                     let device_ids
                     if (selectedInverterOption) {
@@ -246,13 +303,22 @@ function useSyncHistory() {
                     } else {
                         device_ids = null
                     }
-
-                    console.log(`Get Data of ${device_ids} from ${formatDatetime(start)} to ${formatDatetime(end)}`)
+                    let channel_ids
+                    if (selectedUploadChannelOption) {
+                        channel_ids = selectedUploadChannelOption.map(item => item.value)
+                        if (channel_ids.indexOf(null) > -1) {
+                            channel_ids = null
+                        }
+                    } else {
+                        channel_ids = null
+                    }
+                    console.log(`Get Data of ${device_ids ? device_ids : "All"} from ${formatDatetime(start)} to ${formatDatetime(end)}`)
                     if (currentPageIndex) {
                         var { data } = await axiosPrivate.post(
                             `${Constants.API_URL.SYNC_DATA.LIST}?page=${currentPageIndex}&limit=${limit}`,
                             { 
                                 device_ids,
+                                channel_ids,
                                 start_date: formatUTCDatetime(start),
                                 end_date: formatUTCDatetime(end)
                             }
@@ -288,11 +354,11 @@ function useSyncHistory() {
 
     const handleToday = async () => {
         var start = new Date();
-        start.setHours(0, 0, 0)
+        start.setHours(0, 0, 0, 0)
         setStartDate(start)
         start = formatUTCDatetime(start)
         var end = new Date();
-        end.setHours(23, 59, 59)
+        end.setHours(23, 59, 59, 999)
         setEndDate(end)
         end = formatUTCDatetime(end)
 
@@ -305,10 +371,21 @@ function useSyncHistory() {
         } else {
             device_ids = null
         }
+        let channel_ids
+        if (selectedUploadChannelOption) {
+            channel_ids = selectedUploadChannelOption.map(item => item.value)
+            if (channel_ids.indexOf(null) > -1) {
+                channel_ids = null
+            }
+        } else {
+            channel_ids = null
+        }
+
         var { data } = await axiosPrivate.post(
             `${Constants.API_URL.SYNC_DATA.LIST}?page=1&limit=${Constants.DEFAULT_PAGE_SIZE}`,
             { 
                 device_ids,
+                channel_ids,
                 start_date: start,
                 end_date: end
             }
@@ -335,16 +412,27 @@ function useSyncHistory() {
         let device_ids
         if (selectedInverterOption) {
             device_ids = selectedInverterOption.map(item => item.value)
-            if (device_ids.indexOf(null) >= 0) {
+            if (device_ids.indexOf(null) > -1) {
                 device_ids = null
             }
         } else {
             device_ids = null
         }
+        let channel_ids
+        if (selectedUploadChannelOption) {
+            channel_ids = selectedUploadChannelOption.map(item => item.value)
+            if (channel_ids.indexOf(null) > -1) {
+                channel_ids = null
+            }
+        } else {
+            channel_ids = null
+        }
+        
         var { data } = await axiosPrivate.post(
             `${Constants.API_URL.SYNC_DATA.LIST}?page=1&limit=${Constants.DEFAULT_PAGE_SIZE}`,
             { 
                 device_ids,
+                channel_ids,
                 start_date: start,
                 end_date: end
             }
@@ -372,12 +460,22 @@ function useSyncHistory() {
         let device_ids
         if (selectedInverterOption) {
             device_ids = selectedInverterOption.map(item => item.value)
-            if (device_ids.indexOf(null) >= 0) {
+            if (device_ids.indexOf(null) > -1) {
                 device_ids = null
             }
         } else {
             device_ids = null
         }
+        let channel_ids
+        if (selectedUploadChannelOption) {
+            channel_ids = selectedUploadChannelOption.map(item => item.value)
+            if (channel_ids.indexOf(null) > -1) {
+                channel_ids = null
+            }
+        } else {
+            channel_ids = null
+        }
+
         var start = startDate;
         start.setHours(0, 0, 0, 0)
         var end = endDate;
@@ -389,6 +487,7 @@ function useSyncHistory() {
             Constants.API_URL.SYNC_DATA.DELETE,
             { 
                 device_ids,
+                channel_ids,
                 start_date: start,
                 end_date: end
             }
