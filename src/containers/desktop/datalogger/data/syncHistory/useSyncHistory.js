@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import Constants from "../../../../../utils/Constants";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate.js";
-import { formatDatetime, formatUTCDatetime } from "../../../../../utils/Utils.js"
+import { formatDatetime, formatUTCDatetime, formatDate } from "../../../../../utils/Utils.js"
+import LibToast from "../../../../../utils/LibToast";
 import _ from "lodash"
 
 function compareName( a, b ) {
@@ -145,21 +146,6 @@ function useSyncHistory() {
             let device_ids
             if (selectedInverterOption) {
                 device_ids = selectedInverterOption.map(item => item.value)
-                // let newSelectedUploadChannelOption = []
-                // console.log("uploadChannelOptions", uploadChannelOptions)
-                // uploadChannelOptions.forEach(item => {
-                //     const device_id_list = item.devices.map(item => item.id)
-                //     console.log("device_id_list", device_id_list)
-                //     const checker = device_id_list.every(id => device_ids.indexOf(id) !== -1)
-                //     console.log("checker", checker)
-                //     if (checker) {
-                //         newSelectedUploadChannelOption.push(item)
-                //     }
-                // })
-                
-                // console.log("newSelectedUploadChannelOption", newSelectedUploadChannelOption)
-                // if (!_.isEqual(selectedUploadChannelOption, newSelectedUploadChannelOption))
-                //     setSelectedUploadChannelOption(newSelectedUploadChannelOption)
                 if (device_ids.indexOf(null) > -1) {
                     device_ids = null
                 }
@@ -250,7 +236,7 @@ function useSyncHistory() {
                     } else {
                         channel_ids = null
                     }
-                    console.log(`Get Data of ${device_ids ? device_ids : "All"} from ${formatDatetime(start)} to ${formatDatetime(end)}`)
+                    
                     if (currentPageIndex) {
                         var { data } = await axiosPrivate.post(
                             `${Constants.API_URL.SYNC_DATA.LIST}?page=${currentPageIndex}&limit=${limit}`,
@@ -291,6 +277,8 @@ function useSyncHistory() {
     }
 
     const handleToday = async () => {
+        var output = document.getElementById("progress");
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         var start = new Date();
         start.setHours(0, 0, 0, 0)
         setStartDate(start)
@@ -318,28 +306,35 @@ function useSyncHistory() {
         } else {
             channel_ids = null
         }
+        try {
+            var { data } = await axiosPrivate.post(
+                `${Constants.API_URL.SYNC_DATA.LIST}?page=1&limit=${Constants.DEFAULT_PAGE_SIZE}`,
+                { 
+                    device_ids,
+                    channel_ids,
+                    start_date: start,
+                    end_date: end
+                }
+            )
 
-        var { data } = await axiosPrivate.post(
-            `${Constants.API_URL.SYNC_DATA.LIST}?page=1&limit=${Constants.DEFAULT_PAGE_SIZE}`,
-            { 
-                device_ids,
-                channel_ids,
-                start_date: start,
-                end_date: end
-            }
-        )
-
-        const Formateddata = data.data.map(item => {
-            var date = new Date(item.id+"Z")
-            return { ...item, id: formatDatetime(date)}
-        })
-        setTotal(data.total)
-        setHistory(Formateddata)
-        setCurrentPageIndex(1)
-        setLimit(Constants.DEFAULT_PAGE_SIZE)
+            const Formateddata = data.data.map(item => {
+                var date = new Date(item.id+"Z")
+                return { ...item, id: formatDatetime(date)}
+            })
+            setTotal(data.total)
+            setHistory(Formateddata)
+            setCurrentPageIndex(1)
+            setLimit(Constants.DEFAULT_PAGE_SIZE)
+        } catch (e) {
+            console.log(e)
+        } finally {
+            output.innerHTML = "";
+        }
     }
 
     const handleOnSearch = async () => {
+        var output = document.getElementById("progress");
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         var start = startDate;
         start.setHours(0, 0, 0)
         start = formatUTCDatetime(start)
@@ -365,26 +360,31 @@ function useSyncHistory() {
         } else {
             channel_ids = null
         }
-        
-        var { data } = await axiosPrivate.post(
-            `${Constants.API_URL.SYNC_DATA.LIST}?page=1&limit=${Constants.DEFAULT_PAGE_SIZE}`,
-            { 
-                device_ids,
-                channel_ids,
-                start_date: start,
-                end_date: end
-            }
-        
-)
+        try {
+            var { data } = await axiosPrivate.post(
+                `${Constants.API_URL.SYNC_DATA.LIST}?page=1&limit=${Constants.DEFAULT_PAGE_SIZE}`,
+                { 
+                    device_ids,
+                    channel_ids,
+                    start_date: start,
+                    end_date: end
+                }
+            )
 
-        const Formateddata = data.data.map(item => {
-            var date = new Date(item.id+"Z")
-            return { ...item, id: formatDatetime(date)}
-        })
-        setTotal(data.total)
-        setHistory(Formateddata)
-        setCurrentPageIndex(1)
-        setLimit(Constants.DEFAULT_PAGE_SIZE)
+            const Formateddata = data.data.map(item => {
+                var date = new Date(item.id+"Z")
+                return { ...item, id: formatDatetime(date)}
+            })
+            setTotal(data.total)
+            setHistory(Formateddata)
+            setCurrentPageIndex(1)
+            setLimit(Constants.DEFAULT_PAGE_SIZE)
+        } catch (e) {
+            console.log(e)
+        } finally {
+            output.innerHTML = "";
+        }
+        
     }
 
     const handleOnDelete = () => {
@@ -395,6 +395,8 @@ function useSyncHistory() {
     }
 
     const handleOnSubmitDelete = async () => {
+        var output = document.getElementById("progress");
+        output.innerHTML = "<div><img src='/loading.gif' /></div>";
         let device_ids
         if (selectedInverterOption) {
             device_ids = selectedInverterOption.map(item => item.value)
@@ -414,23 +416,47 @@ function useSyncHistory() {
             channel_ids = null
         }
 
-        var start = startDate;
-        start.setHours(0, 0, 0, 0)
-        var end = endDate;
-        end.setHours(23, 59, 59, 999)
-        console.log(`Delete Logs of ${device_ids ? device_ids : "All"} from ${formatUTCDatetime(start)} to ${formatUTCDatetime(end)}`)
+        var start_date = startDate;
+        start_date.setHours(0, 0, 0, 0)
+        var end_date = endDate;
+        end_date.setHours(23, 59, 59, 999)
+        console.log(`Delete Logs of ${device_ids ? device_ids : "All"} from ${formatUTCDatetime(start_date)} to ${formatUTCDatetime(end_date)}`)
         setIsOpen(false)
-
-        var { data } = await axiosPrivate.post(
-            Constants.API_URL.SYNC_DATA.DELETE,
-            { 
-                device_ids,
-                channel_ids,
-                start_date: start,
-                end_date: end
-            }
-        )
-        console.log(data)
+        
+        try {
+            var { data } = await axiosPrivate.post(
+                Constants.API_URL.SYNC_DATA.DELETE,
+                { 
+                    device_ids,
+                    channel_ids,
+                    start_date,
+                    end_date
+                }
+            )
+            LibToast.toast(`Successfully delete logs from ${formatDate(start_date)} to ${formatDate(end_date)}`, 'info');
+            var { data } = await axiosPrivate.post(
+                `${Constants.API_URL.SYNC_DATA.LIST}?page=1&limit=${Constants.DEFAULT_PAGE_SIZE}`,
+                { 
+                    device_ids,
+                    channel_ids,
+                    start_date,
+                    end_date
+                }
+            )
+            const Formateddata = data.data.map(item => {
+                var date = new Date(item.id+"Z")
+                return { ...item, id: formatDatetime(date)}
+            })
+            setTotal(data.total)
+            setHistory(Formateddata)
+            setCurrentPageIndex(1)
+            setLimit(Constants.DEFAULT_PAGE_SIZE)
+        } catch (e) {
+            console.log(e)
+        } finally {
+            output.innerHTML = "";
+        }
+        
     }
 
     return {
