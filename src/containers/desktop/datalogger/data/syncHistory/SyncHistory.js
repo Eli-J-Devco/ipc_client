@@ -71,6 +71,7 @@ function SyncHistory() {
                         <DatePicker
                             selected={startDate}
                             onChange={handleOnStartDateChange}
+                            dateFormat={"dd-MM-yyyy"}
                         />
                         <div className="mx-2">
                             -
@@ -78,6 +79,7 @@ function SyncHistory() {
                         <DatePicker
                             selected={endDate}
                             onChange={handleOnEndDateChange}
+                            dateFormat={"dd-MM-yyyy"}
                         />
                     </div>
                     <Button onClick={handleToday}>
