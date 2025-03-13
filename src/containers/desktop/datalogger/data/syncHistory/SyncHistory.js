@@ -52,14 +52,6 @@ function SyncHistory() {
             </Modal>
             <div>
                 <div className="d-flex align-items-center flex-wrap column-gap-4 row-gap-2 mb-2">
-                    <FormInput.Select
-                        placeholder="Choose inverter"
-                        option={inverterOptions}
-                        value={selectedInverterOption}
-                        onChange={handleOnInverterOptionChange}
-                        className={styles["w-300"]}
-                        isMulti={true}
-                    />
                     <FormInput.Select 
                         placeholder="Choose channel"
                         option={uploadChannelOptions}
@@ -67,6 +59,15 @@ function SyncHistory() {
                         className={styles["w-200"]}
                         onChange={handleOnUploadChannelOptionChange}
                         isMulti={true} />
+                    <FormInput.Select
+                        placeholder="Choose inverter"
+                        option={inverterOptions}
+                        value={selectedInverterOption}
+                        onChange={handleOnInverterOptionChange}
+                        className={styles["w-200"]}
+                        isMulti={true}
+                    />
+                    
                     <div className="d-flex align-items-center">
                         <DatePicker
                             selected={startDate}

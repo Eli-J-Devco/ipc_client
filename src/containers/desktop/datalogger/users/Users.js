@@ -56,6 +56,8 @@ export default function Users() {
           response.data?.data?.map((item, index) => {
             return {
               id: item?.id,
+              first_name: item?.first_name,
+              last_name: item?.last_name,
               full_name: item?.first_name + " " + item?.last_name,
               email: item?.email,
               phone: item?.phone,
@@ -153,8 +155,8 @@ export default function Users() {
                 onClick={() =>
                   openModal(actionOption.Update.action, {
                     ...item,
-                    first_name: item?.full_name.split(" ")[0],
-                    last_name: item?.full_name.split(" ")[1],
+                    first_name: item?.first_name,
+                    last_name: item?.last_name,
                   })
                 }
               />

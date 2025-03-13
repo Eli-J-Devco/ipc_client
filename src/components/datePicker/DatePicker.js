@@ -32,7 +32,7 @@ function DatePicker({
             popperClassName={styles.popper}
             dayClassName={() => styles.day}
             enableTabLoop={false}
-            showIcon={true}
+            // showIcon={true}
             selected={selected ? selected : new Date()}
             minDate={minDate}
             maxDate={maxDate ? maxDate : new Date()}
