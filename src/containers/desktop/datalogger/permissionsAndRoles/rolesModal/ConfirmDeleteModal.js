@@ -52,9 +52,11 @@ export default function ConfirmDeleteModal(props) {
       isOpen={true}
       close={closeRolesModal}
       title={`${action?.text} Delete Role`}
+      centered={true}
     >
+      <h6 className="mb-3">Are you sure you want to delete?</h6>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Button variant="dark" onClick={() => handleDelete()}>
+        <Button className="bg-danger" onClick={() => handleDelete()}>
           <Button.Text text={action?.text} />
         </Button>
         <Button variant="grey" className="ms-3" onClick={() => closeRolesModal(true)}>
