@@ -3,7 +3,7 @@
 * All rights reserved.
 * 
 *********************************************************/
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 
 import useAxiosPrivate from '../../../../../hooks/useAxiosPrivate';
@@ -19,7 +19,30 @@ export default function ConfirmDeleteModal(props) {
   const { closeRolesModal, action, role, setNeedRefresh } = props;
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
+  const [cannotDelete, setCannotDelete] = useState()
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await axiosPrivate.post(
+          Constants.API_URL.USERS.LIST + `?page=0&limit=99999`
+        );
+        if (data) {
+          const users = data.data
+          users.forEach(user => {
+            if (user.role.some(userRole => userRole.name === role.name)) {
+              console.log("There are role matches in User - Role")
+              setCannotDelete(true)
+              return
+            }
+          })
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    fetchData()
+  }, [])
   /**
    * Handle delete role
    * @author nhan.tran 2024-03-22
@@ -44,9 +67,9 @@ export default function ConfirmDeleteModal(props) {
       finally {
         output.innerHTML = "";
       }
-    }, 100);
+    }, 1);
   }
-
+  
   return (
     <Modal
       isOpen={true}
@@ -54,15 +77,22 @@ export default function ConfirmDeleteModal(props) {
       title={`${action?.text} Delete Role`}
       centered={true}
     >
-      <h6 className="mb-3">Are you sure you want to delete?</h6>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Button className="bg-danger" onClick={() => handleDelete()}>
-          <Button.Text text={action?.text} />
-        </Button>
-        <Button variant="grey" className="ms-3" onClick={() => closeRolesModal(true)}>
-          <Button.Text text="Cancel" />
-        </Button>
-      </div>
+      {
+        cannotDelete ? 
+        <h6 className="mb-3">{`There are users assigned with ${role.name} role. Therefore currently cannot delete this role!`}</h6> :
+        <>
+          <h6 className="mb-3">Are you sure you want to delete?</h6>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Button className="bg-danger" onClick={() => handleDelete()}>
+              <Button.Text text={action?.text} />
+            </Button>
+            <Button variant="grey" className="ms-3" onClick={() => closeRolesModal(true)}>
+              <Button.Text text="Cancel" />
+            </Button>
+          </div>
+        </>
+      }
+      
     </Modal>
   )
 }

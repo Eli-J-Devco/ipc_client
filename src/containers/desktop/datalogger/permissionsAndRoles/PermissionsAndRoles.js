@@ -57,6 +57,7 @@ export default function PermissionsAndRoles() {
    * @author nhan.tran 2024-03-18
    * @param {Object} selectedRole selected role
    */
+
   useEffect(() => {
     if (selectedRole && !permissions[selectedRole?.id]) {
       var output = document.getElementById("progress");
