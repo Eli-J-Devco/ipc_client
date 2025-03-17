@@ -12,7 +12,6 @@ export default function useUserModal(props) {
     const [isOpenModal, setIsOpenModal] = useState(null);
 
     const openModal = (action, user) => {
-        console.log("user", user)
         setIsOpenModal({ action: action, user: user });
     }
 

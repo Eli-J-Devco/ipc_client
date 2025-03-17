@@ -16,6 +16,9 @@ import Modal from "../../../../../components/modal/Modal";
 import Constants from "../../../../../utils/Constants";
 import LibToast from "../../../../../utils/LibToast";
 
+import api from "../../../../../api/axios";
+import { clearToken } from "../../../../../utils/Token";
+
 export default function ConfirmDeleteModal({ isOpenModal, closeModal, setNeedRefresh }) {
     const { t } = useTranslation();
     const axiosPrivate = useAxiosPrivate();
@@ -45,8 +48,18 @@ export default function ConfirmDeleteModal({ isOpenModal, closeModal, setNeedRef
                 });
                 if (response?.status === 200) {
                     LibToast.toast(`User with id: ${isOpenModal?.user?.id} ${t('toastMessage.info.delete')}`, 'info');
+                    const currentUser = localStorage.getItem("email").replace(/["]+/g, '');
+                    const deletedUser = isOpenModal.user.email
+                    if (currentUser === deletedUser) {
+                        const res = await api.post(Constants.API_URL.AUTH.LOGOUT);
+                        if (res.status === 200) {
+                            clearToken();
+                            navigate("/")
+                        }
+                    }
                     setNeedRefresh(true);
                 }
+                
             } catch (error) {
                 loginService.handleMissingInfo(error, "Failed to delete user") && navigate("/", { replace: true });
             }

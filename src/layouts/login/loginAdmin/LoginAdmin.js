@@ -74,6 +74,7 @@ const LoginAdmin = () => {
         const response = await loginService.login(params, output);
 
         var { userName, permissions, project_id } = response;
+        setToken("email", data.email)
         setToken("userName", userName);
         setToken("permissions", permissions);
         setToken("project_id", project_id);
