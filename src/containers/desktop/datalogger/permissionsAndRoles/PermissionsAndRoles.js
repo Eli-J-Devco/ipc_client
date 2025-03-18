@@ -121,7 +121,6 @@ export default function PermissionsAndRoles() {
       }
     }, 300);
   }, [needRefresh]);
-
   /**
    * Delete role
    * @author nhan.tran 2024-03-18

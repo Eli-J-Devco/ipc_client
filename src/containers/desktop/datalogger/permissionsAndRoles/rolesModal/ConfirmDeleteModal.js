@@ -70,6 +70,28 @@ export default function ConfirmDeleteModal(props) {
     }, 1);
   }
   
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await axiosPrivate.post(
+          Constants.API_URL.USERS.LIST + `?page=0&limit=99999`
+        );
+        if (data) {
+          const users = data.data
+          users.forEach(user => {
+            if (user.role.some(userRole => userRole.name === role.name)) {
+              setCannotDelete(true)
+              return
+            }
+          })
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    fetchData()
+  }, [])
+
   return (
     <Modal
       isOpen={true}
@@ -83,7 +105,7 @@ export default function ConfirmDeleteModal(props) {
         <>
           <h6 className="mb-3">Are you sure you want to delete?</h6>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Button className="bg-danger" onClick={() => handleDelete()}>
+            <Button className="bg-danger" onClick={() => handleDelete()} >
               <Button.Text text={action?.text} />
             </Button>
             <Button variant="grey" className="ms-3" onClick={() => closeRolesModal(true)}>
