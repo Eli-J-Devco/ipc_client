@@ -63,7 +63,7 @@ function UploadChannels() {
       setDevices(
         uploadChanelConfig?.devices?.map((device) => ({
           value: device.id,
-          label: device.name,
+          label: `${device.name} - (${device.id})`,
         }))
       );
       setLoggingInterval(
@@ -335,11 +335,16 @@ function UploadChannels() {
                                 isClearable={true}
                                 isSearchable={true}
                                 onChange={(event) => {
+                                  console.log("event", event)
                                   let temp = [...channels];
-                                  temp[index].devices = event.map((device) => ({
-                                    id: device.value,
-                                    name: device.label,
-                                  }));
+                                  temp[index].devices = event.map((device) => {
+                                    console.log(device)
+                                    return {
+                                      id: device.value,
+                                      name: device.label,
+                                    }
+                                  });
+                                  console.log("temp", temp)
                                   setChannels(temp);
                                 }}
                               />

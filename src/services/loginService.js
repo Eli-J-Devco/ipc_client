@@ -103,12 +103,20 @@ export const loginService = {
     }
 
     if (error?.response?.data?.message) {
-      LibToast.toast(error?.response?.data?.message, "error");
+      const errorMessage = error?.response?.data?.message
+      // console.log(errorMessage)
+      if (errorMessage.includes("Can't connect to MySQL server on ") && errorMessage.includes("2003")) {
+        LibToast.toast(`Failed to login due to database connection (code: 2003)`, "error");
+        return
+      }
+
+      LibToast.toast(`Failed to login! Please contact admin or try again! (${error.code}, code: ${error.response.status})`, "error");
       return false;
     }
 
     if (error?.message) {
-      LibToast.toast(error?.message, "error");
+      // console.log(error?.message)
+      LibToast.toast("Failed to login! Please try again!", "error");
       return false;
     }
 
