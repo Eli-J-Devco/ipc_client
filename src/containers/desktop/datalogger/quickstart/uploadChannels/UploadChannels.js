@@ -324,10 +324,12 @@ function UploadChannels() {
                                 name={`select_device_only_${channel?.name}`}
                                 value={
                                   channel?.devices
-                                    ? channel?.devices.map((device) => ({
-                                        value: device.id,
-                                        label: device.name,
-                                      }))
+                                    ? channel?.devices.map((device) => {
+                                      return {
+                                          value: device.id,
+                                          label: `${device.name.split(" - ")[0]} - (${device.id})`,
+                                        }
+                                      })
                                     : []
                                 }
                                 option={devices}
@@ -335,16 +337,13 @@ function UploadChannels() {
                                 isClearable={true}
                                 isSearchable={true}
                                 onChange={(event) => {
-                                  console.log("event", event)
                                   let temp = [...channels];
                                   temp[index].devices = event.map((device) => {
-                                    console.log(device)
                                     return {
                                       id: device.value,
                                       name: device.label,
                                     }
                                   });
-                                  console.log("temp", temp)
                                   setChannels(temp);
                                 }}
                               />

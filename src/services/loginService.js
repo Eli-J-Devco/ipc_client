@@ -115,8 +115,8 @@ export const loginService = {
     }
 
     if (error?.message) {
-      // console.log(error?.message)
-      LibToast.toast("Failed to login! Please try again!", "error");
+      console.log(error?.message)
+      LibToast.toast(error?.message, "error");
       return false;
     }
 
