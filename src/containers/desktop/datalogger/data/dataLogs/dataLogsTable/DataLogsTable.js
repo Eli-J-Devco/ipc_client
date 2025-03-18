@@ -1,4 +1,4 @@
-import Table from "../../../../../../components/table/Table";
+import TableNW from "../../../../../../components/tableNW/TableNW";
 import useDataLogsTable from "./useDataLogsTable";
 
 function DataLogsTable({ uploadChannelId }) {
@@ -7,11 +7,12 @@ function DataLogsTable({ uploadChannelId }) {
         total,
         limit, setLimit, 
         offset, setOffset,
+        currentPageIndex, setCurrentPageIndex,
         columns
      } = useDataLogsTable({ uploadChannelId });
      
     return (
-        <Table
+        <TableNW
             maxHeight="calc(100vh - 300px)"
             columns={columns}
             data={dataLogs}
@@ -21,8 +22,8 @@ function DataLogsTable({ uploadChannelId }) {
                 total,
                 limit,
                 setLimit,
-                offset,
-                setOffset,
+                currentPageIndex,
+                setCurrentPageIndex
             }}
         />
     );

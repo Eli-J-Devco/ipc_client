@@ -5,7 +5,7 @@ import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate.js";
 function useDataLogsTable({ uploadChannelId }) {
     const [total, setTotal] = useState(100);
     const [limit, setLimit] = useState(5);
-    const [offset, setOffset] = useState(0);
+    const [currentPageIndex, setCurrentPageIndex] = useState(1);
     const [dataLogs, setDataLogs] = useState();
 
     const axiosPrivate = useAxiosPrivate();
@@ -28,11 +28,10 @@ function useDataLogsTable({ uploadChannelId }) {
     useEffect(() => {
         async function fetchData(props) {
             try {
-                const page = (offset/limit) + 1
                 const { data } = await axiosPrivate.post(
                     `${Constants.API_URL.SYNC_DATA.GET}${uploadChannelId}${
                         props?.isPagination ? 
-                        `?page=${page}&limit=${limit}` : ""
+                        `?page=${currentPageIndex}&limit=${limit}` : ""
                     }`
                 )
                 setTotal(data.total)
@@ -54,7 +53,7 @@ function useDataLogsTable({ uploadChannelId }) {
             }
         }
         fetchData({ isPagination: true })
-    }, [limit, offset, total])
+    }, [currentPageIndex, limit])
 
     return {
         dataLogs,
@@ -63,8 +62,8 @@ function useDataLogsTable({ uploadChannelId }) {
         setTotal,
         limit,
         setLimit,
-        offset,
-        setOffset,
+        currentPageIndex,
+        setCurrentPageIndex,
         columns
     };
 }

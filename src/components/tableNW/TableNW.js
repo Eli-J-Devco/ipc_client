@@ -122,11 +122,7 @@ function TableNW({
                                 ).map((pageSize) => ({
                                 value: pageSize,
                                 label: pageSize,
-                                })),
-                                {
-                                value: pagination.total,
-                                label: pagination.total,
-                                },
+                                }))
                             ]}
                             value={{
                                 label: table.getState().pagination.pageSize,

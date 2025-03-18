@@ -100,11 +100,6 @@ function useSyncHistory() {
             id: 16,
             slug: "status",
             name: "Status"
-        }, {
-            id: 17,
-            slug: "action",
-            name: <div className="text-center">Actions</div>,
-            width: 150
         }
     ];
     // Upload Channel anh Device List
