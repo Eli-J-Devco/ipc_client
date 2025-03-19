@@ -6,7 +6,8 @@
 
 import { useEffect } from "react";
 import { useLocation, useNavigate, Navigate, Outlet } from "react-router-dom";
-
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import Constants from "../../../utils/Constants";
 import useAuth from "../../../hooks/useAuth";
 import { clearToken, getToken } from "../../../utils/Token";
 
@@ -21,6 +22,8 @@ const RequiredAuth = () => {
   const persist = JSON.parse(localStorage.getItem("persist"));
   const project_id = getToken("project_id");
   const navigate = useNavigate()
+
+  const axiosPrivate = useAxiosPrivate();
   /**
    * Check if user is authenticated and project is existed and persist is existed
    * If not, clear token and redirect to login page
@@ -34,11 +37,26 @@ const RequiredAuth = () => {
   }, []);
 
   useEffect(() => {
-    const intervaler = setInterval(() => {
-      if (localStorage.getItem("email") === null) {
-        navigate("/");
+    const intervaler = setInterval(async () => {
+      try {
+        const { data } = await axiosPrivate.post(
+          Constants.API_URL.AUTH.ME
+        );
+        if (data && data.status === 0) {
+          clearToken()
+          navigate("/");
+        }
+        if (!data) {
+          clearToken()
+          navigate("/");
+        }
+        if (localStorage.getItem("email") === null) {
+          navigate("/");
+        }
+      } catch (e) {
+        console.log(e)
       }
-    }, 1000)
+    }, 3000)
     return () => clearInterval(intervaler)
   }, [])
 
