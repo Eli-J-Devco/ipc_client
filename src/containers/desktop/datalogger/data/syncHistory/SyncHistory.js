@@ -31,24 +31,24 @@ function SyncHistory() {
         handleOnClose,
         handleOnSubmitDelete,
     } = useSyncHistory();
-
+    const footer = <div>
+        <Button variant="dark" className="me-3" onClick={handleOnSubmitDelete}>
+            Confirm
+        </Button>
+        <Button variant="grey" onClick={handleOnClose}>
+            Cancel
+        </Button>
+    </div>      
     return (
         <>
             <Modal 
                 isOpen={isOpen}
                 close={handleOnClose}
-                centered={true}
+                centered
                 title="Are you sure you want to delete?"
+                footer={footer}
             >
                 <div>{`These logs of ${selectedInverterOption ? selectedInverterOption.map(item => item.value) : "All"} from ${formatDate(startDate)} to ${formatDate(endDate)} will be deleted.`}</div>
-                <div className="float-end mt-3">
-                    <Button onClick={handleOnClose}>
-                        Cancel
-                    </Button>
-                    <Button className="bg-danger ms-3" onClick={handleOnSubmitDelete}>
-                        Confirm
-                    </Button>
-                </div>      
             </Modal>
             <div>
                 <div className="d-flex align-items-center flex-wrap column-gap-4 row-gap-2 mb-2">
