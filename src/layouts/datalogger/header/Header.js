@@ -11,7 +11,7 @@ import { LogoutErrors } from "../../../utils/Errors.js";
 import ChangePasswordModal from "./ChangePasswordModal.js";
 
 const Header = () => {
-  const { auth } = useAuth();
+  const { auth, setAuth } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
 

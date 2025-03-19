@@ -5,7 +5,7 @@
  *********************************************************/
 
 import { useEffect } from "react";
-import { useLocation, Navigate, Outlet } from "react-router-dom";
+import { useLocation, useNavigate, Navigate, Outlet } from "react-router-dom";
 
 import useAuth from "../../../hooks/useAuth";
 import { clearToken, getToken } from "../../../utils/Token";
@@ -20,7 +20,7 @@ const RequiredAuth = () => {
   const location = useLocation();
   const persist = JSON.parse(localStorage.getItem("persist"));
   const project_id = getToken("project_id");
-
+  const navigate = useNavigate();
   /**
    * Check if user is authenticated and project is existed and persist is existed
    * If not, clear token and redirect to login page
@@ -32,6 +32,14 @@ const RequiredAuth = () => {
       <Navigate to={"/"} state={{ from: location }} replace />
     }
   }, []);
+  useEffect(() => {
+    const intervaler = setInterval(() => {
+      if (localStorage.getItem("email") === null) {
+        navigate("/");
+      }
+    }, 1000)
+    return () => clearInterval(intervaler)
+  }, [])
 
   return auth?.isAuthenticated && persist && project_id ? (
     <Outlet />
