@@ -49,6 +49,7 @@ const Constants = {
       REFRESH: "/authentication/refresh/",
       FORGOT_PASSWORD: "/authentication/forgot/",
       LOGOUT: "/authentication/logout/",
+      ME: "/authentication/me/",
     },
     ETHERNET: {
       ETHERNET_INFO: "/ethernet/get/",
