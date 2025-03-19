@@ -110,7 +110,7 @@ export const loginService = {
         return
       }
 
-      LibToast.toast(`Failed to login! Please contact admin or try again! (${error.code}, code: ${error.response.status})`, "error");
+      LibToast.toast(errorMessage, "error");
       return false;
     }
 

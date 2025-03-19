@@ -44,44 +44,43 @@ export default function ResetPasswordModal({ isOpenModal, closeModal }) {
         }, 300);
     }
 
-    const footer = <div>
+    const footer = !newPassword ?
+    <div>
         <Button variant="dark" type="submit" formId="userModal">
             <Button.Text text="Reset" />
         </Button>
         <Button variant="grey" className="ms-3" onClick={() => closeModal()}>
             <Button.Text text="Cancel" />
         </Button>
-    </div>
+    </div> :
+    <Button variant="dark" onClick={() => closeModal()}>
+        <Button.Text text="Close" />
+    </Button>
     return (
         <FormInput id="userModal" onSubmit={handleResetPassword}>
             <Modal
                 isOpen={true}
                 close={closeModal}
                 title={"Reset password"}
-                size="lg"
+                footer={footer}
+                centered
             >
                 {
 
                     !newPassword ?
                         <div>
-                            <h4 className="text-center m-5">
+                            <p className="text-center">
                                 Are you sure to reset password of user with email: <strong>{isOpenModal?.user?.email}</strong>?
-                            </h4>
-                            <div className="d-flex justify-content-center">
-                                {footer}
-                            </div>
+                            </p>
                         </div>
                         :
                         <div>
-                            <h4 className="text-center">
+                            <h6 className="text-center">
                                 Password of user with email: <strong>{isOpenModal?.user?.email}</strong> has been reset successfully
-                            </h4>
+                            </h6>
                             <div>
                                 <FormInput.Text label="New password" name="new_password" isShow={true} value={newPassword} type="password" />
                             </div>
-                            <Button variant="dark" className="mt-3" onClick={() => closeModal()}>
-                                <Button.Text text="Close" />
-                            </Button>
                         </div>
                 }
             </Modal>

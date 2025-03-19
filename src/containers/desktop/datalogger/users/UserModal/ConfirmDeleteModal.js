@@ -25,7 +25,7 @@ export default function ConfirmDeleteModal({ isOpenModal, closeModal, setNeedRef
     const navigate = useNavigate();
 
     const footer = <div>
-        <Button className="bg-danger" type="submit" formId="userModal">
+        <Button variant="dark" type="submit" formId="userModal">
             <Button.Text text="Confirm delete" />
         </Button>
         <Button variant="grey" className="ms-3" onClick={() => closeModal()}>
@@ -75,16 +75,13 @@ export default function ConfirmDeleteModal({ isOpenModal, closeModal, setNeedRef
                 isOpen={true}
                 close={closeModal}
                 title={"Confirm delete user"}
-                size="lg"
                 centered
+                footer={footer}
             >
-                <div className='d-flex justify-content-center mb-3'>
-                    <h6 className="text-center">
-                        Are you sure to delete user with email: <strong>{isOpenModal?.user?.email}</strong>?
-                    </h6>
-                </div>
                 <div className='d-flex justify-content-center'>
-                    {footer}
+                    <p className="text-center">
+                        Are you sure to delete user with email: <strong>{isOpenModal?.user?.email}</strong>?
+                    </p>
                 </div>
             </Modal>
         </FormInput>
