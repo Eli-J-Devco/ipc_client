@@ -16,32 +16,17 @@ import LibToast from '../../../../../utils/LibToast';
 
 
 export default function ConfirmDeleteModal(props) {
-  const { closeRolesModal, action, role, setNeedRefresh } = props;
+  const { closeRolesModal, action, users, role, setNeedRefresh } = props;
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const [cannotDelete, setCannotDelete] = useState()
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data } = await axiosPrivate.post(
-          Constants.API_URL.USERS.LIST + `?page=0&limit=99999`
-        );
-        if (data) {
-          const users = data.data
-          users.forEach(user => {
-            if (user.role.some(userRole => userRole.name === role.name)) {
-              console.log("There are role matches in User - Role")
-              setCannotDelete(true)
-              return
-            }
-          })
-        }
-      } catch (e) {
-        console.log(e)
+    users.forEach(user => {
+      if (user.role.some(userRole => userRole.name === role.name)) {
+        setCannotDelete(true)
       }
-    }
-    fetchData()
+    })
   }, [])
   /**
    * Handle delete role
@@ -111,10 +96,8 @@ export default function ConfirmDeleteModal(props) {
     >
       {
         cannotDelete ? 
-        <h6 className="mb-3">{`There are users assigned with ${role.name} role. Therefore currently cannot delete this role!`}</h6> :
-        <>
-          <h6>Are you sure you want to delete?</h6>
-        </>
+        <h6 className="mb-3">This role is currently assigned to accounts. Cannot delete</h6> :
+        <h6>Are you sure you want to delete?</h6>
       }
       
     </Modal>
