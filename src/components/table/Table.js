@@ -116,9 +116,7 @@ function Table({
                     onClick={() => {
                       if (selectRow?.enable) {
                         row.toggleSelected(true);
-                        setTimeout(() => {
-                          selectRow?.setRowSelection(row.original);
-                        }, 100);
+                        selectRow?.setRowSelection(row.original);
                       }
                     }}
                     className={`${styles["body-row"]} ${

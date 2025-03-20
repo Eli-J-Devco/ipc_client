@@ -50,6 +50,7 @@ export default function PermissionsAndRoles() {
   // const [roles, setRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
   const [permissions, setPermissions] = useState([]);
+  const [users, setUsers] = useState()
   const navigate = useNavigate();
 
   /**
@@ -132,12 +133,26 @@ export default function PermissionsAndRoles() {
     { id: 2, slug: "name", name: "Name" },
     { id: 3, slug: "actions", name: <div className="text-center">Actions</div> }
   ]
-
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+          const { data } = await axiosPrivate.post(
+            Constants.API_URL.USERS.LIST + `?page=0&limit=99999`
+          );
+          if (data) {
+            setUsers(data.data)
+          }
+      } catch (e) {
+        console.log(e)
+      }   
+    }
+    fetchData()
+  }, [])
   return (
     <div className="main">
       {isOpenRolesModal?.add && <RolesModal closeRolesModal={closeAddRoles} action={{ text: "Add" }} setNeedRefresh={setNeedRefresh} />}
       {isOpenRolesModal?.edit && <RolesModal closeRolesModal={closeEditRoles} action={{ text: "Edit" }} role={selectedRole} setNeedRefresh={setNeedRefresh} />}
-      {isOpenRolesModal?.delete && <ConfirmDeleteModal closeRolesModal={closeConfirmDeleteRoles} action={{ text: "Confirm" }} role={selectedRole} setNeedRefresh={setNeedRefresh} />}
+      {isOpenRolesModal?.delete && <ConfirmDeleteModal closeRolesModal={closeConfirmDeleteRoles} action={{ text: "Confirm" }} users={users} role={selectedRole} setNeedRefresh={setNeedRefresh} />}
       <div className={styles.header}>
         <Breadcrumb
           routes={[
@@ -199,10 +214,8 @@ export default function PermissionsAndRoles() {
                       image={<DeleteIcon />}
                       className="mx-2"
                       onClick={() => {
-                        setTimeout(() => {
-                          setSelectedRole(item);
-                          openConfirmDeleteRoles();
-                        }, 100);
+                        setSelectedRole(item);
+                        openConfirmDeleteRoles();
                       }}
                     />
                   </div>
