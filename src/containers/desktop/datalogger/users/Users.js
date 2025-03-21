@@ -48,7 +48,6 @@ export default function Users() {
               statusFilter !== undefined ? `&status=${statusFilter}` : ""
             }`
         );
-
         setTotal(response.data?.total);
 
         let insertData =
@@ -145,7 +144,6 @@ export default function Users() {
               {<StatusIcon fill={item?.status?.value ? "#38FF49" : "red"} />}
             </div>
           )}
-          control={true}
           actions={(item) => (
             <div className="d-flex flex-wrap justify-content-center">
               <Button.Image
@@ -184,11 +182,13 @@ export default function Users() {
               />
             </div>
           )}
+          control={true}
           pagination={{
             statusFilter: statusFilter,
             enable: true,
             total: total,
             offset: offset,
+            limit,
             setLimit: setLimit,
             setOffset: setOffset,
           }}
