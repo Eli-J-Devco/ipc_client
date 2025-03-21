@@ -31,8 +31,11 @@ function LoggingRate() {
          * Get logging rate from project setup and set to state
          * @author: nhan.tran 2024-03-11
          */
-        if (!projectSetup || !loggingIntervalConfig || loggingIntervalConfig.length === 0) return;
-
+        if (!projectSetup || 
+            !loggingIntervalConfig || 
+            projectSetup.length === 0 ||
+            loggingIntervalConfig.length === 0
+        ) return;
         var output = document.getElementById("progress");
         output.innerHTML = "<div><img src='/loading.gif' /></div>";
         setTimeout(() => {
