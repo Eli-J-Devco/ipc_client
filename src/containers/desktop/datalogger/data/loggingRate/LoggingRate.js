@@ -103,11 +103,7 @@ function LoggingRate() {
 
             <div className={styles.action} >
                 <Button className="m-2" onClick={handleSubmit}>
-                    <Button.Text text="Apply" />
-                </Button>
-
-                <Button className="m-2" variant="white">
-                    <Button.Text text="Cancel" />
+                    <Button.Text text="Save" />
                 </Button>
             </div>
         </div>
