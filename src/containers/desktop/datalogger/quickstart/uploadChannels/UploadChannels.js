@@ -104,13 +104,13 @@ function UploadChannels() {
               [`upload_url_${channel.name.trim().replace(" ", "_")}`]:
                 Yup.string()
                   .required("Upload URL is required")
-                  .matches(
-                    /[(http(s)?)://(www.)?a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/,
-                    "Invalid URL"
-                  ),
+                  // .matches(
+                  //   /[(http(s)?)://(www.)?a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/,
+                  //   "Invalid URL"
+                  // )
+              ,
               [`password_${channel.name.trim().replace(" ", "_")}`]:
                 Yup.string()
-                  .required("Password is required")
                   .matches(
                     Constants.REGEX_PATTERN.PASSWORD,
                     "Invalid password"
@@ -138,16 +138,17 @@ function UploadChannels() {
    * @return {Object}
    */
   const handleSave = (data) => {
-    const channelsMap = channels.map((channel, index) => ({
-      ...channel,
-      uploadurl: data[`upload_url_${channel?.name.trim().replace(" ", "_")}`],
-      password: data[`password_${channel?.name.trim().replace(" ", "_")}`],
-    }));
+    const channelsMap = channels.map((channel, index) => {
+      return {
+        ...channel,
+        uploadurl: data[`upload_url_${channel?.name.trim().replace(" ", "_")}`],
+        password: data[`password_${channel?.name.trim().replace(" ", "_")}`],
+      }
+    });
     if (_.isEqual(channelsMap, channelsRef.current)) {
       LibToast.toast(t("toastMessage.info.noChange"), "info");
       return;
     }
-
     Libs.progress(true);
     setTimeout(async () => {
       try {
@@ -208,6 +209,7 @@ function UploadChannels() {
     }, 100);
   };
 
+
   return (
     <div className={styles.upload_channels}>
       <div className="note">
@@ -222,11 +224,12 @@ function UploadChannels() {
               [`upload_url_${channel?.name.trim().replace(" ", "_")}`]:
                 channel?.uploadurl,
               [`password_${channel?.name.trim().replace(" ", "_")}`]:
-                channel?.password,
+                channel?.password ? channel?.password : "",
             }))
-            .reduce((acc, val) => ({ ...acc, ...val }), {})}
-          onSubmit={handleSave}
+            .reduce((acc, val) => ({ ...acc, ...val }), {})
+          }
           validationSchema={validationSchema}
+          onSubmit={handleSave}
           id="uploadChannelsForm"
         >
           {channels &&
@@ -314,7 +317,6 @@ function UploadChannels() {
                                 type="password"
                                 placeholder={t("site.password")}
                                 className="form-group"
-                                required
                               />
                             </div>
 
