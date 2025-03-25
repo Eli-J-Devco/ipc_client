@@ -57,7 +57,7 @@ function Channel() {
       setDevices(
         uploadChanelConfig?.devices?.map((device) => ({
           value: device.id,
-          label: device.name,
+          label: `${device.name} - (${device.id})`,
         }))
       );
       setLoggingInterval(
@@ -98,13 +98,14 @@ function Channel() {
               [`upload_url_${channel.name.trim().replace(" ", "_")}`]:
                 Yup.string()
                   .required("Upload URL is required")
-                  .matches(
-                    /[(http(s)?)://(www.)?a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/,
-                    "Invalid URL"
-                  ),
+                  // .matches(
+                  //   /[(http(s)?)://(www.)?a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/,
+                  //   "Invalid URL"
+                  // )
+              ,
               [`password_${channel.name.trim().replace(" ", "_")}`]:
                 Yup.string()
-                  .required("Password is required")
+                  // .required("Password is required")
                   .matches(
                     Constants.REGEX_PATTERN.PASSWORD,
                     "Invalid password"
@@ -215,7 +216,7 @@ function Channel() {
               [`upload_url_${channel?.name.trim().replace(" ", "_")}`]:
                 channel?.uploadurl,
               [`password_${channel?.name.trim().replace(" ", "_")}`]:
-                channel?.password,
+                channel?.password ? channel?.password : "",
             }))
             .reduce((acc, val) => ({ ...acc, ...val }), {})}
           onSubmit={handleSave}
@@ -307,7 +308,7 @@ function Channel() {
                                 type="password"
                                 placeholder={t("site.password")}
                                 className="form-group"
-                                required
+                                // required
                               />
                             </div>
 
@@ -319,7 +320,7 @@ function Channel() {
                                   channel?.devices
                                     ? channel?.devices.map((device) => ({
                                         value: device.id,
-                                        label: device.name,
+                                        label: `${device.name.split(" - ")[0]} - (${device.id})`,
                                       }))
                                     : []
                                 }
