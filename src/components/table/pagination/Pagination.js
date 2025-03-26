@@ -27,7 +27,12 @@ function Pagination({ controls, variant }) {
                         key={pageIndex}
                         active={controls.getState().pagination.pageIndex === pageIndex}
                         linkClassName={styles.item}
-                        onClick={() => controls.setPageIndex(pageIndex)}
+                        onClick={() => {
+                            document.getElementById("table-header").scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                            controls.setPageIndex(pageIndex)
+                        }}
                     >
                         {pageIndex + 1}
                     </ReactPagination.Item>

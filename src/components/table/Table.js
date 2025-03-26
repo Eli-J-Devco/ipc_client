@@ -81,7 +81,7 @@ function Table({
           className={`${styles.table} ${variant ? styles[variant] : ""}`}
           style={{ minWidth: table.getTotalSize() ? table.getTotalSize() : 0 }}
         >
-          <thead>
+          <thead id="table-header">
             {table.getHeaderGroups().map((headerGroup) => ( 
               <tr key={headerGroup?.id} className={styles["header-row"]}>
                 {headerGroup.headers.map((header) => {
