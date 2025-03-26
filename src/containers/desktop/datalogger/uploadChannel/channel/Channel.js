@@ -308,7 +308,6 @@ function Channel() {
                                 name="username"
                                 placeholder={t("site.username")}
                                 className="form-group"
-                                required
                                 onChange={(event) => {
                                   let temp = [...channels];
                                   temp[index].username = event.target.value
