@@ -95,6 +95,7 @@ function UploadChannels() {
               channel.uploadurl,
             [`password_${channel.name.trim().replace(" ", "_")}`]:
               channel.password,
+            username: channel.type_protocol.name === "FTP" ? channel.username : null
           }));
           setChannels(allChannels);
           var validation = {};
@@ -209,7 +210,6 @@ function UploadChannels() {
     }, 100);
   };
 
-
   return (
     <div className={styles.upload_channels}>
       <div className="note">
@@ -307,6 +307,21 @@ function UploadChannels() {
                                 required
                               />
                             </div>
+
+                            {channel?.type_protocol.name === "FTP" && <div className="mb-3">
+                              <FormInput.Text
+                                label={t("site.username")}
+                                name="username"
+                                placeholder={t("site.username")}
+                                className="form-group"
+                                required
+                                onChange={(event) => {
+                                  let temp = [...channels];
+                                  temp[index].username = event.target.value
+                                  setChannels(temp);
+                                }}
+                              />
+                            </div>}
 
                             <div className="mb-3">
                               <FormInput.Text
