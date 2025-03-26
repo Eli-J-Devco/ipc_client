@@ -49,7 +49,7 @@ export default function Users() {
             }`
         );
         setTotal(response.data?.total);
-
+        
         let insertData =
           response.data?.data &&
           response.data?.data?.map((item, index) => {
@@ -115,11 +115,11 @@ export default function Users() {
                 { value: 1, label: "Active" },
                 { value: 0, label: "Inactive" },
               ]}
-              onChange={(e) =>
+              onChange={(e) => {
                 setStatusFilter(
                   e?.value === 1 ? true : e?.value === 0 ? false : undefined
                 )
-              }
+              }}
               isClearable={true}
               placeholder={"Status"}
             />

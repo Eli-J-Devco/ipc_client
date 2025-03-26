@@ -28,6 +28,9 @@ function Pagination({ controls, variant }) {
                         active={controls.getState().pagination.pageIndex === pageIndex}
                         linkClassName={styles.item}
                         onClick={() => {
+                            document.getElementById("table-header").scrollIntoView({
+                                behavior: 'smooth'
+                            });
                             controls.setPageIndex(pageIndex)
                         }}
                     >
