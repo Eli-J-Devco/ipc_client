@@ -40,6 +40,7 @@
         "remote_access_channel": "Allow Remote Configuration (channel 1 only)",
         "protocol": "Protocol",
         "select_device_only": "Selected Upload - only these meters",
+        "username": "Username",
         "password": "Password",
         "upload_url": "Upload URL",
         "enable": "Enabled",
