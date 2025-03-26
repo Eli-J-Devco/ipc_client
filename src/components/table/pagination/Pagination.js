@@ -12,7 +12,12 @@ function Pagination({ controls, variant }) {
         >
             <ReactPagination.Prev
                 linkClassName={styles.control}
-                onClick={controls.previousPage}
+                onClick={() => {
+                    controls.previousPage()
+                    document.getElementById("table-header").scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }}
                 disabled={!controls.getCanPreviousPage()}
             />
 
@@ -28,10 +33,10 @@ function Pagination({ controls, variant }) {
                         active={controls.getState().pagination.pageIndex === pageIndex}
                         linkClassName={styles.item}
                         onClick={() => {
+                            controls.setPageIndex(pageIndex)
                             document.getElementById("table-header").scrollIntoView({
                                 behavior: 'smooth'
                             });
-                            controls.setPageIndex(pageIndex)
                         }}
                     >
                         {pageIndex + 1}
@@ -42,7 +47,12 @@ function Pagination({ controls, variant }) {
 
             <ReactPagination.Next
                 linkClassName={styles.control}
-                onClick={controls.nextPage}
+                onClick={() => {
+                    controls.nextPage()
+                    document.getElementById("table-header").scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }}
                 disabled={!controls.getCanNextPage()}
             />
         </ReactPagination>

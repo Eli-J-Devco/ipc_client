@@ -12,6 +12,7 @@ function DataLogsTable({ uploadChannelId }) {
      
     return (
         <TableNW
+            id={uploadChannelId}
             maxHeight="calc(100vh - 300px)"
             columns={columns}
             data={dataLogs}

@@ -3,7 +3,7 @@ import styles from "./Pagination.module.scss";
 import usePagination from './usePagination';
 
 
-function Pagination({ controls, variant }) {
+function Pagination({ controls, variant, headerId }) {
     const paginationRange = usePagination({ controls });
     return (
         <ReactPagination
@@ -12,7 +12,12 @@ function Pagination({ controls, variant }) {
         >
             <ReactPagination.Prev
                 linkClassName={styles.control}
-                onClick={controls.previousPage}
+                onClick={() => {
+                    controls.previousPage()
+                    document.getElementById(headerId).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }}
                 disabled={!controls.getCanPreviousPage()}
             />
 
@@ -28,10 +33,10 @@ function Pagination({ controls, variant }) {
                         active={controls.getState().pagination.pageIndex === pageIndex}
                         linkClassName={styles.item}
                         onClick={() => {
-                            document.getElementById("table-header").scrollIntoView({
+                            controls.setPageIndex(pageIndex)
+                            document.getElementById(headerId).scrollIntoView({
                                 behavior: 'smooth'
                             });
-                            controls.setPageIndex(pageIndex)
                         }}
                     >
                         {pageIndex + 1}
@@ -42,7 +47,12 @@ function Pagination({ controls, variant }) {
 
             <ReactPagination.Next
                 linkClassName={styles.control}
-                onClick={controls.nextPage}
+                onClick={() => {
+                    controls.nextPage()
+                    document.getElementById(headerId).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }}
                 disabled={!controls.getCanNextPage()}
             />
         </ReactPagination>
