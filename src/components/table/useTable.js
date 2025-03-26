@@ -96,12 +96,14 @@ function useTable({
         setLimit(maxPageSize);
         return;
       }
-      if (maxPageSize > pageSize && !Constants.PAGE_SIZES.includes(pageSize)) {
-        table.setPageSize(Constants.DEFAULT_PAGE_SIZE)
-        setLimit(Constants.DEFAULT_PAGE_SIZE)
-      } else {
-        table.setPageSize(Math.min(maxPageSize, pageSize))
-        setLimit(Math.min(maxPageSize, pageSize))
+      if (setLimit) {
+        if (maxPageSize > pageSize && !Constants.PAGE_SIZES.includes(pageSize)) {
+          table.setPageSize(Constants.DEFAULT_PAGE_SIZE)
+          setLimit(Constants.DEFAULT_PAGE_SIZE)
+        } else {
+          table.setPageSize(Math.min(maxPageSize, pageSize))
+          setLimit(Math.min(maxPageSize, pageSize))
+        }
       }
       maxPageSize = Math.min(maxPageSize, pageSize);
       // if (!limit && setLimit) setLimit(maxPageSize);

@@ -7,6 +7,7 @@ import FormInput from "../formInput/FormInput";
 
 
 function TableNW({
+  id,
   control,
   variant,
   className,
@@ -39,7 +40,7 @@ function TableNW({
           className={`${styles.table} ${variant ? styles[variant] : ""}`}
           style={{ minWidth: table.getTotalSize() ? table.getTotalSize() : 0 }}
         >
-          <thead id="table-header">
+          <thead id={id ? `table-header-${id}` : "table-header"}>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup?.id} className={styles["header-row"]}>
                 {headerGroup.headers.map((header) => (
@@ -134,7 +135,7 @@ function TableNW({
                         of {pagination?.total} items
                         </div>
                     </span>
-                    <Pagination controls={table} variant={variant} />
+                    <Pagination controls={table} variant={variant} headerId={id ? `table-header-${id}` : "table-header"} />
                 </>
             )}
             </div>
