@@ -6,7 +6,6 @@ function DataLogsTable({ uploadChannelId }) {
         dataLogs, 
         total,
         limit, setLimit, 
-        offset, setOffset,
         currentPageIndex, setCurrentPageIndex,
         columns
      } = useDataLogsTable({ uploadChannelId });
