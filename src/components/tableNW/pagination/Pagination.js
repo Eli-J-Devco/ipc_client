@@ -3,8 +3,9 @@ import styles from "./Pagination.module.scss";
 import usePagination from './usePagination';
 
 
-function Pagination({ controls, variant, headerId }) {
+function Pagination({ controls, variant, id }) {
     const paginationRange = usePagination({ controls });
+    const headerId=id ? `table-header-${id}` : "table-header"
     return (
         <ReactPagination
             size="sm"
@@ -15,7 +16,8 @@ function Pagination({ controls, variant, headerId }) {
                 onClick={() => {
                     controls.previousPage()
                     document.getElementById(headerId).scrollIntoView({
-                        behavior: 'smooth'
+                        behavior: 'smooth',
+                        block: "nearest",
                     });
                 }}
                 disabled={!controls.getCanPreviousPage()}
@@ -35,7 +37,8 @@ function Pagination({ controls, variant, headerId }) {
                         onClick={() => {
                             controls.setPageIndex(pageIndex)
                             document.getElementById(headerId).scrollIntoView({
-                                behavior: 'smooth'
+                                behavior: 'smooth',
+                                block: "nearest",
                             });
                         }}
                     >
@@ -50,7 +53,8 @@ function Pagination({ controls, variant, headerId }) {
                 onClick={() => {
                     controls.nextPage()
                     document.getElementById(headerId).scrollIntoView({
-                        behavior: 'smooth'
+                        behavior: 'smooth',
+                        block: "nearest",
                     });
                 }}
                 disabled={!controls.getCanNextPage()}

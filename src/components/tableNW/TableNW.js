@@ -35,7 +35,7 @@ function TableNW({
       <div
         className={`${styles["table-wrapper"]} ${className ? className : ""}`}
         style={{ maxHeight }}
-      >
+      > 
         <table
           className={`${styles.table} ${variant ? styles[variant] : ""}`}
           style={{ minWidth: table.getTotalSize() ? table.getTotalSize() : 0 }}
@@ -135,7 +135,7 @@ function TableNW({
                         of {pagination?.total} items
                         </div>
                     </span>
-                    <Pagination controls={table} variant={variant} headerId={id ? `table-header-${id}` : "table-header"} />
+                    <Pagination controls={table} variant={variant} id={id} />
                 </>
             )}
             </div>
