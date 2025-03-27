@@ -28,6 +28,8 @@ function useDataLogsTable({ uploadChannelId }) {
     useEffect(() => {
         async function fetchData(props) {
             try {
+                var output = document.getElementById("progress");
+                output.innerHTML = "<div><img src='/loading.gif' /></div>";
                 const { data } = await axiosPrivate.post(
                     `${Constants.API_URL.SYNC_DATA.GET}${uploadChannelId}${
                         props?.isPagination ? 
@@ -50,6 +52,8 @@ function useDataLogsTable({ uploadChannelId }) {
 
             } catch (e) {
                 console.error(e);
+            } finally {
+                output.innerHTML = ""
             }
         }
         fetchData({ isPagination: true })
