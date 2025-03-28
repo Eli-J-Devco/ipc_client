@@ -15,7 +15,6 @@ function Pagination({ controls, variant }) {
                 onClick={() => {
                     controls.previousPage()
                     document.getElementById("table-header").scrollIntoView({
-                        behavior: 'smooth',
                         block: "nearest",
                     });
                 }}
@@ -36,7 +35,6 @@ function Pagination({ controls, variant }) {
                         onClick={() => {
                             controls.setPageIndex(pageIndex)
                             document.getElementById("table-header").scrollIntoView({
-                                behavior: 'smooth',
                                 block: "nearest",
                             });
                         }}
@@ -52,7 +50,6 @@ function Pagination({ controls, variant }) {
                 onClick={() => {
                     controls.nextPage()
                     document.getElementById("table-header").scrollIntoView({
-                        behavior: 'smooth',
                         block: "nearest",
                     });
                 }}
