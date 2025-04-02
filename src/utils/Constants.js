@@ -51,6 +51,9 @@ const Constants = {
       LOGOUT: "/authentication/logout/",
       ME: "/authentication/me/",
     },
+    ALARM: {
+      LIST: "/alarm/get/all/"
+    },
     ETHERNET: {
       ETHERNET_INFO: "/ethernet/get/",
       ETHERNET_UPDATE: "/ethernet/update/",
@@ -142,6 +145,7 @@ const Constants = {
     },
     TEMPLATE: {
       LIST: "/template/get/",
+      GET: "/template/get/all/",
       ADD: "/template/add/",
       UPDATE: "/template/update/",
       DELETE: "/template/delete/",
@@ -177,6 +181,18 @@ const Constants = {
       CHANGE_PASSWORD: "/user/password/update/",
       RESET_PASSWORD: "/user/password/reset/",
     },
+    ERROR: {
+      ADD: "/error/add/",
+      LEVEL: {
+        LIST: "/error/level/get/all/"
+      },
+      TYPE: {
+        LIST: "/error/type/get/all/"
+      },
+      COMPARISON: {
+        LIST: "/error/comparison/get/all/"
+      }
+    }
   },
 
   REGEX_PATTERN: {

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Constants from "../../../../utils/Constants";
+import useAxiosPrivate from "../../../../hooks/useAxiosPrivate.js";
 import { ReactComponent as NoAlarmIcon } from "../../../../assets/images/greencheck.svg";
 
 function useAlarms() {
@@ -21,54 +22,61 @@ function useAlarms() {
             name: "Closed"
         }, {
             id: 4,
-            slug: "open_period",
-            name: "Open Period"
+            slug: "create_date",
+            name: "Create Date"
         }, {
             id: 5,
-            slug: "device",
+            slug: "device.name",
             name: "Device"
         }, {
             id: 6,
-            slug: "value",
+            slug: "error.value",
             name: "Value"
         }, {
             id: 7,
-            slug: "error_level",
+            slug: "error.error_level.name",
             name: "Error Level"
         }, {
             id: 8,
-            slug: "error_type",
+            slug: "error.error_type.name",
             name: "Error Type"
         }, {
             id: 9,
-            slug: "issue",
-            name: "Issue"
+            slug: "error.message",
+            name: "Message"
         }, {
             id: 10,
             slug: "action",
             name: <div className="text-center">Actions</div>
         }
     ]);
-    const [alarmList, ] = useState(Array.from({length: 20}, () => ({
-        id: "1",
-        opened: "08/21/2023 13:40 PM",
-        closed: "NaN",
-        open_period: "NaN",
-        device: "Inverter 01",
-        value: "1",
-        error_level: "ERROR",
-        error_type: "DC soft starting fault",
-        issue: "DC soft starting fault"
-    })));
-    const [isExpand, setIsExpand] = useState(true);
+    const [alarmList, setAlarmList] = useState();
+    const [isExpand, setIsExpand] = useState(false);
 
+    const axiosPrivate = useAxiosPrivate();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const { data } = await axiosPrivate.post(
+                    Constants.API_URL.ALARM.LIST
+                )
+                setAlarmList(data)
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        fetchData()
+    }, [])
     const handleOnExpand = () => setIsExpand(!isExpand);
 
     return {
         columns,
         alarmList,
         total,
+        limit,
         setLimit,
+        offset,
         setOffset,
         isExpand,
         handleOnExpand

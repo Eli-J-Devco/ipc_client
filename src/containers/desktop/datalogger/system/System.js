@@ -51,8 +51,8 @@ function System() {
                             name: "Synchronized Config Device"
                         },
                         {
-                            path: "/datalogger/system/alarm",
-                            name: "Alarm"
+                            path: "/datalogger/system/error",
+                            name: "Error"
                         }
                     ]}
                 />

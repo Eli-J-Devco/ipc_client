@@ -68,6 +68,8 @@ function useAlarms() {
         columns,
         alarmList,
         total,
+        limit,
+        offset,
         setLimit,
         setOffset,
         isExpand,
