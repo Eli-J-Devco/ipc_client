@@ -6,7 +6,7 @@ import useEditErrorModal from "./useEditErrorModal";
 import styles from "./EditAlarmModal.module.scss"
 
 
-function EditErrorModal({ isOpen, close, data }) {
+function EditErrorModal({ isOpen, close, data, dataList, setDataList }) {
     const { 
         deviceGroups, 
         templates, 
@@ -17,7 +17,7 @@ function EditErrorModal({ isOpen, close, data }) {
         error, setError,
         validationSchema,
         handleSubmitForm
-    } = useEditErrorModal({ close });
+    } = useEditErrorModal({ close, dataList, setDataList });
 
     return (
         <Modal

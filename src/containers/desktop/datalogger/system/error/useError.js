@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Constants from "../../../../../utils/Constants";
+import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate.js";
 
 function useError() {
     const [total, setTotal] = useState(70);
@@ -8,83 +9,57 @@ function useError() {
     const [columns, ] = useState([
         {
             id: 1,
-            slug: "serial_number",
-            name: "Serial Number"
-        }, {
-            id: 2,
             slug: "name",
             name: "Name"
         }, {
-            id: 3,
+            id: 2,
             slug: "message",
             name: "Message"
         }, {
+            id: 3,
+            slug: "device_group.name",
+            name: "Device Group"
+        }, {
             id: 4,
-            slug: "device_categorize",
-            name: "Device Categorize"
+            slug: "tag_point.name",
+            name: "Point"
         }, {
             id: 5,
-            slug: "device",
-            name: "Device"
-        }, {
-            id: 6,
-            slug: "tag",
-            name: "Tag (point)"
-        }, {
-            id: 7,
-            slug: "error_level",
+            slug: "error_level.name",
             name: "Error Level"
         }, {
-            id: 8,
-            slug: "error_type",
-            name: "Condition (Error Type)"
+            id: 6,
+            slug: "error_type.name",
+            name: "Error Type"
         }, {
-            id: 9,
-            slug: "enable_switch",
+            id: 7,
+            slug: "enable",
             name: "Enable"
         }, {
-            id: 10,
+            id: 8,
             slug: "action",
             name: <div className="text-center">Actions</div>
         }
     ]);
-    const [errorList,] = useState([
-        {
-            serial_number: "1",
-            name: "Fan Fault",
-            message: "Fan Fault",
-            device_categorize: "Datalogger",
-            device: "INV01",
-            tag: "pt0",
-            error_level: "ERROR",
-            error_type: "Fan fault = 1",
-            enable: true
-        },{
-            serial_number: "2",
-            name: "DC soft starting fault",
-            message: "DC soft starting fault",
-            device_categorize: "Datalogger",
-            device: "INV01",
-            tag: "pt1",
-            error_level: "ERROR",
-            error_type: "DC soft starting fault = 1",
-            enable: true
-        },{
-            serial_number: "3",
-            name: "Hardware fault",
-            message: "Hardware fault",
-            device_categorize: "Datalogger",
-            device: "INV01",
-            tag: "pt2",
-            error_level: "ERROR",
-            error_type: "Hardware fault = 1",
-            enable: true
-        },
-    ]);
+    const [errorList, setErrorList] = useState();
     const [point, setPoint] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    
+    const axiosPrivate = useAxiosPrivate();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const {data} = await axiosPrivate.post(
+                    Constants.API_URL.ERROR.LIST
+                )
+                setErrorList(data)
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        fetchData()
+    }, [])
 
     const closeModal = () => setIsModalOpen(false);
     const handleErrorEdit = item => {
@@ -94,7 +69,7 @@ function useError() {
 
     return {
         columns,
-        errorList,
+        errorList, setErrorList,
         total,
         setLimit,
         setOffset,

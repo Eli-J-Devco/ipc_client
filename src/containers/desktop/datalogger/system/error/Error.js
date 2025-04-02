@@ -8,7 +8,7 @@ import { ReactComponent as DeleteIcon } from "../../../../../assets/images/delet
 import { ReactComponent as EditIcon } from "../../../../../assets/images/edit.svg";
 
 function Alarm() {
-    const { columns, errorList, total, setLimit, setOffset, isModalOpen, closeModal, error, setError, handleErrorEdit, point } = useError();
+    const { columns, errorList, setErrorList, total, setLimit, setOffset, isModalOpen, closeModal, error, setError, handleErrorEdit, point } = useError();
 
     return (
         <div>
@@ -51,6 +51,8 @@ function Alarm() {
                 isOpen={isModalOpen}
                 close={closeModal}
                 data={point}
+                dataList={errorList}
+                setDataList={setErrorList}
             />
 
             <Button
