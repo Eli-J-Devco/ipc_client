@@ -4,8 +4,7 @@ import FormInput from "../../../../../../components/formInput/FormInput";
 import Modal from "../../../../../../components/modal/Modal";
 import useEditErrorModal from "./useEditErrorModal";
 import styles from "./EditAlarmModal.module.scss"
-import Constants from "../../../../../../utils/Constants";
-import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate.js";
+
 
 function EditErrorModal({ isOpen, close, data }) {
     const { 
@@ -17,37 +16,9 @@ function EditErrorModal({ isOpen, close, data }) {
         errorComparisons, 
         error, setError,
         validationSchema,
-    } = useEditErrorModal();
-    
-    const axiosPrivate = useAxiosPrivate();
+        handleSubmitForm
+    } = useEditErrorModal({ close });
 
-    const handleSubmitForm = async (values) => {
-        const payload = {
-            ...error,
-            name: values.name,
-            message: values.message,
-            id_device_group: values.device_group.value,
-            point: values.point.value,
-            id_error_level: values.error_level.value,
-            id_error_type: values.error_type.value,
-            error_code: values.error_code,
-            id_error_comparison: values.comparison.value,
-            value: values.comparison_number
-        }
-
-        try {
-            const { data } = await axiosPrivate.post(
-                Constants.API_URL.ERROR.ADD,
-                payload
-            );
-            setError({
-                enable: true
-            })
-            close()
-        } catch (e) {
-            console.error(e);
-        }
-    }
     return (
         <Modal
             isOpen={isOpen}
