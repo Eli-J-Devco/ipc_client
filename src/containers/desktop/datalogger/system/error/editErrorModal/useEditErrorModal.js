@@ -4,7 +4,7 @@ import Constants from "../../../../../../utils/Constants";
 import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate.js";
 
 
-function useEditAlarmModal({ close }) {
+function useEditAlarmModal({ close, dataList, setDataList }) {
     const [deviceGroups, setDeviceGroups] = useState([]);
     const [templates, setTemplates] = useState([]);
     const [points, setPoints] = useState([]);
@@ -128,6 +128,7 @@ function useEditAlarmModal({ close }) {
                 Constants.API_URL.ERROR.ADD,
                 payload
             );
+            setDataList([...dataList, data])
             setError({
                 enable: true
             })

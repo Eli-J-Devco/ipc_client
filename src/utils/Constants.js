@@ -182,6 +182,7 @@ const Constants = {
       RESET_PASSWORD: "/user/password/reset/",
     },
     ERROR: {
+      LIST: "error/get/all/",
       ADD: "/error/add/",
       LEVEL: {
         LIST: "/error/level/get/all/"
