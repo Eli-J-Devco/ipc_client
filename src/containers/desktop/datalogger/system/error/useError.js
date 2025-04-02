@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Constants from "../../../../../utils/Constants";
 
-function useAlarm() {
+function useError() {
     const [total, setTotal] = useState(70);
     const [limit, setLimit] = useState(Constants.DEFAULT_PAGE_SIZE);
     const [offset, setOffset] = useState(0);
@@ -48,7 +48,7 @@ function useAlarm() {
             name: <div className="text-center">Actions</div>
         }
     ]);
-    const [alarmList,] = useState([
+    const [errorList,] = useState([
         {
             serial_number: "1",
             name: "Fan Fault",
@@ -83,24 +83,23 @@ function useAlarm() {
     ]);
     const [point, setPoint] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     const closeModal = () => setIsModalOpen(false);
-    const handleAlarmEdit = item => {
+    const handleErrorEdit = item => {
         setIsModalOpen(true);
         setPoint(item);
     }
 
     return {
         columns,
-        alarmList,
+        errorList,
         total,
         setLimit,
         setOffset,
         isModalOpen,
         closeModal,
-        handleAlarmEdit,
+        handleErrorEdit,
         point
     };
 }
 
-export default useAlarm;
+export default useError;

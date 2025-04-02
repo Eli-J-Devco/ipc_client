@@ -77,7 +77,7 @@ import SystemFirmware from "./containers/desktop/datalogger/system/firmware/Firm
 import AutoUpdate from "./containers/desktop/datalogger/system/autoUpdate/AutoUpdate";
 import RebootShutdown from "./containers/desktop/datalogger/system/rebootShutdown/RebootShutdown";
 import Synchronized from "./containers/desktop/datalogger/system/synchronized/Synchronized";
-import Alarm from "./containers/desktop/datalogger/system/alarm/Alarm";
+import SystemError from "./containers/desktop/datalogger/system/error/Error";
 import Users from "./containers/desktop/datalogger/users/Users";
 import PermissionsAndRoles from "./containers/desktop/datalogger/permissionsAndRoles/PermissionsAndRoles";
 import Overview from "./containers/desktop/datalogger/overview/Overview";
@@ -207,7 +207,7 @@ export default class App extends Component {
                       element={<RebootShutdown />}
                     />
                     <Route path="synchronized" element={<Synchronized />} />
-                    <Route path="alarm" element={<Alarm />} />
+                    <Route path="error" element={<SystemError />} />
                   </Route>
 
                   <Route path="users" element={<Users />}></Route>

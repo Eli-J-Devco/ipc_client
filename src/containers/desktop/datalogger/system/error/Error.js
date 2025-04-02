@@ -1,14 +1,14 @@
 import Button from "../../../../../components/button/Button";
 import Table from "../../../../../components/table/Table";
 import FormInput from "../../../../../components/formInput/FormInput";
-import useAlarms from "./useAlarm";
-import EditAlarmModal from "./editAlarmModal/EditAlarmModal";
+import useError from "./useError";
+import EditAlarmModal from "./editErrorModal/EditAlarmModal";
 import { ReactComponent as ViewIcon } from "../../../../../assets/images/eye_view.svg";
 import { ReactComponent as DeleteIcon } from "../../../../../assets/images/delete.svg";
 import { ReactComponent as EditIcon } from "../../../../../assets/images/edit.svg";
 
 function Alarm() {
-    const { columns, alarmList, total, setLimit, setOffset, isModalOpen, closeModal, handleAlarmEdit, point } = useAlarms();
+    const { columns, errorList, total, setLimit, setOffset, isModalOpen, closeModal, error, setError, handleErrorEdit, point } = useError();
 
     return (
         <div>
@@ -22,7 +22,7 @@ function Alarm() {
                     setOffset
                 }}
                 columns={columns}
-                data={alarmList}
+                data={errorList}
                 enable_switch={item => (
                     <FormInput.Check
                         type="switch"
@@ -40,7 +40,7 @@ function Alarm() {
                             image={<DeleteIcon />}
                         />
                         <Button.Image
-                            onClick={() => handleAlarmEdit(item)}
+                            onClick={() => handleErrorEdit(item)}
                             image={<EditIcon />}
                         />
                     </div>
@@ -55,9 +55,9 @@ function Alarm() {
 
             <Button
                 className="mt-3 ms-auto d-block"
-                onClick={() => handleAlarmEdit({})}
+                onClick={() => handleErrorEdit({})}
             >
-                <Button.Text text="Add Alarm"/>
+                <Button.Text text="Add Error"/>
             </Button>
         </div>
     );

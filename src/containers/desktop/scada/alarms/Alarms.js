@@ -8,7 +8,7 @@ import { ReactComponent as RedWarningIcon } from "../../../../assets/images/warn
 import Filter from "./filter/Filter";
 
 function Alarms() {
-    const { columns, alarmList, total, setLimit, setOffset, isExpand, handleOnExpand } = useAlarms();
+    const { columns, alarmList, total, limit, offset, setLimit, setOffset, isExpand, handleOnExpand } = useAlarms();
 
     return (
         <div className={styles.alarms}>
@@ -38,8 +38,10 @@ function Alarms() {
                     pagination={{
                         enable: true,
                         total: total,
+                        offset: offset,
+                        limit,
                         setLimit: setLimit,
-                        setOffset: setOffset
+                        setOffset: setOffset,
                     }}
                     maxHeight={isExpand ? "calc(100vh - 650px)" : "calc(100vh - 250px)"}
                     action={item => (

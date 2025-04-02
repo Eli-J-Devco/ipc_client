@@ -179,6 +179,140 @@ function Text({
 }
 FormInput.Text = Text;
 
+function Number({
+  className,
+  inputClassName = "",
+  invalidClassName = "",
+  lablClassName = "",
+  label,
+  placeholder,
+  name,
+  title,
+  value,
+  required,
+  isRandom,
+  isShow = false,
+  isCustomIcon = false,
+  isHidden = false,
+  type = "number",
+  disabled,
+  readOnly,
+  autoComplete = "off",
+  textarea,
+  horizontal,
+  onChange,
+  onBlur,
+  onClick,
+  unit,
+  onKeyDown,
+  ...rest
+}) {
+  const validate = useContext(FormInputContext);
+  const [showPassword, setShowPassword] = useState(isShow);
+  return (
+    <Form.Group
+      controlId={name}
+      className={`${styles["form-text-wrapper"]} ${
+        validate
+          ? validate.touched[name] && validate.errors[name]
+            ? invalidClassName
+            : ""
+          : ""
+      } ${className ? className : ""} ${horizontal ? styles.horizontal : ""}`}
+      hidden={isHidden}
+    >
+      {label && (
+        <Form.Label className={lablClassName}>
+          {label}
+          {required ? <span className="required">*</span> : ""}
+        </Form.Label>
+      )}
+      <div style={type === "password" ? { position: "relative" } : { flex: 1 }}>
+        <div>
+          <Form.Control
+            className={`${styles["form-text"]} ${
+              inputClassName ? inputClassName : ""
+            }`}
+            style={
+              type === "password" || isCustomIcon
+                ? { backgroundImage: "none" }
+                : {}
+            }
+            placeholder={placeholder}
+            size="sm"
+            name={name}
+            type={
+              type === "password" ? (!showPassword ? "password" : "text") : type
+            }
+            disabled={disabled}
+            readOnly={readOnly}
+            autoComplete={autoComplete}
+            as={textarea ? "textarea" : "input"}
+            rows={3}
+            value={
+              validate && value === undefined ? validate.values[name] : value
+            }
+            onClick={
+              validate && onClick === undefined ? validate.handleFocus : onClick
+            }
+            onChange={
+              validate && onChange === undefined
+                ? validate.handleChange
+                : onChange
+            }
+            onBlur={
+              validate && onBlur === undefined ? validate.handleBlur : onBlur
+            }
+            isInvalid={
+              validate ? validate.touched[name] && validate.errors[name] : false
+            }
+            title={title}
+            onKeyDown={
+              type === "number"
+                ? (evt) =>
+                    ["e", "E", "+", "-"].includes(evt.key) &&
+                    evt.preventDefault()
+                : onKeyDown
+            }
+            {...rest}
+          />
+          <Form.Control.Feedback type="invalid">
+            {validate ? validate.errors[name] : ""}
+          </Form.Control.Feedback>
+        </div>
+        {type === "password" && !isCustomIcon ? (
+          <div
+            className="d-flex align-items-center position-absolute top-0 end-0 mt-1"
+            style={{ cursor: "pointer" }}
+          >
+            {isRandom && (
+              <span
+                onClick={() => {
+                  validate.setFieldValue(name, generateRandomPassword());
+                  setShowPassword(true);
+                }}
+              >
+                <RandomIcon style={{ padding: 4 }} />
+              </span>
+            )}
+            <span onClick={() => setShowPassword(!showPassword)}>
+              {!showPassword ? (
+                <LockIcon style={{ padding: 6 }} />
+              ) : (
+                <UnlockIcon style={{ padding: 6 }} />
+              )}
+            </span>
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
+      {unit && <Form.Label className="ms-2">{unit}</Form.Label>}
+    </Form.Group>
+  );
+}
+FormInput.Number = Number;
+
 function Range({
   className,
   label,

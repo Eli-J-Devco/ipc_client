@@ -7,7 +7,7 @@ import { ReactComponent as RedWarningIcon } from "../../../../assets/images/warn
 import Filter from "./filter/Filter";
 
 function Alarms() {
-    const { columns, alarmList, total, setLimit, setOffset, isExpand, handleOnExpand } = useAlarms();
+    const { columns, alarmList, total, limit, offset, setLimit, setOffset, isExpand, handleOnExpand } = useAlarms();
 
     return (
         <div className="main">
@@ -32,13 +32,16 @@ function Alarms() {
             <Table
                 columns={columns}
                 data={alarmList}
+                control
                 pagination={{
                     enable: true,
-                    total: total,
-                    setLimit: setLimit,
-                    setOffset: setOffset
+                    total,
+                    offset,
+                    limit,
+                    setLimit,
+                    setOffset,
                 }}
-                maxHeight={isExpand ? "calc(100vh - 650px)" : "calc(100vh - 250px)"}
+                maxHeight={isExpand ? "calc(100vh - 630px)" : "calc(100vh - 230px)"}
                 action={item => (
                     <div className="d-flex flex-wrap justify-content-center">
                         <Button.Image

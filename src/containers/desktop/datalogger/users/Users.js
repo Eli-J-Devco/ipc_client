@@ -182,7 +182,7 @@ export default function Users() {
               />
             </div>
           )}
-          control={true}
+          control
           pagination={{
             statusFilter: statusFilter,
             enable: true,
