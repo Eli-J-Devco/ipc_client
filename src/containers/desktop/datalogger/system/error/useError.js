@@ -83,6 +83,9 @@ function useError() {
     ]);
     const [point, setPoint] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    
+
     const closeModal = () => setIsModalOpen(false);
     const handleErrorEdit = item => {
         setIsModalOpen(true);

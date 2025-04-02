@@ -3,7 +3,8 @@ import * as yup from 'yup';
 import Constants from "../../../../../../utils/Constants";
 import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate.js";
 
-function useEditAlarmModal() {
+
+function useEditAlarmModal({ close }) {
     const [deviceGroups, setDeviceGroups] = useState([]);
     const [templates, setTemplates] = useState([]);
     const [points, setPoints] = useState([]);
@@ -108,6 +109,34 @@ function useEditAlarmModal() {
         name: yup.string().required('Required')
     });
 
+    const handleSubmitForm = async (values) => {
+        const payload = {
+            ...error,
+            name: values.name,
+            message: values.message,
+            id_device_group: values.device_group.value,
+            point: values.point.value,
+            id_error_level: values.error_level.value,
+            id_error_type: values.error_type.value,
+            error_code: values.error_code,
+            id_error_comparison: values.comparison.value,
+            value: values.comparison_number
+        }
+
+        try {
+            const { data } = await axiosPrivate.post(
+                Constants.API_URL.ERROR.ADD,
+                payload
+            );
+            setError({
+                enable: true
+            })
+            close()
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     return {
         deviceGroups,
         templates,
@@ -117,6 +146,7 @@ function useEditAlarmModal() {
         errorComparisons,
         error, setError,
         validationSchema,
+        handleSubmitForm
     };
 }
 
