@@ -75,6 +75,7 @@ function Text({
 }) {
   const validate = useContext(FormInputContext);
   const [showPassword, setShowPassword] = useState(isShow);
+  
   return (
     <Form.Group
       controlId={name}
