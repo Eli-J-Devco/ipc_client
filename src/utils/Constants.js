@@ -185,6 +185,7 @@ const Constants = {
       LIST: "error/get/all/",
       ADD: "/error/add/",
       UPDATE: "/error/update/",
+      DELETE: "/error/delete/",
       LEVEL: {
         LIST: "/error/level/get/all/"
       },

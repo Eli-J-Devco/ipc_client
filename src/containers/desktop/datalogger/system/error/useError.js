@@ -83,6 +83,21 @@ function useError() {
         openModal()
     }
 
+    const handleDeleteError = async (id) => {
+        try {
+            const { data } = await axiosPrivate.post(
+                `${Constants.API_URL.ERROR.DELETE}?error_id=${id}`
+            )
+            if (data) {
+                setErrorList(errorList.filter(item => {
+                    return item.id !== id
+                }))
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     return {
         columns,
         isModalOpen,
@@ -93,6 +108,7 @@ function useError() {
         setLimit,
         setOffset,
         handleEditError,
+        handleDeleteError,
     };
 }
 
