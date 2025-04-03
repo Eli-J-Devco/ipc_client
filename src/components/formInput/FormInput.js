@@ -630,7 +630,10 @@ function Select({
         onChange={
           validate && onChange === undefined
             ? (selected) => validate.setFieldValue(name, selected)
-            : onChange
+            : (e) => {
+              validate.setFieldValue(name, e)
+              onChange(e)
+            }
         }
         onBlur={
           validate && onBlur === undefined
