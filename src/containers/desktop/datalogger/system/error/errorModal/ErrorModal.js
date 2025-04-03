@@ -122,6 +122,7 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                     label="Device Group"
                     name="device_group"
                     className="my-2"
+                    required
                     option={deviceGroups.map(item => ({
                         label: `${item.name} - ${item.id}`,
                         value: item.id
@@ -132,6 +133,7 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                     label="Template"
                     name="template"
                     className="my-2"
+                    required
                     option={templates.map(item => ({
                         label: `${item.name} - ${item.id}`,
                         value: item.id
@@ -151,6 +153,7 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                     label="Point"
                     name="point"
                     className="my-2"
+                    required
                     isDisabled={formSubmit.template ? false : true}
                     option={points.map(item => ({
                         label: item.name,
@@ -169,6 +172,7 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                     label="Error Level"
                     name="error_level"
                     className="my-2"
+                    required
                     option={errorLevels.map(item => ({
                         label: item.name,
                         value: item.id
@@ -179,6 +183,7 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                     label="Error Type"
                     name="error_type"
                     className="my-2"
+                    required
                     option={errorTypes.map(item => ({
                         label: item.name,
                         value: item.id
@@ -189,12 +194,14 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                     label="Error Code"
                     name="error_code"
                     className="my-2"
+                    required
                 />
                 <div className="d-flex my-2">
                     <FormInput.Select
                         label="Comparison"
                         name="comparison"
                         className={`${styles["w-200"]}`}
+                        required
                         option={errorComparisons.map(item => ({
                             label: item.name,
                             value: item.id
@@ -202,8 +209,10 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                     />
 
                     <FormInput.Number
-                        name="comparison_number"
-                        className="align-self-end ms-2 w-100"
+                        label="Value"
+                        name="value"
+                        className="ms-2 w-100"
+                        required
                     />
                 </div>
 
