@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { isEmpty } from "lodash";
+import { isEmpty, template } from "lodash";
 import * as yup from 'yup';
 import Constants from "../../../../../../utils/Constants.js";
 import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate.js";
@@ -108,7 +108,15 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
 
     const validationSchema = yup.object({
         name: yup.string().required('Required'),
-        message: yup.string().required('Required')
+        message: yup.string().required('Required'),
+        device_group: yup.object().required("Required"),
+        template: yup.object().required("Required"),
+        point: yup.object().required("Required"),
+        error_level: yup.object().required("Required"),
+        error_type: yup.object().required("Required"),
+        error_code: yup.string().required("Required"),
+        comparison: yup.object().required("Required"),
+        value: yup.number().required("Required"),
     });
 
     const handleSubmitForm = async (values) => {
@@ -120,7 +128,7 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
             id_error_type: values.error_type?.value,
             error_code: values.error_code,
             id_error_comparison: values.comparison?.value,
-            value: values.comparison_number,
+            value: values.value,
             id_template: formSubmit.template.value,
             point: formSubmit.point.value,
             enable: formSubmit.enable
