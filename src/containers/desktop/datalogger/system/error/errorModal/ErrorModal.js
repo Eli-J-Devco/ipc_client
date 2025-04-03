@@ -1,12 +1,13 @@
+import { useEffect } from "react";
 import { isEmpty } from "lodash";
 import Button from "../../../../../../components/button/Button";
 import FormInput from "../../../../../../components/formInput/FormInput";
 import Modal from "../../../../../../components/modal/Modal";
-import useEditErrorModal from "./useEditErrorModal";
-import styles from "./EditAlarmModal.module.scss"
+import useErrorModal from "./useErrorModal";
+import styles from "./ErrorModal.module.scss"
 
 
-function EditErrorModal({ isOpen, close, data, dataList, setDataList }) {
+function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
     const { 
         deviceGroups, 
         templates, 
@@ -14,10 +15,26 @@ function EditErrorModal({ isOpen, close, data, dataList, setDataList }) {
         errorLevels, 
         errorTypes, 
         errorComparisons, 
-        error, setError,
         validationSchema,
-        handleSubmitForm
-    } = useEditErrorModal({ close, dataList, setDataList });
+        formSubmit, setFormSubmit,
+        handleSubmitForm,
+    } = useErrorModal({ data, setData, dataList, setDataList, close });
+    
+    useEffect(() => {
+        if (!isEmpty(data)) {
+            setFormSubmit({
+                ...formSubmit,
+                template: {
+                    label: `${data.template.name} - ${data.template.id}`,
+                    value: data.template.id
+                },
+                point: {
+                    label: data.tag_point.name,
+                    value: data.tag_point.id,
+                }
+            })
+        }      
+    }, [data])
 
     return (
         <Modal
@@ -37,7 +54,12 @@ function EditErrorModal({ isOpen, close, data, dataList, setDataList }) {
                     <Button
                         variant="white"
                         className="m-0 ms-3"
-                        onClick={close}
+                        onClick={() => {
+                            setFormSubmit({
+                                enable: true
+                            })
+                            close()
+                        }}
                     >
                         <Button.Text text="Cancel"/>
                     </Button>
@@ -47,7 +69,38 @@ function EditErrorModal({ isOpen, close, data, dataList, setDataList }) {
             <FormInput
                 id="error-form"
                 onSubmit={handleSubmitForm}
-                initialValues={data}
+                initialValues={!isEmpty(data) ? {
+                        name: data.name,
+                        message: data.message,
+                        device_group: {
+                            label: `${data.device_group.name} - ${data.device_group.id}`,
+                            value: data.device_group.id
+                        },
+                        template: {
+                            label: `${data.template.name} - ${data.template.id}`,
+                            value: data.template.id
+                        },
+                        point: {
+                            label: data.tag_point.name,
+                            value: data.tag_point.id,
+                        },
+                        error_level: {
+                            label: data.error_level.name,
+                            value: data.error_level.id,
+                        },
+                        error_type: {
+                            label: data.error_type.name,
+                            value: data.error_type.id,
+                        },
+                        error_code: data.error_code,
+                        comparison: {
+                            label: data.tag_comparison.name,
+                            value: data.tag_comparison.id,
+                        },
+                        comparison_number: data.value,
+                        enable: data.enable
+                    }: {}
+                }
                 validationSchema={validationSchema}
             >
                 <FormInput.Text
@@ -84,11 +137,13 @@ function EditErrorModal({ isOpen, close, data, dataList, setDataList }) {
                         value: item.id
                     }))}
                     onChange={(e) => {
-                        setError({
-                            ...error,
-                            id_template: e.value
+                        setFormSubmit({
+                            ...formSubmit,
+                            template: e,
+                            point: null
                         })
                     }}
+                    value={formSubmit.template}
                 />
 
                 <FormInput.Select
@@ -96,11 +151,18 @@ function EditErrorModal({ isOpen, close, data, dataList, setDataList }) {
                     label="Point"
                     name="point"
                     className="my-2"
-                    isDisabled={error.id_template ? false : true}
+                    isDisabled={formSubmit.template ? false : true}
                     option={points.map(item => ({
                         label: item.name,
                         value: item.id
                     }))}
+                    onChange={(e) => {
+                        setFormSubmit({
+                            ...formSubmit,
+                            point: e
+                        })
+                    }}
+                    value={formSubmit.point}
                 />
 
                 <FormInput.Select
@@ -150,10 +212,10 @@ function EditErrorModal({ isOpen, close, data, dataList, setDataList }) {
                     label="Enable"
                     name="enable"
                     className="my-2"
-                    checked={error.enable}
+                    checked={formSubmit.enable}
                     onChange={(e) => {
-                        setError({
-                            ...error,
+                        setFormSubmit({
+                            ...formSubmit,
                             enable: e.target.checked
                         })
                     }}
@@ -163,4 +225,4 @@ function EditErrorModal({ isOpen, close, data, dataList, setDataList }) {
     );
 }
 
-export default EditErrorModal;
+export default ErrorModal;

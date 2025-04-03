@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
+import { isEmpty } from "lodash";
 import * as yup from 'yup';
-import Constants from "../../../../../../utils/Constants";
+import Constants from "../../../../../../utils/Constants.js";
 import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate.js";
 
 
-function useEditAlarmModal({ close, dataList, setDataList }) {
+function useErrorModal({ close, data, setData, dataList, setDataList }) {
     const [deviceGroups, setDeviceGroups] = useState([]);
     const [templates, setTemplates] = useState([]);
     const [points, setPoints] = useState([]);
     const [errorLevels, setErrorLevels] = useState([]);
     const [errorTypes, setErrorTypes] = useState([]);
     const [errorComparisons, setErrorComparisons] = useState([]);
-    const [error, setError] = useState({
+    const [formSubmit, setFormSubmit] = useState({
         enable: true
-    })
+    });
     const axiosPrivate = useAxiosPrivate();
 
     useEffect(() => {
@@ -24,7 +25,7 @@ function useEditAlarmModal({ close, dataList, setDataList }) {
                 );
                 setDeviceGroups(data)
             } catch (e) {
-                console.error(e);
+                console.log(e);
             }
         }
         fetchData()
@@ -39,7 +40,7 @@ function useEditAlarmModal({ close, dataList, setDataList }) {
                 );
                 setTemplates(data)
             } catch (e) {
-                console.error(e);
+                console.log(e);
             }
         }
         fetchData()
@@ -49,18 +50,18 @@ function useEditAlarmModal({ close, dataList, setDataList }) {
     useEffect(() => {
         async function fetchData() {
             try {
-                if (error.id_template) {
-                    const { data } = await axiosPrivate.post(
-                        `${Constants.API_URL.POINT.LIST}?id_template=${error.id_template}`
+                if (formSubmit.template) {
+                    const response = await axiosPrivate.post(
+                        `${Constants.API_URL.POINT.LIST}?id_template=${formSubmit.template.value}`
                     );
-                    setPoints(data)
+                    setPoints(response.data)
                 }
             } catch (e) {
-                console.error(e);
+                console.log(e);
             }
         }
         fetchData()
-    }, [error])
+    }, [formSubmit])
 
     useEffect(() => {
         async function fetchData() {
@@ -70,7 +71,7 @@ function useEditAlarmModal({ close, dataList, setDataList }) {
                 );
                 setErrorLevels(data)
             } catch (e) {
-                console.error(e);
+                console.log(e);
             }
         }
         fetchData()
@@ -84,7 +85,7 @@ function useEditAlarmModal({ close, dataList, setDataList }) {
                 );
                 setErrorTypes(data)
             } catch (e) {
-                console.error(e);
+                console.log(e);
             }
         }
         fetchData()
@@ -98,7 +99,7 @@ function useEditAlarmModal({ close, dataList, setDataList }) {
                 );
                 setErrorComparisons(data)
             } catch (e) {
-                console.error(e);
+                console.log(e);
             }
         }
         fetchData()
@@ -106,35 +107,56 @@ function useEditAlarmModal({ close, dataList, setDataList }) {
 
 
     const validationSchema = yup.object({
-        name: yup.string().required('Required')
+        name: yup.string().required('Required'),
+        message: yup.string().required('Required')
     });
 
     const handleSubmitForm = async (values) => {
         const payload = {
-            ...error,
             name: values.name,
             message: values.message,
-            id_device_group: values.device_group.value,
-            point: values.point.value,
-            id_error_level: values.error_level.value,
-            id_error_type: values.error_type.value,
+            id_device_group: values.device_group?.value,
+            id_error_level: values.error_level?.value,
+            id_error_type: values.error_type?.value,
             error_code: values.error_code,
-            id_error_comparison: values.comparison.value,
-            value: values.comparison_number
+            id_error_comparison: values.comparison?.value,
+            value: values.comparison_number,
+            id_template: formSubmit.template.value,
+            point: formSubmit.point.value,
+            enable: formSubmit.enable
         }
-
         try {
-            const { data } = await axiosPrivate.post(
-                Constants.API_URL.ERROR.ADD,
-                payload
-            );
-            setDataList([...dataList, data])
-            setError({
-                enable: true
-            })
-            close()
+            var output = document.getElementById("progress");
+            output.innerHTML = "<div><img src='/loading.gif' /></div>";
+            if (isEmpty(data)) {
+                const { data } = await axiosPrivate.post(
+                    Constants.API_URL.ERROR.ADD,
+                    payload
+                );
+                setDataList([...dataList, data])
+                setFormSubmit({
+                    enable: true
+                })
+            } else {
+                console.log(`${Constants.API_URL.ERROR.UPDATE}?error_id=${data.id}`)
+                const response = await axiosPrivate.post(
+                    `${Constants.API_URL.ERROR.UPDATE}?error_id=${data.id}`,
+                    payload
+                );
+                console.log(response.data)
+                setDataList(dataList.map(item => {
+                    if (item.id === data.id) {
+                        return response.data;
+                    } else {
+                        return item;
+                    }
+                }))
+            }
         } catch (e) {
             console.error(e);
+        } finally {
+            close()
+            output.innerHTML = ""
         }
     }
 
@@ -145,10 +167,10 @@ function useEditAlarmModal({ close, dataList, setDataList }) {
         errorLevels,
         errorTypes,
         errorComparisons,
-        error, setError,
         validationSchema,
+        formSubmit, setFormSubmit,
         handleSubmitForm
     };
 }
 
-export default useEditAlarmModal;
+export default useErrorModal;

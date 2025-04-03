@@ -9,40 +9,48 @@ function useError() {
     const [columns, ] = useState([
         {
             id: 1,
+            slug: "id",
+            name: "ID"
+        }, {
+            id: 2,
             slug: "name",
             name: "Name"
         }, {
-            id: 2,
+            id: 3,
             slug: "message",
             name: "Message"
         }, {
-            id: 3,
+            id: 4,
             slug: "device_group.name",
             name: "Device Group"
         }, {
-            id: 4,
+            id: 10,
+            slug: "template.name",
+            name: "Template"
+        }, {
+            id: 5,
             slug: "tag_point.name",
             name: "Point"
         }, {
-            id: 5,
+            id: 6,
             slug: "error_level.name",
             name: "Error Level"
         }, {
-            id: 6,
+            id: 7,
             slug: "error_type.name",
             name: "Error Type"
         }, {
-            id: 7,
+            id: 8,
             slug: "enable",
             name: "Enable"
         }, {
-            id: 8,
+            id: 9,
             slug: "action",
             name: <div className="text-center">Actions</div>
         }
     ]);
     const [errorList, setErrorList] = useState();
-    const [point, setPoint] = useState({});
+    const [error, setError] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const axiosPrivate = useAxiosPrivate();
@@ -59,24 +67,32 @@ function useError() {
             }
         }
         fetchData()
-    }, [])
+    }, []);
 
-    const closeModal = () => setIsModalOpen(false);
-    const handleErrorEdit = item => {
+    const openModal = () => {
         setIsModalOpen(true);
-        setPoint(item);
+    }
+    
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setError({})
+    }
+
+    const handleEditError = (item) => {
+        setError(item)
+        openModal()
     }
 
     return {
         columns,
+        isModalOpen,
+        openModal, closeModal,
+        error, setError,
         errorList, setErrorList,
         total,
         setLimit,
         setOffset,
-        isModalOpen,
-        closeModal,
-        handleErrorEdit,
-        point
+        handleEditError,
     };
 }
 
