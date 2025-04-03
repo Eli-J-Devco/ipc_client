@@ -97,7 +97,7 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                             label: data.tag_comparison.name,
                             value: data.tag_comparison.id,
                         },
-                        comparison_number: data.value,
+                        value: data.value,
                         enable: data.enable
                     }: {}
                 }
