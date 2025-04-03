@@ -2,13 +2,23 @@ import Button from "../../../../../components/button/Button";
 import Table from "../../../../../components/table/Table";
 import FormInput from "../../../../../components/formInput/FormInput";
 import useError from "./useError";
-import EditAlarmModal from "./editErrorModal/EditAlarmModal";
+import ErrorModal from "./errorModal/ErrorModal";
 import { ReactComponent as ViewIcon } from "../../../../../assets/images/eye_view.svg";
 import { ReactComponent as DeleteIcon } from "../../../../../assets/images/delete.svg";
 import { ReactComponent as EditIcon } from "../../../../../assets/images/edit.svg";
 
-function Alarm() {
-    const { columns, errorList, setErrorList, total, setLimit, setOffset, isModalOpen, closeModal, error, setError, handleErrorEdit, point } = useError();
+function Error() {
+    const { 
+        columns,
+        isModalOpen,
+        openModal, closeModal,
+        errorList, setErrorList, 
+        total, 
+        setLimit, 
+        setOffset, 
+        error, setError,
+        handleEditError
+     } = useError();
 
     return (
         <div>
@@ -40,24 +50,25 @@ function Alarm() {
                             image={<DeleteIcon />}
                         />
                         <Button.Image
-                            onClick={() => handleErrorEdit(item)}
+                            onClick={() => handleEditError(item)}
                             image={<EditIcon />}
                         />
                     </div>
                 )}
             />
 
-            <EditAlarmModal
+            <ErrorModal
                 isOpen={isModalOpen}
                 close={closeModal}
-                data={point}
+                data={error}
+                setData={setError}
                 dataList={errorList}
                 setDataList={setErrorList}
             />
 
             <Button
                 className="mt-3 ms-auto d-block"
-                onClick={() => handleErrorEdit({})}
+                onClick={openModal}
             >
                 <Button.Text text="Add Error"/>
             </Button>
@@ -65,4 +76,4 @@ function Alarm() {
     );
 }
 
-export default Alarm;
+export default Error;
