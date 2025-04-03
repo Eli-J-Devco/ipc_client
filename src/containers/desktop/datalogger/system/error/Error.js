@@ -17,7 +17,8 @@ function Error() {
         setLimit, 
         setOffset, 
         error, setError,
-        handleEditError
+        handleEditError,
+        handleDeleteError,
      } = useError();
 
     return (
@@ -47,6 +48,7 @@ function Error() {
                             image={<ViewIcon />}
                         />
                         <Button.Image
+                        onClick={() => handleDeleteError(item.id)}
                             image={<DeleteIcon />}
                         />
                         <Button.Image
