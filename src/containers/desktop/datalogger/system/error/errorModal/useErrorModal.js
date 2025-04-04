@@ -136,7 +136,6 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
             point: formSubmit.point.value,
             enable: formSubmit.enable
         }
-        console.log("payload", payload)
         try {
             var output = document.getElementById("progress");
             output.innerHTML = "<div><img src='/loading.gif' /></div>";
@@ -146,9 +145,6 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
                     payload
                 );
                 setDataList([...dataList, data])
-                setFormSubmit({
-                    enable: true
-                })
                 LibToast.toast(t("toastMessage.info.add"), "info");
             } else {
                 const response = await axiosPrivate.post(
@@ -162,9 +158,6 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
                         return item;
                     }
                 }))
-                setFormSubmit({
-                    enable: true
-                })
                 LibToast.toast(t("toastMessage.info.update"), "info");
             }
         } catch (e) {
@@ -176,6 +169,9 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
             console.error(e);
         } finally {
             close()
+            setFormSubmit({
+                enable: true
+            })
             output.innerHTML = ""
         }
     }
