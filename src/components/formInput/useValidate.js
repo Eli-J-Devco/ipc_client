@@ -14,7 +14,6 @@ function useValidate(onSubmit, initialValues = {}, validationSchema = object({})
             Object.keys(validationSchema.fields).forEach(value => {
                 formik.setFieldTouched(value, true)            
             });
-
         }
     }, [formik.submitCount]);
 

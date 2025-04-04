@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import Constants from "../../../../../utils/Constants";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate.js";
+import LibToast from "../../../../../utils/LibToast";
+import { useTranslation } from "react-i18next";
+
 
 function useError() {
     const [total, setTotal] = useState(70);
@@ -52,7 +55,8 @@ function useError() {
     const [errorList, setErrorList] = useState();
     const [error, setError] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const { t } = useTranslation()
+    
     const axiosPrivate = useAxiosPrivate();
 
     useEffect(() => {
@@ -92,6 +96,7 @@ function useError() {
                 setErrorList(errorList.filter(item => {
                     return item.id !== id
                 }))
+                LibToast.toast(t("toastMessage.info.delete"), "info");
             }
         } catch (e) {
             console.log(e)

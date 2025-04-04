@@ -33,7 +33,7 @@ function Error() {
                     setOffset
                 }}
                 columns={columns}
-                data={errorList}
+                data={errorList && errorList.length ? errorList.sort((a, b) => b.id - a.id) : []}
                 enable_switch={item => (
                     <FormInput.Check
                         type="switch"

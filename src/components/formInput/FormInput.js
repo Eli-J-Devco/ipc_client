@@ -125,7 +125,10 @@ function Text({
             onChange={
               validate && onChange === undefined
                 ? validate.handleChange
-                : onChange
+                : (e) => {
+                  validate.setFieldValue(name, e.target.value)
+                  onChange(e)
+                }
             }
             onBlur={
               validate && onBlur === undefined ? validate.handleBlur : onBlur
@@ -259,7 +262,10 @@ function Number({
             onChange={
               validate && onChange === undefined
                 ? validate.handleChange
-                : onChange
+                : (e) => {
+                  validate.setFieldValue(name, e.target.value)
+                  onChange(e)
+                }
             }
             onBlur={
               validate && onBlur === undefined ? validate.handleBlur : onBlur
@@ -599,6 +605,7 @@ function Select({
       </span>
     </div>
   );
+
   return (
     <div
       className={`${styles["form-select"]} ${className ? className : ""} ${
@@ -756,6 +763,7 @@ function CreatableDropdown({
       </span>
     </div>
   );
+  
   return (
     <div
       className={`${styles["form-select"]} ${className ? className : ""} ${
