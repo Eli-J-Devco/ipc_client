@@ -168,6 +168,11 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
                 LibToast.toast(t("toastMessage.info.update"), "info");
             }
         } catch (e) {
+            if (isEmpty(data)) {
+                LibToast.toast(t("toastMessage.error.add"), "error");
+            } else {
+                LibToast.toast(t("toastMessage.error.update"), "error");
+            }
             console.error(e);
         } finally {
             close()
