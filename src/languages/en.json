@@ -104,6 +104,7 @@
     "toastMessage": {
         "error": {
             "fetch": "Server error. Please try again later.",
+            "add": "An error occured when adding. Please wait and try again later..",
             "update": "An error occured when updating. Please wait and try again later.",
             "delete": "An error occured when deleting. Please wait and try again later."
         },
