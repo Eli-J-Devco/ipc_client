@@ -3,9 +3,12 @@ import { isEmpty, template } from "lodash";
 import * as yup from 'yup';
 import Constants from "../../../../../../utils/Constants.js";
 import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate.js";
+import LibToast from "../../../../../../utils/LibToast";
+import { useTranslation } from "react-i18next";
 
 
 function useErrorModal({ close, data, setData, dataList, setDataList }) {
+    const { t } = useTranslation();
     const [deviceGroups, setDeviceGroups] = useState([]);
     const [templates, setTemplates] = useState([]);
     const [points, setPoints] = useState([]);
@@ -50,7 +53,7 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
     useEffect(() => {
         async function fetchData() {
             try {
-                if (formSubmit.template) {
+                if (formSubmit.template?.value) {
                     const response = await axiosPrivate.post(
                         `${Constants.API_URL.POINT.LIST}?id_template=${formSubmit.template.value}`
                     );
@@ -121,18 +124,19 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
 
     const handleSubmitForm = async (values) => {
         const payload = {
-            name: values.name,
-            message: values.message,
-            id_device_group: values.device_group?.value,
-            id_error_level: values.error_level?.value,
-            id_error_type: values.error_type?.value,
-            error_code: values.error_code,
-            id_error_comparison: values.comparison?.value,
-            value: values.value,
+            name: formSubmit.name,
+            message: formSubmit.message,
+            id_device_group: formSubmit.device_group?.value,
+            id_error_level: formSubmit.error_level?.value,
+            id_error_type: formSubmit.error_type?.value,
+            error_code: formSubmit.error_code,
+            id_error_comparison: formSubmit.comparison?.value,
+            value: formSubmit.value,
             id_template: formSubmit.template.value,
             point: formSubmit.point.value,
             enable: formSubmit.enable
         }
+        console.log("payload", payload)
         try {
             var output = document.getElementById("progress");
             output.innerHTML = "<div><img src='/loading.gif' /></div>";
@@ -145,13 +149,12 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
                 setFormSubmit({
                     enable: true
                 })
+                LibToast.toast(t("toastMessage.info.add"), "info");
             } else {
-                console.log(`${Constants.API_URL.ERROR.UPDATE}?error_id=${data.id}`)
                 const response = await axiosPrivate.post(
                     `${Constants.API_URL.ERROR.UPDATE}?error_id=${data.id}`,
                     payload
                 );
-                console.log(response.data)
                 setDataList(dataList.map(item => {
                     if (item.id === data.id) {
                         return response.data;
@@ -159,6 +162,10 @@ function useErrorModal({ close, data, setData, dataList, setDataList }) {
                         return item;
                     }
                 }))
+                setFormSubmit({
+                    enable: true
+                })
+                LibToast.toast(t("toastMessage.info.update"), "info");
             }
         } catch (e) {
             console.error(e);

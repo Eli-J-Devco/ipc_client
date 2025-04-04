@@ -22,16 +22,37 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
     
     useEffect(() => {
         if (!isEmpty(data)) {
+            console.log("formSubmit", formSubmit)
             setFormSubmit({
                 ...formSubmit,
-                template: {
-                    label: `${data.template.name} - ${data.template.id}`,
-                    value: data.template.id
+                name: data.name,
+                message: data.message,
+                device_group: {
+                    label: `${data.device_group.name} - ${data.device_group.id}`,
+                    value: data.device_group.id,
                 },
+                template: data.template !== undefined && data.template !== null ? {
+                    label: `${data.template.name} - ${data.template.id}`,
+                    value: data.template.id,
+                } : undefined,
                 point: {
                     label: data.tag_point.name,
                     value: data.tag_point.id,
-                }
+                },
+                error_level: {
+                    label: data.error_level.name,
+                    value: data.error_level.id,
+                },
+                error_type: {
+                    label: data.error_type.name,
+                    value: data.error_type.id,
+                },
+                error_code: data.error_code,
+                comparison: {
+                    label: data.tag_comparison.name,
+                    value: data.tag_comparison.id,
+                },
+                value: data.value,
             })
         }      
     }, [data])
@@ -39,7 +60,12 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
     return (
         <Modal
             isOpen={isOpen}
-            close={close}
+            close={() => {
+                setFormSubmit({
+                    enable: true
+                })
+                close()
+            }}
             title={`${!isEmpty(data) ? "Edit" : "Add"} Error`}
             footer={
                 <>
@@ -61,7 +87,15 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                             close()
                         }}
                     >
-                        <Button.Text text="Cancel"/>
+                        <Button.Text 
+                            text="Cancel" 
+                            onClick={() => {
+                                setFormSubmit({
+                                    enable: true
+                                })
+                                close()
+                            }}
+                        />
                     </Button>
                 </>
             }
@@ -69,38 +103,7 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
             <FormInput
                 id="error-form"
                 onSubmit={handleSubmitForm}
-                initialValues={!isEmpty(data) ? {
-                        name: data.name,
-                        message: data.message,
-                        device_group: {
-                            label: `${data.device_group.name} - ${data.device_group.id}`,
-                            value: data.device_group.id
-                        },
-                        template: {
-                            label: `${data.template.name} - ${data.template.id}`,
-                            value: data.template.id
-                        },
-                        point: {
-                            label: data.tag_point.name,
-                            value: data.tag_point.id,
-                        },
-                        error_level: {
-                            label: data.error_level.name,
-                            value: data.error_level.id,
-                        },
-                        error_type: {
-                            label: data.error_type.name,
-                            value: data.error_type.id,
-                        },
-                        error_code: data.error_code,
-                        comparison: {
-                            label: data.tag_comparison.name,
-                            value: data.tag_comparison.id,
-                        },
-                        value: data.value,
-                        enable: data.enable
-                    }: {}
-                }
+                initialValues={formSubmit}
                 validationSchema={validationSchema}
             >
                 <FormInput.Text
@@ -108,6 +111,13 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                     name="name"
                     className="my-2"
                     required
+                    onChange={(e) => {
+                        setFormSubmit({
+                            ...formSubmit,
+                            name: e.target.value
+                        })
+                    }}
+                    value={formSubmit.name}
                 />
 
                 <FormInput.Text
@@ -116,6 +126,13 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                     className="my-2"
                     required
                     textarea
+                    onChange={(e) => {
+                        setFormSubmit({
+                            ...formSubmit,
+                            message: e.target.value
+                        })
+                    }}
+                    value={formSubmit.message}
                 />
 
                 <FormInput.Select
@@ -127,6 +144,13 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                         label: `${item.name} - ${item.id}`,
                         value: item.id
                     }))}
+                    onChange={(e) => {
+                        setFormSubmit({
+                            ...formSubmit,
+                            device_group: e,
+                        })
+                    }}
+                    value={formSubmit.device_group}
                 />
 
                 <FormInput.Select
@@ -145,7 +169,7 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                             point: null
                         })
                     }}
-                    value={formSubmit.template}
+                    value={formSubmit.template ? formSubmit.template : undefined}
                 />
 
                 <FormInput.Select
@@ -177,6 +201,13 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                         label: item.name,
                         value: item.id
                     }))}
+                    onChange={(e) => {
+                        setFormSubmit({
+                            ...formSubmit,
+                            error_level: e,
+                        })
+                    }}
+                    value={formSubmit.error_level}
                 />
 
                 <FormInput.Select
@@ -188,6 +219,13 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                         label: item.name,
                         value: item.id
                     }))}
+                    onChange={(e) => {
+                        setFormSubmit({
+                            ...formSubmit,
+                            error_type: e,
+                        })
+                    }}
+                    value={formSubmit.error_type}
                 />
 
                 <FormInput.Text
@@ -195,6 +233,13 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                     name="error_code"
                     className="my-2"
                     required
+                    onChange={(e) => {
+                        setFormSubmit({
+                            ...formSubmit,
+                            error_code: e.target.value
+                        })
+                    }}
+                    value={formSubmit.error_code}
                 />
                 <div className="d-flex my-2">
                     <FormInput.Select
@@ -206,6 +251,13 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                             label: item.name,
                             value: item.id
                         }))}
+                        onChange={(e) => {
+                            setFormSubmit({
+                                ...formSubmit,
+                                comparison: e,
+                            })
+                        }}
+                        value={formSubmit.comparison}
                     />
 
                     <FormInput.Number
@@ -213,6 +265,13 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
                         name="value"
                         className="ms-2 w-100"
                         required
+                        onChange={(e) => {
+                            setFormSubmit({
+                                ...formSubmit,
+                                value: e.target.value
+                            })
+                        }}
+                        value={formSubmit.value}
                     />
                 </div>
 
