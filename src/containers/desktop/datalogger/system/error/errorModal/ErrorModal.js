@@ -22,7 +22,6 @@ function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
     
     useEffect(() => {
         if (!isEmpty(data)) {
-            console.log("formSubmit", formSubmit)
             setFormSubmit({
                 ...formSubmit,
                 name: data.name,
