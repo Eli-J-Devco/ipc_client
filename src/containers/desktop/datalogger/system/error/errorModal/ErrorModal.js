@@ -7,18 +7,32 @@ import useErrorModal from "./useErrorModal";
 import styles from "./ErrorModal.module.scss"
 
 
-function ErrorModal({ isOpen, close, data, setData, dataList, setDataList }) {
-    const { 
-        deviceGroups, 
-        templates, 
-        points, 
-        errorLevels, 
-        errorTypes, 
-        errorComparisons, 
+function ErrorModal({ 
+    isOpen, 
+    close, 
+    data, 
+    setData, 
+    dataList, 
+    setDataList,
+    deviceGroups,
+    templates,
+    points,
+    errorLevels,
+    errorTypes,
+    errorComparisons,
+    formSubmit, setFormSubmit,
+}) {
+    const {  
         validationSchema,
-        formSubmit, setFormSubmit,
         handleSubmitForm,
-    } = useErrorModal({ data, setData, dataList, setDataList, close });
+    } = useErrorModal({ 
+        data, 
+        setData, 
+        dataList, 
+        setDataList, 
+        close,
+        formSubmit, setFormSubmit,
+     });
     
     useEffect(() => {
         if (!isEmpty(data)) {
