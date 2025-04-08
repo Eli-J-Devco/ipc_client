@@ -55,6 +55,16 @@ function useError() {
     const [errorList, setErrorList] = useState();
     const [error, setError] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isExpand, setIsExpand] = useState(false);
+    const [deviceGroups, setDeviceGroups] = useState([]);
+    const [templates, setTemplates] = useState([]);
+    const [points, setPoints] = useState([]);
+    const [errorLevels, setErrorLevels] = useState([]);
+    const [errorTypes, setErrorTypes] = useState([]);
+    const [errorComparisons, setErrorComparisons] = useState([]);
+    const [formSubmit, setFormSubmit] = useState({
+        enable: true
+    });
     const { t } = useTranslation()
     
     const axiosPrivate = useAxiosPrivate();
@@ -72,6 +82,94 @@ function useError() {
         }
         fetchData()
     }, []);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const { data } = await axiosPrivate.post(
+                    Constants.API_URL.DEVICES.CONFIG.GROUP
+                );
+                setDeviceGroups(data)
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        fetchData()
+        
+    }, [])
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const { data } = await axiosPrivate.post(
+                    Constants.API_URL.TEMPLATE.GET
+                );
+                setTemplates(data)
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        fetchData()
+        
+    }, [])
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                if (formSubmit.template?.value) {
+                    const response = await axiosPrivate.post(
+                        `${Constants.API_URL.POINT.LIST}?id_template=${formSubmit.template.value}`
+                    );
+                    setPoints(response.data)
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        fetchData()
+    }, [formSubmit])
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const { data } = await axiosPrivate.post(
+                    Constants.API_URL.ERROR.LEVEL.LIST
+                );
+                setErrorLevels(data)
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        fetchData()
+    }, [])
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const { data } = await axiosPrivate.post(
+                    Constants.API_URL.ERROR.TYPE.LIST
+                );
+                setErrorTypes(data)
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        fetchData()
+    }, [])
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const { data } = await axiosPrivate.post(
+                    Constants.API_URL.ERROR.COMPARISON.LIST
+                );
+                setErrorComparisons(data)
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        fetchData()
+    }, [])
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -102,16 +200,25 @@ function useError() {
             console.log(e)
         }
     }
+    const handleIsExpand = () => setIsExpand(!isExpand);
 
     return {
         columns,
         isModalOpen,
         openModal, closeModal,
+        isExpand, handleIsExpand,
         error, setError,
         errorList, setErrorList,
         total,
         setLimit,
         setOffset,
+        deviceGroups,
+        templates,
+        points,
+        errorLevels,
+        errorTypes,
+        errorComparisons,
+        formSubmit, setFormSubmit,
         handleEditError,
         handleDeleteError,
     };

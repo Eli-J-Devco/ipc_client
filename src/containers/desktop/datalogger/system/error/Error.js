@@ -6,23 +6,37 @@ import ErrorModal from "./errorModal/ErrorModal";
 import { ReactComponent as ViewIcon } from "../../../../../assets/images/eye_view.svg";
 import { ReactComponent as DeleteIcon } from "../../../../../assets/images/delete.svg";
 import { ReactComponent as EditIcon } from "../../../../../assets/images/edit.svg";
+import Filter from "./filter/Filter";
+
 
 function Error() {
     const { 
         columns,
         isModalOpen,
+        isExpand, handleIsExpand,
         openModal, closeModal,
         errorList, setErrorList, 
         total, 
         setLimit, 
         setOffset, 
         error, setError,
+        deviceGroups,
+        templates,
+        points,
+        errorLevels,
+        errorTypes,
+        errorComparisons,
+        formSubmit, setFormSubmit,
         handleEditError,
         handleDeleteError,
      } = useError();
 
     return (
         <div>
+            <Filter
+                isExpand={isExpand}
+                onExpand={handleIsExpand}
+            />
             <Table
                 variant="grey"
                 maxHeight="calc(100vh - 300px)"
@@ -66,6 +80,14 @@ function Error() {
                 setData={setError}
                 dataList={errorList}
                 setDataList={setErrorList}
+                deviceGroups={deviceGroups}
+                templates={templates}
+                points={points}
+                errorLevels={errorLevels}
+                errorTypes={errorTypes}
+                errorComparisons={errorComparisons}
+                formSubmit={formSubmit}
+                setFormSubmit={setFormSubmit}
             />
 
             <Button
