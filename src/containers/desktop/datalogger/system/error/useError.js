@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Constants from "../../../../../utils/Constants";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate.js";
 import LibToast from "../../../../../utils/LibToast";
+import ErrorModal from "./errorModal/ErrorModal";
+import DeleteErrorModal from "./errorModal/DeleteErrorModal";
 import { useTranslation } from "react-i18next";
 
 
@@ -65,6 +67,7 @@ function useError() {
     const [formSubmit, setFormSubmit] = useState({
         enable: true
     });
+    const [action, setAction] = useState();
     const { t } = useTranslation()
     
     const axiosPrivate = useAxiosPrivate();
@@ -179,26 +182,35 @@ function useError() {
         setIsModalOpen(false);
         setError({})
     }
+    const handleAddError = () => {
+        setAction("ADD")
+        setError({})
+        openModal()
+    }
 
     const handleEditError = (item) => {
+        setAction("EDIT")
         setError(item)
         openModal()
     }
 
-    const handleDeleteError = async (id) => {
-        try {
-            const { data } = await axiosPrivate.post(
-                `${Constants.API_URL.ERROR.DELETE}?error_id=${id}`
-            )
-            if (data) {
-                setErrorList(errorList.filter(item => {
-                    return item.id !== id
-                }))
-                LibToast.toast(t("toastMessage.info.delete"), "info");
-            }
-        } catch (e) {
-            console.log(e)
-        }
+    const handleDeleteError = async (item) => {
+        setAction("DELETE")
+        setError(item)
+        openModal()
+        // try {
+        //     const { data } = await axiosPrivate.post(
+        //         `${Constants.API_URL.ERROR.DELETE}?error_id=${id}`
+        //     )
+        //     if (data) {
+        //         setErrorList(errorList.filter(item => {
+        //             return item.id !== id
+        //         }))
+        //         LibToast.toast(t("toastMessage.info.delete"), "info");
+        //     }
+        // } catch (e) {
+        //     console.log(e)
+        // }
     }
     const handleIsExpand = () => setIsExpand(!isExpand);
 
@@ -219,7 +231,9 @@ function useError() {
         errorTypes,
         errorComparisons,
         formSubmit, setFormSubmit,
+        action,
         handleEditError,
+        handleAddError,
         handleDeleteError,
     };
 }

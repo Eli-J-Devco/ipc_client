@@ -3,11 +3,11 @@ import { isEmpty, template } from "lodash";
 import * as yup from 'yup';
 import Constants from "../../../../../../utils/Constants.js";
 import useAxiosPrivate from "../../../../../../hooks/useAxiosPrivate.js";
-import LibToast from "../../../../../../utils/LibToast";
+import LibToast from "../../../../../../utils/LibToast.js";
 import { useTranslation } from "react-i18next";
 
 
-function useErrorModal({ 
+function useAddEditErrorModal({ 
     close, 
     data, 
     setData, 
@@ -16,24 +16,7 @@ function useErrorModal({
     formSubmit, setFormSubmit,
 }) {
     const { t } = useTranslation();
-    
-    const [errorComparisons, setErrorComparisons] = useState([]);
     const axiosPrivate = useAxiosPrivate();
-
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const { data } = await axiosPrivate.post(
-                    Constants.API_URL.ERROR.COMPARISON.LIST
-                );
-                setErrorComparisons(data)
-            } catch (e) {
-                console.log(e);
-            }
-        }
-        fetchData()
-    }, [])
-
 
     const validationSchema = yup.object({
         name: yup.string().required('Required'),
@@ -101,12 +84,11 @@ function useErrorModal({
             output.innerHTML = ""
         }
     }
-
+    
     return {
-        errorComparisons,
         validationSchema,
-        handleSubmitForm
+        handleSubmitForm,
     };
 }
 
-export default useErrorModal;
+export default useAddEditErrorModal;
