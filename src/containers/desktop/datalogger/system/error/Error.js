@@ -27,7 +27,9 @@ function Error() {
         errorTypes,
         errorComparisons,
         formSubmit, setFormSubmit,
+        action,
         handleEditError,
+        handleAddError,
         handleDeleteError,
      } = useError();
 
@@ -62,7 +64,7 @@ function Error() {
                             image={<ViewIcon />}
                         />
                         <Button.Image
-                        onClick={() => handleDeleteError(item.id)}
+                        onClick={() => handleDeleteError(item)}
                             image={<DeleteIcon />}
                         />
                         <Button.Image
@@ -74,6 +76,7 @@ function Error() {
             />
 
             <ErrorModal
+                action={action}
                 isOpen={isModalOpen}
                 close={closeModal}
                 data={error}
@@ -92,7 +95,7 @@ function Error() {
 
             <Button
                 className="mt-3 ms-auto d-block"
-                onClick={openModal}
+                onClick={handleAddError}
             >
                 <Button.Text text="Add Error"/>
             </Button>
