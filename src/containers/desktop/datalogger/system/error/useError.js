@@ -9,9 +9,9 @@ import _ from "lodash"
 
 
 function useError() {
-    const [total, setTotal] = useState(70);
+    const [total, setTotal] = useState(100);
     const [limit, setLimit] = useState(Constants.DEFAULT_PAGE_SIZE);
-    const [offset, setOffset] = useState(0);
+    const [currentPageIndex, setCurrentPageIndex] = useState();
     const [columns, ] = useState([
         {
             id: 1,
@@ -81,17 +81,57 @@ function useError() {
 
     useEffect(() => {
         const fetchData = async () => {
+            var output = document.getElementById("progress");
+            output.innerHTML = "<div><img src='/loading.gif' /></div>";
             try {
-                const {data} = await axiosPrivate.post(
-                    Constants.API_URL.ERROR.LIST
-                )
-                setErrorList(data)
+                const payload = {}
+                if (selectedDeviceGroups.length ||
+                    selectedTemplates.length ||
+                    selectedPoints.length ||
+                    selectedErrorLevels.length ||
+                    selectedErrorTypes.length
+                ) {
+                    if (selectedDeviceGroups.length) {
+                        payload.device_group_ids = selectedDeviceGroups
+                    }
+                    if (selectedTemplates.length) {
+                        payload.template_ids = selectedTemplates
+                    }
+                    if (selectedPoints.length) {
+                        payload.point_ids = selectedPoints
+                    }
+                    if (selectedErrorLevels.length) {
+                        payload.error_level_ids = selectedErrorLevels
+                    }
+                    if (selectedErrorTypes.length) {
+                        payload.error_type_ids = selectedErrorTypes
+                    }
+                }
+                if (currentPageIndex) {
+                    const { data } = await axiosPrivate.post(
+                        `${Constants.API_URL.ERROR.LIST}?page=${currentPageIndex}&limit=${limit}`,
+                        _.isEmpty(payload) ? undefined : payload 
+                    )
+                    console.log("payload", _.isEmpty(payload) ? undefined : payload)
+                    console.log("data", data)
+                    setErrorList(data.data)
+                    setTotal(data.total)
+                }
             } catch (e) {
                 console.log(e)
             }
+            output.innerHTML = "";
         }
         fetchData()
-    }, []);
+    }, [
+        currentPageIndex, 
+        limit,
+        selectedDeviceGroups,
+        selectedTemplates,
+        selectedPoints,
+        selectedErrorLevels,
+        selectedErrorTypes,
+    ]);
 
     useEffect(() => {
         async function fetchData() {
@@ -200,50 +240,51 @@ function useError() {
         fetchData()
     }, [selectedTemplates])
 
-    useEffect(() => {
-        console.log("selectedDeviceGroups", selectedDeviceGroups)
-        console.log("selectedTemplates", selectedTemplates)
-        console.log("selectedPoints", selectedPoints)
-        console.log("selectedErrorLevels", selectedErrorLevels)
-        console.log("selectedErrorTypes", selectedErrorTypes)
-        const payload = {}
-        if (selectedDeviceGroups.length) {
-            payload.device_group_ids = selectedDeviceGroups
-        }
-        if (selectedTemplates.length) {
-            payload.template_ids = selectedTemplates
-        }
-        if (selectedPoints.length) {
-            payload.point_ids = selectedPoints
-        }
-        if (selectedErrorLevels.length) {
-            payload.error_level_ids = selectedErrorLevels
-        }
-        if (selectedErrorTypes.length) {
-            payload.error_type_ids = selectedErrorTypes
-        }
-        console.log("payload", payload)
-
-        async function fetchData() {
-            try {
-                const { data } = await axiosPrivate.post(
-                    Constants.API_URL.ERROR.LIST,
-                    _.isEmpty(payload) ? undefined : payload 
-                );
-                setErrorList(data)
-            } catch (e) {
-                console.log(e);
-            }
-        }
-        fetchData()
-
-    }, [
-        selectedDeviceGroups,
-        selectedTemplates,
-        selectedPoints,
-        selectedErrorLevels,
-        selectedErrorTypes
-    ])
+    // useEffect(() => {
+    //     const payload = {}
+    //     if (selectedDeviceGroups.length ||
+    //         selectedTemplates.length ||
+    //         selectedPoints.length ||
+    //         selectedErrorLevels.length ||
+    //         selectedErrorTypes.length
+    //     ) {
+    //         if (selectedDeviceGroups.length) {
+    //             payload.device_group_ids = selectedDeviceGroups
+    //         }
+    //         if (selectedTemplates.length) {
+    //             payload.template_ids = selectedTemplates
+    //         }
+    //         if (selectedPoints.length) {
+    //             payload.point_ids = selectedPoints
+    //         }
+    //         if (selectedErrorLevels.length) {
+    //             payload.error_level_ids = selectedErrorLevels
+    //         }
+    //         if (selectedErrorTypes.length) {
+    //             payload.error_type_ids = selectedErrorTypes
+    //         }
+    //         async function fetchData() {
+    //             try {
+    //                 const { data } = await axiosPrivate.post(
+    //                     `${Constants.API_URL.ERROR.LIST}?page=${currentPageIndex}&limit=${limit}`,
+    //                     _.isEmpty(payload) ? undefined : payload 
+    //                 );
+    //                 console.log(data)
+    //                 setErrorList(data.data)
+    //                 setTotal(data.total)
+    //             } catch (e) {
+    //                 console.log(e);
+    //             }
+    //         }
+    //         fetchData()
+    //     }
+    // }, [
+    //     selectedDeviceGroups,
+    //     selectedTemplates,
+    //     selectedPoints,
+    //     selectedErrorLevels,
+    //     selectedErrorTypes
+    // ])
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -331,8 +372,13 @@ function useError() {
                     .map(item => item.id)
                 setSelectedPoints(newPointList)
                 var checkedPointList = document.querySelectorAll("input[name='point']")
-                checkedPointList = Array.from(checkedPointList).map(el => el.value)
-                var result = newPointList.every(value => checkedPointList.includes(String(value)));
+                checkedPointList = Array.from(checkedPointList).filter(el => el.value !== "all").map(el => Number(el.value))
+                var result
+                if (newPointList.length) {
+                    result = newPointList.every(value => checkedPointList.includes(value));
+                } else {
+                    result = false
+                }
                 if (result) {
                     checkedPointAll.checked = true
                 }
@@ -426,8 +472,8 @@ function useError() {
         error, setError,
         errorList, setErrorList,
         total,
-        setLimit,
-        setOffset,
+        limit, setLimit,
+        currentPageIndex, setCurrentPageIndex,
         deviceGroups,
         templates,
         points,

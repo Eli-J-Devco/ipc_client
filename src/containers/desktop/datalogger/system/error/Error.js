@@ -1,5 +1,5 @@
 import Button from "../../../../../components/button/Button";
-import Table from "../../../../../components/table/Table";
+import TableNW from "../../../../../components/tableNW/TableNW";
 import FormInput from "../../../../../components/formInput/FormInput";
 import useError from "./useError";
 import ErrorModal from "./errorModal/ErrorModal";
@@ -16,9 +16,9 @@ function Error() {
         isExpand, handleIsExpand,
         closeModal,
         errorList, setErrorList, 
-        total, 
-        setLimit, 
-        setOffset, 
+        total,
+        limit, setLimit,
+        currentPageIndex, setCurrentPageIndex,
         error, setError,
         deviceGroups,
         templates,
@@ -57,14 +57,17 @@ function Error() {
                 handleErrorLevelChange={handleErrorLevelChange}
                 handleErrorTypeChange={handleErrorTypeChange}
             />
-            <Table
+            <TableNW
                 variant="grey"
                 maxHeight="calc(100vh - 300px)"
+                control
                 pagination={{
                     enable: true,
                     total,
+                    limit,
                     setLimit,
-                    setOffset
+                    currentPageIndex,
+                    setCurrentPageIndex,
                 }}
                 columns={columns}
                 data={errorList && errorList.length ? errorList.sort((a, b) => b.id - a.id) : []}
