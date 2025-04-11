@@ -39,7 +39,7 @@
                     border: 1px solid var(--bg-color-light);
                     border-radius: 4px;
                     padding: 0 10px;
-                    height: 250px;
+                    height: 400px;
                     overflow: auto;
     
                     .legend {
@@ -51,7 +51,7 @@
                     }
     
                     &.others {
-                        height: 120px;
+                        height: 200px;
 
                         &.top {
                             margin-bottom: 10px;

@@ -130,42 +130,6 @@ function Filter({
                                         </div>
                                     </fieldset>
                                     
-                                    <fieldset className={`${styles.fieldset} ${styles.others}`}>
-                                        <legend className={styles.legend}>
-                                            Error Level
-                                        </legend>
-
-                                        <div className="row">
-                                            <div className="col-3">
-                                                <FormInput.Check
-                                                    name="error_level"
-                                                    label="All"
-                                                    value="all"
-                                                    className="fw-bold"
-                                                    onChange={handleErrorLevelChange}
-                                                />
-                                            </div>
-
-                                        {
-                                            errorLevels.map(item => (
-                                                <div
-                                                    key={item.id}
-                                                    className="col-3"
-                                                >
-                                                    <FormInput.Check
-                                                        name="error_level"
-                                                        label={item.name}
-                                                        value={item.id}
-                                                        onChange={handleErrorLevelChange}
-                                                    />
-                                                </div>
-                                            ))
-                                        }
-                                        </div>
-                                    </fieldset>
-                                </div>
-
-                                <div className="col-3 px-0">
                                     <fieldset disabled={selectedTemplates.length === 0} className={`${styles.fieldset} ${styles.others} ${styles.top}`}>
                                         <legend className={styles.legend}>
                                             Point
@@ -193,6 +157,43 @@ function Filter({
                                                         label={item.name}
                                                         value={item.id}
                                                         onChange={handlePointChange}
+                                                    />
+                                                </div>
+                                            ))
+                                        }
+                                        </div>
+                                    </fieldset>
+                                    
+                                </div>
+
+                                <div className="col-3 px-0">
+                                    <fieldset className={`${styles.fieldset} ${styles.others}`}>
+                                        <legend className={styles.legend}>
+                                            Error Level
+                                        </legend>
+
+                                        <div className="row">
+                                            <div className="col-6">
+                                                <FormInput.Check
+                                                    name="error_level"
+                                                    label="All"
+                                                    value="all"
+                                                    className="fw-bold"
+                                                    onChange={handleErrorLevelChange}
+                                                />
+                                            </div>
+
+                                        {
+                                            errorLevels.map(item => (
+                                                <div
+                                                    key={item.id}
+                                                    className="col-6"
+                                                >
+                                                    <FormInput.Check
+                                                        name="error_level"
+                                                        label={item.name}
+                                                        value={item.id}
+                                                        onChange={handleErrorLevelChange}
                                                     />
                                                 </div>
                                             ))
