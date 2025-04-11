@@ -479,6 +479,7 @@ const Check = forwardRef(
       label,
       id,
       name,
+      value,
       checked,
       disabled,
       inline,
@@ -497,6 +498,7 @@ const Check = forwardRef(
         id={id}
         name={name}
         label={label}
+        value={value}
         disabled={disabled}
         inline={inline}
         className={`${styles["form-check"]} ${className ? className : ""} ${

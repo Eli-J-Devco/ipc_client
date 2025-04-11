@@ -84,6 +84,7 @@ import {
 
     useEffect(() => {
         table.setPageIndex(0)
+        setLimit(Constants.DEFAULT_PAGE_SIZE)
         if (total === 0) {
             setPageCount(0)
         }
