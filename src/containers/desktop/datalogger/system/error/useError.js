@@ -112,8 +112,6 @@ function useError() {
                         `${Constants.API_URL.ERROR.LIST}?page=${currentPageIndex}&limit=${limit}`,
                         _.isEmpty(payload) ? undefined : payload 
                     )
-                    console.log("payload", _.isEmpty(payload) ? undefined : payload)
-                    console.log("data", data)
                     setErrorList(data.data)
                     setTotal(data.total)
                 }
