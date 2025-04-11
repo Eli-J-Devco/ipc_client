@@ -14,7 +14,7 @@ function Error() {
         columns,
         isModalOpen,
         isExpand, handleIsExpand,
-        openModal, closeModal,
+        closeModal,
         errorList, setErrorList, 
         total, 
         setLimit, 
@@ -28,9 +28,16 @@ function Error() {
         errorComparisons,
         formSubmit, setFormSubmit,
         action,
+        pointList,
+        selectedTemplates,
         handleEditError,
         handleAddError,
         handleDeleteError,
+        handleDeviceGroupChange,
+        handleTemplateChange,
+        handlePointChange,
+        handleErrorLevelChange,
+        handleErrorTypeChange,
      } = useError();
 
     return (
@@ -38,6 +45,17 @@ function Error() {
             <Filter
                 isExpand={isExpand}
                 onExpand={handleIsExpand}
+                deviceGroups={deviceGroups}
+                templates={templates}
+                points={pointList}
+                errorLevels={errorLevels}
+                errorTypes={errorTypes}
+                selectedTemplates={selectedTemplates}
+                handleDeviceGroupChange={handleDeviceGroupChange}
+                handleTemplateChange={handleTemplateChange}
+                handlePointChange={handlePointChange}
+                handleErrorLevelChange={handleErrorLevelChange}
+                handleErrorTypeChange={handleErrorTypeChange}
             />
             <Table
                 variant="grey"

@@ -114,6 +114,7 @@ const Constants = {
     },
     POINT: {
       LIST: "/point/get/",
+      LIST_V2: "/point/get/all/",
       ADD: "/point/add/",
       UPDATE: "/point/update/",
       DELETE: "/point/delete/",

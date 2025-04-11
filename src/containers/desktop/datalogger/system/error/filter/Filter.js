@@ -8,8 +8,24 @@ import { ReactComponent as DoubleArrow } from "../../../../../../assets/images/d
 import FormInput from "../../../../../../components/formInput/FormInput";
 import ButtonGroup from "../../../../../../components/buttonGroup/ButtonGroup";
 import DatePickerButton from "../../../../../../components/datePickerButton/DatePickerButton";
+import useFilter from "./useFilter";
 
-function Filter({ isExpand, onExpand }) {
+
+function Filter({ 
+    isExpand, 
+    onExpand, 
+    deviceGroups, 
+    templates,
+    points,
+    errorLevels,
+    errorTypes,
+    selectedTemplates,
+    handleDeviceGroupChange,
+    handleTemplateChange,
+    handlePointChange,
+    handleErrorLevelChange,
+    handleErrorTypeChange,
+}) {
     return (
         <div className={styles.filter}>
             <div className={styles.utils}>
@@ -59,17 +75,20 @@ function Filter({ isExpand, onExpand }) {
                                         </legend>
 
                                         <FormInput.Check
-                                            name="all_devices"
+                                            name="device_group"
                                             label="All"
+                                            value="all"
                                             className="fw-bold"
+                                            onChange={handleDeviceGroupChange}
                                         />
-
                                         {
-                                            Array.from({ length: 20 }, (item, index) => `Inverter ${index + 1}`).map(item => (
+                                            deviceGroups.map(item => (
                                                 <FormInput.Check
-                                                    key={item}
-                                                    name={item}
-                                                    label={item}
+                                                    key={item.id}
+                                                    name="device_group"
+                                                    label={item.name}
+                                                    value={item.id}
+                                                    onChange={handleDeviceGroupChange}
                                                 />
                                             ))
                                         }
@@ -79,27 +98,31 @@ function Filter({ isExpand, onExpand }) {
                                 <div className="col-7 px-3">
                                     <fieldset className={`${styles.fieldset} ${styles.others} ${styles.top}`}>
                                         <legend className={styles.legend}>
-                                            Error Level
+                                            Template
                                         </legend>
 
                                         <div className="row">
                                             <div className="col-3">
                                                 <FormInput.Check
-                                                    name="all_error_level"
+                                                    name="template"
                                                     label="All"
+                                                    value="all"
                                                     className="fw-bold"
+                                                    onChange={handleTemplateChange}
                                                 />
                                             </div>
 
                                             {
-                                                ["DEBUG", "ERROR", "FATAL", "INFO", "WARNING", "PRODUCTION", "COM"].map(item => (
+                                                templates.map(item => (
                                                     <div
-                                                        key={item}
+                                                        key={item.id}
                                                         className="col-3"
                                                     >
                                                         <FormInput.Check
-                                                            name={item}
-                                                            label={item}
+                                                            name="template"
+                                                            label={item.name}
+                                                            value={item.id}
+                                                            onChange={handleTemplateChange}
                                                         />
                                                     </div>
                                                 ))
@@ -109,27 +132,31 @@ function Filter({ isExpand, onExpand }) {
                                     
                                     <fieldset className={`${styles.fieldset} ${styles.others}`}>
                                         <legend className={styles.legend}>
-                                            Device Categorize
+                                            Error Level
                                         </legend>
 
                                         <div className="row">
                                             <div className="col-3">
                                                 <FormInput.Check
-                                                    name="all_device_categorize"
+                                                    name="error_level"
                                                     label="All"
+                                                    value="all"
                                                     className="fw-bold"
+                                                    onChange={handleErrorLevelChange}
                                                 />
                                             </div>
 
                                         {
-                                            ["Production Meter", "Solar Tracker", "Weather Station", "Datalogger", "Sensor", "Load Meter", "Consumption Meter", "Cell Modem", "PV System Inverter"].map(item => (
+                                            errorLevels.map(item => (
                                                 <div
-                                                    key={item}
+                                                    key={item.id}
                                                     className="col-3"
                                                 >
                                                     <FormInput.Check
-                                                        name={item}
-                                                        label={item}
+                                                        name="error_level"
+                                                        label={item.name}
+                                                        value={item.id}
+                                                        onChange={handleErrorLevelChange}
                                                     />
                                                 </div>
                                             ))
@@ -139,29 +166,33 @@ function Filter({ isExpand, onExpand }) {
                                 </div>
 
                                 <div className="col-3 px-0">
-                                    <fieldset className={`${styles.fieldset} ${styles.others} ${styles.top}`}>
+                                    <fieldset disabled={selectedTemplates.length === 0} className={`${styles.fieldset} ${styles.others} ${styles.top}`}>
                                         <legend className={styles.legend}>
-                                            Status
+                                            Point
                                         </legend>
 
                                         <div className="row">
                                             <div className="col-6">
                                                 <FormInput.Check
-                                                    name="all_status"
+                                                    name="point"
                                                     label="All"
+                                                    value="all"
                                                     className="fw-bold"
+                                                    onChange={handlePointChange}
                                                 />
                                             </div>
 
                                         {
-                                            ["Closed", "Opened"].map(item => (
+                                            points.map(item => (
                                                 <div
-                                                    key={item}
+                                                    key={item.id}
                                                     className="col-6"
                                                 >
                                                     <FormInput.Check
-                                                        name={item}
-                                                        label={item}
+                                                        name="point"
+                                                        label={item.name}
+                                                        value={item.id}
+                                                        onChange={handlePointChange}
                                                     />
                                                 </div>
                                             ))
@@ -177,21 +208,25 @@ function Filter({ isExpand, onExpand }) {
                                         <div className="row">
                                             <div className="col-6">
                                                 <FormInput.Check
-                                                    name="all_error_type"
+                                                    name="error_type"
                                                     label="All"
+                                                    value="all"
                                                     className="fw-bold"
+                                                    onChange={handleErrorTypeChange}
                                                 />
                                             </div>
 
                                         {
-                                            ["Zero Generation", "String Performance", "Device Fault", "Performance Index", "System Disconnect"].map(item => (
+                                            errorTypes.map(item => (
                                                 <div
-                                                    key={item}
+                                                    key={item.id}
                                                     className="col-6"
                                                 >
                                                     <FormInput.Check
-                                                        name={item}
-                                                        label={item}
+                                                        name="error_type"
+                                                        label={item.name}
+                                                        value={item.id}
+                                                        onChange={handleErrorTypeChange}
                                                     />
                                                 </div>
                                             ))
